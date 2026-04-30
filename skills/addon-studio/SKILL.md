@@ -34,9 +34,11 @@ Aplicada a tabelas e entities criadas pelo addon:
 | Injecao Guice (`@Component`, `@CustomModule`, `Multibinder`, `@Singleton`, `Provider<T>`) | `instructions/dependency-injection-instructions.md` |
 | MapStruct (`@Mapper`, `componentModel=jakarta`, `injectionStrategy=CONSTRUCTOR`, padrao create/merge) | `instructions/mapstruct-instructions.md` |
 | Testes (JUnit 5 + Mockito 4.11, mock estatico, `JapeRepository` quirks) | `instructions/test-instructions.md`              |
+| Encoding de arquivos (ISO-8859-1 obrigatorio em `.java`, `.xml`, `.kt`) | `instructions/encoding-instructions.md`          |
 
 ## Regras universais (validas em qualquer arquivo)
 
+- **Encoding ISO-8859-1 obrigatorio.** Todo `.java`, `.xml` e `.kt` deve ser salvo em Latin-1. LLMs geram UTF-8 — converter com `iconv` apos criar/editar. Ver `instructions/encoding-instructions.md`.
 - **Java 8 estrito.** Sem `var`, `List.of`, `Map.of`, `String.isBlank`, `Files.readString`, `Optional.ifPresentOrElse`, records, sealed classes, text blocks.
 - **Lombok extensivo:** `@Data`, `@Builder`, `@AllArgsConstructor`, `@NoArgsConstructor`, `@Log`.
 - **Logging:** `@Log` Lombok + `java.util.logging`. Nunca SLF4J. Nunca `System.out`.

@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "statusMessage": "Convertendo encoding para ISO-8859-1...",
+            "command": "FILE=$(jq -r '.tool_input.file_path // .tool_response.filePath' 2>/dev/null); case \"$FILE\" in *.java|*.xml|*.kt) if command -v iconv > /dev/null 2>&1; then iconv -f UTF-8 -t ISO-8859-1 \"$FILE\" -o \"$FILE.tmp\" && mv \"$FILE.tmp\" \"$FILE\"; else python3 -c \"import sys; p=sys.argv[1]; c=open(p,'r',encoding='utf-8',errors='ignore').read(); open(p,'w',encoding='iso-8859-1',errors='replace').write(c)\" \"$FILE\"; fi ;; esac 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}

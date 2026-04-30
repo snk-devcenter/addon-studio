@@ -1,6 +1,6 @@
 {
   "name": "addon-studio",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Skill Sankhya Addon Studio 2.0 — @JapeEntity, datadictionary, dbscripts, @Controller REST, @Repository (@Criteria/@NativeQuery), MapStruct, Guice DI, JUnit+Mockito, gradle deployAddon. Convencao TDC do setor DevCenter.",
   "author": {
     "name": "DevCenter Squad"

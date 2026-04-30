@@ -14,6 +14,7 @@ Stack e regras gerais de codigo Java em projetos Sankhya Addon Studio 2.0 (Wildf
 > - `mapstruct-instructions.md` — MapStruct
 > - `test-instructions.md` — JUnit + Mockito
 > - `build-instructions.md` — Build / deploy
+- `encoding-instructions.md` — Encoding ISO-8859-1 (`.java`, `.xml`, `.kt`)
 
 ---
 
