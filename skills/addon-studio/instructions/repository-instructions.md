@@ -173,14 +173,20 @@ Page<Veiculo> pagina = repository.findByAtivoPaginado(true, pageRequest);
 ### 3.5 Funções SQL e Macros Sankhya
 
 ```java
-// Função UPPER
-@Criteria(clause = "UPPER(this.NOMEPARC) = UPPER(:nome)")
-List<Nota> findByNomeParceiroCaseInsensitive(String nome);
-
-// Macro dbDate()
+// Macro dbDate() — data/hora atual do banco (portatil Oracle/MSSQL)
 @Criteria(clause = "this.DTMOV = dbDate()")
 List<Movimentacao> findByDataAtual();
+
+// Macro ignorecase() — busca tolerante a case e acentos
+@Criteria(clause = "ignorecase(this.NOMEPARC) = ignorecase(:nome)")
+List<Nota> findByNomeParceiro(@Parameter("nome") String nome);
+
+// Macro nullValue() — substitui null por padrao (NVL/ISNULL portatil)
+@NativeQuery("SELECT nullValue(VLRDESCONTO, 0) FROM TGFCAB WHERE NUNOTA = :nu")
+BigDecimal descontoOuZero(@Parameter("nu") Long nu);
 ```
+
+> Macros traduzem automaticamente entre Oracle e MSSQL. Lista completa (datas, texto, conversoes, agregacoes): ver `macros-instructions.md`. **Sempre prefira macro a sintaxe especifica de banco** (`SYSDATE`, `NVL`, `||`, `ROWNUM`, etc.).
 
 ---
 
@@ -426,15 +432,15 @@ public class PedidoService {
 
 ### Criando um repositório novo
 
-1. — Interface Java em local apropriado da arquitetura do projeto.
-2. — Extends `JapeRepository<TipoID, TipoEntidade>` (ID primeiro, entidade depois).
-3. — Anotada com `@Repository` de `br.com.sankhya.studio.stereotypes`.
-4. — Métodos `@Criteria` com prefixo `this.` em todos campos da clause.
-5. — Nomes de params do método batem com `:placeholders` da clause.
-6. — `@NativeQuery.Result` como interface publica em arquivo proprio (não interface interna do repository).
-7. — `@Modifying` sempre com `@Transactional` no serviço chamador.
-8. — Queries complexas em arquivo externo com `fromFile = true`.
-9. — `Optional<T>` para métodos que podem não encontrar resultado.
+1. [ ] Interface Java em local apropriado da arquitetura do projeto.
+2. [ ] Extends `JapeRepository<TipoID, TipoEntidade>` (ID primeiro, entidade depois).
+3. [ ] Anotada com `@Repository` de `br.com.sankhya.studio.stereotypes`.
+4. [ ] Métodos `@Criteria` com prefixo `this.` em todos campos da clause.
+5. [ ] Nomes de params do método batem com `:placeholders` da clause.
+6. [ ] `@NativeQuery.Result` como interface publica em arquivo proprio (não interface interna do repository).
+7. [ ] `@Modifying` sempre com `@Transactional` no serviço chamador.
+8. [ ] Queries complexas em arquivo externo com `fromFile = true`.
+9. [ ] `Optional<T>` para métodos que podem não encontrar resultado.
 
 ### Erros comuns
 

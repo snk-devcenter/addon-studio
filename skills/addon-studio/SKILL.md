@@ -1,6 +1,6 @@
 ---
 name: addon-studio
-description: Use when working on Sankhya Addon Studio 2.0 projects. Covers @JapeEntity entities, datadictionary XML, dbscripts migrations, @Controller REST endpoints, @Repository with @Criteria/@NativeQuery, MapStruct mappers, Guice DI (@Component/@CustomModule), JUnit+Mockito tests with SDK quirks, and gradle deployAddon. Triggers on Java code with Sankhya annotations (@JapeEntity, @Repository, @Controller, @CustomModule, @Listener, @Callback), files in datadictionary/ or dbscripts/, gradle deployAddon usage, or any mention of Addon Studio / JapeRepository / serviceName SP.
+description: Use when working on Sankhya Addon Studio 2.0 projects. Covers @JapeEntity entities, datadictionary XML, dbscripts migrations, @Controller REST endpoints, @Repository with @Criteria/@NativeQuery, MapStruct mappers, Guice DI (@Component/@CustomModule), JUnit+Mockito tests with SDK quirks, @ActionButton with AcaoRotinaJava/@Form/ContextoAcao, @BusinessRule with Regra/ContextoRegra/barramento/liberacao, @Job with IJob/onSchedule/CRON scheduling, @GlobalTypeAdapter with TypeAdapter/JsonSerializer/JsonDeserializer, @Value with ValueType/Provider lazy-eager/SANKHYA_PARAM, @ControllerAdvice with @ExceptionHandler/auto-rollback, MacroTranslator SQL macros (dbDate/nullValue/ignorecase/truncMonth/etc.) for Oracle/MSSQL portability, and gradle deployAddon. Triggers on Java code with Sankhya annotations (@JapeEntity, @Repository, @Controller, @ControllerAdvice, @ExceptionHandler, @CustomModule, @Listener, @Callback, @ActionButton, @BusinessRule, @Job, @GlobalTypeAdapter, @Value, AcaoRotinaJava, Regra, IJob, TypeAdapter, ValueType), files in datadictionary/ or dbscripts/ or queries/, gradle deployAddon usage, SQL macros (dbDate, nullValue, ignorecase, normalizeText, truncMonth, yearMonth, addMonths, etc.), or any mention of Addon Studio / JapeRepository / serviceName SP / botao de acao / regra de negocio / job agendado / adaptador de tipo / injecao de valor / tratamento global de excecao / macros SQL / MacroTranslator.
 ---
 
 # Sankhya Addon Studio 2.0
@@ -30,11 +30,18 @@ Aplicada a tabelas e entities criadas pelo addon:
 | XML do dicionario de dados (`datadictionary/<TABELA>.xml`)            | `instructions/datadictionary-instructions.md`      |
 | Scripts de banco (`dbscripts/V<NNN>-*.xml`, dual mssql/oracle)        | `instructions/database-instructions.md`            |
 | Repository (`@Repository`, `@Criteria`, `@NativeQuery`, `@Modifying`) | `instructions/repository-instructions.md`          |
-| Controller REST (`@Controller`, `serviceName SP`, `@Transactional`, DTO, `@ControllerAdvice`) | `instructions/controller-instructions.md` |
+| Controller REST (`@Controller`, `serviceName SP`, `@Transactional`, DTO, `@Valid`, protocolo HTTP)   | `instructions/controller-instructions.md` |
 | Injecao Guice (`@Component`, `@CustomModule`, `Multibinder`, `@Singleton`, `Provider<T>`) | `instructions/dependency-injection-instructions.md` |
 | MapStruct (`@Mapper`, `componentModel=jakarta`, `injectionStrategy=CONSTRUCTOR`, padrao create/merge) | `instructions/mapstruct-instructions.md` |
 | Testes (JUnit 5 + Mockito 4.11, mock estatico, `JapeRepository` quirks) | `instructions/test-instructions.md`              |
 | Encoding de arquivos (ISO-8859-1 obrigatorio em `.java`, `.xml`, `.kt`) | `instructions/encoding-instructions.md`          |
+| Botao de acao (`@ActionButton`, `AcaoRotinaJava`, `@Form`, `ContextoAcao`)  | `instructions/actionbutton-instructions.md`      |
+| Regra de negocio (`@BusinessRule`, interface `Regra`, `ContextoRegra`, barramento, liberacao de limite) | `instructions/businessrule-instructions.md` |
+| Jobs agendados (`@Job`, interface `IJob`, `onSchedule`, `getScheduleConfigHook`, CRON, migracao XML)    | `instructions/job-instructions.md`          |
+| Adaptadores de tipo (`@GlobalTypeAdapter`, `TypeAdapter`, `JsonSerializer`, `JsonDeserializer`, nativos) | `instructions/typeadapter-instructions.md`  |
+| Injecao de valores (`@Value`, `ValueType`, `Provider<T>` lazy/eager, `SANKHYA_PARAM`, `group`)           | `instructions/value-instructions.md`        |
+| Tratamento global de excecoes (`@ControllerAdvice`, `@ExceptionHandler`, rollback automatico, DTO de erro) | `instructions/controlleradvice-instructions.md` |
+| Macros SQL Sankhya (`dbDate`, `nullValue`, `ignorecase`, `truncMonth`, etc. — portabilidade Oracle/MSSQL)  | `instructions/macros-instructions.md`           |
 
 ## Regras universais (validas em qualquer arquivo)
 

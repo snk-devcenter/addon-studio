@@ -116,7 +116,7 @@ public class IntegrationApiException extends RuntimeException {
 }
 ```
 
-Tratamento centralizado de excecoes em controllers via `@ControllerAdvice` — ver `controller-instructions.md`.
+Tratamento centralizado de excecoes em controllers via `@ControllerAdvice` — ver `controlleradvice-instructions.md`.
 
 ---
 

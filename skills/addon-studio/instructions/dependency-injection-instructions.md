@@ -2,7 +2,7 @@
 applyTo: "**/*.java"
 ---
 
-# Injeção de Dependência (Guice) ? Addon Studio 2.0
+# Injeção de Dependência (Guice) — Addon Studio 2.0
 
 Addon Studio 2.0 usa **Google Guice** como container DI. Anotações estereótipo customizadas fazem auto-scan. Doc descreve regras, padrões, boas práticas DI.
 
@@ -39,8 +39,8 @@ Framework scaneia e registra classes com:
 
 | Anotação | Pacote | Gerenciamento | Uso |
 |:---------|:-------|:--------------|:----|
-| `@Controller` | `br.com.sankhya.studio.annotations` | **Automático** ? NÃO adicionar `@Component` | Entrypoints REST (equivale ao `@Service` EJB) |
-| `@Repository` | `br.com.sankhya.studio.stereotypes` | **Automático** ? NÃO adicionar `@Component` | Interfaces de acesso a dados (`JapeRepository`) |
+| `@Controller` | `br.com.sankhya.studio.annotations` | **Automático** — NÃO adicionar `@Component` | Entrypoints REST (equivale ao `@Service` EJB) |
+| `@Repository` | `br.com.sankhya.studio.stereotypes` | **Automático** — NÃO adicionar `@Component` | Interfaces de acesso a dados (`JapeRepository`) |
 | `@Component` | `br.com.sankhya.studio.stereotypes` | **Automático** | Classes gerais: Services, Services, Adapters, Gateways, Mappers auxiliares |
 | `@ControllerAdvice` | `br.com.sankhya.studio.web` | **Automático** | Tratamento global de exceções |
 | `@CustomModule` | `br.com.sankhya.studio.stereotypes` | **Automático** | Módulos Guice customizados (equivale a `AbstractModule`) |
@@ -48,18 +48,18 @@ Framework scaneia e registra classes com:
 ### Quando usar cada estereótipo
 
 ```
-@Controller      ? Entrypoints REST (serviceName obrigatório com sufixo "SP")
-@Repository      ? Interfaces JapeRepository (NÃO crie implementação manual)
-@Component       ? Todo o resto que precisa ser injetado
-@CustomModule    ? Módulos de configuração Guice (bindings manuais)
-@ControllerAdvice ? Handler global de exceções
+@Controller       -> Entrypoints REST (serviceName obrigatório com sufixo "SP")
+@Repository       -> Interfaces JapeRepository (NÃO crie implementação manual)
+@Component        -> Todo o resto que precisa ser injetado
+@CustomModule     -> Módulos de configuração Guice (bindings manuais)
+@ControllerAdvice -> Handler global de exceções
 ```
 
 ---
 
 ## 3. Classes por Estereótipo
 
-### 3.1 `@Controller` ? Entrypoints REST
+### 3.1 `@Controller` — Entrypoints REST
 
 ```java
 import br.com.sankhya.studio.annotations.Controller;
@@ -81,7 +81,7 @@ public class MeuController {
     }
 
     @Transactional
-    public ResponseEntity<MeuDTO> executar(MeuRequest request) {
+    public MeuDTO executar(MeuRequest request) {
         // ...
     }
 }
@@ -91,9 +91,10 @@ public class MeuController {
 - `serviceName` obrigatório, sufixo `"SP"`.
 - `transactionType` define tipo transação EJB (`Supports`, `Required`, etc.).
 - Métodos que alteram dados precisam `@Transactional`.
-- **NÃO** adicionar `@Component` ? `@Controller` já gerenciado pelo framework.
+- Retorno: DTO direto (ou `void`) — framework serializa em `responseBody`. Nunca `ResponseEntity` (Spring). Ver `controller-instructions.md`.
+- **NÃO** adicionar `@Component` — `@Controller` já gerenciado pelo framework.
 
-### 3.2 `@Repository` ? Interfaces de Acesso a Dados
+### 3.2 `@Repository` — Interfaces de Acesso a Dados
 
 ```java
 import br.com.sankhya.sdk.data.repository.JapeRepository;
@@ -101,17 +102,17 @@ import br.com.sankhya.studio.stereotypes.Repository;
 
 @Repository
 public interface MeuProdutoRepository extends JapeRepository<Integer, MeuProduto> {
-    // métodos declarativos ? o framework gera a implementação
+    // métodos declarativos — o framework gera a implementação
 }
 ```
 
 **Regras:**
 - Sempre **interface** (nunca classe concreta).
 - Estende `JapeRepository<PKType, EntityType>`.
-- **NÃO** adicionar `@Component` ? framework gera implementação e registra no Guice.
+- **NÃO** adicionar `@Component` — framework gera implementação e registra no Guice.
 - Injetável direto em qualquer `@Component` ou `@Controller`.
 
-### 3.3 `@Component` ? Classes Gerais
+### 3.3 `@Component` — Classes Gerais
 
 Pra qualquer classe injetável que não encaixa em `@Controller` ou `@Repository`.
 
@@ -147,33 +148,11 @@ public class ImportarProdutoService {
 }
 ```
 
-### 3.4 `@ControllerAdvice` ? Tratamento Global de Exceções
+### 3.4 `@ControllerAdvice` — Tratamento Global de Exceções
 
-```java
-import br.com.sankhya.studio.web.ControllerAdvice;
-import br.com.sankhya.studio.web.ExceptionHandler;
+Tratamento centralizado de exceções vindas dos `@Controller`/`@Service`. Auto-gerenciado — não adicionar `@Component`.
 
-@Log
-@ControllerAdvice
-public class RestExceptionHandler {
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<String> handleNotFound(EntityNotFoundException e) {
-        log.log(Level.INFO, "Entidade nao encontrada: {0}", e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleBadRequest(IllegalArgumentException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-}
-```
-
-**Regras:**
-- Um por projeto (centraliza tratamento exceções).
-- Cada método trata exceção específica com `@ExceptionHandler`.
-- Dispensa `@Component`.
+> Ver `controlleradvice-instructions.md` para anatomia completa, regras críticas (handler nunca retorna `void`, múltiplas exceções por handler, rollback automático, proibição de `Exception.class`) e níveis de log.
 
 ---
 
@@ -181,7 +160,7 @@ public class RestExceptionHandler {
 
 Quando auto-scan insuficiente (bindings manuais, `Multibinder`, `@Provides`), crie módulo Guice com `@CustomModule`.
 
-### 4.1 Multibinder ? Strategy Pattern
+### 4.1 Multibinder — Strategy Pattern
 
 Registra múltiplas implementações de interface pra resolução dinâmica runtime.
 
@@ -228,7 +207,7 @@ public class IntegrationPlatformResolver {
 }
 ```
 
-### 4.2 `@Provides` ? Factory Methods
+### 4.2 `@Provides` — Factory Methods
 
 Pra criar instâncias com configuração especial (ex: clientes HTTP).
 
@@ -299,7 +278,7 @@ public class RetrofitCallExecutor {
 
 ---
 
-## 6. `Provider<T>` ? Injeção Lazy / Circular
+## 6. `Provider<T>` — Injeção Lazy / Circular
 
 Em dependência circular ou resolução lazy, injete `Provider<T>` em vez de `T`.
 
@@ -426,7 +405,7 @@ public class DynamicProdutoGateway implements ProdutoGateway {
 }
 ```
 
-> Guice resolve `ProdutoGateway` ? `DynamicProdutoGateway` automático porque `DynamicProdutoGateway` é `@Component` e implementa interface.
+> Guice resolve `ProdutoGateway` -> `DynamicProdutoGateway` automático porque `DynamicProdutoGateway` é `@Component` e implementa interface.
 
 ---
 
@@ -434,25 +413,25 @@ public class DynamicProdutoGateway implements ProdutoGateway {
 
 ### Nova classe injetável
 
-1. ? Identificar estereótipo correto (`@Controller`, `@Repository`, `@Component`).
-2. ? Usar `@Inject` de `com.google.inject.Inject` no construtor.
-3. ? Declarar deps `private final`, inicializar no construtor.
-4. ? **NÃO** usar `new` pra criar deps ? sempre injetar.
-5. ? **NÃO** misturar estereótipos (ex: `@Component` + `@Controller`).
+1. [ ] Identificar estereótipo correto (`@Controller`, `@Repository`, `@Component`).
+2. [ ] Usar `@Inject` de `com.google.inject.Inject` no construtor.
+3. [ ] Declarar deps `private final`, inicializar no construtor.
+4. [ ] **NÃO** usar `new` pra criar deps — sempre injetar.
+5. [ ] **NÃO** misturar estereótipos (ex: `@Component` + `@Controller`).
 
 ### Novo módulo customizado
 
-1. ? Criar classe que estende `AbstractModule`.
-2. ? Anotar com `@CustomModule`.
-3. ? Usar `Multibinder` pra Strategy Pattern.
-4. ? Usar `@Provides @Singleton` pra factories.
-5. ? Colocar em `config/`.
+1. [ ] Criar classe que estende `AbstractModule`.
+2. [ ] Anotar com `@CustomModule`.
+3. [ ] Usar `Multibinder` pra Strategy Pattern.
+4. [ ] Usar `@Provides @Singleton` pra factories.
+5. [ ] Colocar conforme arquitetura do projeto.
 
 ### Novo interceptor ou singleton
 
-1. ? Anotar com `@Singleton`.
-2. ? Dep circular? Usar `Provider<T>`.
-3. ? Não é `@Component`? Garantir registro em algum `@CustomModule`.
+1. [ ] Anotar com `@Singleton`.
+2. [ ] Dep circular? Usar `Provider<T>`.
+3. [ ] Não é `@Component`? Garantir registro em algum `@CustomModule`.
 
 ---
 
@@ -463,7 +442,7 @@ public class DynamicProdutoGateway implements ProdutoGateway {
 | Usar `javax.inject.Inject` | Sempre `com.google.inject.Inject`. |
 | Adicionar `@Component` em `@Controller` | `@Controller` já gerenciado. Remove `@Component`. |
 | Adicionar `@Component` em `@Repository` | `@Repository` já gerenciado. Remove `@Component`. |
-| Criar implementação manual de Repository | Use interface `JapeRepository` ? framework gera implementação. |
+| Criar implementação manual de Repository | Use interface `JapeRepository` — framework gera implementação. |
 | Usar `new` pra instanciar dep | Injete via construtor. Guice resolve automático. |
 | Dep circular com `@Singleton` | Use `Provider<T>` pra quebrar ciclo. |
 | Classe sem estereótipo que precisa injeção | Adicione `@Component` ou registre em `@CustomModule`. |

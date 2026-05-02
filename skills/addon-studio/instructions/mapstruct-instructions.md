@@ -403,11 +403,10 @@ public class MeuController {
     }
 
     @Transactional
-    public ResponseEntity<MeuResponse> executar(MeuRequest request) {
+    public MeuResponse executar(MeuRequest request) {
         MeuDomainObj domain = mapper.toDomain(request);
         // ... logica ...
-        MeuResponse response = mapper.toResponse(domain);
-        return ResponseEntity.ok(response);
+        return mapper.toResponse(domain);
     }
 }
 ```

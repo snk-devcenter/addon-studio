@@ -221,13 +221,15 @@ Expressoes calculadas. CDATA pra BeanShell.
 </field>
 ```
 
-**Expressoes comuns:**
+**Variaveis de contexto BeanShell (em `<expression>` BeanShell):**
 
 | Expressao             | Uso                          |
 |:----------------------|:-----------------------------|
 | `$ctx_usuario_logado` | Codigo usuario logado     |
 | `$ctx_dh_atual`       | Data/hora atual servidor  |
 | `$col_<COLUNA>`       | Valor atual coluna        |
+
+> Quando `<expression>` contiver **SQL** (nao BeanShell), use as **macros SQL Sankhya** (`dbDate()`, `nullValue()`, `truncMonth()`, etc.) para portabilidade Oracle/MSSQL. Ver `macros-instructions.md`.
 
 ### Sub-tag `<fieldOptions>` (opcional)
 
@@ -603,12 +605,12 @@ XML ja existe e precisa criar/recriar entidade Java.
 ## 3.1 Fluxo de Criacao
 
 ```
-XML do Dicionario ? Entidade Java (@JapeEntity) limpa
+XML do Dicionario -> Entidade Java (@JapeEntity) limpa
 ```
 
 ---
 
-## 3.2 Mapeamento Tag raiz ? `@JapeEntity`
+## 3.2 Mapeamento Tag raiz -> `@JapeEntity`
 
 | Tag XML         | Java                                                                      |
 |:----------------|:--------------------------------------------------------------------------|
@@ -617,7 +619,7 @@ XML do Dicionario ? Entidade Java (@JapeEntity) limpa
 
 ---
 
-## 3.3 Mapeamento PK ? `@Id`
+## 3.3 Mapeamento PK -> `@Id`
 
 | XML                                    | Java                                                    |
 |:---------------------------------------|:--------------------------------------------------------|
@@ -673,7 +675,7 @@ private TdcXyzEntidadeId embeddedId;
 
 ---
 
-## 3.4 Mapeamento `<field>` ? `@Column`
+## 3.4 Mapeamento `<field>` -> `@Column`
 
 Pra **cada** `<field>` no XML, cria campo Java com **so** `@Column(name = "<nome>")`.
 
@@ -696,7 +698,7 @@ Pra **cada** `<field>` no XML, cria campo Java com **so** `@Column(name = "<nome
 
 ---
 
-## 3.5 Mapeamento `<relationShip>` ? `@OneToMany`
+## 3.5 Mapeamento `<relationShip>` -> `@OneToMany`
 
 Pra cada `<relation>` dentro `<relationShip>`, cria campo `@OneToMany`:
 
@@ -725,7 +727,7 @@ private List<TdcXyzVinculoProduto> vinculos;
 
 ---
 
-## 3.6 Mapeamento PESQUISA com navegacao ? `@OneToOne` + `@JoinColumn`
+## 3.6 Mapeamento PESQUISA com navegacao -> `@OneToOne` + `@JoinColumn`
 
 Dominio precisa navegar pra outra entidade (ex: acessar campos Parceiro)? Adiciona `@OneToOne` + `@JoinColumn`:
 
@@ -805,7 +807,7 @@ Toda entidade tem Lombok minimo:
 
 ---
 
-## 3.9 Exemplo Completo: XML ? Java
+## 3.9 Exemplo Completo: XML -> Java
 
 **XML (`TDCXYZCFG.xml`):**
 
@@ -895,7 +897,7 @@ public class TdcXyzConfiguracao {
 12. [ ] Usar `dataType="PESQUISA"` + `targetInstance`/`targetField`/`targetType` pra lookups.
 13. [ ] `<description>` preenchida em todos `<field>` (nao vazia), sem acentos.
 
-13. [ ] Descricoes sem acentos.
+## 4.2 Checklist: Gerando XML a partir de entidade Java existente
 
 1. [ ] Seguir checklist 4.1 mapeando `@Column` -> `<field>`.
 2. [ ] Pos-gerar XML, limpar entidade Java (secao 2.5).

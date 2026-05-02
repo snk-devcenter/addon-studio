@@ -10,6 +10,7 @@ applyTo: "**/*Controller.java"
 > - `backend-instructions.md` — Stack + camadas
 > - `dependency-injection-instructions.md` — Injecao de dependencia (Guice)
 > - `mapstruct-instructions.md` — Mapeamento de objetos (MapStruct)
+> - `controlleradvice-instructions.md` — Tratamento global de excecoes
 
 ---
 
@@ -306,58 +307,9 @@ Framework serializa auto objeto retornado em `responseBody` da response.
 
 ## 7. Tratamento Global de Excecoes (`@ControllerAdvice`)
 
-Tratamento excecoes centralizado em classe `@ControllerAdvice` (um por projeto).
+Excecoes lancadas em metodos do controller devem ser tratadas em classe `@ControllerAdvice` separada. **Nunca** capturar excecao no proprio controller — deixar propagar.
 
-```java
-import br.com.sankhya.studio.web.ControllerAdvice;
-import br.com.sankhya.studio.web.ExceptionHandler;
-import lombok.extern.java.Log;
-import java.util.logging.Level;
-
-@Log
-@ControllerAdvice
-public class RestExceptionHandler {
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    public void handleNotFound(EntityNotFoundException e) {
-        log.log(Level.INFO, "Entidade nao encontrada: {0}", e.getMessage());
-        throw e;
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public void handleBadRequest(IllegalArgumentException e) {
-        log.log(Level.WARNING, "Argumento invalido: {0}", e.getMessage());
-        throw e;
-    }
-
-    @ExceptionHandler(Exception.class)
-    public void handleGeneric(Exception e) {
-        log.log(Level.SEVERE, "Erro inesperado: {0}", e.getMessage());
-        throw new RuntimeException(e);
-    }
-}
-```
-
-**Regras:**
-- Um `@ControllerAdvice` por projeto.
-- Cada `@ExceptionHandler` trata **um tipo** excecao.
-- Ordenar do mais especifico ao mais generico (framework prioriza especifico).
-- Logar excecao com nivel adequado (`INFO`, `WARNING`, `SEVERE`).
-- **Nunca** capturar excecao negocio no controller — deixe `@ControllerAdvice` tratar.
-
-### Mapeamento Excecao — nivel de log sugerido
-
-| Excecao | Level de Log |
-|:--------|:-------------|
-| `EntityNotFoundException` | `INFO` |
-| `IllegalArgumentException` | `WARNING` |
-| `DomainValidationException` | `WARNING` |
-| `IntegrationImportException` | `WARNING` |
-| `IntegrationExportException` | `WARNING` |
-| `IntegrationApiException` | `WARNING` |
-| `IntegrationNetworkException` | `WARNING` |
-| `RuntimeException` | `SEVERE` |
-| `Exception` | `SEVERE` |
+> Ver `controlleradvice-instructions.md` para regras criticas (handler nao pode retornar `void`, multiplas excecoes por handler, rollback automatico, proibicao de `Exception.class`) e niveis de log sugeridos.
 
 ---
 

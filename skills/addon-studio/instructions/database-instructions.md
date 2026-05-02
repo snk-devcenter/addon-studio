@@ -329,8 +329,8 @@ Tabelas nativas Sankhya (tag `<nativeTable>` no dicionário) **NÃO têm CREATE 
 
 | Tipo de campo no dicionário                            | Script necessário?          | Motivo                         |
 |:-------------------------------------------------------|:----------------------------|:-------------------------------|
-| Campo nativo (ex: `CODPARC`, `NUNOTA`)                 | ? **Não**                   | Já existe tabela Sankhya       |
-| Campo customizado (ex: `XYZ_STATUS`, `XYZ_CODRECEITA`) | ? **Sim** — ALTER TABLE ADD | Adicionado pelo add-on         |
+| Campo nativo (ex: `CODPARC`, `NUNOTA`)                 | **Não**                   | Já existe tabela Sankhya       |
+| Campo customizado (ex: `XYZ_STATUS`, `XYZ_CODRECEITA`) | **Sim** — ALTER TABLE ADD | Adicionado pelo add-on         |
 
 > Convenção: prefixo addon + `_` (ex: `XYZ_`) em campos customizados para identificação fácil.
 
@@ -369,12 +369,12 @@ Tabelas nativas Sankhya (tag `<nativeTable>` no dicionário) **NÃO têm CREATE 
 
 ---
 
-### Relação Dicionário de Dados ? Scripts
+### Relação Dicionário de Dados -> Scripts
 
 | Tag no dicionário | CREATE TABLE?                    | ALTER TABLE para colunas?                           | Observação                |
 |:------------------|:---------------------------------|:----------------------------------------------------|:--------------------------|
-| `<table>`         | ? Sim (somente PKs + constraint) | ? Sim (cada coluna não-PK individualmente)          | Tabela criada pelo add-on |
-| `<nativeTable>`   | ? Não                            | ? Somente colunas com prefixo do addon (ex: `XYZ_`) | Tabela nativa Sankhya     |
+| `<table>`         | Sim (somente PKs + constraint) | Sim (cada coluna não-PK individualmente)          | Tabela criada pelo add-on |
+| `<nativeTable>`   | Não                            | Somente colunas com prefixo do addon (ex: `XYZ_`) | Tabela nativa Sankhya     |
 
 ---
 
@@ -401,7 +401,7 @@ Tabelas nativas Sankhya (tag `<nativeTable>` no dicionário) **NÃO têm CREATE 
 
 ---
 
-## Mapeamento Dicionário de Dados ? Tipos de Banco (Referência)
+## Mapeamento Dicionário de Dados -> Tipos de Banco (Referência)
 
 | `dataType` no dicionário          | Oracle                  | SQL Server              | Observação                           |
 |:----------------------------------|:------------------------|:------------------------|:-------------------------------------|
@@ -410,11 +410,11 @@ Tabelas nativas Sankhya (tag `<nativeTable>` no dicionário) **NÃO têm CREATE 
 | `DECIMAL` (com `nuCasasDecimais`) | `NUMBER(18,<N>)`        | `DECIMAL(18,<N>)`       |                                      |
 | `DATA_HORA` ou `DATA`             | `DATE`                  | `DATETIME`              |                                      |
 | `CHECKBOX`                        | `CHAR(1)`               | `CHAR(1)`               |                                      |
-| `PESQUISA`                        | Depende do `targetType` | Depende do `targetType` | Ex: `INTEIRO` ? `NUMBER(10)` / `INT` |
+| `PESQUISA`                        | Depende do `targetType` | Depende do `targetType` | Ex: `INTEIRO` -> `NUMBER(10)` / `INT` |
 
-### Mapeamento Banco ? Tipo do Dicionário (inverso)
+### Mapeamento Banco -> Tipo do Dicionário (inverso)
 
-| Oracle         | SQL Server                  | ? Tipo Dicionário          | Condição                   |
+| Oracle         | SQL Server                  | Tipo Dicionário          | Condição                   |
 |:---------------|:----------------------------|:---------------------------|:---------------------------|
 | `NUMBER(10)`   | `INT`                       | `INTEIRO`                  | Sem FK                     |
 | `NUMBER(10)`   | `INT`                       | `PESQUISA`                 | Com relacionamento (FK)    |
@@ -432,14 +432,14 @@ Tabelas nativas Sankhya (tag `<nativeTable>` no dicionário) **NÃO têm CREATE 
 ### 1. Omitir uma das tags de banco
 
 ```xml
-<!-- ERRADO ? falta <mssql> -->
+<!-- ERRADO — falta <mssql> -->
 <sql ...>
 <oracle>
 CREATE TABLE TABELA (CODCAD NUMBER(10) NOT NULL, CONSTRAINT PK_TABELA PRIMARY KEY (CODCAD))
 </oracle>
     </sql>
 
-    <!-- CORRETO ? ambas as tags presentes -->
+    <!-- CORRETO — ambas as tags presentes -->
 <sql ...>
 <mssql>
 CREATE TABLE TABELA (CODCAD INT NOT NULL, CONSTRAINT PK_TABELA PRIMARY KEY (CODCAD))
@@ -469,7 +469,7 @@ CREATE TABLE TABELA (CODCAD NUMBER(10) NOT NULL, CONSTRAINT PK_TABELA PRIMARY KE
 ### 3. CREATE TABLE com todas as colunas
 
 ```xml
-<!-- ERRADO ? todas as colunas no CREATE TABLE -->
+<!-- ERRADO — todas as colunas no CREATE TABLE -->
 <oracle>
     CREATE TABLE TDCXYZCAD (
     CODCAD NUMBER(10) NOT NULL,
@@ -684,7 +684,7 @@ V003-ALTER_TABLE_TGFCAB.xml
 </scripts>
 ```
 
-### V002-CREATE_TABLE_TDCXYZFAT.xml ? Tabela com PK composta
+### V002-CREATE_TABLE_TDCXYZFAT.xml — Tabela com PK composta
 
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1"?>
@@ -737,7 +737,7 @@ V003-ALTER_TABLE_TGFCAB.xml
 </scripts>
 ```
 
-### V003-ALTER_TABLE_TGFCAB.xml ? Tabela nativa (somente colunas customizadas)
+### V003-ALTER_TABLE_TGFCAB.xml — Tabela nativa (somente colunas customizadas)
 
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1"?>
@@ -769,7 +769,7 @@ V003-ALTER_TABLE_TGFCAB.xml
 </scripts>
 ```
 
-### v_insert_config.xml ? Dados de configuração
+### v_insert_config.xml — Dados de configuração
 
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1"?>
