@@ -16,7 +16,7 @@ Entidade Java = representação domínio de tabela banco. **Limpa** — contém 
 |:-----------------------------------------------------|:----------------------------------------------------------|
 | `@Column` só tem `name`                              | `@Column(name = "COLUNA")` — nenhum outro atributo.       |
 | `@JoinColumn` só tem `name` e `referencedColumnName` | `@JoinColumn(name = "...", referencedColumnName = "...")` |
-| `@JapeEntity` só tem `entity` e `table`              | `@JapeEntity(entity = "...", table = "...")`              |
+| `@JapeEntity` tem `entity`, `table` e `isNativeTable` | Addon: `@JapeEntity(entity = "...", table = "...")`. Tabela nativa Sankhya: obrigatorio adicionar `isNativeTable = true` (ex.: TGFCAB, TGFFIN, TGFORD, TGFVEI, TGFEMP, TGFPAR) |
 | Sem `@Expression`                                    | Expressões ficam no XML (`<expression>`).                 |
 | Sem `@GeneratedValue`                                | Sequência fica no XML (`sequenceType`/`sequenceField`).   |
 | Sem `@Option` / `@Property`                          | Opções ficam no XML (`<fieldOptions>`).                   |
@@ -47,6 +47,22 @@ Exemplo coerente:
 ```
 
 > Antes criar entidade nova, perguntar dev: (1) sigla modulo 3 caracteres, (2) contexto, (3) confirmar `entity` + `table`.
+
+### 1.2 Tabelas Nativas Sankhya (`isNativeTable = true`)
+
+Ao mapear uma tabela **nativa do Sankhya** e **obrigatorio** adicionar `isNativeTable = true`. Sem esse atributo o KSP rejeita a compilacao com erro de entidade duplicada.
+
+Tabelas nativas mais comuns: `TGFCAB`, `TGFFIN`, `TGFORD`, `TGFVEI`, `TGFEMP`, `TGFPAR`, `TGFPRO`, `TGFITE`.
+
+```java
+// Tabela do addon — sem isNativeTable
+@JapeEntity(entity = "TdcXyzCabecalho", table = "TDCXYZCAB")
+public class TdcXyzCabecalho { ... }
+
+// Tabela nativa Sankhya — isNativeTable OBRIGATORIO
+@JapeEntity(entity = "CabecalhoNota", table = "TGFCAB", isNativeTable = true)
+public class CabecalhoNota { ... }
+```
 
 ---
 
@@ -837,7 +853,7 @@ public class TdcXyzProduto {
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JapeEntity(entity = "CabecalhoNota", table = "TGFCAB")
+@JapeEntity(entity = "CabecalhoNota", table = "TGFCAB", isNativeTable = true)
 public class CabecalhoNota {
 
     @Id
@@ -936,7 +952,7 @@ public class ItemNotaId {
 1. [ ] Criar XML dicionário em `datadictionary/<TABELA>.xml` (ver `datadictionary-instructions.md`).
 2. [ ] Criar classe Java conforme arquitetura do projeto.
 3. [ ] Anotar com `@Data`, `@NoArgsConstructor`, `@AllArgsConstructor`.
-4. [ ] Anotar com `@JapeEntity(entity = "...", table = "...")` — só esses 2 atributos.
+4. [ ] Anotar com `@JapeEntity(entity = "...", table = "...")`. Ao mapear tabela nativa Sankhya (TGFCAB, TGFFIN, TGFORD, etc.), adicionar `isNativeTable = true`.
 5. [ ] Definir PK com `@Id` + `@Column(name)` (simples) ou `@Id` + classe `@Embeddable` (composta).
 6. [ ] Cada campo persistido com `@Column(name = "...")` — só `name`.
 7. [ ] Tipo Java correto para cada campo (ver tabela tipos).
@@ -968,7 +984,7 @@ public class ItemNotaId {
 | Colocar `description`, `dataType`, `size` no `@Column`  | Somente `name`. Metadata fica no XML.                     |
 | Colocar `@GeneratedValue` no `@Id`                      | Sequência fica no XML (`sequenceType`/`sequenceField`).   |
 | Colocar `@Expression` no campo                          | Expressões ficam no XML (`<expression>`).                 |
-| Colocar `isNativeTable`, `description` no `@JapeEntity` | Somente `entity` e `table`.                               |
+| Omitir `isNativeTable = true` em tabela nativa Sankhya  | Obrigatorio para TGFCAB, TGFFIN, TGFORD, TGFVEI, TGFEMP, TGFPAR — KSP rejeita sem ele com erro de entidade duplicada. |
 | Criar `@OneToOne` quando só precisa do valor da FK      | Use `@Column(name = "FK")` se não precisa navegar.        |
 | Esquecer de criar o XML do dicionário                   | Toda entidade **precisa** do XML correspondente.          |
 | Esquecer `@NoArgsConstructor`                           | Obrigatório para o framework instanciar a entidade.       |
