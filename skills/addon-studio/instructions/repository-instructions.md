@@ -31,13 +31,21 @@ public interface VeiculoRepository extends JapeRepository<Long, Veiculo> {
 
 ## 2. Métodos CRUD Padrão (Herdados)
 
-| Método                       | Descrição                                              |
-|:-----------------------------|:-------------------------------------------------------|
-| `save(T entity)`             | Salva ou atualiza entidade                             |
-| `findByPK(ID id)`            | Busca por PK → retorna `Optional<T>`                   |
-| `findAll()`                  | Retorna todas instâncias                               |
-| `findAll(Pageable pageable)` | Retorna página com ordenação → `Page<T>`               |
-| `delete(T entity)`           | Remove entidade do banco                               |
+| Método                       | Descrição                                                                   | Lança       |
+|:-----------------------------|:----------------------------------------------------------------------------|:------------|
+| `save(T entity)`             | Salva ou atualiza entidade                                                  | `Exception` |
+| `findByPK(ID id)`            | Busca por PK → retorna `T` (pode ser `null` — verificar com null-check)     | `Exception` |
+| `findAll()`                  | Retorna todas instâncias                                                    | `Exception` |
+| `findAll(Pageable pageable)` | Retorna página com ordenação → `Page<T>`                                    | `Exception` |
+| `delete(T entity)`           | Remove entidade do banco                                                    | `Exception` |
+
+> **Atencao:** todos os metodos herdados lancam `Exception` **checked**. Todo metodo de servico ou controller que os chame deve declarar `throws Exception` na assinatura.
+>
+> **`findByPK` retorna `T` (nullable), nao `Optional<T>`.** Use null-check manual:
+> ```java
+> MinhaEntidade e = repository.findByPK(id);
+> if (e == null) throw new MinhaException("Registro nao encontrado: " + id);
+> ```
 
 ---
 
@@ -75,6 +83,9 @@ List<Pedido> findByPeriodo(
 ---
 
 ### 3.2 `@NativeQuery` — Consultas SQL Nativas
+
+> **Import obrigatorio:** `import br.com.sankhya.studio.persistence.NativeQuery;`
+> Cobre tanto `@NativeQuery` quanto `@NativeQuery.Result`. **Nao usar** `br.com.sankhya.sdk.data.repository.NativeQuery` — pacote incorreto, causa erro de compilacao.
 
 Use `@NativeQuery` para queries complexas com JOINs, agregações, funções específicas banco etc.
 
@@ -132,20 +143,22 @@ Long contarPendentes(JdbcWrapper jdbc);
 
 @Modifying
 @NativeQuery("UPDATE TGFPRO SET VLRVENDA = VLRVENDA * :fator WHERE CODGRUPOPROD = :grupo")
-int reajustarPrecoPorGrupo(@Parameter("fator") BigDecimal fator, @Parameter("grupo") Long grupo);
+void reajustarPrecoPorGrupo(@Parameter("fator") BigDecimal fator, @Parameter("grupo") Long grupo);
 
 @Modifying
 @NativeQuery("DELETE FROM AD_LOGS WHERE DTEXPIRACAO < :data")
-int excluirLogsExpirados(@Parameter("data") LocalDate data);
+void excluirLogsExpirados(@Parameter("data") LocalDate data);
 ```
+
+> **`@Modifying` deve retornar `void` ou `Boolean`.** KSP rejeita `int` com erro de compilacao.
 
 Sempre envolva `@Modifying` em método `@Transactional`.
 
 ```java
 
 @Transactional
-public int limparLogsAntigos(LocalDate data) {
-    return logRepository.excluirLogsExpirados(data);
+public void limparLogsAntigos(LocalDate data) throws Exception {
+    logRepository.excluirLogsExpirados(data);
 }
 ```
 
@@ -293,7 +306,7 @@ SDK valida queries externas durante compilação:
 
 ## 5. Boas Práticas
 
-1. **Use `Optional<T>`** para resultados que podem não existir
+1. **Use `Optional<T>`** para resultados de `@Criteria` que podem nao existir. Para `findByPK`, o retorno e `T` (nullable) — use null-check manual
 2. **Nomes descritivos** — prefira `findByPlaca` a genérico `buscar`
 3. **Valide params no serviço** antes de chamar repositório
 4. **Separe responsabilidades** — lógica negócio no `@Service`, não no repositório
@@ -327,8 +340,9 @@ public interface PedidoRepository extends JapeRepository<Long, Pedido> {
 public class PedidoService {
 
     @Transactional
-    public void aprovarPedido(Long nunota) {
-        Pedido pedido = repository.findById(nunota).orElseThrow(...);
+    public void aprovarPedido(Long nunota) throws Exception {
+        Pedido pedido = repository.findByPK(nunota);
+        if (pedido == null) throw new IllegalArgumentException("Pedido nao encontrado: " + nunota);
         repository.save(pedido);
     }
 }
@@ -397,7 +411,7 @@ public interface PedidoRepository extends JapeRepository<Long, Pedido> {
 
     @Modifying
     @NativeQuery("DELETE FROM TGFCAB WHERE STATUS = 'R' AND DHALTER < :dataLimite")
-    int deleteRascunhosAntigos(@Parameter("dataLimite") LocalDateTime dataLimite);
+    void deleteRascunhosAntigos(@Parameter("dataLimite") LocalDateTime dataLimite);
 }
 
 // Serviço
@@ -412,12 +426,12 @@ public class PedidoService {
     }
 
     @Transactional
-    public void limparRascunhosAntigos() {
+    public void limparRascunhosAntigos() throws Exception {
         LocalDateTime limite = LocalDateTime.now().minusDays(30);
         pedidoRepository.deleteRascunhosAntigos(limite);
     }
 
-    public List<Pedido> buscarPedidosDoCliente(Long codigoCliente) {
+    public List<Pedido> buscarPedidosDoCliente(Long codigoCliente) throws Exception {
         if (codigoCliente == null) {
             throw new IllegalArgumentException("Código do cliente é obrigatório.");
         }
@@ -440,7 +454,9 @@ public class PedidoService {
 6. [ ] `@NativeQuery.Result` como interface publica em arquivo proprio (não interface interna do repository).
 7. [ ] `@Modifying` sempre com `@Transactional` no serviço chamador.
 8. [ ] Queries complexas em arquivo externo com `fromFile = true`.
-9. [ ] `Optional<T>` para métodos que podem não encontrar resultado.
+9. [ ] `Optional<T>` para metodos `@Criteria` que podem nao encontrar resultado. `findByPK` retorna `T` nullable — usar null-check manual.
+10. [ ] Metodos de servico/controller que chamam `save`, `findByPK`, `findAll` ou `delete` declaram `throws Exception`.
+11. [ ] Metodos `@Modifying` retornam `void` ou `Boolean` — nunca `int`.
 
 ### Erros comuns
 
@@ -452,3 +468,7 @@ public class PedidoService {
 | `@Modifying` sem `@Transactional` no chamador    | Envolver chamada em método `@Transactional`        |
 | Usar Query Methods do Spring Data                | Não suportado — usar `@Criteria` ou `@NativeQuery` |
 | `@Delete` descontinuada                          | Usar `@Modifying` + `@NativeQuery`                 |
+| `@Modifying` retornando `int`                    | KSP rejeita — usar `void` ou `Boolean`             |
+| `findByPK(...).orElseThrow(...)` ou `.map(...)`  | `findByPK` retorna `T` (nullable), nao `Optional<T>` — usar null-check manual |
+| Esquecer `throws Exception` em metodo que usa repositorio | Todo metodo que chama `save`, `findByPK`, `findAll` ou `delete` deve declarar `throws Exception` |
+| Import errado de `@NativeQuery`                  | Usar `br.com.sankhya.studio.persistence.NativeQuery`, nao `br.com.sankhya.sdk.data.repository.NativeQuery` |
