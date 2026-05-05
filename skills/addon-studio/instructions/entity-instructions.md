@@ -16,7 +16,7 @@ Entidade Java = representação domínio de tabela banco. **Limpa** — contém 
 |:-----------------------------------------------------|:----------------------------------------------------------|
 | `@Column` só tem `name`                              | `@Column(name = "COLUNA")` — nenhum outro atributo.       |
 | `@JoinColumn` só tem `name` e `referencedColumnName` | `@JoinColumn(name = "...", referencedColumnName = "...")` |
-| `@JapeEntity` tem `entity`, `table` e `isNativeTable` | Addon: `@JapeEntity(entity = "...", table = "...")`. Tabela nativa Sankhya: obrigatorio adicionar `isNativeTable = true` (ex.: TGFCAB, TGFFIN, TGFORD, TGFVEI, TGFEMP, TGFPAR) |
+| `@JapeEntity` tem `entity`, `table`, `isNativeTable` e `isNativeInstance` | Addon puro: `@JapeEntity(entity = "...", table = "...")`. Tabela nativa Sankhya: adicionar `isNativeTable = true`. Instância também nativa: adicionar `isNativeInstance = true`. Veja seção 1.2. |
 | Sem `@Expression`                                    | Expressões ficam no XML (`<expression>`).                 |
 | Sem `@GeneratedValue`                                | Sequência fica no XML (`sequenceType`/`sequenceField`).   |
 | Sem `@Option` / `@Property`                          | Opções ficam no XML (`<fieldOptions>`).                   |
@@ -48,21 +48,37 @@ Exemplo coerente:
 
 > Antes criar entidade nova, perguntar dev: (1) sigla modulo 3 caracteres, (2) contexto, (3) confirmar `entity` + `table`.
 
-### 1.2 Tabelas Nativas Sankhya (`isNativeTable = true`)
+### 1.2 Tabelas e Instâncias Nativas Sankhya (`isNativeTable` / `isNativeInstance`)
 
-Ao mapear uma tabela **nativa do Sankhya** e **obrigatorio** adicionar `isNativeTable = true`. Sem esse atributo o KSP rejeita a compilacao com erro de entidade duplicada.
+`@JapeEntity` aceita dois flags para sinalizar quando a tabela e/ou a instância já existem no Sankhya nativo. **Os dois flags são independentes** e cobrem 3 cenários:
+
+| Cenário                               | `isNativeTable` | `isNativeInstance` | Tag XML correspondente                  |
+|:--------------------------------------|:----------------|:-------------------|:----------------------------------------|
+| Tabela addon + Instância addon        | omitir          | omitir             | `<table>` + `<instance>`                |
+| Tabela nativa + Instância **nova** do addon | `true`    | omitir             | `<nativeTable>` + `<instance>`          |
+| Tabela nativa + Instância nativa      | `true`          | `true`             | `<nativeTable>` + `<nativeInstance>`    |
+
+> **Por que isso importa:** sem `isNativeTable`, o KSP rejeita a compilação com erro de entidade duplicada ao detectar que a tabela já existe. Sem `isNativeInstance` em uma instância nativa, a instância é regravada no `metadata.xml` gerado e, durante o deploy do addon, o dicionário a re-mapeia para o owner do addon — quebrando todas as regras, validações e telas nativas que dependem dessa instância.
 
 Tabelas nativas mais comuns: `TGFCAB`, `TGFFIN`, `TGFORD`, `TGFVEI`, `TGFEMP`, `TGFPAR`, `TGFPRO`, `TGFITE`.
+Instâncias nativas mais comuns associadas: `CabecalhoNota` (TGFCAB), `ItemNota` (TGFITE), `Parceiro` (TGFPAR), `Produto` (TGFPRO), `TipoOperacao` (TGFTOP), `Financeiro` (TGFFIN).
 
 ```java
-// Tabela do addon — sem isNativeTable
+// 1) Tabela e instância do addon — sem flags
 @JapeEntity(entity = "TdcXyzCabecalho", table = "TDCXYZCAB")
 public class TdcXyzCabecalho { ... }
 
-// Tabela nativa Sankhya — isNativeTable OBRIGATORIO
-@JapeEntity(entity = "CabecalhoNota", table = "TGFCAB", isNativeTable = true)
+// 2) Tabela nativa, instância NOVA do addon — só isNativeTable
+@JapeEntity(entity = "TdcXyzDefensivos", table = "TGFDFAGR", isNativeTable = true)
+public class TdcXyzDefensivos { ... }
+
+// 3) Tabela e instância nativas — os dois flags
+@JapeEntity(entity = "CabecalhoNota", table = "TGFCAB",
+            isNativeTable = true, isNativeInstance = true)
 public class CabecalhoNota { ... }
 ```
+
+> **Regra prática:** se o `entity` for um nome usado pelo Sankhya nativo (`CabecalhoNota`, `ItemNota`, `Parceiro`, `Produto`, etc.), use `isNativeInstance = true`. Se o `entity` segue a convenção `Tdc<Modulo><Contexto>` do addon, é instância nova — não use `isNativeInstance`.
 
 ---
 
@@ -853,7 +869,8 @@ public class TdcXyzProduto {
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JapeEntity(entity = "CabecalhoNota", table = "TGFCAB", isNativeTable = true)
+@JapeEntity(entity = "CabecalhoNota", table = "TGFCAB",
+            isNativeTable = true, isNativeInstance = true)
 public class CabecalhoNota {
 
     @Id
@@ -952,7 +969,7 @@ public class ItemNotaId {
 1. [ ] Criar XML dicionário em `datadictionary/<TABELA>.xml` (ver `datadictionary-instructions.md`).
 2. [ ] Criar classe Java conforme arquitetura do projeto.
 3. [ ] Anotar com `@Data`, `@NoArgsConstructor`, `@AllArgsConstructor`.
-4. [ ] Anotar com `@JapeEntity(entity = "...", table = "...")`. Ao mapear tabela nativa Sankhya (TGFCAB, TGFFIN, TGFORD, etc.), adicionar `isNativeTable = true`.
+4. [ ] Anotar com `@JapeEntity(entity = "...", table = "...")`. Tabela nativa Sankhya (TGFCAB, TGFFIN, TGFORD, etc.): adicionar `isNativeTable = true`. Instância também nativa (entity = `CabecalhoNota`, `Parceiro`, `Produto`, etc.): adicionar também `isNativeInstance = true`. Ver seção 1.2.
 5. [ ] Definir PK com `@Id` + `@Column(name)` (simples) ou `@Id` + classe `@Embeddable` (composta).
 6. [ ] Cada campo persistido com `@Column(name = "...")` — só `name`.
 7. [ ] Tipo Java correto para cada campo (ver tabela tipos).
@@ -984,7 +1001,8 @@ public class ItemNotaId {
 | Colocar `description`, `dataType`, `size` no `@Column`  | Somente `name`. Metadata fica no XML.                     |
 | Colocar `@GeneratedValue` no `@Id`                      | Sequência fica no XML (`sequenceType`/`sequenceField`).   |
 | Colocar `@Expression` no campo                          | Expressões ficam no XML (`<expression>`).                 |
-| Omitir `isNativeTable = true` em tabela nativa Sankhya  | Obrigatorio para TGFCAB, TGFFIN, TGFORD, TGFVEI, TGFEMP, TGFPAR — KSP rejeita sem ele com erro de entidade duplicada. |
+| Omitir `isNativeTable = true` em tabela nativa Sankhya  | Obrigatório para TGFCAB, TGFFIN, TGFORD, TGFVEI, TGFEMP, TGFPAR — KSP rejeita sem ele com erro de entidade duplicada. |
+| Omitir `isNativeInstance = true` em instância nativa    | Obrigatório quando o `entity` reusa um nome nativo (`CabecalhoNota`, `Parceiro`, `Produto`, etc.). Sem ele, o deploy regrava a instância para o owner do addon e quebra regras/validações nativas. |
 | Criar `@OneToOne` quando só precisa do valor da FK      | Use `@Column(name = "FK")` se não precisa navegar.        |
 | Esquecer de criar o XML do dicionário                   | Toda entidade **precisa** do XML correspondente.          |
 | Esquecer `@NoArgsConstructor`                           | Obrigatório para o framework instanciar a entidade.       |
