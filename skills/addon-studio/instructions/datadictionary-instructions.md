@@ -102,9 +102,15 @@ Lista campos PK. PK simples = 1 `<field>`; PK composta = varios `<field>`.
 
 ## 1.6 Instancias (`<instances>`)
 
-Define entidade (instancia JAPE) da tabela.
+Define entidade (instancia JAPE) da tabela. Existem duas tags possiveis dentro de `<instances>`:
+
+| Tag                    | Quando usar                                                                                  |
+|:-----------------------|:---------------------------------------------------------------------------------------------|
+| `<instance>`           | Instancia **nova**, criada pelo addon. Permitida em `<table>` e em `<nativeTable>`.          |
+| `<nativeInstance>`     | Instancia **nativa do Sankhya** (ex.: `CabecalhoNota`, `Parceiro`, `Produto`). **Somente** dentro de `<nativeTable>`. |
 
 ```xml
+<!-- Instancia nova do addon -->
 <instances>
     <instance name="TdcXyzProduto">
         <description>Produtos</description>
@@ -112,25 +118,39 @@ Define entidade (instancia JAPE) da tabela.
 </instances>
 ```
 
-`name` = nome logico entidade (bate com `@JapeEntity(entity = "...")`).
+```xml
+<!-- Instancia nativa Sankhya (so dentro de <nativeTable>) -->
+<instances>
+    <nativeInstance name="CabecalhoNota">
+        <relationShip>
+            <!-- relacoes opcionais com entidades do addon -->
+        </relationShip>
+    </nativeInstance>
+</instances>
+```
+
+`name` = nome logico da entidade (bate com `@JapeEntity(entity = "...")`).
+
+> **Por que `<nativeInstance>` ao inves de `<instance>`:** ambas as tags geram a mesma entidade no runtime, mas `<nativeInstance>` sinaliza para o builder que a instancia **ja existe** no Sankhya nativo e **nao** deve ser regravada no `metadata.xml` final. Se uma instancia nativa for declarada como `<instance>`, o deploy do addon re-mapeia o owner da instancia para o addon e quebra regras de negocio, validacoes e telas nativas que dependem dela. Pareie sempre com `isNativeInstance = true` no `@JapeEntity` correspondente (ver `entity-instructions.md` secao 1.2).
 
 ### Convencao de nomes — setor DevCenter
 
-Convencao do setor para `<instance name>` e `<table name>`:
+Convencao do setor para nomes de tabelas e instancias:
 
-| Atributo                     | Padrao                          | Exemplo               |
-|:-----------------------------|:--------------------------------|:----------------------|
-| `<instance name="...">`      | `Tdc<Modulo><Contexto>` (PascalCase) | `TdcXyzCabecalho`     |
-| `<table name="...">`         | `TDC<MODULO3><CONTEXTO>` (UPPER) | `TDCXYZCAB`           |
-| `<nativeTable>` `<instance>` | `Tdc<Modulo><Contexto>` (PascalCase) | `TdcXyzTipoOperacao`  |
+| Atributo                                | Padrao                                | Exemplo               |
+|:----------------------------------------|:--------------------------------------|:----------------------|
+| `<table name="...">`                    | `TDC<MODULO3><CONTEXTO>` (UPPER)      | `TDCXYZCAB`           |
+| `<instance name="...">` (em `<table>`)  | `Tdc<Modulo><Contexto>` (PascalCase)  | `TdcXyzCabecalho`     |
+| `<instance name="...">` (em `<nativeTable>`, instancia nova) | `Tdc<Modulo><Contexto>` (PascalCase) | `TdcXyzDefensivos` |
+| `<nativeInstance name="...">` (em `<nativeTable>`) | Nome **exato** da instancia nativa Sankhya | `CabecalhoNota`, `Parceiro`, `ItemNota` |
 
-Componentes:
+Componentes do prefixo addon:
 
 - `Tdc` / `TDC`: prefixo fixo (Tabela DevCenter)
 - `<Modulo>` / `<MODULO3>`: sigla modulo, **3 caracteres** (ex.: `Xyz`/`XYZ`, `Fin`/`FIN`)
 - `<Contexto>` / `<CONTEXTO>`: contexto/entidade (ex.: `Cabecalho`/`CAB`, `Item`/`ITE`)
 
-> Prefixo `Tdc<Modulo>` no `<instance>` evita colisao com outros contextos do ERP. Bate com `@JapeEntity(entity = "...")` correspondente.
+> Prefixo `Tdc<Modulo>` no `<instance>` evita colisao com outros contextos do ERP. Bate com `@JapeEntity(entity = "...")` correspondente. `<nativeInstance>` **nunca** leva prefixo addon — o nome tem que ser identico ao da instancia nativa Sankhya.
 
 ---
 
@@ -272,22 +292,49 @@ Estende tabelas Sankhya Om. **Sem** `<primaryKey>` nem `sequenceType`.
 - Declare **todos campos usados pela entidade** (nativos + custom).
 - Prefixo exclusivo add-on (ex: `XYZ_`) nos custom pra evitar conflito.
 
+Dentro de `<nativeTable>` ha **dois cenarios** para a tag de instancia, conforme a entidade alvo seja nativa ou nova (ver tabela completa em 1.6):
+
+### Cenario A — Instancia **nativa** Sankhya: `<nativeInstance>`
+
+Use quando a entidade ja existe no Sankhya nativo (`CabecalhoNota`, `Parceiro`, `ItemNota`, `TipoOperacao`, `Produto`, etc.). Combine sempre com `isNativeTable = true` **e** `isNativeInstance = true` no `@JapeEntity`.
+
 ```xml
 <nativeTable name="TGFTOP">
     <instances>
-        <instance name="TipoOperacao">
-            <description>TipoOperacao</description>
+        <nativeInstance name="TipoOperacao">
+            <relationShip>
+                <relation entityName="TdcXyzVinculo" insert="N" update="N" relation="OneToOne" removeCascade="N">
+                    <fields>
+                        <field localName="CODTIPOPER" targetName="CODTIPOPER"/>
+                    </fields>
+                </relation>
+            </relationShip>
+        </nativeInstance>
+    </instances>
+    <fields>
+        <field name="XYZ_HABILITADO" dataType="CHECKBOX" UITabName="XyzAddon" allowSearch="N" visibleOnSearch="N">
+            <description>Habilitado</description>
+        </field>
+    </fields>
+</nativeTable>
+```
+
+> `<nativeInstance>` aceita apenas `<relationShip>` opcional — sem `<description>`, sem campos adicionais. Os campos vao no `<fields>` da `<nativeTable>`.
+
+### Cenario B — Instancia **nova** do addon em tabela nativa: `<instance>`
+
+Use quando o addon cria uma instancia logica nova sobre uma tabela nativa (ex.: `DefensivosAgricolas` sobre `TGFDFAGR`). Combine com `isNativeTable = true` no `@JapeEntity`, **sem** `isNativeInstance`.
+
+```xml
+<nativeTable name="TGFDFAGR">
+    <instances>
+        <instance name="TdcXyzDefensivos">
+            <description>Defensivos Agricolas</description>
         </instance>
     </instances>
     <fields>
-        <field name="CODTIPOPER" dataType="INTEIRO" order="1" allowSearch="N" visibleOnSearch="N">
-            <description>Cod. Tipo Operacao</description>
-        </field>
-        <field name="DHALTER" dataType="DATA_HORA" order="2" allowSearch="N" visibleOnSearch="N">
-            <description>Data e hora alteracao</description>
-        </field>
-        <field name="XYZ_HABILITADO" dataType="CHECKBOX" UITabName="XyzAddon" allowSearch="N" visibleOnSearch="N">
-            <description>Habilitado</description>
+        <field name="NUMRECEITAGRO" dataType="TEXTO" size="50" UITabName="__main" allowSearch="S" visibleOnSearch="S">
+            <description>Num. Receituario</description>
         </field>
     </fields>
 </nativeTable>
@@ -434,24 +481,41 @@ Campos pra entidades com correspondencia em sistemas externos. Inclui ID origem 
 </table>
 ```
 
-### nativeTable (tabela nativa estendida)
+### nativeTable + nativeInstance (entidade nativa Sankhya estendida)
 
 ```xml
 <nativeTable name="TGFTOP">
     <instances>
-        <instance name="TipoOperacao">
-            <description>TipoOperacao</description>
+        <nativeInstance name="TipoOperacao">
+            <relationShip>
+                <relation entityName="TdcXyzVinculoTop" insert="N" update="N" relation="OneToOne" removeCascade="N">
+                    <fields>
+                        <field localName="CODTIPOPER" targetName="CODTIPOPER"/>
+                    </fields>
+                </relation>
+            </relationShip>
+        </nativeInstance>
+    </instances>
+    <fields>
+        <field name="XYZ_CAMPOCUSTOM" dataType="CHECKBOX" UITabName="XyzAddon" allowSearch="N" visibleOnSearch="N">
+            <description>Campo Customizado</description>
+        </field>
+    </fields>
+</nativeTable>
+```
+
+### nativeTable + instance nova (addon cria instancia logica sobre tabela nativa)
+
+```xml
+<nativeTable name="TGFDFAGR">
+    <instances>
+        <instance name="TdcXyzDefensivos">
+            <description>Defensivos Agricolas</description>
         </instance>
     </instances>
     <fields>
-        <field name="CODTIPOPER" dataType="INTEIRO" order="1" allowSearch="N" visibleOnSearch="N">
-            <description>Cod. Tipo Operacao</description>
-        </field>
-        <field name="DHALTER" dataType="DATA_HORA" order="2" allowSearch="N" visibleOnSearch="N">
-            <description>Data e hora alteracao</description>
-        </field>
-        <field name="XYZ_CAMPOCUSTOM" dataType="CHECKBOX" UITabName="XyzAddon" allowSearch="N" visibleOnSearch="N">
-            <description>Campo Customizado</description>
+        <field name="NUMRECEITAGRO" dataType="TEXTO" size="50" UITabName="__main" allowSearch="S" visibleOnSearch="S">
+            <description>Num. Receituario</description>
         </field>
     </fields>
 </nativeTable>
@@ -477,14 +541,17 @@ Entidade Java (@JapeEntity) -> XML do Dicionario -> Limpar entidade Java
 
 ---
 
-## 2.2 Mapeamento `@JapeEntity` -> Tag raiz
+## 2.2 Mapeamento `@JapeEntity` -> Tag raiz e tag de instancia
 
-| Condicao na entidade                           | Tag XML         |
-|:-----------------------------------------------|:----------------|
-| Tabela criada pelo add-on (sem flag `isNative`) | `<table>`       |
-| Tabela nativa (com `isNativeTable = true`)      | `<nativeTable>` |
+| `isNativeTable` | `isNativeInstance` | Tag raiz        | Tag de instancia      |
+|:----------------|:-------------------|:----------------|:----------------------|
+| omitido         | omitido            | `<table>`       | `<instance>`          |
+| `true`          | omitido            | `<nativeTable>` | `<instance>`          |
+| `true`          | `true`             | `<nativeTable>` | `<nativeInstance>`    |
 
-Atributo `name` vem de `@JapeEntity(table = "...")`.
+Atributo `name` da tag raiz vem de `@JapeEntity(table = "...")`. Atributo `name` da tag de instancia vem de `@JapeEntity(entity = "...")`.
+
+> Combinacao `isNativeTable = false` + `isNativeInstance = true` **nao existe** — instancia nativa pressupoe tabela nativa.
 
 ---
 
@@ -550,7 +617,7 @@ Pos-gerar XML, **limpe entidade Java** removendo tudo que foi pro dicionario.
 |:---------------------------------------------------------|:----------------------------------------------------------|
 | `@Column(description, dataType, size, ...)`             | Manter **so** `@Column(name = "...")`                |
 | `@JoinColumn(description, dataType, ...)`               | Manter **so** `name` e `referencedColumnName`        |
-| `@JapeEntity(description, isNativeTable, ...)`          | Manter **so** `entity` e `table`                     |
+| `@JapeEntity(description, ...)` (atributos extras)      | Manter `entity`, `table` e — quando aplicavel — `isNativeTable` / `isNativeInstance`. Remover `description` e demais atributos. |
 | `@Expression`                                            | Remover (vai pra `<expression>` no XML)    |
 | `@GeneratedValue`                                        | Remover (vai pra `sequenceType` no XML)    |
 | `@Option`                                                | Remover (vai pra `<fieldOptions>` no XML)  |
@@ -610,12 +677,13 @@ XML do Dicionario -> Entidade Java (@JapeEntity) limpa
 
 ---
 
-## 3.2 Mapeamento Tag raiz -> `@JapeEntity`
+## 3.2 Mapeamento Tag raiz / instancia -> `@JapeEntity`
 
-| Tag XML         | Java                                                                      |
-|:----------------|:--------------------------------------------------------------------------|
-| `<table>`       | `@JapeEntity(entity = "<instance.name>", table = "<table.name>")`         |
-| `<nativeTable>` | `@JapeEntity(entity = "<instance.name>", table = "<nativeTable.name>")`   |
+| Tag raiz XML    | Tag instancia XML    | `@JapeEntity` resultante                                                                                  |
+|:----------------|:---------------------|:-----------------------------------------------------------------------------------------------------------|
+| `<table>`       | `<instance>`         | `@JapeEntity(entity = "<instance.name>", table = "<table.name>")`                                          |
+| `<nativeTable>` | `<instance>`         | `@JapeEntity(entity = "<instance.name>", table = "<nativeTable.name>", isNativeTable = true)`              |
+| `<nativeTable>` | `<nativeInstance>`   | `@JapeEntity(entity = "<nativeInstance.name>", table = "<nativeTable.name>", isNativeTable = true, isNativeInstance = true)` |
 
 ---
 
@@ -884,7 +952,7 @@ public class TdcXyzConfiguracao {
 ## 4.1 Checklist: Criando XML do zero (solicitacao do usuario)
 
 1. [ ] Criar `<NOME_TABELA>.xml` em `datadictionary/`.
-2. [ ] `<table>` pra novas ou `<nativeTable>` pra nativas.
+2. [ ] `<table>` pra novas ou `<nativeTable>` pra nativas. Em `<nativeTable>`, escolher `<instance>` (instancia nova do addon) ou `<nativeInstance>` (instancia nativa Sankhya — nome reusa entidade do ERP).
 3. [ ] Definir `sequenceType` e `sequenceField` conforme estrategia.
 4. [ ] Declarar `<primaryKey>` com campos PK.
 5. [ ] Declarar `<instance>` com nome entidade.
@@ -935,3 +1003,5 @@ public class TdcXyzConfiguracao {
 | Atributos extras no `@Column` Java      | Manter **so** `name` — resto no XML.               |
 | Usar `@Expression` ou `@GeneratedValue` no Java  | Remover — vao pra `<expression>` e `sequenceType` no XML.       |
 | `@JoinColumn` com `name` e `referencedColumnName` invertidos | `name` = campo local (na tabela com `@JoinColumn`). `referencedColumnName` = campo na referenciada. Ver secao 3.6.1. |
+| Usar `<instance>` para instancia nativa Sankhya em `<nativeTable>` | Usar `<nativeInstance>`. `<instance>` faz o builder regravar a entrada no `metadata.xml`; durante o deploy a instancia e re-mapeada para o owner do addon e quebra regras/validacoes nativas. |
+| Esquecer `<nativeInstance>` quando o `entity` Java reusa nome nativo (`CabecalhoNota`, `Parceiro`, `Produto`, etc.) | Trocar `<instance>` por `<nativeInstance>` no XML e adicionar `isNativeInstance = true` no `@JapeEntity`. |
