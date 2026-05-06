@@ -1,21 +1,19 @@
 {
   "name": "snk-devcenter",
-  "version": "1.0.0",
-  "description": "Marketplace de skills oficiais do setor DevCenter Sankhya.",
+  "interface": {
+    "displayName": "DevCenter Sankhya"
+  },
   "plugins": [
     {
       "name": "addon-studio",
-      "description": "Skill Sankhya Addon Studio 2.0 — JAPE, datadictionary, dbscripts, REST, Guice, MapStruct, tests, MacroTranslator.",
-      "version": "1.5.0",
-      "author": {
-        "name": "DevCenter Squad"
-      },
       "source": {
-        "type": "directory",
-        "path": "."
+        "source": "local",
+        "path": "./plugins/addon-studio"
       },
-      "category": "development",
-      "installPolicy": "manual"
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Development"
     }
   ]
 }
