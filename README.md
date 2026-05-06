@@ -84,12 +84,28 @@ A skill funciona nativamente em Claude Code e em OpenAI Codex CLI. Use o fluxo d
 
 ### OpenAI Codex CLI
 
-```
-codex plugin marketplace add snk-devcenter/addon-studio
-/plugins
-```
+> **Atencao:** o repo `snk-devcenter/addon-studio` e privado. O Codex CLI nao respeita credenciais `gh`/git/SSH do usuario ao resolver `owner/repo` (libgit2 interno ignora credential helpers). Use o fluxo de **clone local** abaixo.
 
-Na TUI `/plugins`, escolha `snk-devcenter` -> `addon-studio` -> Install.
+1. Clone o repo manualmente (usa seu `gh auth` ou chave SSH ja configurada):
+
+   ```
+   mkdir -p ~/.codex/marketplaces
+   git clone git@github.com:snk-devcenter/addon-studio.git ~/.codex/marketplaces/addon-studio
+   ```
+
+2. Adicione o marketplace apontando para o caminho local:
+
+   ```
+   codex plugin marketplace add ~/.codex/marketplaces/addon-studio
+   ```
+
+3. Abra a TUI e instale:
+
+   ```
+   /plugins
+   ```
+
+   Escolha `snk-devcenter` -> `addon-studio` -> Install.
 
 ### Atualizar
 
@@ -99,9 +115,10 @@ Claude Code:
 /plugin update addon-studio@snk-devcenter
 ```
 
-Codex CLI:
+Codex CLI (atualizar o clone local + recarregar marketplace):
 
 ```
+git -C ~/.codex/marketplaces/addon-studio pull
 codex plugin marketplace update snk-devcenter
 ```
 
@@ -115,6 +132,7 @@ E reinstalar via `/plugins` se necessario.
 | Auto-trigger por `applyTo` glob          | sim         | nao (campo ignorado nos arquivos `instructions/`) |
 | Hook PostToolUse encoding ISO-8859-1     | sim         | nao (rodar `iconv` apos editar — ver `instructions/encoding-instructions.md`) |
 | Invocacao explicita                      | `/addon-studio` | `$addon-studio` |
+| Repo privado via `owner/repo`            | sim (usa `gh`/git auth do user) | nao (libgit2 interno; usar clone local + path) |
 
 ## Versionamento
 
