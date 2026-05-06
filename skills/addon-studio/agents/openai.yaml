@@ -1,0 +1,9 @@
+---
+name: addon-studio
+displayName: "Sankhya Addon Studio 2.0"
+description: "Skill para implementacao em projetos Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Cobre @JapeEntity, datadictionary XML, dbscripts, @Controller REST, @Repository, MapStruct, Guice DI, JUnit+Mockito, @ActionButton, @BusinessRule, @Job, @GlobalTypeAdapter, @Value, @ControllerAdvice e MacroTranslator."
+allow_implicit_invocation: true
+ui:
+  category: "development"
+  shortDescription: "JAPE entities, datadictionary, dbscripts, controllers REST, Guice, MapStruct, testes, MacroTranslator."
+---

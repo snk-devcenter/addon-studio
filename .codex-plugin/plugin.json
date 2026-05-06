@@ -1,0 +1,23 @@
+{
+  "name": "addon-studio",
+  "version": "1.5.0",
+  "description": "Skill Sankhya Addon Studio 2.0 — @JapeEntity, datadictionary, dbscripts, @Controller REST, @Repository (@Criteria/@NativeQuery), MapStruct, Guice DI, JUnit+Mockito, @ActionButton, @BusinessRule, @Job, @GlobalTypeAdapter, @Value, @ControllerAdvice, MacroTranslator (macros SQL), gradle deployAddon. Convencao TDC do setor DevCenter.",
+  "author": {
+    "name": "DevCenter Squad"
+  },
+  "homepage": "https://github.com/snk-devcenter/addon-studio",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/snk-devcenter/addon-studio.git"
+  },
+  "license": "UNLICENSED",
+  "keywords": [
+    "sankhya",
+    "addon-studio",
+    "jape",
+    "java",
+    "wildfly",
+    "codex-cli"
+  ],
+  "skills": "./skills/"
+}
