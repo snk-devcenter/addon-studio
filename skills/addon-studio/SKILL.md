@@ -5,11 +5,11 @@ description: Use when working on Sankhya Addon Studio 2.0 projects. Covers @Jape
 
 # Sankhya Addon Studio 2.0
 
-Skill que orienta implementacao em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Foco: regras do SDK e do framework. **Sem opiniao arquitetural** — organizacao de pacotes, camadas e padroes de design sao decisoes do dev/projeto.
+Skill orienta implementacao em **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Foco: regras SDK + framework. **Sem opiniao arquitetural** — pacotes, camadas, design = decisao dev/projeto.
 
 ## Convencao do setor DevCenter (camada de persistencia)
 
-Aplicada a tabelas e entities criadas pelo addon:
+Aplica a tabelas/entities do addon:
 
 | Artefato                              | Padrao                          | Exemplo               |
 |:--------------------------------------|:--------------------------------|:----------------------|
@@ -17,8 +17,8 @@ Aplicada a tabelas e entities criadas pelo addon:
 | `@JapeEntity(entity = "...")`         | `Tdc<Modulo><Contexto>` Pascal  | `TdcXyzCabecalho`     |
 | Coluna custom em tabela nativa Sankhya| `<MOD>_NOMECAMPO` UPPER         | `XYZ_STATUS`          |
 
-`<MODULO3>` / `<Modulo>` = sigla 3 caracteres do modulo do addon (ex.: `XYZ`, `FIN`, `FAT`).
-`<CONTEXTO>` / `<Contexto>` = contexto/entidade da tabela (ex.: `CAB`/`Cabecalho`, `ITE`/`Item`, `CFG`/`Configuracao`).
+`<MODULO3>` / `<Modulo>` = sigla 3 chars modulo addon (ex.: `XYZ`, `FIN`, `FAT`).
+`<CONTEXTO>` / `<Contexto>` = contexto/entidade tabela (ex.: `CAB`/`Cabecalho`, `ITE`/`Item`, `CFG`/`Configuracao`).
 
 ## Indice por tarefa
 
@@ -26,49 +26,49 @@ Aplicada a tabelas e entities criadas pelo addon:
 |:----------------------------------------------------------------------|:---------------------------------------------------|
 | Stack, Java 8, Lombok, logging, restricoes gerais                     | `instructions/backend-instructions.md`             |
 | Build / deploy local (`gradle deployAddon`)                           | `instructions/build-instructions.md`               |
-| Criar / alterar entidade `@JapeEntity` (Lombok, PK, relacionamentos)  | `instructions/entity-instructions.md`              |
-| XML do dicionario de dados (`datadictionary/<TABELA>.xml`)            | `instructions/datadictionary-instructions.md`      |
-| Scripts de banco (`dbscripts/V<NNN>-*.xml`, dual mssql/oracle)        | `instructions/database-instructions.md`            |
+| Criar/alterar entidade `@JapeEntity` (Lombok, PK, relacionamentos)    | `instructions/entity-instructions.md`              |
+| XML dicionario dados (`datadictionary/<TABELA>.xml`)                  | `instructions/datadictionary-instructions.md`      |
+| Scripts banco (`dbscripts/V<NNN>-*.xml`, dual mssql/oracle)           | `instructions/database-instructions.md`            |
 | Repository (`@Repository`, `@Criteria`, `@NativeQuery`, `@Modifying`) | `instructions/repository-instructions.md`          |
 | Controller REST (`@Controller`, `serviceName SP`, `@Transactional`, DTO, `@Valid`, protocolo HTTP)   | `instructions/controller-instructions.md` |
 | Injecao Guice (`@Component`, `@CustomModule`, `Multibinder`, `@Singleton`, `Provider<T>`) | `instructions/dependency-injection-instructions.md` |
 | MapStruct (`@Mapper`, `componentModel=jakarta`, `injectionStrategy=CONSTRUCTOR`, padrao create/merge) | `instructions/mapstruct-instructions.md` |
 | Testes (JUnit 5 + Mockito 4.11, mock estatico, `JapeRepository` quirks) | `instructions/test-instructions.md`              |
-| Encoding de arquivos (ISO-8859-1 obrigatorio em `.java`, `.xml`, `.kt`) | `instructions/encoding-instructions.md`          |
-| Botao de acao (`@ActionButton`, `AcaoRotinaJava`, `@Form`, `ContextoAcao`)  | `instructions/actionbutton-instructions.md`      |
-| Regra de negocio (`@BusinessRule`, interface `Regra`, `ContextoRegra`, barramento, liberacao de limite) | `instructions/businessrule-instructions.md` |
+| Encoding arquivos (ISO-8859-1 obrigatorio em `.java`, `.xml`, `.kt`)  | `instructions/encoding-instructions.md`            |
+| Botao acao (`@ActionButton`, `AcaoRotinaJava`, `@Form`, `ContextoAcao`)  | `instructions/actionbutton-instructions.md`     |
+| Regra negocio (`@BusinessRule`, interface `Regra`, `ContextoRegra`, barramento, liberacao limite) | `instructions/businessrule-instructions.md` |
 | Jobs agendados (`@Job`, interface `IJob`, `onSchedule`, `getScheduleConfigHook`, CRON, migracao XML)    | `instructions/job-instructions.md`          |
-| Adaptadores de tipo (`@GlobalTypeAdapter`, `TypeAdapter`, `JsonSerializer`, `JsonDeserializer`, nativos) | `instructions/typeadapter-instructions.md`  |
-| Injecao de valores (`@Value`, `ValueType`, `Provider<T>` lazy/eager, `SANKHYA_PARAM`, `group`)           | `instructions/value-instructions.md`        |
-| Tratamento global de excecoes (`@ControllerAdvice`, `@ExceptionHandler`, rollback automatico, DTO de erro) | `instructions/controlleradvice-instructions.md` |
+| Adaptadores tipo (`@GlobalTypeAdapter`, `TypeAdapter`, `JsonSerializer`, `JsonDeserializer`, nativos) | `instructions/typeadapter-instructions.md`  |
+| Injecao valores (`@Value`, `ValueType`, `Provider<T>` lazy/eager, `SANKHYA_PARAM`, `group`)           | `instructions/value-instructions.md`        |
+| Tratamento global excecoes (`@ControllerAdvice`, `@ExceptionHandler`, rollback automatico, DTO erro) | `instructions/controlleradvice-instructions.md` |
 | Macros SQL Sankhya (`dbDate`, `nullValue`, `ignorecase`, `truncMonth`, etc. — portabilidade Oracle/MSSQL)  | `instructions/macros-instructions.md`           |
 
 ## Regras universais (validas em qualquer arquivo)
 
-- **Encoding ISO-8859-1 obrigatorio.** Todo `.java`, `.xml` e `.kt` deve ser salvo em Latin-1. LLMs geram UTF-8 — converter com `iconv` apos criar/editar. Ver `instructions/encoding-instructions.md`.
+- **Encoding ISO-8859-1 obrigatorio.** Todo `.java`, `.xml`, `.kt` salvo Latin-1. LLMs geram UTF-8 — converter `iconv` apos criar/editar. Ver `instructions/encoding-instructions.md`.
 - **Java 8 estrito.** Sem `var`, `List.of`, `Map.of`, `String.isBlank`, `Files.readString`, `Optional.ifPresentOrElse`, records, sealed classes, text blocks.
 - **Lombok extensivo:** `@Data`, `@Builder`, `@AllArgsConstructor`, `@NoArgsConstructor`, `@Log`.
 - **Logging:** `@Log` Lombok + `java.util.logging`. Nunca SLF4J. Nunca `System.out`.
-- **Injecao:** sempre via construtor com `@Inject` de **`com.google.inject.Inject`**. Nunca `javax.inject.Inject`. Nunca `new` para dependencia gerenciada.
+- **Injecao:** via construtor com `@Inject` de **`com.google.inject.Inject`**. Nunca `javax.inject.Inject`. Nunca `new` em dependencia gerenciada.
 - **Excecoes:** tipadas (estendem `RuntimeException`). Nunca `throw new RuntimeException(...)` cru.
-- **Mappers:** sempre MapStruct. Nunca implementacao manual.
+- **Mappers:** sempre MapStruct. Nunca manual.
 - **HTTP externo:** Retrofit + `RetrofitCallExecutor`. Nunca `HttpClient` nativo.
-- **Repository:** interface estendendo `JapeRepository<TipoID, TipoEntidade>`. Nunca implementacao manual.
+- **Repository:** interface estende `JapeRepository<TipoID, TipoEntidade>`. Nunca manual.
 - **Persistencia:** `@JapeEntity` (SDK). Nunca JPA padrao (`javax.persistence.@Entity`).
 
 ## Quando perguntar antes de criar
 
-- **Nome de tabela nova:** confirmar `<MODULO3>` + `<CONTEXTO>` + nome final `TDC<MOD><CTX>`.
-- **Campos de auditoria** (`DHALTER`, `DHCREATE`, `CODUSU`): perguntar se inclui.
-- **Convencao de pacote / organizacao em camadas:** **nao opinar.** Dev decide.
+- **Nome tabela nova:** confirmar `<MODULO3>` + `<CONTEXTO>` + nome final `TDC<MOD><CTX>`.
+- **Campos auditoria** (`DHALTER`, `DHCREATE`, `CODUSU`): perguntar se inclui.
+- **Convencao pacote / organizacao camadas:** **nao opinar.** Dev decide.
 
 ## Fluxo tipico de criacao de feature CRUD
 
-1. XML do dicionario de dados em `datadictionary/<TABELA>.xml`.
-2. Script de banco em `dbscripts/V<NNN>-CREATE_TABLE_<TABELA>.xml`.
+1. XML dicionario dados em `datadictionary/<TABELA>.xml`.
+2. Script banco em `dbscripts/V<NNN>-CREATE_TABLE_<TABELA>.xml`.
 3. Entidade `@JapeEntity` (Java).
-4. Repository (interface estendendo `JapeRepository`).
-5. Servico de aplicacao (anotado `@Component`, organizacao a criterio do projeto).
+4. Repository (interface estende `JapeRepository`).
+5. Servico aplicacao (anotado `@Component`, organizacao a criterio projeto).
 6. Controller REST (`@Controller(serviceName = "...SP")`).
 7. Request/Response DTOs + Mapper MapStruct.
 8. Testes JUnit + Mockito.
