@@ -9,7 +9,7 @@
     {
       "name": "addon-studio",
       "description": "Skill Sankhya Addon Studio 2.0 — JAPE, datadictionary, dbscripts, REST, Guice, MapStruct, tests, MacroTranslator.",
-      "version": "1.5.0",
+      "version": "1.6.0",
       "author": {
         "name": "DevCenter Squad"
       },
@@ -17,7 +17,7 @@
       "source": {
         "source": "github",
         "url": "https://github.com/snk-devcenter/addon-studio.git",
-        "path": ".",
+        "path": "plugins/addon-studio",
         "ref": "main"
       },
       "homepage": "https://github.com/snk-devcenter/addon-studio"

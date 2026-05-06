@@ -9,40 +9,45 @@ Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto
 ```
 .
 ├── .claude-plugin/
-│   ├── marketplace.json                        # catalogo Claude Code
-│   └── plugin.json                             # manifest do plugin Claude Code
-├── .codex-plugin/
-│   └── plugin.json                             # manifest do plugin Codex CLI
+│   └── marketplace.json                            # catalogo Claude Code (raiz)
 ├── .agents/
 │   └── plugins/
-│       └── marketplace.json                    # catalogo Codex CLI
-├── hooks/
-│   └── hooks.json                              # hook PostToolUse encoding (Claude-only)
-└── skills/
+│       └── marketplace.json                        # catalogo Codex CLI (raiz)
+└── plugins/
     └── addon-studio/
-        ├── SKILL.md                            # entrypoint da skill (universal)
-        ├── agents/
-        │   └── openai.yaml                     # politica/UI metadata (Codex)
-        └── instructions/
-            ├── backend-instructions.md
-            ├── build-instructions.md
-            ├── controller-instructions.md
-            ├── controlleradvice-instructions.md
-            ├── database-instructions.md
-            ├── datadictionary-instructions.md
-            ├── dependency-injection-instructions.md
-            ├── encoding-instructions.md
-            ├── entity-instructions.md
-            ├── actionbutton-instructions.md
-            ├── businessrule-instructions.md
-            ├── job-instructions.md
-            ├── macros-instructions.md
-            ├── mapstruct-instructions.md
-            ├── repository-instructions.md
-            ├── test-instructions.md
-            ├── typeadapter-instructions.md
-            └── value-instructions.md
+        ├── .claude-plugin/
+        │   └── plugin.json                         # manifest plugin Claude Code
+        ├── .codex-plugin/
+        │   └── plugin.json                         # manifest plugin Codex CLI
+        ├── hooks/
+        │   └── hooks.json                          # hook PostToolUse encoding (Claude-only)
+        └── skills/
+            └── addon-studio/
+                ├── SKILL.md                        # entrypoint da skill (universal)
+                ├── agents/
+                │   └── openai.yaml                 # politica/UI metadata (Codex)
+                └── instructions/
+                    ├── actionbutton-instructions.md
+                    ├── backend-instructions.md
+                    ├── build-instructions.md
+                    ├── businessrule-instructions.md
+                    ├── controller-instructions.md
+                    ├── controlleradvice-instructions.md
+                    ├── database-instructions.md
+                    ├── datadictionary-instructions.md
+                    ├── dependency-injection-instructions.md
+                    ├── encoding-instructions.md
+                    ├── entity-instructions.md
+                    ├── job-instructions.md
+                    ├── macros-instructions.md
+                    ├── mapstruct-instructions.md
+                    ├── repository-instructions.md
+                    ├── test-instructions.md
+                    ├── typeadapter-instructions.md
+                    └── value-instructions.md
 ```
+
+> **Layout multi-plugin:** o repo serve como **marketplace + plugin**. Cada plugin futuro vai ganhar pasta propria em `plugins/<nome>/`. Exigencia do Codex CLI (path local tem que apontar pra subpasta do marketplace root, nao pra raiz).
 
 ## Cobertura
 
