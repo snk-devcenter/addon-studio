@@ -21,32 +21,34 @@ Entidade Java = representação domínio de tabela banco. **Limpa** — contém 
 | Sem `@GeneratedValue`                                | Sequência fica no XML (`sequenceType`/`sequenceField`).   |
 | Sem `@Option` / `@Property`                          | Opções ficam no XML (`<fieldOptions>`).                   |
 | Lombok obrigatório                                   | `@Data`, `@NoArgsConstructor`, `@AllArgsConstructor`.     |
-| Convencao DevCenter no `entity`/`table`              | Veja secao 1.1.                                           |
+| Convencao de nomenclatura no `entity`/`table`        | Veja secao 1.1.                                           |
 
-### 1.1 Convencao de nomes — setor DevCenter
+### 1.1 Convencao de nomes (parametrizada por projeto)
 
-Convencao do setor para nomear `@JapeEntity`:
+Padrao parametrizado por `<PRX>` (prefixo) + `<MOD3>` (modulo). Ver `database-instructions.md` secao "Descobrir convencao do projeto" antes de criar.
 
-| Atributo  | Padrao                          | Exemplo               |
-|:----------|:--------------------------------|:----------------------|
-| `entity`  | `Tdc<Modulo><Contexto>` (PascalCase) | `TdcXyzCabecalho`     |
-| `table`   | `TDC<MODULO3><CONTEXTO>` (UPPER) | `TDCXYZCAB`           |
+| Atributo  | Padrao                              | Exemplo (PRX=TDC, MOD3=XYZ)  |
+|:----------|:------------------------------------|:-----------------------------|
+| `entity`  | `<Prx><Mod><Ctx>` (PascalCase)      | `TdcXyzCabecalho`            |
+| `table`   | `<PRX><MOD3><CTX>` (UPPER)          | `TDCXYZCAB`                  |
 
 Componentes:
 
-- `Tdc` / `TDC`: prefixo fixo (Tabela DevCenter)
-- `<Modulo>` / `<MODULO3>`: sigla do modulo, **3 caracteres** (ex.: `XYZ`, `FIN`, `FAT`, `CAD`)
-- `<Contexto>` / `<CONTEXTO>`: contexto/entidade (ex.: `Cabecalho`/`CAB`, `Item`/`ITE`, `Configuracao`/`CFG`)
+- `<Prx>` / `<PRX>`: prefixo fixo do projeto, **3-4 chars** (ex.: `Tdc`/`TDC`, `App`/`APP`, `Cst`/`CST`)
+- `<Mod>` / `<MOD3>`: sigla do modulo, **3 caracteres** (ex.: `Xyz`/`XYZ`, `Fin`/`FIN`, `Fat`/`FAT`)
+- `<Ctx>` / `<CTX>`: contexto/entidade (ex.: `Cabecalho`/`CAB`, `Item`/`ITE`, `Configuracao`/`CFG`)
 
-`entity` segue PascalCase com modulo em formato legivel (`Xyz`, nao `XYZ`). `table` segue UPPER concatenado.
+`entity` usa PascalCase legivel (`Xyz`, nao `XYZ`). `table` usa UPPER concatenado.
 
-Exemplo coerente:
+Exemplo coerente (`<PRX>`=`TDC`, `<MOD3>`=`XYZ`):
 
 ```java
 @JapeEntity(entity = "TdcXyzCabecalho", table = "TDCXYZCAB")
 ```
 
-> Antes criar entidade nova, perguntar dev: (1) sigla modulo 3 caracteres, (2) contexto, (3) confirmar `entity` + `table`.
+> Antes criar entidade nova: (1) inspecionar projeto pra detectar `<PRX>` existente; (2) se ausente, perguntar dev `<PRX>` + `<MOD3>` + `<CTX>`; (3) confirmar `entity` + `table` final.
+
+> **NOTA:** exemplos seguintes usam `TDC` como prefixo ilustrativo. Substituir pelo `<PRX>` real do projeto.
 
 ### 1.2 Tabelas e Instâncias Nativas Sankhya (`isNativeTable` / `isNativeInstance`)
 

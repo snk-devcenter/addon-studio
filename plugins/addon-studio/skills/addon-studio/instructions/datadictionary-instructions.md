@@ -133,24 +133,26 @@ Define entidade (instancia JAPE) da tabela. Existem duas tags possiveis dentro d
 
 > **Por que `<nativeInstance>` ao inves de `<instance>`:** ambas as tags geram a mesma entidade no runtime, mas `<nativeInstance>` sinaliza para o builder que a instancia **ja existe** no Sankhya nativo e **nao** deve ser regravada no `metadata.xml` final. Se uma instancia nativa for declarada como `<instance>`, o deploy do addon re-mapeia o owner da instancia para o addon e quebra regras de negocio, validacoes e telas nativas que dependem dela. Pareie sempre com `isNativeInstance = true` no `@JapeEntity` correspondente (ver `entity-instructions.md` secao 1.2).
 
-### Convencao de nomes — setor DevCenter
+### Convencao de nomes (parametrizada por projeto)
 
-Convencao do setor para nomes de tabelas e instancias:
+Padrao parametrizado por `<PRX>` (prefixo) + `<MOD3>` (modulo). Ver `database-instructions.md` secao "Descobrir convencao do projeto" antes de criar tabela nova.
 
-| Atributo                                | Padrao                                | Exemplo               |
-|:----------------------------------------|:--------------------------------------|:----------------------|
-| `<table name="...">`                    | `TDC<MODULO3><CONTEXTO>` (UPPER)      | `TDCXYZCAB`           |
-| `<instance name="...">` (em `<table>`)  | `Tdc<Modulo><Contexto>` (PascalCase)  | `TdcXyzCabecalho`     |
-| `<instance name="...">` (em `<nativeTable>`, instancia nova) | `Tdc<Modulo><Contexto>` (PascalCase) | `TdcXyzDefensivos` |
+| Atributo                                | Padrao                                  | Exemplo (PRX=TDC, MOD3=XYZ)  |
+|:----------------------------------------|:----------------------------------------|:-----------------------------|
+| `<table name="...">`                    | `<PRX><MOD3><CTX>` (UPPER)              | `TDCXYZCAB`                  |
+| `<instance name="...">` (em `<table>`)  | `<Prx><Mod><Ctx>` (PascalCase)          | `TdcXyzCabecalho`            |
+| `<instance name="...">` (em `<nativeTable>`, instancia nova) | `<Prx><Mod><Ctx>` (PascalCase) | `TdcXyzDefensivos`     |
 | `<nativeInstance name="...">` (em `<nativeTable>`) | Nome **exato** da instancia nativa Sankhya | `CabecalhoNota`, `Parceiro`, `ItemNota` |
 
 Componentes do prefixo addon:
 
-- `Tdc` / `TDC`: prefixo fixo (Tabela DevCenter)
-- `<Modulo>` / `<MODULO3>`: sigla modulo, **3 caracteres** (ex.: `Xyz`/`XYZ`, `Fin`/`FIN`)
-- `<Contexto>` / `<CONTEXTO>`: contexto/entidade (ex.: `Cabecalho`/`CAB`, `Item`/`ITE`)
+- `<Prx>` / `<PRX>`: prefixo fixo do projeto, **3-4 caracteres** (ex.: `Tdc`/`TDC`, `App`/`APP`, `Cst`/`CST`)
+- `<Mod>` / `<MOD3>`: sigla modulo, **3 caracteres** (ex.: `Xyz`/`XYZ`, `Fin`/`FIN`)
+- `<Ctx>` / `<CTX>`: contexto/entidade (ex.: `Cabecalho`/`CAB`, `Item`/`ITE`)
 
-> Prefixo `Tdc<Modulo>` no `<instance>` evita colisao com outros contextos do ERP. Bate com `@JapeEntity(entity = "...")` correspondente. `<nativeInstance>` **nunca** leva prefixo addon — o nome tem que ser identico ao da instancia nativa Sankhya.
+> Prefixo `<Prx><Mod>` no `<instance>` evita colisao com outros contextos do ERP. Bate com `@JapeEntity(entity = "...")` correspondente. `<nativeInstance>` **nunca** leva prefixo addon — o nome tem que ser identico ao da instancia nativa Sankhya.
+
+> **NOTA:** exemplos seguintes usam `TDC` como prefixo ilustrativo. Substituir pelo `<PRX>` real do projeto.
 
 ---
 
