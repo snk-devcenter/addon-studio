@@ -8,18 +8,29 @@ when_to_use: Triggers on Java code with Sankhya annotations (@JapeEntity, @Repos
 
 Skill orienta implementacao em **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Foco: regras SDK + framework. **Sem opiniao arquitetural** — pacotes, camadas, design = decisao dev/projeto.
 
-## Convencao do setor DevCenter (camada de persistencia)
+## Convencao de nomenclatura (parametrizada por projeto)
 
-Aplica a tabelas/entities do addon:
+Aplica a tabelas/entities do addon. Padrao parametrizado por dois tokens — `<PRX>` (prefixo) + `<MOD3>` (modulo) — definidos pelo projeto:
 
-| Artefato                              | Padrao                          | Exemplo               |
-|:--------------------------------------|:--------------------------------|:----------------------|
-| Tabela do addon                       | `TDC<MODULO3><CONTEXTO>` UPPER  | `TDCXYZCAB`           |
-| `@JapeEntity(entity = "...")`         | `Tdc<Modulo><Contexto>` Pascal  | `TdcXyzCabecalho`     |
-| Coluna custom em tabela nativa Sankhya| `<MOD>_NOMECAMPO` UPPER         | `XYZ_STATUS`          |
+| Artefato                              | Padrao                            | Exemplo (PRX=TDC, MOD3=XYZ)  |
+|:--------------------------------------|:----------------------------------|:-----------------------------|
+| Tabela do addon                       | `<PRX><MOD3><CTX>` UPPER          | `TDCXYZCAB`                  |
+| `@JapeEntity(entity = "...")`         | `<Prx><Mod><Ctx>` Pascal          | `TdcXyzCabecalho`            |
+| Coluna custom em tabela nativa Sankhya| `<MOD3>_NOMECAMPO` UPPER          | `XYZ_STATUS`                 |
 
-`<MODULO3>` / `<Modulo>` = sigla 3 chars modulo addon (ex.: `XYZ`, `FIN`, `FAT`).
-`<CONTEXTO>` / `<Contexto>` = contexto/entidade tabela (ex.: `CAB`/`Cabecalho`, `ITE`/`Item`, `CFG`/`Configuracao`).
+- `<PRX>` / `<Prx>` = prefixo fixo do projeto (ex.: `TDC`, `APP`, `CST` — UPPER 3-4 chars).
+- `<MOD3>` / `<Mod>` = sigla 3 chars do modulo (ex.: `XYZ`, `FIN`, `FAT`).
+- `<CTX>` / `<Ctx>` = contexto/entidade da tabela (ex.: `CAB`/`Cabecalho`, `ITE`/`Item`, `CFG`/`Configuracao`).
+
+### Descobrir convencao do projeto
+
+Antes de criar tabela/entity nova:
+
+1. **Inspecionar projeto existente:** procurar `@JapeEntity(table = "...")` em arquivos `.java`, `<table name="...">` em `datadictionary/*.xml`, ou `CREATE TABLE` em `dbscripts/*.xml`. Se houver padrao consistente (ex.: todas tabelas comecam com `TDC`), reusar.
+2. **Se nao houver padrao detectavel ou projeto for novo:** **perguntar ao dev** explicitamente:
+   - "Qual prefixo (`<PRX>`) usar para tabelas custom deste projeto? Ex.: `TDC`, `APP`, `CST`."
+   - "Qual sigla de 3 chars (`<MOD3>`) representa este modulo? Ex.: `XYZ`, `FIN`, `FAT`."
+3. **Confirmar nome final** antes de gerar artefatos: `<PRX><MOD3><CTX>`.
 
 ## Indice por tarefa
 
@@ -59,7 +70,7 @@ Aplica a tabelas/entities do addon:
 
 ## Quando perguntar antes de criar
 
-- **Nome tabela nova:** confirmar `<MODULO3>` + `<CONTEXTO>` + nome final `TDC<MOD><CTX>`.
+- **Nome tabela nova:** descobrir/confirmar `<PRX>` + `<MOD3>` + `<CTX>` + nome final `<PRX><MOD3><CTX>` (ver "Descobrir convencao do projeto").
 - **Campos auditoria** (`DHALTER`, `DHCREATE`, `CODUSU`): perguntar se inclui.
 - **Convencao pacote / organizacao camadas:** **nao opinar.** Dev decide.
 

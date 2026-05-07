@@ -1,15 +1,15 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "snk-devcenter",
-  "description": "Marketplace de skills oficiais do setor DevCenter Sankhya.",
+  "description": "Marketplace de skills oficiais do DevCenter Sankhya.",
   "owner": {
     "name": "DevCenter Squad"
   },
   "plugins": [
     {
       "name": "addon-studio",
-      "description": "Skill Sankhya Addon Studio 2.0 — JAPE, datadictionary, dbscripts, REST, Guice, MapStruct, tests, MacroTranslator.",
-      "version": "1.6.2",
+      "description": "Skill Sankhya Addon Studio 2.0 — JAPE, datadictionary, dbscripts, REST, Guice, MapStruct, tests, MacroTranslator. Convencao de nomenclatura parametrizada por projeto.",
+      "version": "1.6.3",
       "author": {
         "name": "DevCenter Squad"
       },

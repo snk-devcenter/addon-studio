@@ -99,27 +99,36 @@ CREATE TABLE EXEMPLO (CODEXEMPLO NUMBER(10) NOT NULL, CONSTRAINT PK_EXEMPLO PRIM
 
 ## Regras de Nomenclatura
 
-### Nome de Tabela — Convencao do setor DevCenter
+### Nome de Tabela — Convencao parametrizada por projeto
 
-**Padrao obrigatorio:** `TDC<MODULO3><CONTEXTO>` — tudo MAIUSCULO, sem underscores.
+**Padrao obrigatorio:** `<PRX><MOD3><CTX>` — tudo MAIUSCULO, sem underscores.
 
 Componentes:
 
-- `TDC`: prefixo fixo (Tabela DevCenter)
-- `<MODULO3>`: sigla do modulo, **3 caracteres** (ex.: `FIN`, `FAT`, `CFG`, `CAD`)
-- `<CONTEXTO>`: sigla curta do contexto/entidade da tabela (ex.: `CAB`, `ITE`, `CFG`, `LOG`)
+- `<PRX>`: prefixo fixo do projeto, **3-4 caracteres** UPPER (ex.: `TDC`, `APP`, `CST`)
+- `<MOD3>`: sigla do modulo, **3 caracteres** (ex.: `FIN`, `FAT`, `CFG`, `CAD`)
+- `<CTX>`: sigla curta do contexto/entidade da tabela (ex.: `CAB`, `ITE`, `CFG`, `LOG`)
 
-Exemplos genericos (modulo `XYZ` ficticio):
+#### Descobrir convencao do projeto (obrigatorio antes de criar)
 
-| Conceito       | Modulo | Contexto | Resultado    |
-|:---------------|:-------|:---------|:-------------|
-| Cadastro       | `XYZ`  | `CAD`    | `TDCXYZCAD`  |
-| Faturamento    | `XYZ`  | `FAT`    | `TDCXYZFAT`  |
-| Configuracao   | `XYZ`  | `CFG`    | `TDCXYZCFG`  |
-| Cabecalho nota | `XYZ`  | `CAB`    | `TDCXYZCAB`  |
-| Item nota      | `XYZ`  | `ITE`    | `TDCXYZITE`  |
+1. **Inspecionar projeto:** procurar tabelas existentes em `dbscripts/*.xml` (`CREATE TABLE`), `datadictionary/*.xml` (`<table name="...">`), entities `@JapeEntity(table = "...")`. Se houver padrao consistente (todas com mesmo prefixo), reusar `<PRX>`.
+2. **Se projeto novo / sem padrao:** perguntar ao dev:
+   - "Qual prefixo (`<PRX>`, 3-4 chars UPPER) usar para tabelas custom? Ex.: `TDC`, `APP`, `CST`."
+   - "Qual sigla 3 chars (`<MOD3>`) representa este modulo? Ex.: `FIN`, `FAT`."
+   - "Qual contexto/entidade (`<CTX>`)? Ex.: `CAB`, `ITE`, `CFG`."
+3. **Confirmar nome final** antes de gerar artefatos.
 
-> **IMPORTANTE:** Antes criar tabela nova, assistente DEVE perguntar dev: (1) sigla modulo 3 caracteres, (2) sigla contexto, (3) confirmar nome final proposto.
+Exemplos ilustrativos (`<PRX>`=`TDC`, `<MOD3>`=`XYZ`):
+
+| Conceito       | PRX    | MOD3   | CTX      | Resultado    |
+|:---------------|:-------|:-------|:---------|:-------------|
+| Cadastro       | `TDC`  | `XYZ`  | `CAD`    | `TDCXYZCAD`  |
+| Faturamento    | `TDC`  | `XYZ`  | `FAT`    | `TDCXYZFAT`  |
+| Configuracao   | `TDC`  | `XYZ`  | `CFG`    | `TDCXYZCFG`  |
+| Cabecalho nota | `TDC`  | `XYZ`  | `CAB`    | `TDCXYZCAB`  |
+| Item nota      | `TDC`  | `XYZ`  | `ITE`    | `TDCXYZITE`  |
+
+> **NOTA:** exemplos abaixo usam `TDC` como prefixo ilustrativo. Substituir pelo `<PRX>` real do projeto.
 
 ### Nome de Constraint (PK)
 

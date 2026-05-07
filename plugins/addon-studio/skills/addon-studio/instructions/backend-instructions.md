@@ -138,14 +138,16 @@ Tratamento centralizado de excecoes em controllers via `@ControllerAdvice` — v
 
 ---
 
-## Convencao do setor DevCenter (camada de persistencia)
+## Convencao de nomenclatura (parametrizada por projeto)
 
-Aplicada a tabelas e entities do addon:
+Aplicada a tabelas e entities do addon. Padrao parametrizado por `<PRX>` (prefixo) + `<MOD3>` (modulo):
 
-| Artefato                              | Padrao                          | Exemplo               |
-|:--------------------------------------|:--------------------------------|:----------------------|
-| Tabela do addon (criada pelo projeto) | `TDC<MODULO3><CONTEXTO>` UPPER  | `TDCXYZCAB`           |
-| `@JapeEntity(entity = "...")`         | `Tdc<Modulo><Contexto>` Pascal  | `TdcXyzCabecalho`     |
-| Coluna custom em tabela nativa        | `<MOD>_NOMECAMPO` UPPER         | `XYZ_STATUS`          |
+| Artefato                              | Padrao                            | Exemplo (PRX=TDC, MOD3=XYZ)  |
+|:--------------------------------------|:----------------------------------|:-----------------------------|
+| Tabela do addon (criada pelo projeto) | `<PRX><MOD3><CTX>` UPPER          | `TDCXYZCAB`                  |
+| `@JapeEntity(entity = "...")`         | `<Prx><Mod><Ctx>` Pascal          | `TdcXyzCabecalho`            |
+| Coluna custom em tabela nativa        | `<MOD3>_NOMECAMPO` UPPER          | `XYZ_STATUS`                 |
+
+`<PRX>` = prefixo fixo do projeto (UPPER 3-4 chars; ex.: `TDC`, `APP`, `CST`). `<MOD3>` = sigla 3 chars do modulo. Se projeto novo ou sem padrao detectavel, **perguntar ao dev** antes de criar.
 
 Detalhes: `database-instructions.md`, `entity-instructions.md`, `datadictionary-instructions.md`.

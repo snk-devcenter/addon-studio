@@ -64,13 +64,15 @@ Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto
 - Encoding ISO-8859-1 obrigatorio
 - Build / deploy (`gradle deployAddon`)
 
-## Convencao do setor DevCenter (camada de persistencia)
+## Convencao de nomenclatura (parametrizada por projeto)
 
-| Artefato                              | Padrao                          | Exemplo            |
-|:--------------------------------------|:--------------------------------|:-------------------|
-| Tabela do addon                       | `TDC<MODULO3><CONTEXTO>` UPPER  | `TDCXYZCAB`        |
-| `@JapeEntity(entity = "...")`         | `Tdc<Modulo><Contexto>` Pascal  | `TdcXyzCabecalho`  |
-| Coluna custom em tabela nativa        | `<MOD>_NOMECAMPO` UPPER         | `XYZ_STATUS`       |
+Padrao parametrizado por `<PRX>` (prefixo) + `<MOD3>` (modulo). Skill detecta padrao existente no projeto; se ausente, **pergunta ao dev** antes de gerar artefatos.
+
+| Artefato                              | Padrao                            | Exemplo (PRX=TDC, MOD3=XYZ)  |
+|:--------------------------------------|:----------------------------------|:-----------------------------|
+| Tabela do addon                       | `<PRX><MOD3><CTX>` UPPER          | `TDCXYZCAB`                  |
+| `@JapeEntity(entity = "...")`         | `<Prx><Mod><Ctx>` Pascal          | `TdcXyzCabecalho`            |
+| Coluna custom em tabela nativa        | `<MOD3>_NOMECAMPO` UPPER          | `XYZ_STATUS`                 |
 
 ## Sem opiniao arquitetural
 
