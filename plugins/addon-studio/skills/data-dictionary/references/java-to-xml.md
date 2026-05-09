@@ -66,15 +66,22 @@ Entidade original com atributos extra no `@Column`? Mapeie pra XML:
 
 **Mapeamento `DataType`:**
 
-| Java (`DataType`)    | XML (`dataType`) |
-|:---------------------|:-----------------|
-| `DataType.INTEGER`   | `INTEIRO`        |
-| `DataType.TEXT`      | `TEXTO`          |
-| `DataType.DECIMAL`   | `DECIMAL`        |
-| `DataType.DATE_TIME` | `DATA_HORA`      |
-| `DataType.CHECKBOX`  | `CHECKBOX`       |
-| `DataType.SEARCH`    | `PESQUISA`       |
-| `DataType.LIST`      | `TEXTO`          |
+| Java (`DataType`)              | XML (`dataType`)       | Notas                                                          |
+|:-------------------------------|:-----------------------|:---------------------------------------------------------------|
+| `DataType.TEXT`                | `TEXTO`                | Exige atributo `size` no XML                                   |
+| `DataType.LARGE_TEXT`          | `CAIXA_TEXTO`          | Textarea/multi-line. Exige `size`                              |
+| `DataType.INTEGER`             | `INTEIRO`              | —                                                              |
+| `DataType.DECIMAL`             | `DECIMAL`              | Exige `nuCasasDecimais`                                        |
+| `DataType.DATE`                | `DATA`                 | Sem hora                                                       |
+| `DataType.DATE_TIME`           | `DATA_HORA`            | Data + hora                                                    |
+| `DataType.TIME`                | `HORA`                 | Sem data                                                       |
+| `DataType.CHECKBOX`            | `CHECKBOX`             | `S`/`N` no banco                                               |
+| `DataType.LIST`                | `LISTA`                | Exige sub-tag `<fieldOptions>` com `<option value>label</option>` |
+| `DataType.SEARCH`              | `PESQUISA`             | Exige `targetInstance`+`targetField`+`targetType`              |
+| `DataType.HTML`                | `HTML`                 | Editor rich text                                               |
+| `DataType.FILE`                | `ARQUIVO`              | Upload unico                                                   |
+| `DataType.MULTIPLE_FILES`      | `MULTIPLOS_ARQUIVOS`   | Upload multiplo                                                |
+| `DataType.IMAGE`               | `IMAGEM`               | Upload de imagem                                               |
 
 ---
 

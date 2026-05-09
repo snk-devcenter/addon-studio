@@ -1,6 +1,6 @@
 ---
 name: database
-description: Create Sankhya dbscripts (`dbscripts/V<NNN>-*.xml`) with dual MSSQL/Oracle migrations and naming conventions. Use when adding or altering tables in `dbscripts/`.
+description: Cria dbscripts Sankhya (`dbscripts/V<NNN>-*.xml`) com migrations dual MSSQL/Oracle e convenções de nomenclatura. Use ao adicionar ou alterar tabelas em `dbscripts/`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -78,6 +78,8 @@ CREATE TABLE EXEMPLO (CODEXEMPLO NUMBER(10) NOT NULL, CONSTRAINT PK_EXEMPLO PRIM
 ```
 
 > **Regra:** Todo `<sql>` tem duas tags — `<mssql>` primeiro, `<oracle>` depois. Nunca omitir.
+>
+> **Nota sobre o schema:** o `scripts.xsd` define `<oracle>`/`<mssql>` como `xs:all` (qualquer ordem, no máximo 1 cada, podendo ter só um dos dois). A regra acima é **convenção do projeto** para garantir portabilidade dual MSSQL/Oracle — não restrição do schema.
 
 ### Atributos do Elemento `<sql>`
 
@@ -86,7 +88,7 @@ CREATE TABLE EXEMPLO (CODEXEMPLO NUMBER(10) NOT NULL, CONSTRAINT PK_EXEMPLO PRIM
 | `nomeTabela` | Sim         | Tabela afetada (usado em logs)                                     | Nome tabela                                   |
 | `ordem`      | Sim         | Ordem execução no arquivo. **Não duplicar** dentro mesmo XML       | Inteiro sequencial (1, 2, 3...)               |
 | `executar`   | Sim         | Condição execução                                                  | `SE_NAO_EXISTIR`, `SE_EXISTIR`, `SEMPRE`      |
-| `tipoObjeto` | Sim         | Tipo objeto verificado por `executar`                              | `TABLE`, `COLUMN`, `VIEW`, `INDEX`, `TRIGGER` |
+| `tipoObjeto` | Sim         | Tipo objeto verificado por `executar`                              | `TABLE`, `COLUMN`, `FUNCTION`, `PROCEDURE`, `TRIGGER`, `VIEW`, `CONSTRAINT`, `PRIMARY KEY`, `FOREIGN KEY`, `INDEX` |
 | `nomeObjeto` | Sim         | Nome objeto verificado (identificador único versionamento)         | Nome objeto no banco                          |
 | `descricao`  | Não         | Descrição textual script (documentação)                            | Texto livre                                   |
 

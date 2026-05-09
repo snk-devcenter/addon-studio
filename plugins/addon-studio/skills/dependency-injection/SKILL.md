@@ -1,6 +1,6 @@
 ---
 name: dependency-injection
-description: Configure Guice DI for Sankhya Addon Studio (@Inject from `com.google.inject`, @Component, @CustomModule, Provider<T>, Multibinder, @Singleton). Use when wiring components or modules.
+description: Configura DI Guice para Sankhya Addon Studio (@Inject de `com.google.inject`, @Component, @CustomModule, Provider<T>, Multibinder, @Singleton). Use ao montar wiring de componentes ou módulos.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

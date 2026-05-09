@@ -1,6 +1,6 @@
 ---
 name: addon-studio
-description: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK) project overview, naming convention `<PRX><MOD3><CTX>`, universal rules (Java 8 strict, Lombok, ISO-8859-1, Guice DI, MapStruct, JapeRepository), and CRUD feature workflow. Use at project start, when defining naming convention for new projects, when planning a new CRUD feature end-to-end, or when needing universal Java 8/encoding/logging rules. Do NOT use for topic-specific tasks — invoke the focused skill (entity, repository, controller, etc.) instead.
+description: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK) — overview do projeto, convenção de nomenclatura `<PRX><MOD3><CTX>`, regras universais (Java 8 strict, Lombok, ISO-8859-1, Guice DI, MapStruct, JapeRepository) e fluxo de feature CRUD. Use no início do projeto, ao definir naming convention para projetos novos, ao planejar feature CRUD end-to-end, ou ao precisar das regras universais Java 8/encoding/logging. NÃO usar para tarefas de tópico específico — invoque a skill focada (entity, repository, controller, etc.).
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

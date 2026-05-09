@@ -1,6 +1,6 @@
 ---
 name: value
-description: Sankhya @Value injection (ValueType, Provider<T> lazy/eager, SANKHYA_PARAM, group). Use when injecting configuration values into Guice-managed components.
+description: Injeção @Value Sankhya (ValueType, Provider<T> lazy/eager, SANKHYA_PARAM, group). Use ao injetar valores de configuração em componentes gerenciados pelo Guice.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

@@ -84,16 +84,24 @@ Pra **cada** `<field>` no XML, cria campo Java com **so** `@Column(name = "<nome
 
 **Tipo Java inferido do `dataType` XML:**
 
-| XML `dataType` | Tipo Java sugerido                |
-|:---------------|:----------------------------------|
-| `INTEIRO`      | `BigDecimal` ou `Integer`         |
-| `TEXTO`        | `String`                          |
-| `DECIMAL`      | `BigDecimal`                      |
-| `DATA_HORA`    | `Timestamp` (`java.sql.Timestamp`) |
-| `CHECKBOX`     | `Boolean`                         |
-| `PESQUISA`     | `BigDecimal` ou `Integer` (tipo FK) |
+| XML `dataType`        | Tipo Java sugerido                                |
+|:----------------------|:--------------------------------------------------|
+| `TEXTO`               | `String`                                          |
+| `CAIXA_TEXTO`         | `String`                                          |
+| `INTEIRO`             | `BigDecimal` ou `Integer` (PK addon = `Integer`, PK nativa Sankhya = `BigDecimal`) |
+| `DECIMAL`             | `BigDecimal`                                      |
+| `DATA`                | `java.sql.Date`                                   |
+| `DATA_HORA`           | `Timestamp` (`java.sql.Timestamp`)                |
+| `HORA`                | `java.sql.Time`                                   |
+| `CHECKBOX`            | `Boolean`                                         |
+| `LISTA`               | `String` (valor da `<option>`)                    |
+| `PESQUISA`            | Tipo correspondente ao `targetType` (FK simples). Se navegar para entidade, adicionar `@OneToOne`/`@JoinColumn` com a entidade-alvo |
+| `HTML`                | `String`                                          |
+| `ARQUIVO`             | `String` (chave/path do arquivo)                  |
+| `MULTIPLOS_ARQUIVOS`  | `String` (chaves serializadas)                    |
+| `IMAGEM`              | `String` (chave/path da imagem)                   |
 
-> Campos `dataType="PESQUISA"` geram campo Java com tipo FK. Nao precisa `@OneToOne` / `@JoinColumn` so por ser PESQUISA — so adiciona quando entidade precisa navegar pra referenciada no dominio.
+> Campos `dataType="PESQUISA"` geram campo Java com tipo FK conforme `targetType`. Nao precisa `@OneToOne` / `@JoinColumn` so por ser PESQUISA — so adiciona quando entidade precisa navegar pra referenciada no dominio.
 
 ---
 

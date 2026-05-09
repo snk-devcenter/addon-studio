@@ -1,6 +1,6 @@
 ---
 name: action-button
-description: Implement Sankhya @ActionButton (AcaoRotinaJava + @Form + ContextoAcao) UI buttons. Use when creating screen action buttons, writing AcaoRotinaJava classes, or editing files matching `*Action.java`.
+description: Implementa @ActionButton Sankhya (AcaoRotinaJava + @Form + ContextoAcao) — botões de ação em telas. Use ao criar botão de ação, escrever classes AcaoRotinaJava ou editar arquivos `*Action.java`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

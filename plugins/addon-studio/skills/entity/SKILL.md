@@ -1,6 +1,6 @@
 ---
 name: entity
-description: Create or modify Sankhya @JapeEntity Java entities (Lombok, simple/composite PK, @Embeddable, @Column, @JoinColumn, naming `<PRX><MOD3><CTX>`). Use when defining entities or editing `.java` files with @JapeEntity.
+description: Cria ou modifica entidades Java @JapeEntity Sankhya (Lombok, PK simples/composta, @Embeddable, @Column, @JoinColumn, naming `<PRX><MOD3><CTX>`). Use ao definir entidades ou editar arquivos `.java` com @JapeEntity.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

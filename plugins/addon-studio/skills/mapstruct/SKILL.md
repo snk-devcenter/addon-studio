@@ -1,6 +1,6 @@
 ---
 name: mapstruct
-description: MapStruct @Mapper for Sankhya Addon Studio (componentModel=jakarta, injectionStrategy=CONSTRUCTOR, create/merge patterns) for DTO<->Entity conversion. Use when writing mappers or editing files matching `*Mapper.java`.
+description: Mappers MapStruct para Sankhya Addon Studio (`@Mapper` com componentModel=jakarta, injectionStrategy=CONSTRUCTOR, padrões create/merge) para conversão DTO<->Entidade. Use ao escrever mappers ou editar arquivos `*Mapper.java`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

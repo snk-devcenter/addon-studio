@@ -1,6 +1,6 @@
 ---
 name: data-dictionary
-description: Create Sankhya data dictionary XML (`datadictionary/<TABELA>.xml`) with `<table>`, `<instance>`, fields, types, and options. Use when defining table metadata under `datadictionary/`.
+description: Cria XML do dicionário de dados Sankhya (`datadictionary/<TABELA>.xml`) com `<table>`, `<instance>`, campos, tipos e opções. Use ao definir metadados de tabela em `datadictionary/`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -216,14 +216,26 @@ Cada `<field>` = coluna + metadata.
 
 ### Tipos de dados
 
-| Tipo XML    | Uso                             |
-|:------------|:--------------------------------|
-| `INTEIRO`   | Inteiros                |
-| `TEXTO`     | Textos, listas opcoes       |
-| `DECIMAL`   | Decimais                |
-| `DATA_HORA` | Data/hora                     |
-| `CHECKBOX`  | Booleano (S/N)                  |
-| `PESQUISA`  | Lookup / FK outra entidade |
+Conforme `metadados.xsd`, `dataType` aceita 14 valores:
+
+| Tipo XML              | Uso                                                         | Atributos extras obrigatorios            |
+|:----------------------|:------------------------------------------------------------|:------------------------------------------|
+| `TEXTO`               | Texto curto (single-line)                                   | `size`                                    |
+| `CAIXA_TEXTO`         | Texto longo (textarea/multi-line)                           | `size`                                    |
+| `INTEIRO`             | Inteiros                                                    | —                                         |
+| `DECIMAL`             | Decimais                                                    | `nuCasasDecimais`                         |
+| `DATA`                | Data (sem hora)                                             | —                                         |
+| `DATA_HORA`           | Data + hora                                                 | —                                         |
+| `HORA`                | Hora (sem data)                                             | —                                         |
+| `CHECKBOX`            | Booleano (`S`/`N`)                                          | —                                         |
+| `LISTA`               | Combo/select com opcoes fixas                               | `<fieldOptions>` (sub-tag)                |
+| `PESQUISA`            | Lookup / FK para outra entidade                             | `targetInstance`, `targetField`, `targetType` |
+| `HTML`                | Editor rich text (HTML)                                     | —                                         |
+| `ARQUIVO`             | Upload de arquivo unico                                     | —                                         |
+| `MULTIPLOS_ARQUIVOS`  | Upload de multiplos arquivos                                | —                                         |
+| `IMAGEM`              | Upload de imagem                                            | —                                         |
+
+> **`targetType` em PESQUISA** aceita: `TEXTO`, `INTEIRO`, `DECIMAL`, `DATA`, `DATA_HORA`, `HORA`.
 
 ### Sub-tag `<description>` (obrigatoria)
 
@@ -254,7 +266,23 @@ Expressoes calculadas. CDATA pra BeanShell.
 | `$ctx_dh_atual`       | Data/hora atual servidor  |
 | `$col_<COLUNA>`       | Valor atual coluna        |
 
-> Quando `<expression>` contiver **SQL** (nao BeanShell), use as **macros SQL Sankhya** (`dbDate()`, `nullValue()`, `truncMonth()`, etc.) para portabilidade Oracle/MSSQL. Ver `macros`.
+> Quando `<expression>` contiver **SQL** (nao BeanShell), envolva o conteudo com `#type.sql#` e use as **macros SQL Sankhya** (`dbDate()`, `nullValue()`, `truncMonth()`, etc.) para portabilidade Oracle/MSSQL. Ver `macros`.
+
+**`<expression>` vs atributo `calculated` — semantica completa:**
+
+`<expression>` define a logica do campo (BeanShell ou SQL via `#type.sql#`). O comportamento depende de o campo ter ou nao a flag `calculated="S"`:
+
+| Cenario | `<expression>` roda | Coluna no banco | `@Column` na entity Java |
+|---------|---------------------|-----------------|---------------------------|
+| `<expression>` **sem** `calculated` (default `N`) | So em INSERT/UPDATE | **Sim** — valor persiste na coluna fisica | **Sim** — `@Column` normal |
+| `<expression>` **com** `calculated="S"` | A cada leitura do registro | **Nao** — sem DDL para esse campo | **Sim** — `@Column` normal (framework le via expression) |
+
+Pontos criticos:
+
+- `calculated="S"` **exige** `<expression>` presente (obrigatorio).
+- `calculated="S"` afeta **somente o DDL** (sem coluna fisica). **Nao** afeta `@Column` da `@JapeEntity` — campo calculado continua acessivel pela entity Java normalmente.
+- Use `calculated="S"` quando precisar de informacao variavel atualizada em tempo real (ex.: status derivado de outras tabelas, agregacao).
+- **Custo alto, especialmente SQL**: se carregar 1000 registros, o framework dispara 1 query por registro para cada coluna calculada. Sem `calculated`, a `<expression>` roda 1 vez no INSERT/UPDATE e o valor fica persistido — leitura barata.
 
 ### Sub-tag `<fieldOptions>` (opcional)
 

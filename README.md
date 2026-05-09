@@ -1,6 +1,6 @@
 # Addon Studio Plugin
 
-Plugin com **18 skills focadas** — orienta implementacao em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo setor DevCenter.
+Plugin com **18 skills focadas + 6 sub-agents** — orienta implementacao em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo setor DevCenter.
 
 Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto Agent Skills / agentskills.io).
 
@@ -18,6 +18,13 @@ Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto
         ├── .claude-plugin/plugin.json              # manifest plugin Claude Code
         ├── .codex-plugin/plugin.json               # manifest plugin Codex CLI
         ├── hooks/hooks.json                        # hook PostToolUse encoding (Claude-only)
+        ├── agents/                                 # 6 sub-agents (Claude Code only)
+        │   ├── addon-reviewer.md                   # review pre-commit (sonnet)
+        │   ├── entity-architect.md                 # modela trio CRUD (sonnet)
+        │   ├── controller-designer.md              # @Controller + DTOs + Mapper (sonnet)
+        │   ├── test-writer.md                      # JUnit 5 + Mockito 4.11 (sonnet)
+        │   ├── troubleshooter.md                   # debug erros comuns (haiku)
+        │   └── dbscript-builder.md                 # dbscripts dual MSSQL/Oracle (haiku)
         └── skills/
             ├── addon-studio/                       # overview + regras universais + naming + fluxo CRUD
             │   ├── SKILL.md
@@ -76,6 +83,21 @@ Padrao parametrizado por `<PRX>` (prefixo) + `<MOD3>` (modulo). Skill detecta pa
 | `@JapeEntity(entity = "...")`         | `<Prx><Mod><Ctx>` Pascal          | `TdcXyzCabecalho`            |
 | Coluna custom em tabela nativa        | `<MOD3>_NOMECAMPO` UPPER          | `XYZ_STATUS`                 |
 
+## Sub-agents (Claude Code only)
+
+Agents sao especialistas com workflow ativo, tools restritas e modelo proprio. Diferente de skills (conhecimento/instrucao textual), agents executam decisao + acao.
+
+| Agent | Modelo | Escopo |
+|-------|:------:|--------|
+| `addon-reviewer` | sonnet | Review pre-commit: encoding, Java 8, Lombok, Guice DI, `@JapeEntity`, anti-patterns. Saida em Blockers/Warnings/Suggestions. |
+| `entity-architect` | sonnet | Modela trio CRUD end-to-end: XML dicionario + dbscript migration + entidade `@JapeEntity` Java. |
+| `controller-designer` | sonnet | Desenha endpoint REST: `@Controller` + Request/Response DTOs + MapStruct Mapper + (se aplicavel) `@ControllerAdvice`. |
+| `test-writer` | sonnet | Escreve JUnit 5 + Mockito 4.11 com quirks de `JapeRepository`. Roda `./gradlew test` pra validar. |
+| `troubleshooter` | haiku | Diagnostica erros: encoding, Guice DI, JPA misturada com JAPE, Java 8 violations, build/deploy. |
+| `dbscript-builder` | haiku | Gera dbscripts `V<NNN>-*.xml` dual MSSQL/Oracle (CREATE_TABLE minimo + ALTER por coluna). |
+
+> **Codex CLI:** agents sao feature exclusiva do Claude Code. As 18 skills funcionam em ambos harnesses; os 6 agents sao ignorados pelo Codex CLI (sem perda — usuarios do Codex usam invocacao explicita das skills).
+
 ## Sem opiniao arquitetural
 
 Skills cobrem **regras do SDK e do framework**. Organizacao de pacotes, camadas e padroes de design (Clean Arch, Hexagonal, MVC, DDD) sao decisoes do dev/projeto.
@@ -91,7 +113,7 @@ A skill funciona nativamente em Claude Code e em OpenAI Codex CLI. Use o fluxo d
 /plugin install addon-studio@snk-devcenter
 ```
 
-Apos instalado, skills ficam disponiveis via auto-trigger (descrições específicas) ou invocacao explicita: `/addon-studio:entity`, `/addon-studio:repository`, etc.
+Apos instalado, skills ficam disponiveis via auto-trigger (descrições específicas) ou invocacao explicita: `/addon-studio:entity`, `/addon-studio:repository`, etc. Sub-agents aparecem em `/agents` e sao auto-invocados conforme contexto (ou explicitamente via comando).
 
 ### OpenAI Codex CLI
 
@@ -142,6 +164,7 @@ E reinstalar via `/plugins` se necessario.
 | Auto-trigger por `description` da skill  | sim         | sim       |
 | Hook PostToolUse encoding ISO-8859-1     | sim         | nao (rodar `iconv` apos editar — ver skill `encoding`) |
 | Invocacao explicita por skill            | `/addon-studio:<skill>` | `$addon-studio:<skill>` |
+| Sub-agents (`agents/*.md`)               | sim (6 agents disponiveis) | nao (feature exclusiva Claude Code) |
 | Repo privado via `owner/repo`            | sim (usa `gh`/git auth do user) | nao (libgit2 interno; usar clone local + path) |
 
 ## Versionamento
