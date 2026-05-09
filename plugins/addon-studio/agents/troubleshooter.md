@@ -38,7 +38,7 @@ Tabela de diagnóstico rápido (mapeia sintoma → causa-raiz):
 | `NoSuchMethodError` em `java.util.List.of` ou similares | Java 8 violation (API pós-Java 8) | Substituir por equivalente Java 8 (ver §3.3) |
 | `@Entity is not a JapeEntity` ou erro silencioso de persistência | Importou `javax.persistence.@Entity` em vez de `@JapeEntity` | Trocar para `br.com.sankhya.studio.persistence.JapeEntity` |
 | `OutOfMemoryError` em deploy | Build muito grande / leak Wildfly | `./gradlew clean` + restart Wildfly |
-| `Could not bind ... Provider` no startup | `@Component` faltando, `@CustomModule` não registrado, ou Multibinder incorreto | Verificar registro no módulo Guice (ver §3.4) |
+| `Could not bind ... Provider` no startup | `@Component` faltando, `@CustomModule` não registrado, ou Multibinder incorreto | Verificar registro no módulo Guice (ver §3.2) |
 | `Connection refused` em deploy | Wildfly local fora do ar | Iniciar Wildfly via SDK Sankhya |
 | `Constraint violation` em runtime | DTO Request sem `@Valid` no controller | Adicionar `@Valid` no parâmetro |
 | Build OK mas endpoint 404 | `serviceName` errado ou sem sufixo `SP` | Conferir `@Controller(serviceName = "...SP")` |
@@ -66,7 +66,7 @@ else
 fi
 ```
 
-**Atenção:** o hook `PostToolUse` (Claude Code) já converte automaticamente após `Write`/`Edit`. Se não disparou, conferir `.claude-plugin/hooks/hooks.json`.
+**Atenção:** o hook `PostToolUse` (Claude Code) já converte automaticamente após `Write`/`Edit`. Se não disparou, conferir `plugins/addon-studio/hooks/hooks.json` (caminho relativo à raiz do plugin).
 
 #### 3.2 DI / Guice
 

@@ -84,7 +84,8 @@ Para conhecimento de domínio, consulte estas skills do plugin:
 - [ ] Interface estende `JapeRepository<TipoID, TipoEntidade>` — nunca implementação manual
 - [ ] `@Criteria` ou `@NativeQuery` corretos
 - [ ] Macros SQL Sankhya em `@NativeQuery` portáveis (`dbDate`, `nullValue`, etc.) — não `SYSDATE`/`NVL` direto
-- [ ] `Optional<>` para retornos de busca por chave
+- [ ] `Optional<>` apenas em métodos `@Criteria` que podem não encontrar resultado. **`findByPK(ID)` retorna `T` nullable** (não `Optional`) — null-check manual obrigatório
+- [ ] Métodos que chamam `save`/`findByPK`/`findAll`/`delete` declaram `throws Exception`
 
 ### Controller REST
 

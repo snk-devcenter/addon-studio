@@ -174,15 +174,18 @@ Coluna custom em tabela nativa: prefixo `<MOD3>_` UPPER (ex.: `XYZ_STATUS`, `FIN
 
 ### 5. Tipos por banco
 
-| Tipo Java/conceito | Oracle | MSSQL |
-|--------------------|--------|-------|
-| `Integer` | `NUMBER(10)` | `INT` |
-| `BigDecimal` (PK nativa) | `NUMBER(15)` | `NUMERIC(15)` |
-| `BigDecimal` (valor monetário) | `NUMBER(15,2)` | `NUMERIC(15,2)` |
-| `String` curto | `VARCHAR2(N)` | `VARCHAR(N)` |
-| `String` longo (>4000) | `CLOB` | `VARCHAR(MAX)` |
-| `Boolean` (CHECKBOX) | `VARCHAR2(1)` (`'S'`/`'N'`) | `VARCHAR(1)` |
-| `Timestamp` | `DATE` ou `TIMESTAMP` | `DATETIME` |
+Alinhado com o mapeamento autoritativo da skill `database`:
+
+| Tipo Java/conceito | Oracle | MSSQL | Quando usar |
+|--------------------|--------|-------|-------------|
+| `Integer` | `NUMBER(10)` | `INT` | `COD*`/`NU*` sequenciais, contadores, FKs comuns do addon |
+| `BigDecimal` (decimal/monetário/quantidade) | `NUMBER(18,N)` | `DECIMAL(18,N)` | Valores monetários, percentuais, decimais com casas (`N` = `nuCasasDecimais` do dicionário) |
+| `String` curto | `VARCHAR2(N)` | `VARCHAR(N)` | Texto de tamanho variável; `N` vem do `size` do `<field>` |
+| `String` longo (>4000) | `CLOB` | `VARCHAR(MAX)` | Texto grande |
+| `Boolean` (CHECKBOX) | `CHAR(1)` | `CHAR(1)` | Flag `'S'`/`'N'` — usar `CHAR(1)` em ambos bancos (não `VARCHAR(1)`) |
+| `Timestamp` / data | `DATE` | `DATETIME` | Data e/ou data+hora |
+
+> **`BigDecimal` em PK nativa Sankhya:** o tipo Java é `BigDecimal` por convenção (NUNOTA, CODPARC, CODPROD, etc.), mas o tipo no DDL é o **mesmo da tabela nativa original** — geralmente `NUMBER(10)`/`INT` (pra IDs sequenciais) ou outro conforme a tabela. **Não** assumir `NUMBER(15)`. Ao adicionar coluna custom `<MOD3>_<COL>` em tabela nativa, inferir o tipo do contexto da coluna (não da PK).
 
 ### 6. Macros SQL para portabilidade (em `INSERT` ou `UPDATE` complexos)
 

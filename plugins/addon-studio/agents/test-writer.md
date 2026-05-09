@@ -73,11 +73,11 @@ class MeuServiceTest {
     }
 
     @Test
-    void deveExecutarCasoFeliz() {
+    void deveExecutarCasoFeliz() throws Exception {
         // Arrange
         MeuEntity entity = new MeuEntity();
         entity.setId(1);
-        when(repository.findById(1)).thenReturn(Optional.of(entity));
+        when(repository.findByPK(1)).thenReturn(entity);
 
         // Act
         MeuResultado resultado = meuService.executar(1);
@@ -85,13 +85,13 @@ class MeuServiceTest {
         // Assert
         assertNotNull(resultado);
         assertEquals(1, resultado.getId());
-        verify(repository).findById(1);
+        verify(repository).findByPK(1);
     }
 
     @Test
-    void deveLancarExcecaoQuandoNaoEncontrar() {
-        // Arrange
-        when(repository.findById(99)).thenReturn(Optional.empty());
+    void deveLancarExcecaoQuandoNaoEncontrar() throws Exception {
+        // Arrange — JapeRepository.findByPK retorna T nullable (NÃO Optional)
+        when(repository.findByPK(99)).thenReturn(null);
 
         // Act + Assert
         EntidadeNaoEncontradaException ex = assertThrows(
@@ -102,6 +102,8 @@ class MeuServiceTest {
     }
 }
 ```
+
+> **API JapeRepository:** `findByPK(ID)` retorna `T` **nullable** (não `Optional<T>`) e declara `throws Exception`. Métodos `@Criteria` custom podem retornar `Optional<T>`. Ver skill `repository` para contrato completo.
 
 **Padrões obrigatórios:**
 
