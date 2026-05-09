@@ -40,6 +40,18 @@ Antes de criar qualquer artefato:
 | Sequência | AUTO (banco) ou MANUAL | AUTO por default. MANUAL se PK vem de regra externa. |
 | Auditoria (DHALTER, DHCREATE, CODUSU) | Incluir ou não | **Perguntar ao dev**. |
 | Relacionamentos | `@OneToMany`, `@OneToOne`/`@JoinColumn`, `@ManyToOne` | Conforme cardinalidade — ler skill `entity` para padrões. |
+| Campo persistido vs calculado | Campo normal ou `<expression>` no dicionário | Calculado: lógica em runtime (BeanShell ou SQL portável via macros). Ver §3 abaixo. |
+
+#### 2.1 Campos calculados — regra crítica
+
+Campo cujo valor **deriva de outros campos ou contexto** (ex.: status default `'S'` se null, usuário logado, data atual, soma de itens) é **campo calculado**. Tratamento:
+
+- **Vai no XML do dicionário** com sub-tag `<expression>` (BeanShell ou SQL portável via macros). Ver skill `data-dictionary` §1.8.
+- **NÃO vai no dbscript** — sem coluna física no banco. Não gerar `ALTER TABLE ADD <col>` para ele.
+- **NÃO vai na entidade Java** — sem `@Column` correspondente. Framework resolve em runtime.
+- **NÃO usar `@Expression` Java** — anotação proibida. Lógica fica **só** no XML.
+
+Detectar campo calculado pela pergunta: *"O valor é gravado no banco ou calculado dinamicamente a cada leitura?"* Se calculado → `<expression>`, sem coluna, sem `@Column`.
 
 ### 3. Gerar 3 artefatos consistentes
 
@@ -73,10 +85,11 @@ Antes de criar qualquer artefato:
 
 Após gerar:
 - Tabela do XML = tabela do dbscript = tabela da entity (case-insensitive UPPER)
-- Cada `<field>` no XML tem `@Column` correspondente na entity
+- Cada `<field>` **persistido** no XML tem `@Column` correspondente na entity
 - Cada coluna no dbscript tem `<field>` no XML
 - PK do XML bate com `@Id`/`@EmbeddedId` da entity
 - Relacionamentos do XML batem com `@OneToMany`/`@OneToOne` da entity
+- **Campos calculados** (com `<expression>`) **não** têm coluna no dbscript nem `@Column` na entity
 
 ## Decisões a perguntar antes de executar
 
