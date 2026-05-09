@@ -1,7 +1,3 @@
----
-applyTo: "**/*.java"
----
-
 # Injeção de Dependência (Guice) — Addon Studio 2.0
 
 Addon Studio 2.0 usa **Google Guice** como container DI. Anotações estereótipo customizadas fazem auto-scan. Doc descreve regras, padrões, boas práticas DI.
@@ -91,7 +87,7 @@ public class MeuController {
 - `serviceName` obrigatório, sufixo `"SP"`.
 - `transactionType` define tipo transação EJB (`Supports`, `Required`, etc.).
 - Métodos que alteram dados precisam `@Transactional`.
-- Retorno: DTO direto (ou `void`) — framework serializa em `responseBody`. Nunca `ResponseEntity` (Spring). Ver `controller-instructions.md`.
+- Retorno: DTO direto (ou `void`) — framework serializa em `responseBody`. Nunca `ResponseEntity` (Spring). Ver `controller.md`.
 - **NÃO** adicionar `@Component` — `@Controller` já gerenciado pelo framework.
 
 ### 3.2 `@Repository` — Interfaces de Acesso a Dados
@@ -152,7 +148,7 @@ public class ImportarProdutoService {
 
 Tratamento centralizado de exceções vindas dos `@Controller`/`@Service`. Auto-gerenciado — não adicionar `@Component`.
 
-> Ver `controlleradvice-instructions.md` para anatomia completa, regras críticas (handler nunca retorna `void`, múltiplas exceções por handler, rollback automático, proibição de `Exception.class`) e níveis de log.
+> Ver `controlleradvice.md` para anatomia completa, regras críticas (handler nunca retorna `void`, múltiplas exceções por handler, rollback automático, proibição de `Exception.class`) e níveis de log.
 
 ---
 

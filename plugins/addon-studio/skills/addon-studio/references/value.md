@@ -1,14 +1,10 @@
----
-applyTo: "**/*.java"
----
-
 # Injecao de Valores (`@Value`) — Addon Studio 2.0
 
 `@Value` injeta valores de configuracao (env vars, system properties, parametros Sankhya) diretamente em campos de componentes gerenciados pelo Guice. Conversao de tipo automatica. Thread-safe.
 
 > **Beta / Acesso Antecipado**: funcionalidade sujeita a mudancas.
 >
-> **Referencia complementar:** `dependency-injection-instructions.md`
+> **Referencia complementar:** `dependency-injection.md`
 
 ---
 

@@ -1,14 +1,10 @@
----
-applyTo: "**/*Mapper.java"
----
-
 # MapStruct ? Addon Studio 2.0
 
 MapStruct = biblioteca padrao pra conversao DTO <-> Entidade Dominio. **Nunca** faca mapper manual — use MapStruct.
 
-> **Referencia complementar:** veja `dependency-injection-instructions.md` pra como mappers registram no container Guice.
+> **Referencia complementar:** veja `dependency-injection.md` pra como mappers registram no container Guice.
 >
-> **Escopo:** arquivo define so regras **genericas** MapStruct. Regras negocio, filtros plataforma, convencoes dominio especificas ficam em `mapstruct-project-instructions.md`.
+> **Escopo:** arquivo define so regras **genericas** MapStruct. Regras negocio, filtros plataforma, convencoes dominio especificas ficam em `mapstruct-project.md` (override por projeto, fora desta skill).
 
 ---
 

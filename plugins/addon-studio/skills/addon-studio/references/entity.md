@@ -1,12 +1,8 @@
----
-applyTo: "**/*.java"
----
-
 # Entidade Java (@JapeEntity) — Addon Studio 2.0
 
 Entidade Java = representação domínio de tabela banco. **Limpa** — contém só mapeamento estrutural mínimo. Metadata UI, tipos, descrições, comportamento fica no **Dicionário de Dados** (XMLs em `datadictionary/`).
 
-> **Referência complementar:** consulte `datadictionary-instructions.md` para criar XML correspondente à entidade.
+> **Referência complementar:** consulte `datadictionary.md` para criar XML correspondente à entidade.
 
 ---
 
@@ -25,7 +21,7 @@ Entidade Java = representação domínio de tabela banco. **Limpa** — contém 
 
 ### 1.1 Convencao de nomes (parametrizada por projeto)
 
-Padrao parametrizado por `<PRX>` (prefixo) + `<MOD3>` (modulo). Ver `database-instructions.md` secao "Descobrir convencao do projeto" antes de criar.
+Padrao parametrizado por `<PRX>` (prefixo) + `<MOD3>` (modulo). Ver `database.md` secao "Descobrir convencao do projeto" antes de criar.
 
 | Atributo  | Padrao                              | Exemplo (PRX=TDC, MOD3=XYZ)  |
 |:----------|:------------------------------------|:-----------------------------|
@@ -492,7 +488,7 @@ private TipoOperacao tipoOperacao;
 
 - **Nomes descritivos**: `FK_PAI_COL1` ou `CODEMP_CONTRATO` em vez de `EMP`/`COL`. Reduz ambiguidade quando há múltiplas FKs compostas no mesmo entity.
 - **Mesma ordem** em `@JoinColumns` e no `@Embeddable` da PK alvo. Inconsistência causa join quebrado em runtime sem erro de compilação.
-- **`name` vs `referencedColumnName`**: `name` = coluna **local** (na tabela com `@JoinColumn`); `referencedColumnName` = coluna **na tabela alvo**. Inverter quebra silenciosamente — ver secao 3.6.1 do `datadictionary-instructions.md`.
+- **`name` vs `referencedColumnName`**: `name` = coluna **local** (na tabela com `@JoinColumn`); `referencedColumnName` = coluna **na tabela alvo**. Inverter quebra silenciosamente — ver secao 3.6.1 do `datadictionary.md`.
 
 ### 8.4 `@ManyToOne` + `@JoinColumn` — Filho -> Pai
 
@@ -968,7 +964,7 @@ public class ItemNotaId {
 
 ### Criando uma entidade nova
 
-1. [ ] Criar XML dicionário em `datadictionary/<TABELA>.xml` (ver `datadictionary-instructions.md`).
+1. [ ] Criar XML dicionário em `datadictionary/<TABELA>.xml` (ver `datadictionary.md`).
 2. [ ] Criar classe Java conforme arquitetura do projeto.
 3. [ ] Anotar com `@Data`, `@NoArgsConstructor`, `@AllArgsConstructor`.
 4. [ ] Anotar com `@JapeEntity(entity = "...", table = "...")`. Tabela nativa Sankhya (TGFCAB, TGFFIN, TGFORD, etc.): adicionar `isNativeTable = true`. Instância também nativa (entity = `CabecalhoNota`, `Parceiro`, `Produto`, etc.): adicionar também `isNativeInstance = true`. Ver seção 1.2.

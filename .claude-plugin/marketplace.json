@@ -9,7 +9,7 @@
     {
       "name": "addon-studio",
       "description": "Skill Sankhya Addon Studio 2.0 — JAPE, datadictionary, dbscripts, REST, Guice, MapStruct, tests, MacroTranslator. Convencao de nomenclatura parametrizada por projeto.",
-      "version": "1.6.4",
+      "version": "2.0.0",
       "author": {
         "name": "DevCenter Squad"
       },

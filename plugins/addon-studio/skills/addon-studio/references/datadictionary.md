@@ -1,7 +1,3 @@
----
-applyTo: "datadictionary/**/*.xml"
----
-
 # Dicionario de Dados (Data Dictionary) - Addon Studio 2.0
 
 **Dicionario de Dados** define estrutura dados aplicacao — tabelas, campos, instancias, extensoes entidades nativas — declarativo via XML em `datadictionary/`.
@@ -131,11 +127,11 @@ Define entidade (instancia JAPE) da tabela. Existem duas tags possiveis dentro d
 
 `name` = nome logico da entidade (bate com `@JapeEntity(entity = "...")`).
 
-> **Por que `<nativeInstance>` ao inves de `<instance>`:** ambas as tags geram a mesma entidade no runtime, mas `<nativeInstance>` sinaliza para o builder que a instancia **ja existe** no Sankhya nativo e **nao** deve ser regravada no `metadata.xml` final. Se uma instancia nativa for declarada como `<instance>`, o deploy do addon re-mapeia o owner da instancia para o addon e quebra regras de negocio, validacoes e telas nativas que dependem dela. Pareie sempre com `isNativeInstance = true` no `@JapeEntity` correspondente (ver `entity-instructions.md` secao 1.2).
+> **Por que `<nativeInstance>` ao inves de `<instance>`:** ambas as tags geram a mesma entidade no runtime, mas `<nativeInstance>` sinaliza para o builder que a instancia **ja existe** no Sankhya nativo e **nao** deve ser regravada no `metadata.xml` final. Se uma instancia nativa for declarada como `<instance>`, o deploy do addon re-mapeia o owner da instancia para o addon e quebra regras de negocio, validacoes e telas nativas que dependem dela. Pareie sempre com `isNativeInstance = true` no `@JapeEntity` correspondente (ver `entity.md` secao 1.2).
 
 ### Convencao de nomes (parametrizada por projeto)
 
-Padrao parametrizado por `<PRX>` (prefixo) + `<MOD3>` (modulo). Ver `database-instructions.md` secao "Descobrir convencao do projeto" antes de criar tabela nova.
+Padrao parametrizado por `<PRX>` (prefixo) + `<MOD3>` (modulo). Ver `database.md` secao "Descobrir convencao do projeto" antes de criar tabela nova.
 
 | Atributo                                | Padrao                                  | Exemplo (PRX=TDC, MOD3=XYZ)  |
 |:----------------------------------------|:----------------------------------------|:-----------------------------|
@@ -251,7 +247,7 @@ Expressoes calculadas. CDATA pra BeanShell.
 | `$ctx_dh_atual`       | Data/hora atual servidor  |
 | `$col_<COLUNA>`       | Valor atual coluna        |
 
-> Quando `<expression>` contiver **SQL** (nao BeanShell), use as **macros SQL Sankhya** (`dbDate()`, `nullValue()`, `truncMonth()`, etc.) para portabilidade Oracle/MSSQL. Ver `macros-instructions.md`.
+> Quando `<expression>` contiver **SQL** (nao BeanShell), use as **macros SQL Sankhya** (`dbDate()`, `nullValue()`, `truncMonth()`, etc.) para portabilidade Oracle/MSSQL. Ver `macros.md`.
 
 ### Sub-tag `<fieldOptions>` (opcional)
 

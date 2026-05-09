@@ -1,7 +1,8 @@
 ---
 name: addon-studio
-description: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Use for @JapeEntity, datadictionary XML, dbscripts, REST controllers, Guice DI, MapStruct, JUnit+Mockito, MacroTranslator SQL macros, gradle deployAddon.
-when_to_use: Triggers on Java code with Sankhya annotations (@JapeEntity, @Repository, @Controller, @ControllerAdvice, @ExceptionHandler, @CustomModule, @Listener, @Callback, @ActionButton, @BusinessRule, @Job, @GlobalTypeAdapter, @Value, AcaoRotinaJava, Regra, IJob, TypeAdapter, ValueType), files in datadictionary/ or dbscripts/ or queries/, gradle deployAddon usage, MacroTranslator SQL macros (dbDate, nullValue, ignorecase, normalizeText, truncMonth, yearMonth, addMonths, etc.), or any mention of Addon Studio, JapeRepository, serviceName SP, botao de acao, regra de negocio, job agendado, adaptador de tipo, injecao de valor, tratamento global de excecao, macros SQL, MacroTranslator.
+description: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Use for @JapeEntity, datadictionary XML, dbscripts, REST controllers, Guice DI, MapStruct, JUnit+Mockito, MacroTranslator SQL macros, gradle deployAddon. Triggers on Java code with Sankhya annotations (@JapeEntity, @Repository, @Controller, @ControllerAdvice, @ExceptionHandler, @CustomModule, @Listener, @Callback, @ActionButton, @BusinessRule, @Job, @GlobalTypeAdapter, @Value, AcaoRotinaJava, Regra, IJob, TypeAdapter, ValueType), files in datadictionary/ or dbscripts/ or queries/, gradle deployAddon usage, MacroTranslator SQL macros (dbDate, nullValue, ignorecase, normalizeText, truncMonth, yearMonth, addMonths, etc.), or any mention of Addon Studio, JapeRepository, serviceName SP, botao de acao, regra de negocio, job agendado, adaptador de tipo, injecao de valor, tratamento global de excecao, macros SQL, MacroTranslator.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 projects (Wildfly/EJB + JAPE SDK). Requires Java 8, Gradle, ISO-8859-1 encoding for .java/.xml/.kt files. Targets Claude Code and OpenAI Codex CLI.
 ---
 
 # Sankhya Addon Studio 2.0
@@ -36,28 +37,28 @@ Antes de criar tabela/entity nova:
 
 | Tarefa                                                                | Arquivo                                            |
 |:----------------------------------------------------------------------|:---------------------------------------------------|
-| Stack, Java 8, Lombok, logging, restricoes gerais                     | `instructions/backend-instructions.md`             |
-| Build / deploy local (`gradle deployAddon`)                           | `instructions/build-instructions.md`               |
-| Criar/alterar entidade `@JapeEntity` (Lombok, PK, relacionamentos)    | `instructions/entity-instructions.md`              |
-| XML dicionario dados (`datadictionary/<TABELA>.xml`)                  | `instructions/datadictionary-instructions.md`      |
-| Scripts banco (`dbscripts/V<NNN>-*.xml`, dual mssql/oracle)           | `instructions/database-instructions.md`            |
-| Repository (`@Repository`, `@Criteria`, `@NativeQuery`, `@Modifying`) | `instructions/repository-instructions.md`          |
-| Controller REST (`@Controller`, `serviceName SP`, `@Transactional`, DTO, `@Valid`, protocolo HTTP)   | `instructions/controller-instructions.md` |
-| Injecao Guice (`@Component`, `@CustomModule`, `Multibinder`, `@Singleton`, `Provider<T>`) | `instructions/dependency-injection-instructions.md` |
-| MapStruct (`@Mapper`, `componentModel=jakarta`, `injectionStrategy=CONSTRUCTOR`, padrao create/merge) | `instructions/mapstruct-instructions.md` |
-| Testes (JUnit 5 + Mockito 4.11, mock estatico, `JapeRepository` quirks) | `instructions/test-instructions.md`              |
-| Encoding arquivos (ISO-8859-1 obrigatorio em `.java`, `.xml`, `.kt`)  | `instructions/encoding-instructions.md`            |
-| Botao acao (`@ActionButton`, `AcaoRotinaJava`, `@Form`, `ContextoAcao`)  | `instructions/actionbutton-instructions.md`     |
-| Regra negocio (`@BusinessRule`, interface `Regra`, `ContextoRegra`, barramento, liberacao limite) | `instructions/businessrule-instructions.md` |
-| Jobs agendados (`@Job`, interface `IJob`, `onSchedule`, `getScheduleConfigHook`, CRON, migracao XML)    | `instructions/job-instructions.md`          |
-| Adaptadores tipo (`@GlobalTypeAdapter`, `TypeAdapter`, `JsonSerializer`, `JsonDeserializer`, nativos) | `instructions/typeadapter-instructions.md`  |
-| Injecao valores (`@Value`, `ValueType`, `Provider<T>` lazy/eager, `SANKHYA_PARAM`, `group`)           | `instructions/value-instructions.md`        |
-| Tratamento global excecoes (`@ControllerAdvice`, `@ExceptionHandler`, rollback automatico, DTO erro) | `instructions/controlleradvice-instructions.md` |
-| Macros SQL Sankhya (`dbDate`, `nullValue`, `ignorecase`, `truncMonth`, etc. — portabilidade Oracle/MSSQL)  | `instructions/macros-instructions.md`           |
+| Stack, Java 8, Lombok, logging, restricoes gerais                     | `references/backend.md`             |
+| Build / deploy local (`gradle deployAddon`)                           | `references/build.md`               |
+| Criar/alterar entidade `@JapeEntity` (Lombok, PK, relacionamentos)    | `references/entity.md`              |
+| XML dicionario dados (`datadictionary/<TABELA>.xml`)                  | `references/datadictionary.md`      |
+| Scripts banco (`dbscripts/V<NNN>-*.xml`, dual mssql/oracle)           | `references/database.md`            |
+| Repository (`@Repository`, `@Criteria`, `@NativeQuery`, `@Modifying`) | `references/repository.md`          |
+| Controller REST (`@Controller`, `serviceName SP`, `@Transactional`, DTO, `@Valid`, protocolo HTTP)   | `references/controller.md` |
+| Injecao Guice (`@Component`, `@CustomModule`, `Multibinder`, `@Singleton`, `Provider<T>`) | `references/dependency-injection.md` |
+| MapStruct (`@Mapper`, `componentModel=jakarta`, `injectionStrategy=CONSTRUCTOR`, padrao create/merge) | `references/mapstruct.md` |
+| Testes (JUnit 5 + Mockito 4.11, mock estatico, `JapeRepository` quirks) | `references/test.md`              |
+| Encoding arquivos (ISO-8859-1 obrigatorio em `.java`, `.xml`, `.kt`)  | `references/encoding.md`            |
+| Botao acao (`@ActionButton`, `AcaoRotinaJava`, `@Form`, `ContextoAcao`)  | `references/actionbutton.md`     |
+| Regra negocio (`@BusinessRule`, interface `Regra`, `ContextoRegra`, barramento, liberacao limite) | `references/businessrule.md` |
+| Jobs agendados (`@Job`, interface `IJob`, `onSchedule`, `getScheduleConfigHook`, CRON, migracao XML)    | `references/job.md`          |
+| Adaptadores tipo (`@GlobalTypeAdapter`, `TypeAdapter`, `JsonSerializer`, `JsonDeserializer`, nativos) | `references/typeadapter.md`  |
+| Injecao valores (`@Value`, `ValueType`, `Provider<T>` lazy/eager, `SANKHYA_PARAM`, `group`)           | `references/value.md`        |
+| Tratamento global excecoes (`@ControllerAdvice`, `@ExceptionHandler`, rollback automatico, DTO erro) | `references/controlleradvice.md` |
+| Macros SQL Sankhya (`dbDate`, `nullValue`, `ignorecase`, `truncMonth`, etc. — portabilidade Oracle/MSSQL)  | `references/macros.md`           |
 
 ## Regras universais (validas em qualquer arquivo)
 
-- **Encoding ISO-8859-1 obrigatorio.** Todo `.java`, `.xml`, `.kt` salvo Latin-1. LLMs geram UTF-8 — converter `iconv` apos criar/editar. Ver `instructions/encoding-instructions.md`.
+- **Encoding ISO-8859-1 obrigatorio.** Todo `.java`, `.xml`, `.kt` salvo Latin-1. LLMs geram UTF-8 — converter `iconv` apos criar/editar. Ver `references/encoding.md`.
 - **Java 8 estrito.** Sem `var`, `List.of`, `Map.of`, `String.isBlank`, `Files.readString`, `Optional.ifPresentOrElse`, records, sealed classes, text blocks.
 - **Lombok extensivo:** `@Data`, `@Builder`, `@AllArgsConstructor`, `@NoArgsConstructor`, `@Log`.
 - **Logging:** `@Log` Lombok + `java.util.logging`. Nunca SLF4J. Nunca `System.out`.

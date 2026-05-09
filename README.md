@@ -26,25 +26,25 @@ Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto
                 ├── SKILL.md                        # entrypoint da skill (universal)
                 ├── agents/
                 │   └── openai.yaml                 # politica/UI metadata (Codex)
-                └── instructions/
-                    ├── actionbutton-instructions.md
-                    ├── backend-instructions.md
-                    ├── build-instructions.md
-                    ├── businessrule-instructions.md
-                    ├── controller-instructions.md
-                    ├── controlleradvice-instructions.md
-                    ├── database-instructions.md
-                    ├── datadictionary-instructions.md
-                    ├── dependency-injection-instructions.md
-                    ├── encoding-instructions.md
-                    ├── entity-instructions.md
-                    ├── job-instructions.md
-                    ├── macros-instructions.md
-                    ├── mapstruct-instructions.md
-                    ├── repository-instructions.md
-                    ├── test-instructions.md
-                    ├── typeadapter-instructions.md
-                    └── value-instructions.md
+                └── references/
+                    ├── actionbutton.md
+                    ├── backend.md
+                    ├── build.md
+                    ├── businessrule.md
+                    ├── controller.md
+                    ├── controlleradvice.md
+                    ├── database.md
+                    ├── datadictionary.md
+                    ├── dependency-injection.md
+                    ├── encoding.md
+                    ├── entity.md
+                    ├── job.md
+                    ├── macros.md
+                    ├── mapstruct.md
+                    ├── repository.md
+                    ├── test.md
+                    ├── typeadapter.md
+                    └── value.md
 ```
 
 > **Layout multi-plugin:** o repo serve como **marketplace + plugin**. Cada plugin futuro vai ganhar pasta propria em `plugins/<nome>/`. Exigencia do Codex CLI (path local tem que apontar pra subpasta do marketplace root, nao pra raiz).
@@ -136,8 +136,7 @@ E reinstalar via `/plugins` se necessario.
 | Recurso                                  | Claude Code | Codex CLI |
 |:-----------------------------------------|:------------|:----------|
 | Auto-trigger por `description` da skill  | sim         | sim       |
-| Auto-trigger por `applyTo` glob          | sim         | nao (campo ignorado nos arquivos `instructions/`) |
-| Hook PostToolUse encoding ISO-8859-1     | sim         | nao (rodar `iconv` apos editar — ver `instructions/encoding-instructions.md`) |
+| Hook PostToolUse encoding ISO-8859-1     | sim         | nao (rodar `iconv` apos editar — ver `references/encoding.md`) |
 | Invocacao explicita                      | `/addon-studio` | `$addon-studio` |
 | Repo privado via `owner/repo`            | sim (usa `gh`/git auth do user) | nao (libgit2 interno; usar clone local + path) |
 

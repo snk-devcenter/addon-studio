@@ -1,7 +1,3 @@
----
-applyTo: "**/src/test/java/**/*.java"
----
-
 # Testes Backend - Addon Studio 2.0 (JUnit + Mockito)
 
 Documento define como desenvolver testes automatizados backend Addon Studio 2.0 com libs de mercado.

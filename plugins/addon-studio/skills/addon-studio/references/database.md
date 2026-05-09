@@ -1,7 +1,3 @@
----
-applyTo: "dbscripts/**/*.xml"
----
-
 # Scripts de Banco de Dados (Addon Studio 2.0)
 
 Instruções para criar/manter scripts migração em `dbscripts/` para projetos Addon Studio 2.0.

@@ -1,7 +1,3 @@
----
-applyTo: "**/*Adapter.java"
----
-
 # Adaptadores de Tipo (`@GlobalTypeAdapter`) — Addon Studio 2.0
 
 `@GlobalTypeAdapter` registra adaptadores customizados no SDK para converter tipos entre JSON, objetos Java e valores Jape (camada de persistencia). Aplicado automaticamente em todo marshal/unmarshal de DTOs.
@@ -9,8 +5,8 @@ applyTo: "**/*Adapter.java"
 > **Beta / Acesso Antecipado**: funcionalidade sujeita a mudancas. Contato: developer@sankhya.com.br.
 >
 > **Referencias complementares:**
-> - `entity-instructions.md` — Tipos suportados em `@JapeEntity`
-> - `controller-instructions.md` — DTOs e serialização JSON
+> - `entity.md` — Tipos suportados em `@JapeEntity`
+> - `controller.md` — DTOs e serialização JSON
 
 ---
 
@@ -217,4 +213,4 @@ Ja registrados automaticamente. Nao recriar sem necessidade — apenas sobrescre
 5. [ ] Tratar `null` em todos os caminhos de `fromVO` e `toVO`.
 6. [ ] Lancar `JsonParseException` (nunca silenciar) em erros de `deserialize`.
 7. [ ] Manter `setType` com corpo vazio se subtipo concreto nao for relevante.
-8. [ ] Registrar no modulo Guice do projeto (ver `dependency-injection-instructions.md`).
+8. [ ] Registrar no modulo Guice do projeto (ver `dependency-injection.md`).

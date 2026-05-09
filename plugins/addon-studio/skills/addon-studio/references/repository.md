@@ -1,12 +1,8 @@
----
-applyTo: "**/*Repository.java"
----
-
 # Repositório (@Repository) — Addon Studio 2.0
 
 Padrão **Repository** no SDK Sankhya = abstração simplifica acesso dados. Define interfaces declarativas, SDK gera implementação em compile-time — sem boilerplate, type-safe, protege SQL Injection.
 
-> **Referência complementar:** consulte `entity-instructions.md` para criar entidades correspondentes.
+> **Referência complementar:** consulte `entity.md` para criar entidades correspondentes.
 
 ---
 
@@ -199,7 +195,7 @@ List<Nota> findByNomeParceiro(@Parameter("nome") String nome);
 BigDecimal descontoOuZero(@Parameter("nu") Long nu);
 ```
 
-> Macros traduzem automaticamente entre Oracle e MSSQL. Lista completa (datas, texto, conversoes, agregacoes): ver `macros-instructions.md`. **Sempre prefira macro a sintaxe especifica de banco** (`SYSDATE`, `NVL`, `||`, `ROWNUM`, etc.).
+> Macros traduzem automaticamente entre Oracle e MSSQL. Lista completa (datas, texto, conversoes, agregacoes): ver `macros.md`. **Sempre prefira macro a sintaxe especifica de banco** (`SYSDATE`, `NVL`, `||`, `ROWNUM`, etc.).
 
 ---
 

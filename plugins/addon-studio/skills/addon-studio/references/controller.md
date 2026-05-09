@@ -1,16 +1,12 @@
----
-applyTo: "**/*Controller.java"
----
-
 # Controller (`@Controller`) — Addon Studio 2.0
 
 `@Controller` marca classes = pontos entrada API interna add-on. Cada metodo publico auto-exposto como endpoint servico. Controllers **orquestram** fluxo requisicao — **nunca** contem logica negocio.
 
 > **Referencias complementares:**
-> - `backend-instructions.md` — Stack + camadas
-> - `dependency-injection-instructions.md` — Injecao de dependencia (Guice)
-> - `mapstruct-instructions.md` — Mapeamento de objetos (MapStruct)
-> - `controlleradvice-instructions.md` — Tratamento global de excecoes
+> - `backend.md` — Stack + camadas
+> - `dependency-injection.md` — Injecao de dependencia (Guice)
+> - `mapstruct.md` — Mapeamento de objetos (MapStruct)
+> - `controlleradvice.md` — Tratamento global de excecoes
 
 ---
 
@@ -309,7 +305,7 @@ Framework serializa auto objeto retornado em `responseBody` da response.
 
 Excecoes lancadas em metodos do controller devem ser tratadas em classe `@ControllerAdvice` separada. **Nunca** capturar excecao no proprio controller — deixar propagar.
 
-> Ver `controlleradvice-instructions.md` para regras criticas (handler nao pode retornar `void`, multiplas excecoes por handler, rollback automatico, proibicao de `Exception.class`) e niveis de log sugeridos.
+> Ver `controlleradvice.md` para regras criticas (handler nao pode retornar `void`, multiplas excecoes por handler, rollback automatico, proibicao de `Exception.class`) e niveis de log sugeridos.
 
 ---
 
@@ -470,7 +466,7 @@ public class PedidoController {
 4. [ ] Injetar dependencias (servicos da camada de aplicacao, mappers) via construtor com `@Inject`.
 5. [ ] Criar Request DTOs com validacao (`@NotNull`, `@NotBlank`, etc.).
 6. [ ] Criar Response DTOs.
-7. [ ] Criar MapStruct Mapper (ver `mapstruct-instructions.md`).
+7. [ ] Criar MapStruct Mapper (ver `mapstruct.md`).
 8. [ ] Usar `@Valid` em parametro dos metodos que recebem DTOs.
 9. [ ] Usar `@Transactional` em metodos que alteram dados.
 10. [ ] Retornar tipo adequado conforme regra negocio (DTO resposta ou `void`).

@@ -1,14 +1,10 @@
----
-applyTo: "**/*Action.java"
----
-
 # Botao de Acao (`@ActionButton`) — Addon Studio 2.0
 
 `@ActionButton` associa uma classe Java ao menu "Acoes" de telas nativas do Sankhya Om. Disponivel a partir do Addon Studio 2.0.
 
 > **Referencias complementares:**
-> - `backend-instructions.md` — Stack + restricoes Java 8
-> - `dependency-injection-instructions.md` — Injecao de dependencia (Guice)
+> - `backend.md` — Stack + restricoes Java 8
+> - `dependency-injection.md` — Injecao de dependencia (Guice)
 
 ---
 
@@ -252,4 +248,4 @@ public class ExportarDadosAction implements AcaoRotinaJava {
 7. [ ] Chamar `contexto.setMensagemRetorno()` em todos os caminhos (sucesso e erro).
 8. [ ] Definir `transactionType` se precisar de transacao isolada (`REQUIRES_NEW`).
 9. [ ] Definir `refreshType` se precisar atualizar mais que o registro atual.
-10. [ ] Registrar o `@Component` no modulo Guice do projeto (ver `dependency-injection-instructions.md`).
+10. [ ] Registrar o `@Component` no modulo Guice do projeto (ver `dependency-injection.md`).

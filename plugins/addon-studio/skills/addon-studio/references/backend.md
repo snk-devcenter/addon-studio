@@ -5,16 +5,16 @@ Stack e regras gerais de codigo Java em projetos Sankhya Addon Studio 2.0 (Wildf
 > **Skill nao opina sobre arquitetura.** Organizacao de pacotes, camadas, padroes de design (Clean Arch, Hexagonal, MVC, DDD etc.) sao decisoes do dev/projeto. Este arquivo cobre **so** stack tecnologica + estilo de codigo + restricoes do framework.
 >
 > **Arquivos complementares (ler conforme tarefa):**
-> - `entity-instructions.md` — Entidades `@JapeEntity`
-> - `datadictionary-instructions.md` — Dicionario de Dados (XML)
-> - `database-instructions.md` — Scripts banco (`dbscripts/`)
-> - `repository-instructions.md` — Repositorios `@Repository`
-> - `controller-instructions.md` — Controllers REST `@Controller`
-> - `dependency-injection-instructions.md` — Injecao Guice
-> - `mapstruct-instructions.md` — MapStruct
-> - `test-instructions.md` — JUnit + Mockito
-> - `build-instructions.md` — Build / deploy
-- `encoding-instructions.md` — Encoding ISO-8859-1 (`.java`, `.xml`, `.kt`)
+> - `entity.md` — Entidades `@JapeEntity`
+> - `datadictionary.md` — Dicionario de Dados (XML)
+> - `database.md` — Scripts banco (`dbscripts/`)
+> - `repository.md` — Repositorios `@Repository`
+> - `controller.md` — Controllers REST `@Controller`
+> - `dependency-injection.md` — Injecao Guice
+> - `mapstruct.md` — MapStruct
+> - `test.md` — JUnit + Mockito
+> - `build.md` — Build / deploy
+- `encoding.md` — Encoding ISO-8859-1 (`.java`, `.xml`, `.kt`)
 
 ---
 
@@ -85,7 +85,7 @@ public class Exemplo {
 
 ### Injecao de dependencia
 
-- Sempre `@Inject` via construtor. Nunca em campo (excecao: mappers MapStruct `abstract class` com repository — ver `mapstruct-instructions.md`).
+- Sempre `@Inject` via construtor. Nunca em campo (excecao: mappers MapStruct `abstract class` com repository — ver `mapstruct.md`).
 - `@Inject` de **`com.google.inject.Inject`**. Nunca `javax.inject.Inject`.
 - Dependencias declaradas `private final`.
 - Nunca usar `new` para criar dependencia gerenciada.
@@ -116,7 +116,7 @@ public class IntegrationApiException extends RuntimeException {
 }
 ```
 
-Tratamento centralizado de excecoes em controllers via `@ControllerAdvice` — ver `controlleradvice-instructions.md`.
+Tratamento centralizado de excecoes em controllers via `@ControllerAdvice` — ver `controlleradvice.md`.
 
 ---
 
@@ -150,4 +150,4 @@ Aplicada a tabelas e entities do addon. Padrao parametrizado por `<PRX>` (prefix
 
 `<PRX>` = prefixo fixo do projeto (UPPER 3-4 chars; ex.: `TDC`, `APP`, `CST`). `<MOD3>` = sigla 3 chars do modulo. Se projeto novo ou sem padrao detectavel, **perguntar ao dev** antes de criar.
 
-Detalhes: `database-instructions.md`, `entity-instructions.md`, `datadictionary-instructions.md`.
+Detalhes: `database.md`, `entity.md`, `datadictionary.md`.

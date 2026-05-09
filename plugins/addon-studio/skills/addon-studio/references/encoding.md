@@ -1,7 +1,3 @@
----
-applyTo: "**/*.java,**/*.xml,**/*.kt"
----
-
 # Codificacao de Arquivos — Addon Studio 2.0
 
 > **REGRA CRITICA — SEM EXCECOES**

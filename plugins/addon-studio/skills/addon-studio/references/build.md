@@ -1,7 +1,3 @@
----
-applyTo: "**/{build.gradle,settings.gradle,gradle.properties,gradlew,gradlew.bat}"
----
-
 # Build e Deploy de Desenvolvimento
 
 ## Compilar e Fazer Deploy Local

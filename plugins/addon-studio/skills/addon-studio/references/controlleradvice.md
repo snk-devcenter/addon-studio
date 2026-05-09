@@ -1,14 +1,10 @@
----
-applyTo: "**/*ExceptionHandler.java,**/*ControllerAdvice.java"
----
-
 # Tratamento Global de Excecoes (`@ControllerAdvice`) — Addon Studio 2.0
 
 `@ControllerAdvice` centraliza tratamento de excecoes de todos `@Controller` e `@Service`. Excecao capturada = **rollback automatico** da transacao ativa.
 
 > **Beta / Acesso Antecipado**: funcionalidade sujeita a mudancas.
 >
-> **Referencia complementar:** `controller-instructions.md` — controllers devem deixar excecao propagar.
+> **Referencia complementar:** `controller.md` — controllers devem deixar excecao propagar.
 
 ---
 

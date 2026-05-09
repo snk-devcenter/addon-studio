@@ -1,14 +1,10 @@
----
-applyTo: "**/*Regra.java"
----
-
 # Regra de Negocio (`@BusinessRule`) — Addon Studio 2.0
 
 `@BusinessRule` implementa logica automatica disparada por eventos do ciclo de vida comercial — principalmente **confirmacao e faturamento** de documentos (Pedidos, Notas de Venda). Disponivel a partir do Addon Studio 2.0.
 
 > **Referencias complementares:**
-> - `backend-instructions.md` — Stack + restricoes Java 8
-> - `dependency-injection-instructions.md` — Injecao de dependencia (Guice)
+> - `backend.md` — Stack + restricoes Java 8
+> - `dependency-injection.md` — Injecao de dependencia (Guice)
 
 ---
 
@@ -278,4 +274,4 @@ public class IntegracaoExternaRegra implements Regra {
 7. [ ] Delegar logica de negocio para Service (`@Component`).
 8. [ ] Integracoes externas: usar mecanismo assincrono.
 9. [ ] Fornecer feedback ao usuario via `addMensagem()` ou excecao com mensagem clara.
-10. [ ] Registrar no modulo Guice do projeto (ver `dependency-injection-instructions.md`).
+10. [ ] Registrar no modulo Guice do projeto (ver `dependency-injection.md`).
