@@ -149,7 +149,7 @@ Long contarPendentes(JdbcWrapper jdbc);
 void reajustarPrecoPorGrupo(@Parameter("fator") BigDecimal fator, @Parameter("grupo") Long grupo);
 
 @Modifying
-@NativeQuery("DELETE FROM AD_LOGS WHERE DTEXPIRACAO < :data")
+@NativeQuery("DELETE FROM TDCXYZLOG WHERE DTEXPIRACAO < :data")
 void excluirLogsExpirados(@Parameter("data") LocalDate data);
 ```
 

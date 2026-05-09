@@ -46,7 +46,12 @@ Entidade Java (`@JapeEntity`) = classe dominio **limpa** — so `@Column(name = 
 | Tag XML           | Quando usar                                                              |
 |:------------------|:-------------------------------------------------------------------------|
 | `<table />`       | Tabela **nova** criada pelo add-on.                                      |
+| `<treeTable />`   | Tabela **hierarquica** (pai/filho) — cadastros tipo centro de custo, categorias de produto, organogramas. Framework gera UI tree + campos `CODIGOPAI`/`ANALITICO`/`GRAU`. Detalhes em [`references/tree-table.md`](references/tree-table.md). |
 | `<nativeTable />` | Extensao tabela **nativa** Sankhya Om (adiciona campos/instancia). |
+| `<nativeFolder />`| Container para `<pastaNativa>` — encaixe em pasta nativa Sankhya (Configuracoes / Cadastros / Consulta / Rotina / Relatorio). Detalhes em [`references/menu.md`](references/menu.md). |
+| `<menu />`        | Estrutura de menu/navegacao do add-on. Container para `<folder>`, `<dynamicForm>`, `<dynamicTreeView>`, `<ui>`, `<dashboard>`. Detalhes em [`references/menu.md`](references/menu.md). |
+| `<dynamicForm />` | Tela CRUD declarativa (sem JS/HTML) gerada a partir de uma `<instance>` da tabela. Vai dentro de `<menu>`/`<folder>`. Detalhes em [`references/dynamic-form.md`](references/dynamic-form.md). |
+| `<filters />`     | Filtros de busca em telas geradas por `<dynamicForm>`/`<dynamicTreeView>`. Filho de `<table>`/`<treeTable>`. Detalhes em [`references/filters.md`](references/filters.md). |
 
 ---
 
