@@ -36,108 +36,139 @@ Ações:
 
 | Decisão | Opções |
 |---------|--------|
-| Tipo de operação | `CREATE TABLE` (tabela nova), `ALTER TABLE ADD` (adicionar coluna), `ALTER TABLE MODIFY` (modificar), `ALTER TABLE DROP` (remover), `INSERT` (dados de configuração) |
-| Tabela é nova ou nativa Sankhya? | Nova: `CREATE TABLE` permitido. Nativa: **somente** `ALTER TABLE` para colunas custom prefixadas com `<MOD3>_` |
+| Tipo de operação | CREATE TABLE (tabela nova), ALTER TABLE ADD (adicionar coluna), ALTER TABLE MODIFY (modificar), ALTER TABLE DROP (remover), INSERT/UPDATE (dados de configuração) |
+| Tabela é nova ou nativa Sankhya? | Nova: CREATE TABLE permitido. Nativa: **somente** ALTER TABLE para colunas custom prefixadas com `<MOD3>_` |
 | Próximo `V<NNN>` | Sequencial — não pular números, não duplicar |
+| `executar` (atributo do `<sql>`) | `SE_NAO_EXISTIR` (CREATE/ADD), `SE_EXISTIR` (MODIFY/DROP), `SEMPRE` (INSERT idempotente — usar com cautela) |
+| `tipoObjeto` (atributo do `<sql>`) | `TABLE`, `COLUMN`, `VIEW`, `INDEX`, `TRIGGER` — combinado com `nomeObjeto` é o que o engine confere para decidir executar |
 
 ### 3. Gerar dbscript
 
-**Localização:** `dbscripts/V<NNN>-<DESCRICAO>.xml`
+**Localização:** `dbscripts/V<NNN>-<OPERACAO>_<TABELA>.xml` (ex.: `V001-CREATE_TABLE_TDCXYZCAB.xml`).
 
 **Formato XML base:**
 
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<dbscript>
-    <sql executar="<TIPO>" ordem="1">
-        <oracle><![CDATA[
-            -- DDL Oracle aqui
-        ]]></oracle>
-        <mssql><![CDATA[
+<scripts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../.gradle/scripts.xsd">
+
+    <sql nomeTabela="NOME_TABELA"
+         ordem="1"
+         executar="SE_NAO_EXISTIR"
+         tipoObjeto="TABLE"
+         nomeObjeto="NOME_OBJETO"
+         descricao="Descrição do que o script faz">
+        <mssql>
             -- DDL MSSQL aqui
-        ]]></mssql>
+        </mssql>
+        <oracle>
+            -- DDL Oracle aqui
+        </oracle>
     </sql>
-    <!-- Mais blocos <sql> conforme necessário, ordem incremental -->
-</dbscript>
+
+</scripts>
 ```
 
-**Atributos do `<sql>`:**
+**Regras estruturais:**
 
-- `executar`: tipo de operação (`CREATE_TABLE`, `ALTER_TABLE`, `INSERT`, etc.)
-- `ordem`: número incremental dentro do mesmo arquivo (1, 2, 3...). **Único** dentro do arquivo.
+- Root: `<scripts>` (não `<dbscript>`) com namespace `xmlns:xsi` + `xsi:noNamespaceSchemaLocation="../.gradle/scripts.xsd"`
+- Cada operação = um bloco `<sql>` com **6 atributos** (5 obrigatórios + `descricao` opcional)
+- Body: `<mssql>` **primeiro**, `<oracle>` **depois** — sem `<![CDATA[...]]>` wrapper
+- `</scripts>` no final (não auto-fechar)
+
+**Atributos obrigatórios do `<sql>`:**
+
+| Atributo | Descrição | Valores |
+|----------|-----------|---------|
+| `nomeTabela` | Tabela afetada (usado em logs) | Nome da tabela UPPER |
+| `ordem` | Ordem de execução no arquivo. **Não duplicar** dentro do mesmo XML | Inteiro sequencial (1, 2, 3...) |
+| `executar` | Condição de execução | `SE_NAO_EXISTIR`, `SE_EXISTIR`, `SEMPRE` |
+| `tipoObjeto` | Tipo do objeto verificado por `executar` | `TABLE`, `COLUMN`, `VIEW`, `INDEX`, `TRIGGER` |
+| `nomeObjeto` | Nome do objeto verificado (identificador único de versionamento) | Nome do objeto no banco |
+| `descricao` | (opcional) Descrição textual do script | Texto livre |
 
 ### 4. Padrões obrigatórios
 
 #### 4.1 CREATE TABLE — somente PK + constraint
 
 ```xml
-<sql executar="CREATE_TABLE" ordem="1">
-    <oracle><![CDATA[
+<sql nomeTabela="TDCXYZCAB" ordem="1" executar="SE_NAO_EXISTIR"
+     tipoObjeto="TABLE" nomeObjeto="TDCXYZCAB"
+     descricao="Criacao da tabela TDCXYZCAB">
+    <mssql>
         CREATE TABLE TDCXYZCAB (
-            CODCAB NUMBER(10) NOT NULL,
-            CONSTRAINT PK_TDCXYZCAB PRIMARY KEY (CODCAB)
+        CODCAB INT NOT NULL,
+        CONSTRAINT PK_TDCXYZCAB PRIMARY KEY (CODCAB)
         )
-    ]]></oracle>
-    <mssql><![CDATA[
+    </mssql>
+    <oracle>
         CREATE TABLE TDCXYZCAB (
-            CODCAB INT NOT NULL,
-            CONSTRAINT PK_TDCXYZCAB PRIMARY KEY (CODCAB)
+        CODCAB NUMBER(10) NOT NULL,
+        CONSTRAINT PK_TDCXYZCAB PRIMARY KEY (CODCAB)
         )
-    ]]></mssql>
+    </oracle>
 </sql>
 ```
 
 #### 4.2 ALTER TABLE ADD — uma coluna por bloco `<sql>`
 
 ```xml
-<sql executar="ALTER_TABLE" ordem="2">
-    <oracle><![CDATA[
-        ALTER TABLE TDCXYZCAB ADD (DESCRICAO VARCHAR2(200))
-    ]]></oracle>
-    <mssql><![CDATA[
+<sql nomeTabela="TDCXYZCAB" ordem="2" executar="SE_NAO_EXISTIR"
+     tipoObjeto="COLUMN" nomeObjeto="DESCRICAO"
+     descricao="Adicionar campo DESCRICAO em TDCXYZCAB">
+    <mssql>
         ALTER TABLE TDCXYZCAB ADD DESCRICAO VARCHAR(200)
-    ]]></mssql>
+    </mssql>
+    <oracle>
+        ALTER TABLE TDCXYZCAB ADD (DESCRICAO VARCHAR2(200))
+    </oracle>
 </sql>
 
-<sql executar="ALTER_TABLE" ordem="3">
-    <oracle><![CDATA[
-        ALTER TABLE TDCXYZCAB ADD (VALOR NUMBER(15,2))
-    ]]></oracle>
-    <mssql><![CDATA[
+<sql nomeTabela="TDCXYZCAB" ordem="3" executar="SE_NAO_EXISTIR"
+     tipoObjeto="COLUMN" nomeObjeto="VALOR"
+     descricao="Adicionar campo VALOR em TDCXYZCAB">
+    <mssql>
         ALTER TABLE TDCXYZCAB ADD VALOR NUMERIC(15,2)
-    ]]></mssql>
+    </mssql>
+    <oracle>
+        ALTER TABLE TDCXYZCAB ADD (VALOR NUMBER(15,2))
+    </oracle>
 </sql>
 ```
 
 **Nunca:**
 ```xml
-<!-- ❌ ERRADO: várias colunas no mesmo CREATE/ALTER -->
-<sql executar="CREATE_TABLE" ordem="1">
-    <oracle><![CDATA[
+<!-- ❌ ERRADO: várias colunas no mesmo CREATE -->
+<sql nomeTabela="TDCXYZCAB" ordem="1" executar="SE_NAO_EXISTIR"
+     tipoObjeto="TABLE" nomeObjeto="TDCXYZCAB">
+    <mssql>
         CREATE TABLE TDCXYZCAB (
-            CODCAB NUMBER(10) NOT NULL,
-            DESCRICAO VARCHAR2(200),
-            VALOR NUMBER(15,2),
-            ...
+        CODCAB INT NOT NULL,
+        DESCRICAO VARCHAR(200),
+        VALOR NUMERIC(15,2),
+        ...
         )
-    ]]></oracle>
+    </mssql>
 </sql>
 ```
 
-#### 4.3 Tabela nativa — somente ALTER
+#### 4.3 Tabela nativa — somente ALTER, coluna prefixada `<MOD3>_`
 
 ```xml
-<sql executar="ALTER_TABLE" ordem="1">
-    <oracle><![CDATA[
-        ALTER TABLE TGFCAB ADD (XYZ_STATUS VARCHAR2(1))
-    ]]></oracle>
-    <mssql><![CDATA[
+<sql nomeTabela="TGFCAB" ordem="1" executar="SE_NAO_EXISTIR"
+     tipoObjeto="COLUMN" nomeObjeto="XYZ_STATUS"
+     descricao="Adicionar campo custom XYZ_STATUS em TGFCAB">
+    <mssql>
         ALTER TABLE TGFCAB ADD XYZ_STATUS VARCHAR(1)
-    ]]></mssql>
+    </mssql>
+    <oracle>
+        ALTER TABLE TGFCAB ADD (XYZ_STATUS VARCHAR2(1))
+    </oracle>
 </sql>
 ```
 
-Coluna custom em tabela nativa: prefixo `<MOD3>_` UPPER.
+Coluna custom em tabela nativa: prefixo `<MOD3>_` UPPER (ex.: `XYZ_STATUS`, `FIN_TAXA`).
 
 ### 5. Tipos por banco
 
