@@ -2,6 +2,8 @@
 
 Componente UI declarativo que **gera tela de cadastro CRUD completa** sem escrever código de interface (sem JavaScript/HTML). Aproveita a definição do `<table>`/`<instance>` no dicionário de dados — campos, abas, relacionamentos e lookups são montados automaticamente.
 
+> **`<dynamicForm>` é para `<table>` regular** (CRUD em grade/formulário). Para `<treeTable>` (hierarquia pai/filho), usar `<dynamicTreeView>` — mesma estrutura de atributos, mas renderiza tree-view. Ver tabela "Diferença `<dynamicForm>` vs outros componentes" abaixo.
+
 ## Quando usar
 
 - Cadastros administrativos baseados em tabelas estruturadas
@@ -43,31 +45,33 @@ Componente UI declarativo que **gera tela de cadastro CRUD completa** sem escrev
 `instance` é o **elo lógico** entre `<dynamicForm>` e a tabela:
 
 ```xml
-<!-- Arquivo: datadictionary/TDCXYZCCU.xml -->
-<treeTable name="TDCXYZCCU" defaultMask="##.##.##">
-    <description>Centro de Custo</description>
-    <primaryKey><field name="CODCCU"/></primaryKey>
+<!-- Arquivo: datadictionary/TDCXYZATD.xml -->
+<table name="TDCXYZATD" sequenceType="A" sequenceField="CODATD">
+    <description>Atendimento</description>
+    <primaryKey><field name="CODATD"/></primaryKey>
     <instances>
-        <instance name="TdcXyzCentroCusto">    <!-- ← instance declarada aqui -->
-            <description>Centro de Custo</description>
+        <instance name="TdcXyzAtendimento">    <!-- ← instance declarada aqui -->
+            <description>Atendimento</description>
         </instance>
     </instances>
     <fields>...</fields>
-</treeTable>
+</table>
 ```
 
 ```xml
 <!-- Arquivo: datadictionary/TDCXYZ_MENU.xml -->
 <metadados>
     <menu id="TDC_MENU_XYZ" description="Modulo XYZ" icon="...">
-        <dynamicForm id="TDC_FORM_CCU"
-                     instance="TdcXyzCentroCusto"   <!-- ← bate com instance acima -->
-                     description="Centro de Custo"/>
+        <dynamicForm id="TDC_FORM_ATD"
+                     instance="TdcXyzAtendimento"   <!-- ← bate com instance acima -->
+                     description="Atendimentos"/>
     </menu>
 </metadados>
 ```
 
 Se `instance` apontar para nome inexistente, o deploy **falha**.
+
+> **Para `<treeTable>`:** mesma lógica de `instance`, mas o componente de menu correto é `<dynamicTreeView>` (não `<dynamicForm>`). Atributos idênticos (`id`, `instance`, `description`, `resourceId`, `license`).
 
 ## Geração automática da tela
 
@@ -152,17 +156,20 @@ Resultado: tela com 4 campos, `CODUSU` lookup pra Usuario com default = usuário
 
 ## Diferença `<dynamicForm>` vs outros componentes de menu
 
-| Componente | Quando usar | UI gerada de... |
-|------------|-------------|----------------|
-| `<dynamicForm>` | Cadastro CRUD baseado em `<instance>` | Definição da tabela no dicionário |
-| `<dynamicTreeView>` | Cadastro CRUD com tree-view (use com `<treeTable>`) | Idem, mas exibe como árvore |
-| `<ui>` | Tela custom (JS/HTML/xhtml5) | URL aponta para arquivo `.xhtml5` |
-| `<dashboard>` | Dashboard de gráficos/KPIs | Arquivo de dashboard em `/dashboards/` |
+| Componente | Tipo de tabela alvo | Renderização |
+|------------|---------------------|--------------|
+| `<dynamicForm>` | `<table>` regular | Grid + form CRUD padrão |
+| `<dynamicTreeView>` | `<treeTable>` hierárquica | Tree-view expansível com mesmos campos do form |
+| `<ui>` | Qualquer (custom) | Arquivo `.xhtml5` próprio (JS/HTML manual) |
+| `<dashboard>` | N/A | Arquivo de dashboard em `/dashboards/` (gráficos/KPIs) |
+
+> **Regra:** componente segue o tipo da tabela. `<table>` → `<dynamicForm>`. `<treeTable>` → `<dynamicTreeView>`. Tentar usar `<dynamicForm>` apontando pra `<instance>` de uma `<treeTable>` perde a UI hierárquica (renderiza grade plana, ignorando `CODIGOPAI`/`GRAU`/`ANALITICO`).
 
 ## Anti-patterns
 
 - [ ] Usar prefixo genérico `AD_` no `id` — usar `<PRX>_` do projeto
 - [ ] `instance` apontando para nome que não existe na tabela — deploy falha
+- [ ] **Usar `<dynamicForm>` apontando para `<instance>` de `<treeTable>`** — perde tree-view, renderiza grade plana. Use `<dynamicTreeView>` para `<treeTable>`.
 - [ ] Conflito de nome com entidade nativa Sankhya (`Produto`, `Parceiro`, `Usuario`, etc.) — usar nomes específicos do addon
 - [ ] Declarar `<dynamicForm>` dentro de `<table>` — vai dentro de `<menu>`
 - [ ] Definir tabela e menu no mesmo arquivo XML — separar em arquivos diferentes

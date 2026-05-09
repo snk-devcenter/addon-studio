@@ -22,9 +22,17 @@ Define ponto de entrada na barra de navegação principal do Sankhya Om. Contain
           description="Modulo XYZ"
           icon="/$ctx/assets/xyz_icone.png">
         <folder id="TDC_FLD_CADASTROS" description="Cadastros">
-            <dynamicForm id="TDC_FORM_CCU"
-                         instance="TdcXyzCentroCusto"
-                         description="Centro de Custo"/>
+            <!-- Atendimento e Departamento sao <table> regulares -->
+            <dynamicForm id="TDC_FORM_ATD"
+                         instance="TdcXyzAtendimento"
+                         description="Atendimentos"/>
+            <dynamicForm id="TDC_FORM_DEP"
+                         instance="TdcXyzDepartamento"
+                         description="Departamentos"/>
+            <!-- Centro de Custo eh <treeTable> hierarquica - usar dynamicTreeView -->
+            <dynamicTreeView id="TDC_TREE_CCU"
+                             instance="TdcXyzCentroCusto"
+                             description="Centro de Custo"/>
         </folder>
     </menu>
 </metadados>
@@ -46,8 +54,8 @@ Define ponto de entrada na barra de navegação principal do Sankhya Om. Contain
 | Filho | Função | Detalhes |
 |-------|--------|----------|
 | `<folder>` | Submenu hierárquico recursivo | Pode aninhar mais folders/uis/forms/etc |
-| `<dynamicForm>` | Tela CRUD declarativa baseada em `<instance>` | Ver [`dynamic-form.md`](dynamic-form.md) |
-| `<dynamicTreeView>` | CRUD com tree-view (use com `<treeTable>`) | Mesmos atributos do `<dynamicForm>` |
+| `<dynamicForm>` | Tela CRUD declarativa para `<table>` regular | Ver [`dynamic-form.md`](dynamic-form.md) |
+| `<dynamicTreeView>` | Tela CRUD com tree-view para `<treeTable>` hierárquica. Atributos idênticos ao `<dynamicForm>` (`id`, `instance`, `description`, `resourceId`, `license`). **Regra:** `<table>` → `<dynamicForm>`; `<treeTable>` → `<dynamicTreeView>` | Ver [`tree-table.md`](tree-table.md) |
 | `<ui>` | Tela custom (xhtml5/JS/HTML) | URL aponta para arquivo XHTML5 |
 | `<dashboard>` | Dashboard de gráficos/KPIs | Arquivo em `/dashboards/` |
 | `<pastaNativa>` | Encaixe em pasta nativa do Sankhya | Apenas 4 valores enum (ver abaixo) |
@@ -176,12 +184,12 @@ Filho `<properties>` em `<ui>`/`<dynamicForm>`/`<dynamicTreeView>` aceita 3 sub-
 | `<filterExpression>` | Filtro fixo aplicado ao listar registros |
 | `<paramMenuAtivo>` | SQL que retorna 1+ row para liberar o item de menu (toggle por feature flag, parâmetro Sankhya, etc.) |
 
-Exemplo `paramMenuAtivo` — habilita o form só se parâmetro Sankhya `XYZ_FEAT_CCU = 'S'`:
+Exemplo `paramMenuAtivo` — habilita o form só se parâmetro Sankhya `XYZ_FEAT_ATD = 'S'`:
 
 ```xml
-<dynamicForm id="TDC_FORM_CCU" instance="TdcXyzCentroCusto" description="Centro de Custo">
+<dynamicForm id="TDC_FORM_ATD" instance="TdcXyzAtendimento" description="Atendimentos">
     <properties>
-        <paramMenuAtivo>SELECT 1 FROM TSIPAR WHERE CHAVE = 'XYZ_FEAT_CCU' AND VALOR = 'S'</paramMenuAtivo>
+        <paramMenuAtivo>SELECT 1 FROM TSIPAR WHERE CHAVE = 'XYZ_FEAT_ATD' AND VALOR = 'S'</paramMenuAtivo>
     </properties>
 </dynamicForm>
 ```
@@ -198,12 +206,14 @@ Item somente aparece no menu se a query retornar pelo menos 1 row no banco.
           icon="/$ctx/assets/xyz_icone.png">
 
         <folder id="TDC_FLD_CADASTROS" description="Cadastros">
-            <dynamicForm id="TDC_FORM_CCU"
-                         instance="TdcXyzCentroCusto"
-                         description="Centro de Custo"/>
+            <!-- Departamento eh <table> regular -->
             <dynamicForm id="TDC_FORM_DEP"
                          instance="TdcXyzDepartamento"
                          description="Departamento"/>
+            <!-- Centro de Custo eh <treeTable> - usar dynamicTreeView -->
+            <dynamicTreeView id="TDC_TREE_CCU"
+                             instance="TdcXyzCentroCusto"
+                             description="Centro de Custo"/>
         </folder>
 
         <folder id="TDC_FLD_MOVIMENTOS" description="Movimentos">

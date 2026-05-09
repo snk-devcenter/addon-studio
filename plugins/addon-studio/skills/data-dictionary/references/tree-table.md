@@ -2,6 +2,8 @@
 
 Tipo especializado de tabela para cadastros com estrutura de árvore (pai/filho). O framework gera automaticamente UI com navegação expansível por níveis hierárquicos.
 
+> **Componente de menu correto:** `<dynamicTreeView>` (não `<dynamicForm>`). `<dynamicForm>` é para `<table>` regular — apontar para `<instance>` de `<treeTable>` perde a UI hierárquica. Atributos do `<dynamicTreeView>` são idênticos: `id`, `instance`, `description`, `resourceId`, `license`. Ver [`dynamic-form.md`](dynamic-form.md) para detalhes do componente irmão.
+
 ## Quando usar
 
 Casos típicos:
