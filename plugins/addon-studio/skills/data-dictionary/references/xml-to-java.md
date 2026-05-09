@@ -43,7 +43,7 @@ private Integer codProduto;
 
 ```xml
 <primaryKey>
-    <field name="CODPAI"/>
+    <field name="CODORIG"/>
     <field name="NUITEM"/>
 </primaryKey>
 ```
@@ -57,13 +57,15 @@ Cria classe `@Embeddable`:
 @Embeddable
 public class TdcXyzEntidadeId {
 
-    @Column(name = "CODPAI")
-    private Integer codPai;
+    @Column(name = "CODORIG")
+    private Integer codOrig;
 
     @Column(name = "NUITEM")
     private Integer nuItem;
 }
 ```
+
+> **Não confundir com `<treeTable>`:** `CODORIG` aqui é nome arbitrário de exemplo. Em `<treeTable>` a FK pro registro pai **é sempre `CODIGOPAI`** (nome fixo do framework Sankhya, não renomeável). Ver `tree-table.md`.
 
 Na entidade:
 

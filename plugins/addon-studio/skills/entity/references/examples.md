@@ -50,12 +50,12 @@ public class TdcXyzRelacao {
 
     // Navegação ManyToOne
     @ManyToOne
-    @JoinColumn(name = "CODORIGEM", referencedColumnName = "CODPAI")
+    @JoinColumn(name = "CODORIGEM", referencedColumnName = "CODORIG")
     private TdcXyzProduto produto;
 
     // Métodos auxiliares para PK composta
-    public Integer getCodPai() {
-        return this.embeddedId.getCodPai();
+    public Integer getCodOrig() {
+        return this.embeddedId.getCodOrig();
     }
 }
 ```
