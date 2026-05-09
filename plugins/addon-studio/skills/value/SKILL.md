@@ -1,5 +1,8 @@
 ---
-applyTo: "**/*.java"
+name: value
+description: Sankhya @Value injection (ValueType, Provider<T> lazy/eager, SANKHYA_PARAM, group). Use when injecting configuration values into Guice-managed components.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
 
 # Injecao de Valores (`@Value`) — Addon Studio 2.0
@@ -8,7 +11,7 @@ applyTo: "**/*.java"
 
 > **Beta / Acesso Antecipado**: funcionalidade sujeita a mudancas.
 >
-> **Referencia complementar:** `dependency-injection-instructions.md`
+> **Referencia complementar:** `dependency-injection`
 
 ---
 
@@ -163,3 +166,8 @@ public class IntegracaoConfig {
 4. [ ] Definir `defaultValue` com valor significativo — nunca string vazia em config critica.
 5. [ ] Decidir Eager vs Lazy: `Provider<T>` se o valor for condicional ou opcional.
 6. [ ] Campo nao e `final`.
+
+
+## Related Skills
+
+- `dependency-injection` — @Value injeta em @Component gerenciados pelo Guice

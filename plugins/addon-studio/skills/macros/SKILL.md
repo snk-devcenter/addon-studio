@@ -1,5 +1,8 @@
 ---
-applyTo: "datadictionary/**/*.xml,**/*Repository.java,**/queries/**/*.sql,**/queries/**/*.xml"
+name: macros
+description: MacroTranslator SQL macros for Sankhya Addon Studio (dbDate, nullValue, ignorecase, normalizeText, truncMonth, yearMonth, addMonths) for Oracle/MSSQL portability. Use when writing portable SQL in `queries/`, datadictionary, or @NativeQuery.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
 
 # Macros SQL Sankhya (MacroTranslator) — Addon Studio 2.0
@@ -13,7 +16,7 @@ Macros SQL traduzidas automaticamente entre Oracle e MSSQL pelo framework Sankhy
 > - `@NativeQuery("...")` em `@Repository`
 > - Queries externas em `model/src/main/resources/queries/*.sql` ou `queries/*.xml`
 >
-> **Nao confundir com BeanShell**: variaveis `$col_<COLUNA>`, `$ctx_usuario_logado`, `$ctx_dh_atual` sao contexto **BeanShell** em `<expression>` — nao sao macros SQL. Ver `datadictionary-instructions.md` §1.8.
+> **Nao confundir com BeanShell**: variaveis `$col_<COLUNA>`, `$ctx_usuario_logado`, `$ctx_dh_atual` sao contexto **BeanShell** em `<expression>` — nao sao macros SQL. Ver `data-dictionary` §1.8.
 
 ---
 
@@ -102,7 +105,7 @@ Algumas `<expression>` em metadata podem conter **SQL** (nao BeanShell). Macros 
 </field>
 ```
 
-> Para `<expression>` **BeanShell** (mais comum em campos com `$col_*`/`$ctx_*`), use as variaveis de contexto BeanShell — **nao** macros SQL. Ver `datadictionary-instructions.md` §1.8.
+> Para `<expression>` **BeanShell** (mais comum em campos com `$col_*`/`$ctx_*`), use as variaveis de contexto BeanShell — **nao** macros SQL. Ver `data-dictionary` §1.8.
 
 ---
 
@@ -172,6 +175,13 @@ GROUP BY VEND.CODVEND, VEND.NOMEVEND, getYear(CAB.DTNEG)
 
 ## 7. Quando NAO usar macro
 
-- **Operacao muito especifica** de um banco sem equivalente no outro (ex.: window function avancada Oracle-only). Nesses casos, separar em `queries/<arquivo>.xml` com tags `<oracle>` e `<mssql>`. Ver `repository-instructions.md` §4.
+- **Operacao muito especifica** de um banco sem equivalente no outro (ex.: window function avancada Oracle-only). Nesses casos, separar em `queries/<arquivo>.xml` com tags `<oracle>` e `<mssql>`. Ver `repository` §4.
 - **Logica em `<expression>` BeanShell** (nao SQL). Use variaveis de contexto BeanShell (`$col_*`, `$ctx_*`).
 - **DDL** em `dbscripts/` — scripts de banco ja sao split via tags `<mssql>`/`<oracle>`. Macros nao se aplicam ali.
+
+
+## Related Skills
+
+- `data-dictionary` — macros usadas em campo `<expression>` quando contém SQL (não BeanShell)
+- `database` — macros usadas em dbscripts para portabilidade Oracle/MSSQL
+- `repository` — macros usadas em `@NativeQuery` e `queries/<arquivo>.xml`

@@ -1,5 +1,8 @@
 ---
-applyTo: "**/*ExceptionHandler.java,**/*ControllerAdvice.java"
+name: controller-advice
+description: Implement Sankhya @ControllerAdvice + @ExceptionHandler with auto-rollback and error DTO. Use when writing global exception handlers in Sankhya Addon Studio projects.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
 
 # Tratamento Global de Excecoes (`@ControllerAdvice`) — Addon Studio 2.0
@@ -8,7 +11,7 @@ applyTo: "**/*ExceptionHandler.java,**/*ControllerAdvice.java"
 
 > **Beta / Acesso Antecipado**: funcionalidade sujeita a mudancas.
 >
-> **Referencia complementar:** `controller-instructions.md` — controllers devem deixar excecao propagar.
+> **Referencia complementar:** `controller` — controllers devem deixar excecao propagar.
 
 ---
 
@@ -188,3 +191,8 @@ public class ErrorResponse {
 6. [ ] DTO de resposta nao expoe stack trace nem dados sensiveis.
 7. [ ] **Nao** declarar `@ExceptionHandler({Exception.class})`.
 8. [ ] Confirmar que excecoes lancadas pela camada de servico estao mapeadas.
+
+
+## Related Skills
+
+- `controller` — controllers devem deixar exceção propagar até o advice

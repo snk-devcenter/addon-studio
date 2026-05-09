@@ -1,5 +1,8 @@
 ---
-applyTo: "**/*Adapter.java"
+name: type-adapter
+description: Sankhya @GlobalTypeAdapter (TypeAdapter, JsonSerializer/JsonDeserializer, native types). Use when defining JSON serialization adapters or editing files matching `*Adapter.java`.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
 
 # Adaptadores de Tipo (`@GlobalTypeAdapter`) — Addon Studio 2.0
@@ -9,8 +12,8 @@ applyTo: "**/*Adapter.java"
 > **Beta / Acesso Antecipado**: funcionalidade sujeita a mudancas. Contato: developer@sankhya.com.br.
 >
 > **Referencias complementares:**
-> - `entity-instructions.md` — Tipos suportados em `@JapeEntity`
-> - `controller-instructions.md` — DTOs e serialização JSON
+> - `entity` — Tipos suportados em `@JapeEntity`
+> - `controller` — DTOs e serialização JSON
 
 ---
 
@@ -217,4 +220,11 @@ Ja registrados automaticamente. Nao recriar sem necessidade — apenas sobrescre
 5. [ ] Tratar `null` em todos os caminhos de `fromVO` e `toVO`.
 6. [ ] Lancar `JsonParseException` (nunca silenciar) em erros de `deserialize`.
 7. [ ] Manter `setType` com corpo vazio se subtipo concreto nao for relevante.
-8. [ ] Registrar no modulo Guice do projeto (ver `dependency-injection-instructions.md`).
+8. [ ] Registrar no modulo Guice do projeto (ver `dependency-injection`).
+
+
+## Related Skills
+
+- `entity` — tipos suportados em @JapeEntity
+- `controller` — DTOs e serialização JSON nos endpoints
+- `dependency-injection` — @GlobalTypeAdapter registra-se via módulo Guice

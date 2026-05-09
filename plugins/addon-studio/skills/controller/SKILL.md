@@ -1,5 +1,8 @@
 ---
-applyTo: "**/*Controller.java"
+name: controller
+description: Implement Sankhya @Controller REST endpoints with serviceName SP, @Transactional, DTOs, @Valid, and HTTP protocol. Use when writing controllers or editing files matching `*Controller.java`.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
 
 # Controller (`@Controller`) — Addon Studio 2.0
@@ -7,10 +10,10 @@ applyTo: "**/*Controller.java"
 `@Controller` marca classes = pontos entrada API interna add-on. Cada metodo publico auto-exposto como endpoint servico. Controllers **orquestram** fluxo requisicao — **nunca** contem logica negocio.
 
 > **Referencias complementares:**
-> - `backend-instructions.md` — Stack + camadas
-> - `dependency-injection-instructions.md` — Injecao de dependencia (Guice)
-> - `mapstruct-instructions.md` — Mapeamento de objetos (MapStruct)
-> - `controlleradvice-instructions.md` — Tratamento global de excecoes
+> - `addon-studio` — overview, regras universais, naming convention, fluxo CRUD
+> - `dependency-injection` — Injecao de dependencia (Guice)
+> - `mapstruct` — Mapeamento de objetos (MapStruct)
+> - `controller-advice` — Tratamento global de excecoes
 
 ---
 
@@ -54,7 +57,7 @@ public class MeuFeatureController {
 
 ### `serviceName` (obrigatorio)
 
-Nome servico registrado plataforma. **Deve** terminar sufixo `SP`.
+Nome servico registrado plataforma. **Deve** terminar com sufixo `SP`.
 
 ```java
 @Controller(serviceName = "PedidoControllerSP")
@@ -301,7 +304,7 @@ public void cancelar(@Valid CancelarPedidoRequest request) {
 }
 ```
 
-Framework serializa auto objeto retornado em `responseBody` da response.
+Framework serializa automaticamente o objeto retornado em `responseBody` da response.
 
 ---
 
@@ -309,7 +312,7 @@ Framework serializa auto objeto retornado em `responseBody` da response.
 
 Excecoes lancadas em metodos do controller devem ser tratadas em classe `@ControllerAdvice` separada. **Nunca** capturar excecao no proprio controller — deixar propagar.
 
-> Ver `controlleradvice-instructions.md` para regras criticas (handler nao pode retornar `void`, multiplas excecoes por handler, rollback automatico, proibicao de `Exception.class`) e niveis de log sugeridos.
+> Ver `controller-advice` para regras criticas (handler nao pode retornar `void`, multiplas excecoes por handler, rollback automatico, proibicao de `Exception.class`) e niveis de log sugeridos.
 
 ---
 
@@ -370,83 +373,7 @@ public void sincronizar() {
 
 ## 9. Exemplos Completos
 
-### Controller simples (CRUD)
-
-```java
-@Controller(
-    serviceName = "AlvoControllerSP",
-    transactionType = EJBTransactionType.Supports
-)
-public class AlvoController {
-
-    private final ImportarAlvoService importarAlvoService;
-
-    @Inject
-    public AlvoController(ImportarAlvoService importarAlvoService) {
-        this.importarAlvoService = importarAlvoService;
-    }
-
-    @Transactional
-    public List<AlvoDTO> importar() {
-        return importarAlvoService.execute();
-    }
-}
-```
-
-### Controller completo (multiplas operacoes)
-
-```java
-@Controller(
-    serviceName = "PedidoControllerSP",
-    transactionType = EJBTransactionType.Supports
-)
-public class PedidoController {
-
-    private final CriarPedidoService criarPedidoService;
-    private final CancelarPedidoService cancelarPedidoService;
-    private final EmitirPedidoService emitirPedidoService;
-    private final GerarPdfService gerarPdfService;
-    private final PedidoRestMapper mapper;
-
-    @Inject
-    public PedidoController(
-        CriarPedidoService criarPedidoService,
-        CancelarPedidoService cancelarPedidoService,
-        EmitirPedidoService emitirPedidoService,
-        GerarPdfService gerarPdfService,
-        PedidoRestMapper mapper
-    ) {
-        this.criarPedidoService = criarPedidoService;
-        this.cancelarPedidoService = cancelarPedidoService;
-        this.emitirPedidoService = emitirPedidoService;
-        this.gerarPdfService = gerarPdfService;
-        this.mapper = mapper;
-    }
-
-    @Transactional
-    public CriarPedidoResponse criar(@Valid CriarPedidoRequest request) {
-        Pedido pedido = mapper.toPedido(request);
-        Pedido resultado = criarPedidoService.execute(pedido);
-        return mapper.toCriarResponse(resultado);
-    }
-
-    @Transactional
-    public EmitirPedidoResponse emitir(@Valid EmitirPedidoRequest request) {
-        Resultado resultado = emitirPedidoService.execute(request.getNuPedido());
-        Impressao impressao = gerarPdfService.execute(resultado);
-
-        ServiceContext ctx = ServiceContext.getCurrent();
-        ctx.putHttpSessionAttribute(impressao.getLabel(), impressao.getFile());
-
-        return mapper.toEmitirResponse(resultado);
-    }
-
-    @Transactional
-    public void cancelar(@Valid CancelarPedidoRequest request) {
-        cancelarPedidoService.execute(request.getNuPedido());
-    }
-}
-```
+Exemplos completos — controller simples (CRUD) e controller completo (múltiplas operações: criar, emitir, cancelar, com `ServiceContext` para impressão) — em [`references/examples.md`](references/examples.md).
 
 ---
 
@@ -470,7 +397,7 @@ public class PedidoController {
 4. [ ] Injetar dependencias (servicos da camada de aplicacao, mappers) via construtor com `@Inject`.
 5. [ ] Criar Request DTOs com validacao (`@NotNull`, `@NotBlank`, etc.).
 6. [ ] Criar Response DTOs.
-7. [ ] Criar MapStruct Mapper (ver `mapstruct-instructions.md`).
+7. [ ] Criar MapStruct Mapper (ver `mapstruct`).
 8. [ ] Usar `@Valid` em parametro dos metodos que recebem DTOs.
 9. [ ] Usar `@Transactional` em metodos que alteram dados.
 10. [ ] Retornar tipo adequado conforme regra negocio (DTO resposta ou `void`).
@@ -494,3 +421,12 @@ public class PedidoController {
 | Esquecer `@Valid` no parametro | Adicionar `@Valid` para ativar validacao |
 | Adicionar `@Component` no controller | `@Controller` ja e gerenciado — nao misturar |
 | Capturar excecao e retornar `null` | Deixar a excecao propagar para o `@ControllerAdvice` |
+
+
+## Related Skills
+
+- `controller-advice` — tratamento global de exceções lançadas pelo controller
+- `dependency-injection` — controller injeta serviços via Guice
+- `mapstruct` — controller usa mapper MapStruct para DTO ↔ entidade
+- `repository` — controller delega persistência ao repository
+- `addon-studio` — regras universais (Java 8, Lombok, ISO-8859-1, exceções tipadas)
