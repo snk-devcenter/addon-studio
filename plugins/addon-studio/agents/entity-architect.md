@@ -96,10 +96,10 @@ Após gerar:
 1. Nome da tabela: confirmar `<PRX><MOD3><CTX>` final
 2. PK: simples ou composta?
 3. Tabela nova ou nativa Sankhya?
-4. Campos: lista completa com tipo (`STRING`, `INTEGER`, `BIGDECIMAL`, `DATE`, `TIMESTAMP`, `BOOLEAN`, `LISTA`, `PESQUISA`, `CHECKBOX`)
+4. Campos: lista completa com `dataType` conforme schema `metadados.xsd` — `TEXTO`, `CAIXA_TEXTO`, `INTEIRO`, `DECIMAL`, `DATA`, `DATA_HORA`, `HORA`, `CHECKBOX`, `LISTA`, `PESQUISA`, `HTML`, `ARQUIVO`, `MULTIPLOS_ARQUIVOS`, `IMAGEM`. Atenção: `TEXTO`/`CAIXA_TEXTO` exigem `size`; `LISTA` exige sub-tag `<fieldOptions>`; `PESQUISA` exige `targetInstance`+`targetField`+`targetType`.
 5. Relacionamentos com outras tabelas?
 6. Auditoria (`DHALTER`, `DHCREATE`, `CODUSU`)?
-7. Sequência: AUTO ou MANUAL?
+7. Sequência (`sequenceType`): `A` (auto) ou `M` (manual)?
 
 ## Output format
 

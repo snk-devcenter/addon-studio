@@ -216,14 +216,26 @@ Cada `<field>` = coluna + metadata.
 
 ### Tipos de dados
 
-| Tipo XML    | Uso                             |
-|:------------|:--------------------------------|
-| `INTEIRO`   | Inteiros                |
-| `TEXTO`     | Textos, listas opcoes       |
-| `DECIMAL`   | Decimais                |
-| `DATA_HORA` | Data/hora                     |
-| `CHECKBOX`  | Booleano (S/N)                  |
-| `PESQUISA`  | Lookup / FK outra entidade |
+Conforme `metadados.xsd`, `dataType` aceita 14 valores:
+
+| Tipo XML              | Uso                                                         | Atributos extras obrigatorios            |
+|:----------------------|:------------------------------------------------------------|:------------------------------------------|
+| `TEXTO`               | Texto curto (single-line)                                   | `size`                                    |
+| `CAIXA_TEXTO`         | Texto longo (textarea/multi-line)                           | `size`                                    |
+| `INTEIRO`             | Inteiros                                                    | —                                         |
+| `DECIMAL`             | Decimais                                                    | `nuCasasDecimais`                         |
+| `DATA`                | Data (sem hora)                                             | —                                         |
+| `DATA_HORA`           | Data + hora                                                 | —                                         |
+| `HORA`                | Hora (sem data)                                             | —                                         |
+| `CHECKBOX`            | Booleano (`S`/`N`)                                          | —                                         |
+| `LISTA`               | Combo/select com opcoes fixas                               | `<fieldOptions>` (sub-tag)                |
+| `PESQUISA`            | Lookup / FK para outra entidade                             | `targetInstance`, `targetField`, `targetType` |
+| `HTML`                | Editor rich text (HTML)                                     | —                                         |
+| `ARQUIVO`             | Upload de arquivo unico                                     | —                                         |
+| `MULTIPLOS_ARQUIVOS`  | Upload de multiplos arquivos                                | —                                         |
+| `IMAGEM`              | Upload de imagem                                            | —                                         |
+
+> **`targetType` em PESQUISA** aceita: `TEXTO`, `INTEIRO`, `DECIMAL`, `DATA`, `DATA_HORA`, `HORA`.
 
 ### Sub-tag `<description>` (obrigatoria)
 
@@ -255,6 +267,15 @@ Expressoes calculadas. CDATA pra BeanShell.
 | `$col_<COLUNA>`       | Valor atual coluna        |
 
 > Quando `<expression>` contiver **SQL** (nao BeanShell), use as **macros SQL Sankhya** (`dbDate()`, `nullValue()`, `truncMonth()`, etc.) para portabilidade Oracle/MSSQL. Ver `macros`.
+
+**Atributo `calculated` (alternativa explicita):**
+
+O schema `metadados.xsd` define o atributo `calculated` no `<field>` com default `N`. Se `calculated="S"`, o framework **nao cria coluna fisica no banco** — equivalente semanticamente a usar `<expression>`. Diferenca pratica:
+
+- `<expression>` = inclui logica do calculo (BeanShell ou SQL portavel). Usar quando ha computacao.
+- `calculated="S"` (sem `<expression>`) = marca o campo como calculado sem fornecer logica. Raro — usar so se a computacao ja vem de outro lugar (ex.: campo de view, expressao herdada).
+
+Default: prefira `<expression>`. Se usar `calculated="S"`, ainda assim **nao gerar coluna no dbscript** nem `@Column` na entity Java.
 
 ### Sub-tag `<fieldOptions>` (opcional)
 
