@@ -48,6 +48,8 @@ Entidade Java (`@JapeEntity`) = classe dominio **limpa** — so `@Column(name = 
 | `<table />`       | Tabela **nova** criada pelo add-on.                                      |
 | `<treeTable />`   | Tabela **hierarquica** (pai/filho) — cadastros tipo centro de custo, categorias de produto, organogramas. Framework gera UI tree + campos `CODIGOPAI`/`ANALITICO`/`GRAU`. Detalhes em [`references/tree-table.md`](references/tree-table.md). |
 | `<nativeTable />` | Extensao tabela **nativa** Sankhya Om (adiciona campos/instancia). |
+| `<menu />`        | Estrutura de menu/navegacao do add-on. Container para `<folder>`, `<dynamicForm>`, `<dynamicTreeView>`, `<ui>`, `<dashboard>`. |
+| `<dynamicForm />` | Tela CRUD declarativa (sem JS/HTML) gerada a partir de uma `<instance>` da tabela. Vai dentro de `<menu>`/`<folder>`. Detalhes em [`references/dynamic-form.md`](references/dynamic-form.md). |
 
 ---
 
