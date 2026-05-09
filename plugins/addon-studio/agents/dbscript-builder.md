@@ -40,7 +40,7 @@ Ações:
 | Tabela é nova ou nativa Sankhya? | Nova: CREATE TABLE permitido. Nativa: **somente** ALTER TABLE para colunas custom prefixadas com `<MOD3>_` |
 | Próximo `V<NNN>` | Sequencial — não pular números, não duplicar |
 | `executar` (atributo do `<sql>`) | `SE_NAO_EXISTIR` (CREATE/ADD), `SE_EXISTIR` (MODIFY/DROP), `SEMPRE` (INSERT idempotente — usar com cautela) |
-| `tipoObjeto` (atributo do `<sql>`) | `TABLE`, `COLUMN`, `VIEW`, `INDEX`, `TRIGGER` — combinado com `nomeObjeto` é o que o engine confere para decidir executar |
+| `tipoObjeto` (atributo do `<sql>`) | `TABLE`, `COLUMN`, `FUNCTION`, `PROCEDURE`, `TRIGGER`, `VIEW`, `CONSTRAINT`, `PRIMARY KEY`, `FOREIGN KEY`, `INDEX` — combinado com `nomeObjeto` é o que o engine confere para decidir executar |
 
 ### 3. Gerar dbscript
 
@@ -77,6 +77,8 @@ Ações:
 - Body: `<mssql>` **primeiro**, `<oracle>` **depois** — sem `<![CDATA[...]]>` wrapper
 - `</scripts>` no final (não auto-fechar)
 
+> **Nota sobre o schema (`scripts.xsd`):** `<oracle>`/`<mssql>` são `xs:all` no schema (qualquer ordem, no máximo 1 cada, podendo ter só um dos dois). Convenção do projeto: **sempre dual** com mssql primeiro, para garantir portabilidade. Schema não restringe — convenção sim.
+
 **Atributos obrigatórios do `<sql>`:**
 
 | Atributo | Descrição | Valores |
@@ -84,7 +86,7 @@ Ações:
 | `nomeTabela` | Tabela afetada (usado em logs) | Nome da tabela UPPER |
 | `ordem` | Ordem de execução no arquivo. **Não duplicar** dentro do mesmo XML | Inteiro sequencial (1, 2, 3...) |
 | `executar` | Condição de execução | `SE_NAO_EXISTIR`, `SE_EXISTIR`, `SEMPRE` |
-| `tipoObjeto` | Tipo do objeto verificado por `executar` | `TABLE`, `COLUMN`, `VIEW`, `INDEX`, `TRIGGER` |
+| `tipoObjeto` | Tipo do objeto verificado por `executar` | `TABLE`, `COLUMN`, `FUNCTION`, `PROCEDURE`, `TRIGGER`, `VIEW`, `CONSTRAINT`, `PRIMARY KEY`, `FOREIGN KEY`, `INDEX` |
 | `nomeObjeto` | Nome do objeto verificado (identificador único de versionamento) | Nome do objeto no banco |
 | `descricao` | (opcional) Descrição textual do script | Texto livre |
 
