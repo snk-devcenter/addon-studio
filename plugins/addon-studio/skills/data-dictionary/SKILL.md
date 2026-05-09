@@ -46,6 +46,7 @@ Entidade Java (`@JapeEntity`) = classe dominio **limpa** — so `@Column(name = 
 | Tag XML           | Quando usar                                                              |
 |:------------------|:-------------------------------------------------------------------------|
 | `<table />`       | Tabela **nova** criada pelo add-on.                                      |
+| `<treeTable />`   | Tabela **hierarquica** (pai/filho) — cadastros tipo centro de custo, categorias de produto, organogramas. Framework gera UI tree + campos `CODIGOPAI`/`ANALITICO`/`GRAU`. Detalhes em [`references/tree-table.md`](references/tree-table.md). |
 | `<nativeTable />` | Extensao tabela **nativa** Sankhya Om (adiciona campos/instancia). |
 
 ---
