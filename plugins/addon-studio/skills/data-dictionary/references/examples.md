@@ -69,7 +69,7 @@
 ```xml
 <table name="TDCXYZREL" sequenceType="A" sequenceField="NURELACAO">
     <primaryKey>
-        <field name="CODPAI"/>
+        <field name="CODORIG"/>
         <field name="NURELACAO"/>
     </primaryKey>
     <!-- ... -->
@@ -81,12 +81,14 @@
 ```xml
 <table name="TDCXYZVIN" sequenceType="M">
     <primaryKey>
-        <field name="CODPAI"/>
+        <field name="CODORIG"/>
         <field name="CODPROD"/>
     </primaryKey>
     <!-- ... -->
 </table>
 ```
+
+> **Não confundir com `<treeTable>`:** os nomes `CODORIG`/`CODPROD`/`NURELACAO` aqui são exemplos arbitrários de PK composta entre tabelas distintas. Em `<treeTable>` a coluna que aponta pro pai **chama-se sempre `CODIGOPAI`** (nome fixo do framework, não pode ser renomeado). Ver `tree-table.md`.
 
 ### nativeTable + nativeInstance (entidade nativa Sankhya estendida)
 

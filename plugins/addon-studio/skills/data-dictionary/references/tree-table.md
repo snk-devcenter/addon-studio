@@ -58,11 +58,13 @@ Filhos (`xs:all`, mesmo de `<table>`): `<description>`, `<primaryKey>`, `<instan
 
 Toda `<treeTable>` exige 3 campos de controle que o framework usa para navegação tree, validação de níveis e exibição da UI hierárquica. **No projeto Sankhya Addon Studio, esses campos são declarados manualmente em todos os artefatos** (dbscript + entity Java) — não há Auto DDL.
 
+> **Atenção — nomes fixos do framework:** os 3 nomes abaixo (`CODIGOPAI`, `ANALITICO`, `GRAU`) são **literais fixos do Sankhya** — não podem ser renomeados (`CODPAI`, `CODORIG`, `PARENT_ID`, `NIVEL` **não funcionam**). O framework procura por essas colunas exatas para montar a UI hierárquica. Se viu `CODPAI` em algum exemplo, era cenário de **PK composta entre tabelas distintas** (relação pai/filho horizontal), não hierarquia recursiva.
+
 | Campo | Função | Tipo (DDL) | Tipo Java |
 |-------|--------|-----------|-----------|
-| `CODIGOPAI` | FK para registro pai (raiz = `NULL`) | `NUMBER(10)` Oracle / `INT` MSSQL | `Integer` |
-| `ANALITICO` | `'S'` aceita lançamentos; `'N'` é agrupador (apenas estrutura) | `CHAR(1)` (default `'S'`, NOT NULL) | `Boolean` (CHECKBOX `'S'`/`'N'`) |
-| `GRAU` | Nível na hierarquia (0 = raiz, 1 = filhos, etc.) | `NUMBER(10)` Oracle / `INT` MSSQL (NOT NULL) | `Integer` |
+| `CODIGOPAI` | FK para registro pai na própria tabela (raiz = `NULL`). **Nome fixo, não renomear.** | `NUMBER(10)` Oracle / `INT` MSSQL | `Integer` |
+| `ANALITICO` | `'S'` aceita lançamentos; `'N'` é agrupador (apenas estrutura). **Nome fixo, não renomear.** | `CHAR(1)` (default `'S'`, NOT NULL) | `Boolean` (CHECKBOX `'S'`/`'N'`) |
+| `GRAU` | Nível na hierarquia (0 = raiz, 1 = filhos, etc.). **Nome fixo, não renomear.** | `NUMBER(10)` Oracle / `INT` MSSQL (NOT NULL) | `Integer` |
 
 ## Padrão dbscript (manual, dual MSSQL/Oracle)
 
@@ -186,6 +188,7 @@ public class TdcXyzCentroCusto {
 
 ## Anti-patterns
 
+- [ ] **Renomear `CODIGOPAI` para `CODPAI`/`CODORIG`/`PARENT_ID`** — framework não reconhece, UI hierárquica falha ao montar tree. Nome é **fixo do framework**.
 - [ ] Omitir `CODIGOPAI`/`ANALITICO`/`GRAU` em `CREATE TABLE` — causa erro em runtime (UI hierárquica falha ao acessar campos inexistentes)
 - [ ] `CODIGOPAI` declarado como `NOT NULL` — registros raiz não têm pai, precisam de `NULL`
 - [ ] `ANALITICO` sem `DEFAULT 'S'` — força preenchimento explícito em todo INSERT

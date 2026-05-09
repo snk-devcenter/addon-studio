@@ -32,13 +32,15 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class TdcXyzEntidadeId {
 
-    @Column(name = "CODPAI")
-    private Integer codPai;
+    @Column(name = "CODORIG")
+    private Integer codOrig;
 
     @Column(name = "NUITEM")
     private Integer nuItem;
 }
 ```
+
+> **Não confundir com `<treeTable>`:** `CODORIG` é nome arbitrário de exemplo de PK composta entre tabelas distintas. Em `<treeTable>` (hierarquia recursiva pai/filho dentro da própria tabela), a coluna FK pro pai **é sempre `CODIGOPAI`** (nome fixo do framework, não renomeável). Ver skill `data-dictionary` → `tree-table.md`.
 
 **Uso na entidade:**
 
@@ -62,8 +64,8 @@ private TdcXyzEntidadeId embeddedId;
 Facilitar acesso aos campos da PK composta — crie métodos delegadores:
 
 ```java
-public Integer getCodPai() {
-    return this.embeddedId.getCodPai();
+public Integer getCodOrig() {
+    return this.embeddedId.getCodOrig();
 }
 
 public Integer getNuItem() {
