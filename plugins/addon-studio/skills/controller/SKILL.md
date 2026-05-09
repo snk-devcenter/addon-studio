@@ -10,7 +10,7 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 `@Controller` marca classes = pontos entrada API interna add-on. Cada metodo publico auto-exposto como endpoint servico. Controllers **orquestram** fluxo requisicao — **nunca** contem logica negocio.
 
 > **Referencias complementares:**
-> - `addon-studio` — Stack + camadas
+> - `addon-studio` — overview, regras universais, naming convention, fluxo CRUD
 > - `dependency-injection` — Injecao de dependencia (Guice)
 > - `mapstruct` — Mapeamento de objetos (MapStruct)
 > - `controller-advice` — Tratamento global de excecoes
@@ -57,7 +57,7 @@ public class MeuFeatureController {
 
 ### `serviceName` (obrigatorio)
 
-Nome servico registrado plataforma. **Deve** terminar sufixo `SP`.
+Nome servico registrado plataforma. **Deve** terminar com sufixo `SP`.
 
 ```java
 @Controller(serviceName = "PedidoControllerSP")
@@ -304,7 +304,7 @@ public void cancelar(@Valid CancelarPedidoRequest request) {
 }
 ```
 
-Framework serializa auto objeto retornado em `responseBody` da response.
+Framework serializa automaticamente o objeto retornado em `responseBody` da response.
 
 ---
 
@@ -373,83 +373,7 @@ public void sincronizar() {
 
 ## 9. Exemplos Completos
 
-### Controller simples (CRUD)
-
-```java
-@Controller(
-    serviceName = "AlvoControllerSP",
-    transactionType = EJBTransactionType.Supports
-)
-public class AlvoController {
-
-    private final ImportarAlvoService importarAlvoService;
-
-    @Inject
-    public AlvoController(ImportarAlvoService importarAlvoService) {
-        this.importarAlvoService = importarAlvoService;
-    }
-
-    @Transactional
-    public List<AlvoDTO> importar() {
-        return importarAlvoService.execute();
-    }
-}
-```
-
-### Controller completo (multiplas operacoes)
-
-```java
-@Controller(
-    serviceName = "PedidoControllerSP",
-    transactionType = EJBTransactionType.Supports
-)
-public class PedidoController {
-
-    private final CriarPedidoService criarPedidoService;
-    private final CancelarPedidoService cancelarPedidoService;
-    private final EmitirPedidoService emitirPedidoService;
-    private final GerarPdfService gerarPdfService;
-    private final PedidoRestMapper mapper;
-
-    @Inject
-    public PedidoController(
-        CriarPedidoService criarPedidoService,
-        CancelarPedidoService cancelarPedidoService,
-        EmitirPedidoService emitirPedidoService,
-        GerarPdfService gerarPdfService,
-        PedidoRestMapper mapper
-    ) {
-        this.criarPedidoService = criarPedidoService;
-        this.cancelarPedidoService = cancelarPedidoService;
-        this.emitirPedidoService = emitirPedidoService;
-        this.gerarPdfService = gerarPdfService;
-        this.mapper = mapper;
-    }
-
-    @Transactional
-    public CriarPedidoResponse criar(@Valid CriarPedidoRequest request) {
-        Pedido pedido = mapper.toPedido(request);
-        Pedido resultado = criarPedidoService.execute(pedido);
-        return mapper.toCriarResponse(resultado);
-    }
-
-    @Transactional
-    public EmitirPedidoResponse emitir(@Valid EmitirPedidoRequest request) {
-        Resultado resultado = emitirPedidoService.execute(request.getNuPedido());
-        Impressao impressao = gerarPdfService.execute(resultado);
-
-        ServiceContext ctx = ServiceContext.getCurrent();
-        ctx.putHttpSessionAttribute(impressao.getLabel(), impressao.getFile());
-
-        return mapper.toEmitirResponse(resultado);
-    }
-
-    @Transactional
-    public void cancelar(@Valid CancelarPedidoRequest request) {
-        cancelarPedidoService.execute(request.getNuPedido());
-    }
-}
-```
+Exemplos completos — controller simples (CRUD) e controller completo (múltiplas operações: criar, emitir, cancelar, com `ServiceContext` para impressão) — em [`references/examples.md`](references/examples.md).
 
 ---
 
