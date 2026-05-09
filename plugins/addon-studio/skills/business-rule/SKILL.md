@@ -1,10 +1,17 @@
+---
+name: business-rule
+description: Implement Sankhya @BusinessRule (Regra interface + ContextoRegra) for event bus, limit liberation, and transactional rules. Use when creating business rules or editing files matching `*Regra.java`.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
+---
+
 # Regra de Negocio (`@BusinessRule`) — Addon Studio 2.0
 
 `@BusinessRule` implementa logica automatica disparada por eventos do ciclo de vida comercial — principalmente **confirmacao e faturamento** de documentos (Pedidos, Notas de Venda). Disponivel a partir do Addon Studio 2.0.
 
 > **Referencias complementares:**
-> - `backend.md` — Stack + restricoes Java 8
-> - `dependency-injection.md` — Injecao de dependencia (Guice)
+> - `addon-studio` — Stack + restricoes Java 8
+> - `dependency-injection` — Injecao de dependencia (Guice)
 
 ---
 
@@ -274,4 +281,11 @@ public class IntegracaoExternaRegra implements Regra {
 7. [ ] Delegar logica de negocio para Service (`@Component`).
 8. [ ] Integracoes externas: usar mecanismo assincrono.
 9. [ ] Fornecer feedback ao usuario via `addMensagem()` ou excecao com mensagem clara.
-10. [ ] Registrar no modulo Guice do projeto (ver `dependency-injection.md`).
+10. [ ] Registrar no modulo Guice do projeto (ver `dependency-injection`).
+
+
+## Related Skills
+
+- `action-button` — botão dispara fluxo que pode invocar regra
+- `controller` — controller pode invocar regra via barramento
+- `dependency-injection` — @Component da Regra precisa estar registrado no módulo Guice

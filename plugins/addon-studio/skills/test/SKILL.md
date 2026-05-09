@@ -1,3 +1,10 @@
+---
+name: test
+description: JUnit 5 + Mockito 4.11 testing for Sankhya Addon Studio (static mock, JapeRepository quirks, fixtures). Use when writing unit tests under `src/test/java/`.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
+---
+
 # Testes Backend - Addon Studio 2.0 (JUnit + Mockito)
 
 Documento define como desenvolver testes automatizados backend Addon Studio 2.0 com libs de mercado.
@@ -343,3 +350,9 @@ Fluxo dev Addon Studio: rode testes antes de `deployAddon`.
 - [ ] `./gradlew :<modulo-backend>:test` passando local.
 - [ ] `throws Exception` declarado em metodos que interagem com repositorios.
 - [ ] Stubs sem acentos nas asserções de mensagem.
+
+
+## Related Skills
+
+- `repository` — JapeRepository tem quirks — leia antes de mockar
+- `dependency-injection` — componentes Guice injetam dependências via construtor — facilita mock

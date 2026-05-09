@@ -1,10 +1,17 @@
+---
+name: action-button
+description: Implement Sankhya @ActionButton (AcaoRotinaJava + @Form + ContextoAcao) UI buttons. Use when creating screen action buttons, writing AcaoRotinaJava classes, or editing files matching `*Action.java`.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
+---
+
 # Botao de Acao (`@ActionButton`) — Addon Studio 2.0
 
 `@ActionButton` associa uma classe Java ao menu "Acoes" de telas nativas do Sankhya Om. Disponivel a partir do Addon Studio 2.0.
 
 > **Referencias complementares:**
-> - `backend.md` — Stack + restricoes Java 8
-> - `dependency-injection.md` — Injecao de dependencia (Guice)
+> - `addon-studio` — Stack + restricoes Java 8
+> - `dependency-injection` — Injecao de dependencia (Guice)
 
 ---
 
@@ -248,4 +255,11 @@ public class ExportarDadosAction implements AcaoRotinaJava {
 7. [ ] Chamar `contexto.setMensagemRetorno()` em todos os caminhos (sucesso e erro).
 8. [ ] Definir `transactionType` se precisar de transacao isolada (`REQUIRES_NEW`).
 9. [ ] Definir `refreshType` se precisar atualizar mais que o registro atual.
-10. [ ] Registrar o `@Component` no modulo Guice do projeto (ver `dependency-injection.md`).
+10. [ ] Registrar o `@Component` no modulo Guice do projeto (ver `dependency-injection`).
+
+
+## Related Skills
+
+- `controller` — alternativa REST quando ação não é botão de tela mas endpoint HTTP
+- `dependency-injection` — @Component do AcaoRotinaJava precisa estar no módulo Guice
+- `business-rule` — regra de negócio dispara via barramento — alternativa a botão para validações

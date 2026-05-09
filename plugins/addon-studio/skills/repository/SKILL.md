@@ -1,8 +1,15 @@
+---
+name: repository
+description: Sankhya @Repository interfaces extending JapeRepository<ID, Entity> with @Criteria, @NativeQuery, @Modifying. Use when defining data access layer or editing files matching `*Repository.java`.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
+---
+
 # Repositório (@Repository) — Addon Studio 2.0
 
 Padrão **Repository** no SDK Sankhya = abstração simplifica acesso dados. Define interfaces declarativas, SDK gera implementação em compile-time — sem boilerplate, type-safe, protege SQL Injection.
 
-> **Referência complementar:** consulte `entity.md` para criar entidades correspondentes.
+> **Referência complementar:** consulte `entity` para criar entidades correspondentes.
 
 ---
 
@@ -195,7 +202,7 @@ List<Nota> findByNomeParceiro(@Parameter("nome") String nome);
 BigDecimal descontoOuZero(@Parameter("nu") Long nu);
 ```
 
-> Macros traduzem automaticamente entre Oracle e MSSQL. Lista completa (datas, texto, conversoes, agregacoes): ver `macros.md`. **Sempre prefira macro a sintaxe especifica de banco** (`SYSDATE`, `NVL`, `||`, `ROWNUM`, etc.).
+> Macros traduzem automaticamente entre Oracle e MSSQL. Lista completa (datas, texto, conversoes, agregacoes): ver `macros`. **Sempre prefira macro a sintaxe especifica de banco** (`SYSDATE`, `NVL`, `||`, `ROWNUM`, etc.).
 
 ---
 
@@ -468,3 +475,10 @@ public class PedidoService {
 | `findByPK(...).orElseThrow(...)` ou `.map(...)`  | `findByPK` retorna `T` (nullable), não `Optional<T>` — usar null-check manual |
 | Esquecer `throws Exception` em método que usa repositório | Todo método que chama `save`, `findByPK`, `findAll` ou `delete` deve declarar `throws Exception` |
 | Import errado de `@NativeQuery`                  | Usar `br.com.sankhya.studio.persistence.NativeQuery`, não `br.com.sankhya.sdk.data.repository.NativeQuery` |
+
+
+## Related Skills
+
+- `entity` — entidade @JapeEntity sobre a qual o repository opera
+- `macros` — macros SQL para `@NativeQuery` e `queries/<arquivo>.xml`
+- `test` — repository é tipicamente mockado em testes (cuidado com JapeRepository quirks)

@@ -1,3 +1,10 @@
+---
+name: encoding
+description: Convert Sankhya source files (`.java`, `.xml`, `.kt`) to ISO-8859-1 via iconv or Python after edit. Use whenever LLM-generated content was saved as UTF-8 and Sankhya requires Latin-1.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
+---
+
 # Codificacao de Arquivos — Addon Studio 2.0
 
 > **REGRA CRITICA — SEM EXCECOES**
@@ -148,3 +155,9 @@ Alternativa segura (portavel, sem depender de encoding): escapes Unicode.
 | XML sem cabecalho `encoding="ISO-8859-1"`           | Cabecalho obrigatorio em todo XML               |
 | Alterar cabecalho de XML para `encoding="UTF-8"`    | Manter `ISO-8859-1` sem excecao                 |
 | Deixar arquivo gerado por LLM sem converter         | Rodar `iconv` (Mac/Linux) ou Python3 (Windows) apos cada criacao/edicao |
+
+
+## Related Skills
+
+- `addon-studio` — regra universal: ISO-8859-1 obrigatório em `.java`/`.xml`/`.kt`
+- `build` — build falha silenciosamente se encoding estiver errado

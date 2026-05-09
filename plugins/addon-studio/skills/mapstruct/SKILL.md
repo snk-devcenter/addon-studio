@@ -1,10 +1,17 @@
+---
+name: mapstruct
+description: MapStruct @Mapper for Sankhya Addon Studio (componentModel=jakarta, injectionStrategy=CONSTRUCTOR, create/merge patterns) for DTO<->Entity conversion. Use when writing mappers or editing files matching `*Mapper.java`.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
+---
+
 # MapStruct ? Addon Studio 2.0
 
 MapStruct = biblioteca padrao pra conversao DTO <-> Entidade Dominio. **Nunca** faca mapper manual — use MapStruct.
 
-> **Referencia complementar:** veja `dependency-injection.md` pra como mappers registram no container Guice.
+> **Referencia complementar:** veja `dependency-injection` pra como mappers registram no container Guice.
 >
-> **Escopo:** arquivo define so regras **genericas** MapStruct. Regras negocio, filtros plataforma, convencoes dominio especificas ficam em `mapstruct-project.md` (override por projeto, fora desta skill).
+> **Escopo:** arquivo define so regras **genericas** MapStruct. Regras negocio, filtros plataforma, convencoes dominio especificas ficam em override por projeto (fora desta skill).
 
 ---
 
@@ -515,3 +522,10 @@ Mapper de integracao com plataforma externa (toDomain precisa de upsert)?
 | Campo target nao populado | Verificar se `@Mapping` correto. Mesmo nome = automatico; diferentes precisam `@Mapping` explicito. |
 | Erro compilacao "Ambiguous mapping methods" | Renomear metodos pra evitar conflitos assinatura ou usar `@Named` pra qualificar. |
 | Erro compilacao com Lombok | Verificar `lombok-mapstruct-binding` nas deps do `annotationProcessor`. |
+
+
+## Related Skills
+
+- `dependency-injection` — mappers registram no container Guice
+- `controller` — controllers consomem mappers para conversão DTO ↔ entidade
+- `entity` — entidades-alvo dos mappers

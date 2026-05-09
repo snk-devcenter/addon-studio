@@ -1,3 +1,10 @@
+---
+name: dependency-injection
+description: Configure Guice DI for Sankhya Addon Studio (@Inject from `com.google.inject`, @Component, @CustomModule, Provider<T>, Multibinder, @Singleton). Use when wiring components or modules.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
+---
+
 # Injeção de Dependência (Guice) — Addon Studio 2.0
 
 Addon Studio 2.0 usa **Google Guice** como container DI. Anotações estereótipo customizadas fazem auto-scan. Doc descreve regras, padrões, boas práticas DI.
@@ -87,7 +94,7 @@ public class MeuController {
 - `serviceName` obrigatório, sufixo `"SP"`.
 - `transactionType` define tipo transação EJB (`Supports`, `Required`, etc.).
 - Métodos que alteram dados precisam `@Transactional`.
-- Retorno: DTO direto (ou `void`) — framework serializa em `responseBody`. Nunca `ResponseEntity` (Spring). Ver `controller.md`.
+- Retorno: DTO direto (ou `void`) — framework serializa em `responseBody`. Nunca `ResponseEntity` (Spring). Ver `controller`.
 - **NÃO** adicionar `@Component` — `@Controller` já gerenciado pelo framework.
 
 ### 3.2 `@Repository` — Interfaces de Acesso a Dados
@@ -148,7 +155,7 @@ public class ImportarProdutoService {
 
 Tratamento centralizado de exceções vindas dos `@Controller`/`@Service`. Auto-gerenciado — não adicionar `@Component`.
 
-> Ver `controlleradvice.md` para anatomia completa, regras críticas (handler nunca retorna `void`, múltiplas exceções por handler, rollback automático, proibição de `Exception.class`) e níveis de log.
+> Ver `controller-advice` para anatomia completa, regras críticas (handler nunca retorna `void`, múltiplas exceções por handler, rollback automático, proibição de `Exception.class`) e níveis de log.
 
 ---
 
@@ -445,3 +452,11 @@ public class DynamicProdutoGateway implements ProdutoGateway {
 | `@Singleton` sem `@Component` e sem módulo | Guice não encontra. Adicione um dos dois. |
 | Mapper MapStruct com `uses` sem `injectionStrategy` | Adicione `injectionStrategy = InjectionStrategy.CONSTRUCTOR`. |
 | `@Provides` em classe sem `@CustomModule` | Guice não encontra provider. Adicione `@CustomModule`. |
+
+
+## Related Skills
+
+- `addon-studio` — regras universais sobre @Inject (com.google.inject) e proibição de `new`
+- `controller` — controllers são @Component injetados via Guice
+- `controller-advice` — advice é @Component registrado no módulo
+- `mapstruct` — mappers são registrados no container Guice

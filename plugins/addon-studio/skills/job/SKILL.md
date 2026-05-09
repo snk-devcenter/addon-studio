@@ -1,3 +1,10 @@
+---
+name: job
+description: Implement Sankhya @Job (IJob + onSchedule + getScheduleConfigHook + CRON, XML migration). Use when creating scheduled jobs or editing files matching `*Job.java`.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
+---
+
 # Jobs Agendados (`@Job`) — Addon Studio 2.0
 
 `@Job` substitui a configuracao via `mgeschedule.xml` por abordagem declarativa diretamente na classe Java. Jobs sao gerenciados pelo SDK e suportam injecao de dependencias.
@@ -5,8 +12,8 @@
 > **Beta / Acesso Antecipado**: funcionalidade sujeita a mudancas. Contato: developer@sankhya.com.br.
 >
 > **Referencias complementares:**
-> - `backend.md` — Stack + restricoes Java 8
-> - `dependency-injection.md` — Injecao de dependencia (Guice)
+> - `addon-studio` — Stack + restricoes Java 8
+> - `dependency-injection` — Injecao de dependencia (Guice)
 
 ---
 
@@ -259,4 +266,11 @@ public class MeuJob implements IJob {
 8. [ ] Envolver corpo de `onSchedule()` em `try/catch` com logging adequado.
 9. [ ] Se frequencia for dinamica: implementar `getScheduleConfigHook()`.
 10. [ ] Confirmar que **nao existem** `mgeschedule.xml` nem `mgechedule-cfg.xml` no projeto.
-11. [ ] Registrar no modulo Guice do projeto (ver `dependency-injection.md`).
+11. [ ] Registrar no modulo Guice do projeto (ver `dependency-injection`).
+
+
+## Related Skills
+
+- `dependency-injection` — @Component do IJob precisa estar registrado no módulo Guice
+- `repository` — jobs tipicamente operam sobre dados via repository
+- `addon-studio` — regras universais Java 8 + Lombok

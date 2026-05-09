@@ -1,12 +1,19 @@
+---
+name: controller
+description: Implement Sankhya @Controller REST endpoints with serviceName SP, @Transactional, DTOs, @Valid, and HTTP protocol. Use when writing controllers or editing files matching `*Controller.java`.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
+---
+
 # Controller (`@Controller`) — Addon Studio 2.0
 
 `@Controller` marca classes = pontos entrada API interna add-on. Cada metodo publico auto-exposto como endpoint servico. Controllers **orquestram** fluxo requisicao — **nunca** contem logica negocio.
 
 > **Referencias complementares:**
-> - `backend.md` — Stack + camadas
-> - `dependency-injection.md` — Injecao de dependencia (Guice)
-> - `mapstruct.md` — Mapeamento de objetos (MapStruct)
-> - `controlleradvice.md` — Tratamento global de excecoes
+> - `addon-studio` — Stack + camadas
+> - `dependency-injection` — Injecao de dependencia (Guice)
+> - `mapstruct` — Mapeamento de objetos (MapStruct)
+> - `controller-advice` — Tratamento global de excecoes
 
 ---
 
@@ -305,7 +312,7 @@ Framework serializa auto objeto retornado em `responseBody` da response.
 
 Excecoes lancadas em metodos do controller devem ser tratadas em classe `@ControllerAdvice` separada. **Nunca** capturar excecao no proprio controller — deixar propagar.
 
-> Ver `controlleradvice.md` para regras criticas (handler nao pode retornar `void`, multiplas excecoes por handler, rollback automatico, proibicao de `Exception.class`) e niveis de log sugeridos.
+> Ver `controller-advice` para regras criticas (handler nao pode retornar `void`, multiplas excecoes por handler, rollback automatico, proibicao de `Exception.class`) e niveis de log sugeridos.
 
 ---
 
@@ -466,7 +473,7 @@ public class PedidoController {
 4. [ ] Injetar dependencias (servicos da camada de aplicacao, mappers) via construtor com `@Inject`.
 5. [ ] Criar Request DTOs com validacao (`@NotNull`, `@NotBlank`, etc.).
 6. [ ] Criar Response DTOs.
-7. [ ] Criar MapStruct Mapper (ver `mapstruct.md`).
+7. [ ] Criar MapStruct Mapper (ver `mapstruct`).
 8. [ ] Usar `@Valid` em parametro dos metodos que recebem DTOs.
 9. [ ] Usar `@Transactional` em metodos que alteram dados.
 10. [ ] Retornar tipo adequado conforme regra negocio (DTO resposta ou `void`).
@@ -490,3 +497,12 @@ public class PedidoController {
 | Esquecer `@Valid` no parametro | Adicionar `@Valid` para ativar validacao |
 | Adicionar `@Component` no controller | `@Controller` ja e gerenciado — nao misturar |
 | Capturar excecao e retornar `null` | Deixar a excecao propagar para o `@ControllerAdvice` |
+
+
+## Related Skills
+
+- `controller-advice` — tratamento global de exceções lançadas pelo controller
+- `dependency-injection` — controller injeta serviços via Guice
+- `mapstruct` — controller usa mapper MapStruct para DTO ↔ entidade
+- `repository` — controller delega persistência ao repository
+- `addon-studio` — regras universais (Java 8, Lombok, ISO-8859-1, exceções tipadas)

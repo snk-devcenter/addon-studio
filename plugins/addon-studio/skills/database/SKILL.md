@@ -1,3 +1,10 @@
+---
+name: database
+description: Create Sankhya dbscripts (`dbscripts/V<NNN>-*.xml`) with dual MSSQL/Oracle migrations and naming conventions. Use when adding or altering tables in `dbscripts/`.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
+---
+
 # Scripts de Banco de Dados (Addon Studio 2.0)
 
 Instruções para criar/manter scripts migração em `dbscripts/` para projetos Addon Studio 2.0.
@@ -842,3 +849,10 @@ V003-ALTER_TABLE_TGFCAB.xml
 
 - [ ] Nomear arquivo descritivamente (ex: `v_insert_config.xml`)
 - [ ] Usar `executar="SEMPRE"` com `INSERT ... WHERE NOT EXISTS` ou `MERGE` para idempotência
+
+
+## Related Skills
+
+- `entity` — entidade @JapeEntity da tabela criada por este dbscript
+- `data-dictionary` — XML que descreve metadados da tabela
+- `macros` — macros SQL para portabilidade Oracle/MSSQL no dbscript

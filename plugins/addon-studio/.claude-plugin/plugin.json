@@ -1,7 +1,7 @@
 {
   "name": "addon-studio",
-  "version": "2.0.0",
-  "description": "Skill Sankhya Addon Studio 2.0 — @JapeEntity, datadictionary, dbscripts, @Controller REST, @Repository (@Criteria/@NativeQuery), MapStruct, Guice DI, JUnit+Mockito, @ActionButton, @BusinessRule, @Job, @GlobalTypeAdapter, @Value, @ControllerAdvice, MacroTranslator (macros SQL), gradle deployAddon. Convencao de nomenclatura parametrizada por projeto. Compativel com Claude Code e OpenAI Codex CLI.",
+  "version": "3.0.0",
+  "description": "Plugin Sankhya Addon Studio 2.0 com 18 skills focadas: addon-studio (overview), entity, repository, controller, controller-advice, data-dictionary, database, dependency-injection, mapstruct, test, action-button, business-rule, job, type-adapter, value, macros, encoding, build. Compativel com Claude Code e OpenAI Codex CLI.",
   "author": {
     "name": "DevCenter Squad"
   },

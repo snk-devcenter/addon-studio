@@ -1,3 +1,10 @@
+---
+name: data-dictionary
+description: Create Sankhya data dictionary XML (`datadictionary/<TABELA>.xml`) with `<table>`, `<instance>`, fields, types, and options. Use when defining table metadata under `datadictionary/`.
+license: Proprietary
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
+---
+
 # Dicionario de Dados (Data Dictionary) - Addon Studio 2.0
 
 **Dicionario de Dados** define estrutura dados aplicacao — tabelas, campos, instancias, extensoes entidades nativas — declarativo via XML em `datadictionary/`.
@@ -127,11 +134,11 @@ Define entidade (instancia JAPE) da tabela. Existem duas tags possiveis dentro d
 
 `name` = nome logico da entidade (bate com `@JapeEntity(entity = "...")`).
 
-> **Por que `<nativeInstance>` ao inves de `<instance>`:** ambas as tags geram a mesma entidade no runtime, mas `<nativeInstance>` sinaliza para o builder que a instancia **ja existe** no Sankhya nativo e **nao** deve ser regravada no `metadata.xml` final. Se uma instancia nativa for declarada como `<instance>`, o deploy do addon re-mapeia o owner da instancia para o addon e quebra regras de negocio, validacoes e telas nativas que dependem dela. Pareie sempre com `isNativeInstance = true` no `@JapeEntity` correspondente (ver `entity.md` secao 1.2).
+> **Por que `<nativeInstance>` ao inves de `<instance>`:** ambas as tags geram a mesma entidade no runtime, mas `<nativeInstance>` sinaliza para o builder que a instancia **ja existe** no Sankhya nativo e **nao** deve ser regravada no `metadata.xml` final. Se uma instancia nativa for declarada como `<instance>`, o deploy do addon re-mapeia o owner da instancia para o addon e quebra regras de negocio, validacoes e telas nativas que dependem dela. Pareie sempre com `isNativeInstance = true` no `@JapeEntity` correspondente (ver `entity` secao 1.2).
 
 ### Convencao de nomes (parametrizada por projeto)
 
-Padrao parametrizado por `<PRX>` (prefixo) + `<MOD3>` (modulo). Ver `database.md` secao "Descobrir convencao do projeto" antes de criar tabela nova.
+Padrao parametrizado por `<PRX>` (prefixo) + `<MOD3>` (modulo). Ver `database` secao "Descobrir convencao do projeto" antes de criar tabela nova.
 
 | Atributo                                | Padrao                                  | Exemplo (PRX=TDC, MOD3=XYZ)  |
 |:----------------------------------------|:----------------------------------------|:-----------------------------|
@@ -247,7 +254,7 @@ Expressoes calculadas. CDATA pra BeanShell.
 | `$ctx_dh_atual`       | Data/hora atual servidor  |
 | `$col_<COLUNA>`       | Valor atual coluna        |
 
-> Quando `<expression>` contiver **SQL** (nao BeanShell), use as **macros SQL Sankhya** (`dbDate()`, `nullValue()`, `truncMonth()`, etc.) para portabilidade Oracle/MSSQL. Ver `macros.md`.
+> Quando `<expression>` contiver **SQL** (nao BeanShell), use as **macros SQL Sankhya** (`dbDate()`, `nullValue()`, `truncMonth()`, etc.) para portabilidade Oracle/MSSQL. Ver `macros`.
 
 ### Sub-tag `<fieldOptions>` (opcional)
 
@@ -1003,3 +1010,10 @@ public class TdcXyzConfiguracao {
 | `@JoinColumn` com `name` e `referencedColumnName` invertidos | `name` = campo local (na tabela com `@JoinColumn`). `referencedColumnName` = campo na referenciada. Ver secao 3.6.1. |
 | Usar `<instance>` para instancia nativa Sankhya em `<nativeTable>` | Usar `<nativeInstance>`. `<instance>` faz o builder regravar a entrada no `metadata.xml`; durante o deploy a instancia e re-mapeada para o owner do addon e quebra regras/validacoes nativas. |
 | Esquecer `<nativeInstance>` quando o `entity` Java reusa nome nativo (`CabecalhoNota`, `Parceiro`, `Produto`, etc.) | Trocar `<instance>` por `<nativeInstance>` no XML e adicionar `isNativeInstance = true` no `@JapeEntity`. |
+
+
+## Related Skills
+
+- `entity` — classe Java @JapeEntity que mapeia a tabela definida neste XML
+- `database` — dbscript que materializa a tabela no banco
+- `macros` — MacroTranslator macros para portar SQL no campo `<expression>`
