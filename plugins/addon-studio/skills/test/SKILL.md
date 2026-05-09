@@ -1,6 +1,6 @@
 ---
 name: test
-description: JUnit 5 + Mockito 4.11 testing for Sankhya Addon Studio (static mock, JapeRepository quirks, fixtures). Use when writing unit tests under `src/test/java/`.
+description: Testes JUnit 5 + Mockito 4.11 para Sankhya Addon Studio (mock estático, quirks de JapeRepository, fixtures). Use ao escrever testes unitários em `src/test/java/`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

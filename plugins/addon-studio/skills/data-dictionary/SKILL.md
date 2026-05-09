@@ -1,6 +1,6 @@
 ---
 name: data-dictionary
-description: Create Sankhya data dictionary XML (`datadictionary/<TABELA>.xml`) with `<table>`, `<instance>`, fields, types, and options. Use when defining table metadata under `datadictionary/`.
+description: Cria XML do dicionário de dados Sankhya (`datadictionary/<TABELA>.xml`) com `<table>`, `<instance>`, campos, tipos e opções. Use ao definir metadados de tabela em `datadictionary/`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

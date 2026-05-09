@@ -1,6 +1,6 @@
 ---
 name: build
-description: Build and deploy Sankhya addon locally via `gradle clean deployAddon` or `./gradlew clean deployAddon`. Use when running the build, troubleshooting deploy, or editing `build.gradle`/`gradlew`.
+description: Build e deploy local de addon Sankhya via `gradle clean deployAddon` ou `./gradlew clean deployAddon`. Use ao rodar build, fazer troubleshooting de deploy, ou editar `build.gradle`/`gradlew`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

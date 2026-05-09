@@ -1,6 +1,6 @@
 ---
 name: controller-advice
-description: Implement Sankhya @ControllerAdvice + @ExceptionHandler with auto-rollback and error DTO. Use when writing global exception handlers in Sankhya Addon Studio projects.
+description: Implementa @ControllerAdvice + @ExceptionHandler Sankhya com rollback automático e DTO de erro. Use ao escrever handlers globais de exceção em projetos Sankhya Addon Studio.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

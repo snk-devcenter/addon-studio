@@ -1,6 +1,6 @@
 ---
 name: database
-description: Create Sankhya dbscripts (`dbscripts/V<NNN>-*.xml`) with dual MSSQL/Oracle migrations and naming conventions. Use when adding or altering tables in `dbscripts/`.
+description: Cria dbscripts Sankhya (`dbscripts/V<NNN>-*.xml`) com migrations dual MSSQL/Oracle e convenções de nomenclatura. Use ao adicionar ou alterar tabelas em `dbscripts/`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

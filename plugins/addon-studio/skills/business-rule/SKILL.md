@@ -1,6 +1,6 @@
 ---
 name: business-rule
-description: Implement Sankhya @BusinessRule (Regra interface + ContextoRegra) for event bus, limit liberation, and transactional rules. Use when creating business rules or editing files matching `*Regra.java`.
+description: Implementa @BusinessRule Sankhya (interface Regra + ContextoRegra) para barramento de eventos, liberação de limite e regras transacionais. Use ao criar regras de negócio ou editar arquivos `*Regra.java`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

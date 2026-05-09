@@ -1,6 +1,6 @@
 ---
 name: encoding
-description: Convert Sankhya source files (`.java`, `.xml`, `.kt`) to ISO-8859-1 via iconv or Python after edit. Use whenever LLM-generated content was saved as UTF-8 and Sankhya requires Latin-1.
+description: Converte arquivos-fonte Sankhya (`.java`, `.xml`, `.kt`) para ISO-8859-1 via iconv ou Python após edição. Use sempre que conteúdo gerado por LLM tiver sido salvo em UTF-8 e o Sankhya exigir Latin-1.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

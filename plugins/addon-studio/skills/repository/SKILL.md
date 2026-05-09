@@ -1,6 +1,6 @@
 ---
 name: repository
-description: Sankhya @Repository interfaces extending JapeRepository<ID, Entity> with @Criteria, @NativeQuery, @Modifying. Use when defining data access layer or editing files matching `*Repository.java`.
+description: Interfaces @Repository Sankhya estendendo JapeRepository<ID, Entity> com @Criteria, @NativeQuery, @Modifying. Use ao definir camada de acesso a dados ou editar arquivos `*Repository.java`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

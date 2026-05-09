@@ -1,6 +1,6 @@
 ---
 name: macros
-description: MacroTranslator SQL macros for Sankhya Addon Studio (dbDate, nullValue, ignorecase, normalizeText, truncMonth, yearMonth, addMonths) for Oracle/MSSQL portability. Use when writing portable SQL in `queries/`, datadictionary, or @NativeQuery.
+description: Macros SQL do MacroTranslator para Sankhya Addon Studio (dbDate, nullValue, ignorecase, normalizeText, truncMonth, yearMonth, addMonths) para portabilidade Oracle/MSSQL. Use ao escrever SQL portável em `queries/`, datadictionary ou @NativeQuery.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
