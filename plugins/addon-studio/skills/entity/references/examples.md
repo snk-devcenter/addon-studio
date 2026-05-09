@@ -43,15 +43,10 @@ public class TdcXyzRelacao {
     @Column(name = "QTDMIN")
     private BigDecimal qtdMinima;
 
-    // Navegação OneToOne
+    // Navegação OneToOne — FK aponta direto pra PK da entidade alvo
     @OneToOne
     @JoinColumn(name = "CODORIGEM", referencedColumnName = "CODPRODUTO")
     private TdcXyzProduto produtoOrigem;
-
-    // Navegação ManyToOne
-    @ManyToOne
-    @JoinColumn(name = "CODORIGEM", referencedColumnName = "CODORIG")
-    private TdcXyzProduto produto;
 
     // Métodos auxiliares para PK composta
     public Integer getCodOrig() {
@@ -59,6 +54,8 @@ public class TdcXyzRelacao {
     }
 }
 ```
+
+> **`@ManyToOne` com FK pra campo não-PK:** caso menos comum (FK aponta pra coluna única não-PK da entidade alvo). Padrão e exemplo correto em `data-dictionary` → `xml-to-java.md` (seção "Atenção: FK que referencia campo nao-PK"). Não duplicar a mesma coluna local em múltiplos `@JoinColumn` na mesma entidade — cada `@JoinColumn` deve usar coluna FK local distinta.
 
 ## Entidade com @OneToMany (pai com filhos)
 
