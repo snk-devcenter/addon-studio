@@ -266,16 +266,23 @@ Expressoes calculadas. CDATA pra BeanShell.
 | `$ctx_dh_atual`       | Data/hora atual servidor  |
 | `$col_<COLUNA>`       | Valor atual coluna        |
 
-> Quando `<expression>` contiver **SQL** (nao BeanShell), use as **macros SQL Sankhya** (`dbDate()`, `nullValue()`, `truncMonth()`, etc.) para portabilidade Oracle/MSSQL. Ver `macros`.
+> Quando `<expression>` contiver **SQL** (nao BeanShell), envolva o conteudo com `#type.sql#` e use as **macros SQL Sankhya** (`dbDate()`, `nullValue()`, `truncMonth()`, etc.) para portabilidade Oracle/MSSQL. Ver `macros`.
 
-**Atributo `calculated` (alternativa explicita):**
+**`<expression>` vs atributo `calculated` — semantica completa:**
 
-O schema `metadados.xsd` define o atributo `calculated` no `<field>` com default `N`. Se `calculated="S"`, o framework **nao cria coluna fisica no banco** — equivalente semanticamente a usar `<expression>`. Diferenca pratica:
+`<expression>` define a logica do campo (BeanShell ou SQL via `#type.sql#`). O comportamento depende de o campo ter ou nao a flag `calculated="S"`:
 
-- `<expression>` = inclui logica do calculo (BeanShell ou SQL portavel). Usar quando ha computacao.
-- `calculated="S"` (sem `<expression>`) = marca o campo como calculado sem fornecer logica. Raro — usar so se a computacao ja vem de outro lugar (ex.: campo de view, expressao herdada).
+| Cenario | `<expression>` roda | Coluna no banco | `@Column` na entity Java |
+|---------|---------------------|-----------------|---------------------------|
+| `<expression>` **sem** `calculated` (default `N`) | So em INSERT/UPDATE | **Sim** — valor persiste na coluna fisica | **Sim** — `@Column` normal |
+| `<expression>` **com** `calculated="S"` | A cada leitura do registro | **Nao** — sem DDL para esse campo | **Sim** — `@Column` normal (framework le via expression) |
 
-Default: prefira `<expression>`. Se usar `calculated="S"`, ainda assim **nao gerar coluna no dbscript** nem `@Column` na entity Java.
+Pontos criticos:
+
+- `calculated="S"` **exige** `<expression>` presente (obrigatorio).
+- `calculated="S"` afeta **somente o DDL** (sem coluna fisica). **Nao** afeta `@Column` da `@JapeEntity` — campo calculado continua acessivel pela entity Java normalmente.
+- Use `calculated="S"` quando precisar de informacao variavel atualizada em tempo real (ex.: status derivado de outras tabelas, agregacao).
+- **Custo alto, especialmente SQL**: se carregar 1000 registros, o framework dispara 1 query por registro para cada coluna calculada. Sem `calculated`, a `<expression>` roda 1 vez no INSERT/UPDATE e o valor fica persistido — leitura barata.
 
 ### Sub-tag `<fieldOptions>` (opcional)
 

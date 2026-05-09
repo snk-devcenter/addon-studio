@@ -210,7 +210,7 @@ Quando precisar de SQL portável em INSERT/UPDATE/SELECT em dbscript, usar macro
 - [ ] Alterar dbscript já aplicado (criar novo `V<NNN>` em vez)
 - [ ] `FOREIGN KEY` constraint no DDL — não declarar (Sankhya gerencia via `<relationShip>` no dicionário)
 - [ ] Versionamento `V<NNN>` fora do padrão (sem `V`, sem zero-padding, etc.)
-- [ ] **Coluna física no banco para campo calculado** — campos com `<expression>` no dicionário **não** têm coluna no dbscript. Filtrar ao inferir de XML/entity: apenas campos persistidos viram DDL.
+- [ ] **Coluna física no banco para campo com `calculated="S"`** — apenas campos com a flag `calculated="S"` no XML do dicionário **não** geram DDL. Campos com `<expression>` mas **sem** `calculated="S"` (default `N`) **continuam tendo coluna persistida** — `<expression>` roda só em INSERT/UPDATE e o valor fica na coluna. Critério de filtro ao gerar dbscript: ler atributo `calculated` do `<field>`, **não** a presença ou ausência de `<expression>`.
 
 ### 8. Validar arquivo gerado
 

@@ -40,18 +40,26 @@ Antes de criar qualquer artefato:
 | Sequência | AUTO (banco) ou MANUAL | AUTO por default. MANUAL se PK vem de regra externa. |
 | Auditoria (DHALTER, DHCREATE, CODUSU) | Incluir ou não | **Perguntar ao dev**. |
 | Relacionamentos | `@OneToMany`, `@OneToOne`/`@JoinColumn`, `@ManyToOne` | Conforme cardinalidade — ler skill `entity` para padrões. |
-| Campo persistido vs calculado | Campo normal ou `<expression>` no dicionário | Calculado: lógica em runtime (BeanShell ou SQL portável via macros). Ver §3 abaixo. |
+| Campo com `<expression>` (lógica) | Persistido (default) ou `calculated="S"` | Persistido: lógica roda só em INSERT/UPDATE, valor fica na coluna física. `calculated="S"`: lógica roda a cada leitura, sem coluna no banco. Ver §2.1 abaixo. |
 
-#### 2.1 Campos calculados — regra crítica
+#### 2.1 Campos com `<expression>` — semântica completa
 
-Campo cujo valor **deriva de outros campos ou contexto** (ex.: status default `'S'` se null, usuário logado, data atual, soma de itens) é **campo calculado**. Tratamento:
+`<expression>` define lógica (BeanShell ou SQL via `#type.sql#`). Combinado com o atributo `calculated`, gera 2 cenários distintos:
 
-- **Vai no XML do dicionário** com sub-tag `<expression>` (BeanShell ou SQL portável via macros). Ver skill `data-dictionary` §1.8.
-- **NÃO vai no dbscript** — sem coluna física no banco. Não gerar `ALTER TABLE ADD <col>` para ele.
-- **NÃO vai na entidade Java** — sem `@Column` correspondente. Framework resolve em runtime.
-- **NÃO usar `@Expression` Java** — anotação proibida. Lógica fica **só** no XML.
+| Cenário | `<expression>` roda | Coluna no banco (DDL) | `@Column` na entity Java |
+|---------|---------------------|-----------------------|---------------------------|
+| `<expression>` **sem** `calculated` (default `N`) | Em INSERT/UPDATE | **Sim** — valor persiste | **Sim** — `@Column` normal |
+| `<expression>` **com** `calculated="S"` | A cada leitura do registro | **Não** — sem DDL para o campo | **Sim** — `@Column` normal (framework lê via expression) |
 
-Detectar campo calculado pela pergunta: *"O valor é gravado no banco ou calculado dinamicamente a cada leitura?"* Se calculado → `<expression>`, sem coluna, sem `@Column`.
+Pontos críticos ao gerar artefatos:
+
+- `calculated="S"` **exige** `<expression>` presente — sempre combinados, nunca alternativas.
+- A flag `calculated` afeta **somente o dbscript** (sem coluna física). **Não** afeta a entidade Java — `@Column` continua existindo normalmente, framework lê o valor via expression.
+- Use `calculated="S"` para informação **variável atualizada em tempo real** (status derivado, agregação dinâmica, dado dependente de contexto).
+- **Custo alto, especialmente SQL**: cada leitura de N registros dispara N queries por coluna calculada. Sem `calculated`, expression roda 1 vez no INSERT/UPDATE e leitura é barata.
+- **NUNCA usar `@Expression` Java** — anotação proibida. Lógica fica só no XML.
+
+Heurística: "O valor pode mudar sem que o registro seja alterado pela aplicação?" Sim → `calculated="S"` + `<expression>`. Não → `<expression>` sozinha (persistido).
 
 ### 3. Gerar 3 artefatos consistentes
 
@@ -85,11 +93,11 @@ Detectar campo calculado pela pergunta: *"O valor é gravado no banco ou calcula
 
 Após gerar:
 - Tabela do XML = tabela do dbscript = tabela da entity (case-insensitive UPPER)
-- Cada `<field>` **persistido** no XML tem `@Column` correspondente na entity
-- Cada coluna no dbscript tem `<field>` no XML
+- **Todo `<field>` no XML** (calculado ou não) tem `@Column` correspondente na entity
+- **Apenas `<field>` SEM `calculated="S"`** tem coluna no dbscript (DDL)
+- Campos com `calculated="S"` **NÃO** geram coluna no dbscript, mas **mantêm** `@Column` normal na entity
 - PK do XML bate com `@Id`/`@EmbeddedId` da entity
 - Relacionamentos do XML batem com `@OneToMany`/`@OneToOne` da entity
-- **Campos calculados** (com `<expression>`) **não** têm coluna no dbscript nem `@Column` na entity
 
 ## Decisões a perguntar antes de executar
 
