@@ -91,7 +91,7 @@ A skill funciona nativamente em Claude Code e em OpenAI Codex CLI. Use o fluxo d
 /plugin install addon-studio@snk-devcenter
 ```
 
-Apos instalado, skills ficam disponiveis via auto-trigger (descricoes specific) ou invocacao explicita: `/addon-studio:entity`, `/addon-studio:repository`, etc.
+Apos instalado, skills ficam disponiveis via auto-trigger (descrições específicas) ou invocacao explicita: `/addon-studio:entity`, `/addon-studio:repository`, etc.
 
 ### OpenAI Codex CLI
 
