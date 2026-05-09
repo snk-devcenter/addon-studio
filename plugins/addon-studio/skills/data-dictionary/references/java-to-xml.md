@@ -134,7 +134,4 @@ Toda metadata (description, dataType, order, readOnly, etc.) fica no `TDCXYZPRD.
 
 ---
 
-# PARTE 3 - CRIANDO A ENTIDADE JAVA A PARTIR DO DICIONARIO
-
-XML ja existe e precisa criar/recriar entidade Java.
-
+Para o fluxo inverso (XML -> Java), consulte `references/xml-to-java.md`.
