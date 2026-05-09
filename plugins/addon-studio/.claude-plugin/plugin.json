@@ -1,6 +1,6 @@
 {
   "name": "addon-studio",
-  "version": "3.0.0",
+  "version": "2.0.0",
   "description": "Plugin Sankhya Addon Studio 2.0 com 18 skills focadas: addon-studio (overview), entity, repository, controller, controller-advice, data-dictionary, database, dependency-injection, mapstruct, test, action-button, business-rule, job, type-adapter, value, macros, encoding, build. Compativel com Claude Code e OpenAI Codex CLI.",
   "author": {
     "name": "DevCenter Squad"
