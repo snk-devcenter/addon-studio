@@ -8,7 +8,7 @@ Entidade Java (@JapeEntity) -> XML do Dicionario -> Limpar entidade Java
 
 1. **Ler** entidade + dependencias (`@Embeddable`, relacionamentos).
 2. **Gerar** XML conforme Parte 1.
-3. **Limpar** entidade removendo atributos extras (secao 2.5).
+3. **Limpar** entidade removendo atributos extras, conforme a etapa de limpeza da entidade Java.
 
 ---
 
