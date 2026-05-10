@@ -1,6 +1,6 @@
 ---
 name: build
-description: Build e deploy local de addon Sankhya via `gradle clean deployAddon` ou `./gradlew clean deployAddon`. Use ao rodar build, fazer troubleshooting de deploy, diagnosticar `BUILD FAILED`, revisar/auditar configuração Gradle, editar `build.gradle`/`build.gradle.kts`/`gradlew`/`settings.gradle`, ou ao precisar de comandos de empacotamento e instalação do addon.
+description: Build e deploy local de addon Sankhya via `gradle clean deployAddon` ou `./gradlew clean deployAddon`. Use ao rodar build, fazer troubleshooting de deploy, diagnosticar `BUILD FAILED`, revisar/auditar configuração Gradle, editar `build.gradle`/`build.gradle.kts`/`gradlew`/`settings.gradle`, ou ao precisar de comandos de empacotamento e instalação do addon. Sinaliza projeto Addon Studio quando `build.gradle` ou `build.gradle.kts` aplica o plugin Gradle `br.com.sankhya.addonstudio`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
