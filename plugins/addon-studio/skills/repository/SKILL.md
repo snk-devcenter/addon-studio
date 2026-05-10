@@ -98,7 +98,7 @@ List<Pedido> findByPeriodo(
 | Funções SQL (`UPPER`, `LOWER`, `CONCAT`, `COUNT`, `SUM`) | `UPPER(this.NOMEPARC) = UPPER(:nome)`         |
 | Macros Sankhya portáveis                | `this.DTMOV = dbDate()`, `ignorecase(this.NOME) = ignorecase(:nome)` |
 
-> Macros são preferidas a sintaxe específica de banco (`SYSDATE`, `NVL`, `||`, `ROWNUM`). Ver skill `macros` para o catálogo completo.
+> Macros são preferidas à sintaxe específica de banco (`SYSDATE`, `NVL`, `||`, `ROWNUM`). Ver skill `macros` para o catálogo completo.
 
 ---
 
