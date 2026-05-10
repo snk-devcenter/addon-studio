@@ -227,6 +227,16 @@ Antes de criar tabela/entity nova:
 8. Testes JUnit + Mockito (skill `test`).
 9. Build: `gradle deployAddon` (skill `build`).
 
+> **Delegação obrigatória aos sub-agents (Claude Code only):** ao receber spec/MVP/feature, **NÃO implemente inline** — delegue cada bloco do fluxo ao sub-agent especialista correspondente:
+> - Modelagem (passos 1-3, trio CRUD) → `entity-architect`
+> - Migration banco (passo 2 isolado, ALTER, seed) → `dbscript-builder`
+> - Endpoint REST (passos 6-7) → `controller-designer`
+> - Testes (passo 8) → `test-writer`
+> - Erros/diagnóstico → `troubleshooter`
+> - Revisão pré-commit → `addon-reviewer`
+>
+> Sub-agents rodam em modelos otimizados (`sonnet`/`haiku`), economizam tokens do agente principal e mantêm o contexto principal limpo. **Implementar inline sem delegar é anti-pattern em projetos Sankhya Addon Studio.**
+
 ---
 
 ## Skills do plugin

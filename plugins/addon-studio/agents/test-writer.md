@@ -1,6 +1,6 @@
 ---
 name: test-writer
-description: Escreve, revisa e amplia testes JUnit 5 + Mockito 4.11 para código Sankhya Addon Studio — controllers, services, repositories, mappers — incluindo quirks de `JapeRepository` (mock estático). Use proativamente após escrever ou modificar código de produção, ao revisar cobertura de testes, ao diagnosticar testes falhando, ou ao precisar ampliar cobertura existente.
+description: Escreve, revisa e amplia testes JUnit 5 + Mockito 4.11 para código Sankhya Addon Studio — controllers, services, repositories, mappers — incluindo quirks de `JapeRepository` (mock estático). **Use proativamente** após escrever ou modificar código de produção, ao revisar cobertura de testes, ao diagnosticar testes falhando, ou ao precisar ampliar cobertura existente. **MUST BE USED** sempre que código de produção for criado ou alterado — não deixar testes pendentes sem delegação.
 tools: Read, Write, Edit, Glob, Grep, Bash(./gradlew *)
 model: sonnet
 color: green
