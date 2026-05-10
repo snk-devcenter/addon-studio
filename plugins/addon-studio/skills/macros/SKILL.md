@@ -114,7 +114,7 @@ Algumas `<expression>` em metadata podem conter **SQL** (nao BeanShell). Macros 
 ```java
 // Busca tolerante a acento e case
 @Criteria(clause = "ignorecase(this.NOMEPARC) = ignorecase(:nome)")
-List<Parceiro> findByNome(@Parameter("nome") String nome);
+List<Parceiro> findByNome(String nome);
 
 // Filtro por data atual do servidor
 @Criteria(clause = "this.DTMOV = dbDate()")
@@ -127,7 +127,7 @@ List<CompetenciaDTO> agruparPorCompetencia();
 
 // Tratamento de null
 @NativeQuery("SELECT nullValue(VLRDESCONTO, 0) FROM TGFCAB WHERE NUNOTA = :nu")
-BigDecimal descontoOrZero(@Parameter("nu") Long nu);
+BigDecimal descontoOrZero(Long nu);
 
 // Limite de linhas portatil
 @NativeQuery("SELECT maxLines(10) NUNOTA, VLRNOTA FROM TGFCAB ORDER BY DTNEG DESC")
