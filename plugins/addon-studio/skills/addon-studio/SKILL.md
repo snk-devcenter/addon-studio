@@ -39,18 +39,20 @@ plugins {
 
 ### Template `CLAUDE.md`/`AGENTS.md` para projeto consumidor
 
-Plugin entrega um template pronto pra colar na raiz do projeto Sankhya. **Localização canônica:**
+Plugin entrega um template pronto pra colar na raiz do projeto Sankhya. **Localização canônica** (dentro dos `assets/` desta própria skill, convenção Agent Skills):
 
 ```
-<plugin-root>/templates/CLAUDE.md
+<plugin-root>/skills/addon-studio/assets/CLAUDE.md
 ```
 
-Em ambiente Claude Code, o path tipicamente é `~/.claude/plugins/cache/snk-devcenter/addon-studio/plugins/addon-studio/templates/CLAUDE.md`. Em Codex CLI, `~/.codex/marketplaces/addon-studio/plugins/addon-studio/templates/CLAUDE.md`.
+Paths esperados em ambiente real:
+- **Claude Code:** `~/.claude/plugins/cache/snk-devcenter/addon-studio/plugins/addon-studio/skills/addon-studio/assets/CLAUDE.md`
+- **Codex CLI:** `~/.codex/marketplaces/addon-studio/plugins/addon-studio/skills/addon-studio/assets/CLAUDE.md`
 
 Se o usuário pedir "configurar `CLAUDE.md`", "setup do projeto" ou similar, **copie esse template** para a raiz do projeto (não regenere o conteúdo do zero — use a fonte canônica):
 
 ```bash
-cp <plugin-root>/templates/CLAUDE.md ./CLAUDE.md
+cp <plugin-root>/skills/addon-studio/assets/CLAUDE.md ./CLAUDE.md
 # Para suportar Codex CLI também:
 ln -s CLAUDE.md AGENTS.md
 ```

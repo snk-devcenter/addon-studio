@@ -106,13 +106,13 @@ Skills cobrem **regras do SDK e do framework**. Organizacao de pacotes, camadas 
 
 Skill discovery e semantica — agente so dispara skill quando o prompt do dev casa com algum trigger da `description`. Em projeto onde o dev pede so "implementa essa spec", agente pode pular o overview e perder regras universais (Java 8 strict, ISO-8859-1, JAPE nao JPA).
 
-Para forcar discovery + alinhamento, adicione um `CLAUDE.md` (Claude Code) ou `AGENTS.md` (Codex CLI) na raiz do projeto Sankhya. **Template pronto** disponivel no plugin:
+Para forcar discovery + alinhamento, adicione um `CLAUDE.md` (Claude Code) ou `AGENTS.md` (Codex CLI) na raiz do projeto Sankhya. **Template pronto** disponivel nos `assets/` da skill `addon-studio`:
 
 ```
-plugins/addon-studio/templates/CLAUDE.md
+plugins/addon-studio/skills/addon-studio/assets/CLAUDE.md
 ```
 
-Copie esse arquivo direto para a raiz do projeto (ou crie symlink: `cp <plugin-path>/templates/CLAUDE.md ./CLAUDE.md && ln -s CLAUDE.md AGENTS.md`).
+Copie esse arquivo direto para a raiz do projeto (e opcionalmente crie symlink para Codex CLI: `cp <plugin-path>/skills/addon-studio/assets/CLAUDE.md ./CLAUDE.md && ln -s CLAUDE.md AGENTS.md`).
 
 O conteudo do template (referencia inline):
 
