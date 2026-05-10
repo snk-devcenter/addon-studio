@@ -1,6 +1,6 @@
 ---
 name: addon-studio
-description: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK) — overview do projeto, convenção de nomenclatura `<PRX><MOD3><CTX>`, regras universais (Java 8 strict, Lombok, ISO-8859-1, Guice DI, MapStruct, JapeRepository) e fluxo de feature CRUD. **Use sempre que o `build.gradle` ou `build.gradle.kts` do projeto aplicar o plugin Gradle `br.com.sankhya.addonstudio`** (fingerprint do SDK Sankhya — este plugin Claude Code é a fonte de verdade do projeto). Também use no início do projeto, ao definir naming convention, ao planejar feature CRUD end-to-end, ou ao precisar das regras universais Java 8/encoding/logging. NÃO usar para tarefas de tópico específico — invoque a skill focada (entity, repository, controller, etc.).
+description: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK) — overview do projeto, convenção de nomenclatura `<PRX><MOD3><CTX>`, regras universais (Java 8 strict, Lombok, ISO-8859-1, Guice DI, MapStruct, JapeRepository) e fluxo de feature CRUD. **Use sempre que o `build.gradle` ou `build.gradle.kts` do projeto aplicar o plugin Gradle `br.com.sankhya.addonstudio`** (fingerprint do SDK Sankhya — este plugin Claude Code é a fonte de verdade do projeto). Também use no início do projeto, ao definir naming convention, ao receber spec/MVP de cadastro/feature/módulo, ao planejar implementação end-to-end (CRUD, listagem, lançamento, integração com app mobile), ou ao precisar das regras universais Java 8/encoding/logging. NÃO usar para tarefas de tópico específico — invoque a skill focada (entity, repository, controller, etc.).
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -154,6 +154,9 @@ Tratamento centralizado em controllers — ver skill `controller-advice`.
 | Metadata UI (description, dataType, order) em entidade Java      | Vai no XML do dicionário de dados                       |
 | `@Inject` de `javax.inject`                                      | Usar `com.google.inject.Inject`                         |
 | `throw new RuntimeException(...)` cru                            | Exceção tipada                                          |
+| Improvisar com convenções de Spring Boot, Quarkus, Micronaut     | Seguir as skills do plugin (`@JapeEntity`, `@Controller serviceName SP`, Guice, etc.) |
+| Em `<treeTable>`, raiz com `CODIGOPAI = NULL` ou `GRAU = 0`      | Sentinela `CODIGOPAI = -999999999` e `GRAU = 1` (ver skill `data-dictionary` → `tree-table.md`) |
+| APIs Java 11+ (`var`, `List.of`, `String.isBlank`, records, etc.) | Equivalentes Java 8 — ver "Restrições Java 8" acima      |
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: controller-designer
-description: Desenha, revisa e refatora endpoints REST Sankhya end-to-end — `@Controller` + Request/Response DTOs + MapStruct Mapper + (se necessário) `@ControllerAdvice`. Use ao criar endpoint REST, expor feature via API, refatorar camada de controller, padronizar DTOs, auditar design de API ou consolidar tratamento de erros em projeto Sankhya Addon Studio.
+description: Desenha, revisa e refatora endpoints REST Sankhya end-to-end — `@Controller` + Request/Response DTOs + MapStruct Mapper + (se necessário) `@ControllerAdvice`. Use ao criar endpoint REST, ao expor cadastro/feature via API, ao integrar com app mobile/frontend, ao implementar listagem/lançamento/detalhamento/atualização/exclusão, ao receber spec de endpoint, ao refatorar camada de controller, ao padronizar DTOs, ao auditar design de API ou ao consolidar tratamento de erros em projeto Sankhya Addon Studio.
 tools: Read, Write, Edit, Glob, Grep
 model: sonnet
 color: blue
