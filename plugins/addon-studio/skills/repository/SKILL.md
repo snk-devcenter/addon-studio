@@ -72,10 +72,13 @@ List<Veiculo> findByAtivo(Boolean ativo);
 List<Pedido> findByEmpresaAndStatus(Long empresa, String status);
 ```
 
-> Use `@Parameter("nome")` para vincular explicitamente nome do param quando necessário.
+> **Quando usar `@Parameter`:**
+>
+> - **Opcional** quando o nome do parâmetro Java casa com o `:nome` da clause — basta declarar `Long empresa, String status` (vincula automaticamente).
+> - **Obrigatório** quando os nomes diferem. Sintaxe correta: **`@Parameter(name = "...")`** — sempre com `name = ` explícito. A forma posicional `@Parameter("...")` **causa erro de compilação**.
 
 ```java
-
+// Nomes do método != :nome da clause → @Parameter(name = "...") obrigatório
 @Criteria(clause = "this.DTNEG BETWEEN :dataInicio AND :dataFim")
 List<Pedido> findByPeriodo(
     @Parameter(name = "dataInicio") LocalDate inicio,
@@ -95,7 +98,7 @@ Use `@NativeQuery` para queries complexas com JOINs, agregações, funções esp
 ```java
 
 @NativeQuery("SELECT CODVEICULO, PLACA FROM TGFVEI WHERE MODELO = :modelo")
-List<VeiculoDTO> findByModeloNativo(@Parameter("modelo") String modelo);
+List<VeiculoDTO> findByModeloNativo(String modelo);
 ```
 
 #### Mapeando o resultado com `@NativeQuery.Result`
@@ -120,7 +123,7 @@ Nomes dos getters devem coincidir **exatamente** com nomes/aliases das colunas. 
 ```java
 
 @NativeQuery("SELECT DESCRPROD FROM TGFPRO WHERE CODPROD = :codigo")
-String buscarDescricaoPorCodigo(@Parameter("codigo") Long codigo);
+String buscarDescricaoPorCodigo(Long codigo);
 
 @NativeQuery("SELECT COUNT(1) FROM TGFPRO")
 Long contarTotalDeProdutos();
@@ -146,11 +149,11 @@ Long contarPendentes(JdbcWrapper jdbc);
 
 @Modifying
 @NativeQuery("UPDATE TGFPRO SET VLRVENDA = VLRVENDA * :fator WHERE CODGRUPOPROD = :grupo")
-void reajustarPrecoPorGrupo(@Parameter("fator") BigDecimal fator, @Parameter("grupo") Long grupo);
+void reajustarPrecoPorGrupo(BigDecimal fator, Long grupo);
 
 @Modifying
 @NativeQuery("DELETE FROM TDCXYZLOG WHERE DTEXPIRACAO < :data")
-void excluirLogsExpirados(@Parameter("data") LocalDate data);
+void excluirLogsExpirados(LocalDate data);
 ```
 
 > **`@Modifying` deve retornar `void` ou `Boolean`.** KSP rejeita `int` com erro de compilação.
@@ -195,11 +198,11 @@ List<Movimentacao> findByDataAtual();
 
 // Macro ignorecase() — busca tolerante a case e acentos
 @Criteria(clause = "ignorecase(this.NOMEPARC) = ignorecase(:nome)")
-List<Nota> findByNomeParceiro(@Parameter("nome") String nome);
+List<Nota> findByNomeParceiro(String nome);
 
 // Macro nullValue() — substitui null por padrao (NVL/ISNULL portatil)
 @NativeQuery("SELECT nullValue(VLRDESCONTO, 0) FROM TGFCAB WHERE NUNOTA = :nu")
-BigDecimal descontoOuZero(@Parameter("nu") Long nu);
+BigDecimal descontoOuZero(Long nu);
 ```
 
 > Macros traduzem automaticamente entre Oracle e MSSQL. Lista completa (datas, texto, conversoes, agregacoes): ver `macros`. **Sempre prefira macro a sintaxe especifica de banco** (`SYSDATE`, `NVL`, `||`, `ROWNUM`, etc.).
@@ -245,7 +248,7 @@ Queries complexas (100+ linhas) = arquivos externos com `fromFile = true`.
 ```java
 
 @NativeQuery(value = "queries/listar-veiculos-ativos.sql", fromFile = true)
-List<VeiculoView> listarAtivos(@Parameter("ativo") String ativo);
+List<VeiculoView> listarAtivos(String ativo);
 ```
 
 **Arquivo:** `model/src/main/resources/queries/listar-veiculos-ativos.sql`
@@ -355,7 +358,7 @@ List<Veiculo> findByPlacaStartingWith(String prefix); // não funciona
 
 // Correto: use @Criteria no lugar
 @Criteria(clause = "this.PLACA LIKE :prefix")
-List<Veiculo> findByPlacaStartingWith(@Parameter("prefix") String prefix);
+List<Veiculo> findByPlacaStartingWith(String prefix);
 ```
 
 ---
@@ -404,17 +407,17 @@ public interface PedidoResumoDTO {
 public interface PedidoRepository extends JapeRepository<Long, Pedido> {
 
     @Criteria(clause = "this.CODPARC = :codigoCliente")
-    List<Pedido> findByCliente(@Parameter("codigoCliente") Long codigoCliente);
+    List<Pedido> findByCliente(Long codigoCliente);
 
     @NativeQuery("SELECT NUNOTA as numero, VLRNOTA as valor FROM TGFCAB WHERE STATUS = :status AND CODEMP = :empresa")
     List<PedidoResumoDTO> findResumoPorStatus(
-        @Parameter("status") String status,
-        @Parameter("empresa") Long empresa
+        String status,
+        Long empresa
     );
 
     @Modifying
     @NativeQuery("DELETE FROM TGFCAB WHERE STATUS = 'R' AND DHALTER < :dataLimite")
-    void deleteRascunhosAntigos(@Parameter("dataLimite") LocalDateTime dataLimite);
+    void deleteRascunhosAntigos(LocalDateTime dataLimite);
 }
 
 // Serviço
