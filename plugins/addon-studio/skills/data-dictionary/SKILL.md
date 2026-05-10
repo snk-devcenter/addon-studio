@@ -1,6 +1,6 @@
 ---
 name: data-dictionary
-description: Cria XML do dicionário de dados Sankhya (`datadictionary/<TABELA>.xml`) com `<table>`, `<instance>`, campos, tipos e opções. Use ao definir metadados de tabela em `datadictionary/`.
+description: Cria, revisa e padroniza XML do dicionário de dados Sankhya (`datadictionary/<TABELA>.xml`) — `<table>`, `<treeTable>`, `<nativeTable>`, `<instance>`, `<fields>`, `<filters>`, `<menu>`, `<dynamicForm>`, `<dynamicTreeView>`, `dataType` (TEXTO/INTEIRO/DECIMAL/DATA/DATA_HORA/HORA/CHECKBOX/LISTA/PESQUISA), `<expression>`, `calculated`, lookups e relacionamentos. Use ao criar, alterar, revisar, auditar ou padronizar arquivos em `datadictionary/`, ao modelar cadastro/feature/MVP/módulo, ao receber spec de tabela/entidade hierárquica, ao mapear tipos, ao trabalhar com `metadados.xml`, ou ao tocar em XML com tags `<table>`/`<treeTable>`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -512,3 +512,9 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 - `entity` — classe Java @JapeEntity que mapeia a tabela definida neste XML
 - `database` — dbscript que materializa a tabela no banco
 - `macros` — MacroTranslator macros para portar SQL no campo `<expression>`
+
+## Skills relacionadas
+
+- `entity` — classe Java `@JapeEntity` que mapeia esta tabela
+- `database` — dbscript que materializa a tabela no banco
+- `macros` — macros para `<expression>` portável Oracle/MSSQL

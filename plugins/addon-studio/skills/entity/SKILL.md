@@ -1,6 +1,6 @@
 ---
 name: entity
-description: Cria ou modifica entidades Java @JapeEntity Sankhya (Lombok, PK simples/composta, @Embeddable, @Column, @JoinColumn, naming `<PRX><MOD3><CTX>`). Use ao definir entidades ou editar arquivos `.java` com @JapeEntity.
+description: Cria, revisa e refatora entidades Java `@JapeEntity` Sankhya — Lombok (`@Data`/`@NoArgsConstructor`/`@AllArgsConstructor`), PK simples/composta com `@Embeddable`, `@Column`, `@Id`, `@JoinColumn`, `@OneToMany`/`@OneToOne`/`@ManyToOne`, `@Relationship`, naming `<PRX><MOD3><CTX>`, mapeamento de tipos (`Integer`/`BigDecimal`/`String`/`Boolean`/`Date`/`Timestamp`). Use ao criar, alterar, revisar, auditar ou padronizar entidades, ao implementar cadastro/CRUD/feature/MVP, ao modelar dados de uma spec/módulo, ou ao tocar em código com `@JapeEntity`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -479,4 +479,11 @@ Entidades completas — PK simples, PK composta + relacionamentos, `@OneToMany` 
 - `data-dictionary` — XML do dicionário de dados que descreve a tabela mapeada por esta entidade
 - `database` — dbscript V<NNN>-*.xml que cria a tabela física no MSSQL/Oracle
 - `repository` — interface JapeRepository que opera sobre esta entidade
+- `mapstruct` — mapper DTO ↔ entidade
+
+## Skills relacionadas
+
+- `data-dictionary` — XML do dicionário que descreve a tabela
+- `database` — dbscript que cria a tabela física
+- `repository` — interface `JapeRepository` que opera sobre esta entidade
 - `mapstruct` — mapper DTO ↔ entidade

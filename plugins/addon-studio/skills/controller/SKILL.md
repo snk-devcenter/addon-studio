@@ -1,6 +1,6 @@
 ---
 name: controller
-description: Implementa endpoints REST @Controller Sankhya com serviceName SP, @Transactional, DTOs, @Valid e protocolo HTTP. Use ao escrever controllers ou editar arquivos `*Controller.java`.
+description: Cria, revisa e refatora endpoints REST Sankhya com `@Controller` — `serviceName`, SP, `@Transactional`, DTOs, `@Valid`, mapeamento HTTP (GET/POST/PUT/DELETE), códigos de status. Use ao criar, alterar, revisar, auditar ou padronizar controllers REST, ao expor cadastro/feature via REST, ao integrar com app mobile/frontend, ao implementar listagem/lançamento/detalhamento/atualização/exclusão, ao receber spec de endpoint/API, ao trabalhar com arquivos `*Controller.java`, ou ao tocar em código com `@Controller`/`@GetMapping`/`@PostMapping`/`@RequestMapping`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -430,3 +430,11 @@ Exemplos completos — controller simples (CRUD) e controller completo (múltipl
 - `mapstruct` — controller usa mapper MapStruct para DTO ↔ entidade
 - `repository` — controller delega persistência ao repository
 - `addon-studio` — regras universais (Java 8, Lombok, ISO-8859-1, exceções tipadas)
+
+## Skills relacionadas
+
+- `controller-advice` — tratamento global de exceções
+- `mapstruct` — DTO ↔ entidade
+- `repository` — camada de acesso a dados consumida
+- `dependency-injection` — wiring Guice do controller
+- `test` — JUnit + Mockito do controller

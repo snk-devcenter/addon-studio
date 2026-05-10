@@ -1,6 +1,6 @@
 ---
 name: dependency-injection
-description: Configura DI Guice para Sankhya Addon Studio (@Inject de `com.google.inject`, @Component, @CustomModule, Provider<T>, Multibinder, @Singleton). Use ao montar wiring de componentes ou módulos.
+description: Configura, revisa e debuga DI Guice em Sankhya Addon Studio — `@Inject` de `com.google.inject`, `@Component`, `@CustomModule`, `Provider<T>`, `Multibinder`, `@Singleton`, escopos. Use ao montar wiring, criar/alterar módulos Guice, revisar/auditar dependências, diagnosticar `ConfigurationException`/`CreationException`/binding ausente, ou ao tocar em código com `@Inject`/`@CustomModule`/`AbstractModule`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -460,3 +460,8 @@ public class DynamicProdutoGateway implements ProdutoGateway {
 - `controller` — controllers são @Component injetados via Guice
 - `controller-advice` — advice é @Component registrado no módulo
 - `mapstruct` — mappers são registrados no container Guice
+
+## Skills relacionadas
+
+- `value` — injeção de valores de configuração via `@Value`
+- `addon-studio` — regras universais do projeto

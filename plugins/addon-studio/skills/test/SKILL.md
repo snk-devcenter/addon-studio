@@ -1,6 +1,6 @@
 ---
 name: test
-description: Testes JUnit 5 + Mockito 4.11 para Sankhya Addon Studio (mock estático, quirks de JapeRepository, fixtures). Use ao escrever testes unitários em `src/test/java/`.
+description: Escreve, revisa e amplia testes JUnit 5 + Mockito 4.11 para Sankhya Addon Studio — mock estático de `JapeRepository`, fixtures, controllers, services, repositories, mappers. Use ao criar, alterar, revisar ou ampliar cobertura de testes em `src/test/java/`, ao diagnosticar testes flaky/falhando, ou ao tocar em código com `@Test`/`@Mock`/`@InjectMocks`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -356,3 +356,10 @@ Fluxo dev Addon Studio: rode testes antes de `deployAddon`.
 
 - `repository` — JapeRepository tem quirks — leia antes de mockar
 - `dependency-injection` — componentes Guice injetam dependências via construtor — facilita mock
+
+## Skills relacionadas
+
+- `controller` — controllers cobertos por testes
+- `repository` — repositórios cobertos (mock estático JapeRepository)
+- `entity` — fixtures de entidades
+- `mapstruct` — mappers cobertos

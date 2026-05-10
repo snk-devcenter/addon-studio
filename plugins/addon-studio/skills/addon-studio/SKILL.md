@@ -1,6 +1,6 @@
 ---
 name: addon-studio
-description: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK) — overview do projeto, convenção de nomenclatura `<PRX><MOD3><CTX>`, regras universais (Java 8 strict, Lombok, ISO-8859-1, Guice DI, MapStruct, JapeRepository) e fluxo de feature CRUD. Use no início do projeto, ao definir naming convention para projetos novos, ao planejar feature CRUD end-to-end, ou ao precisar das regras universais Java 8/encoding/logging. NÃO usar para tarefas de tópico específico — invoque a skill focada (entity, repository, controller, etc.).
+description: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK) — overview do projeto, convenção de nomenclatura `<PRX><MOD3><CTX>`, regras universais (Java 8 strict, Lombok, ISO-8859-1, Guice DI, MapStruct, JapeRepository) e fluxo de feature CRUD. **Use sempre que o `build.gradle` ou `build.gradle.kts` do projeto aplicar o plugin Gradle `br.com.sankhya.addonstudio`** (fingerprint do SDK Sankhya — este plugin Claude Code é a fonte de verdade do projeto). Também use no início do projeto, ao definir naming convention, ao receber spec/MVP de cadastro/feature/módulo, ao planejar implementação end-to-end (CRUD, listagem, lançamento, integração com app mobile), ou ao precisar das regras universais Java 8/encoding/logging. NÃO usar para tarefas de tópico específico — invoque a skill focada (entity, repository, controller, etc.).
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -10,6 +10,32 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 Skill orienta projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Foco: stack, regras universais, convenção de nomenclatura, fluxo CRUD. **Sem opinião arquitetural** — pacotes, camadas, design = decisão dev/projeto.
 
 Para tópicos específicos (entidades, controllers, repositories, jobs, etc.), invoque a skill focada correspondente — ver "Skills do plugin" abaixo.
+
+---
+
+## Como detectar projeto Sankhya Addon Studio
+
+Marca registrada: `build.gradle` ou `build.gradle.kts` aplica o plugin Gradle do SDK Sankhya.
+
+```groovy
+// build.gradle (Groovy DSL)
+apply plugin: "br.com.sankhya.addonstudio"
+```
+
+```kotlin
+// build.gradle.kts (Kotlin DSL)
+plugins {
+    id("br.com.sankhya.addonstudio")
+}
+```
+
+**Se o projeto aplica esse plugin, este plugin Claude Code (`addon-studio`) é a fonte de verdade — siga as skills daqui.** Antes de gerar/alterar código:
+
+1. Identifique o domínio (entity, repository, controller, controller-advice, dbscript, dicionário de dados, mapstruct, dependency-injection, action-button, business-rule, job, type-adapter, value, macros, encoding, build, test).
+2. Invoque a skill focada correspondente — não improvise nem misture convenções de outros stacks (Spring Boot, Quarkus, JPA padrão, etc.).
+3. Para regras universais (Java 8, Lombok, encoding ISO-8859-1, naming `<PRX><MOD3><CTX>`), volte neste overview.
+
+> Conflito entre convenção do projeto e skill: **prevalece a skill** (a não ser que o projeto declare regra explícita em `CLAUDE.md` ou `AGENTS.md` na raiz).
 
 ---
 
@@ -128,6 +154,9 @@ Tratamento centralizado em controllers — ver skill `controller-advice`.
 | Metadata UI (description, dataType, order) em entidade Java      | Vai no XML do dicionário de dados                       |
 | `@Inject` de `javax.inject`                                      | Usar `com.google.inject.Inject`                         |
 | `throw new RuntimeException(...)` cru                            | Exceção tipada                                          |
+| Improvisar com convenções de Spring Boot, Quarkus, Micronaut     | Seguir as skills do plugin (`@JapeEntity`, `@Controller serviceName SP`, Guice, etc.) |
+| Em `<treeTable>`, raiz com `CODIGOPAI = NULL` ou `GRAU = 0`      | Sentinela `CODIGOPAI = -999999999` e `GRAU = 1` (ver skill `data-dictionary` → `tree-table.md`) |
+| APIs Java 11+ (`var`, `List.of`, `String.isBlank`, records, etc.) | Equivalentes Java 8 — ver "Restrições Java 8" acima      |
 
 ---
 

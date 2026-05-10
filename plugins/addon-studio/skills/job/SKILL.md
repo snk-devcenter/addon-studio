@@ -1,6 +1,6 @@
 ---
 name: job
-description: Implementa @Job Sankhya (IJob + onSchedule + getScheduleConfigHook + CRON, migração via XML). Use ao criar jobs agendados ou editar arquivos `*Job.java`.
+description: Cria, revisa e refatora jobs agendados Sankhya com `@Job` (`IJob` + `onSchedule` + `getScheduleConfigHook` + CRON), incluindo migration via XML. Use ao criar, alterar, revisar, auditar ou padronizar jobs agendados, ao ajustar agendamento CRON, ao trabalhar com arquivos `*Job.java`, ou ao tocar em código com `@Job`/`IJob`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -274,3 +274,10 @@ public class MeuJob implements IJob {
 - `dependency-injection` — @Component do IJob precisa estar registrado no módulo Guice
 - `repository` — jobs tipicamente operam sobre dados via repository
 - `addon-studio` — regras universais Java 8 + Lombok
+
+## Skills relacionadas
+
+- `dependency-injection` — wiring Guice do job
+- `repository` — acesso a dados dentro do `onSchedule`
+- `value` — configuração agendamento via `@Value`/`SANKHYA_PARAM`
+- `database` — migration XML do registro do job
