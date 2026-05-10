@@ -1,6 +1,6 @@
 ---
 name: addon-reviewer
-description: Revisa código Sankhya Addon Studio verificando regras do framework — encoding ISO-8859-1, Java 8 strict, Lombok, Guice DI, @JapeEntity (sem JPA), exceções tipadas, MapStruct, Retrofit. Use proativamente após escrever ou modificar código em projetos addon, antes de commits, ou ao revisar PRs.
+description: Revisa código Sankhya Addon Studio verificando regras do framework — encoding ISO-8859-1, Java 8 strict, Lombok, Guice DI, `@JapeEntity` (sem JPA), exceções tipadas, MapStruct, Retrofit. **Use proativamente** após escrever ou modificar código em projetos addon, antes de commits, ou ao revisar PRs. **MUST BE USED** antes de qualquer commit em projeto Sankhya Addon Studio — não pular essa revisão pré-commit.
 tools: Read, Grep, Glob, Bash(git diff *), Bash(git log *), Bash(skills-ref *)
 model: sonnet
 color: red

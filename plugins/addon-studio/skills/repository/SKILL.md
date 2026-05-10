@@ -86,6 +86,20 @@ List<Pedido> findByPeriodo(
 );
 ```
 
+#### Operadores SQL suportados em `@Criteria`
+
+| Operador / construção                   | Exemplo de clause                                             |
+|:----------------------------------------|:--------------------------------------------------------------|
+| Comparação (`=`, `>`, `<`, `>=`, `<=`, `!=`) | `this.VLRNOTA >= :valor`                                  |
+| `LIKE`                                  | `this.PLACA LIKE :prefix`                                     |
+| `IN` com `List<?>`                      | `this.CODPROD IN (:codigos)` (parâmetro `List<Long> codigos`) |
+| `BETWEEN`                               | `this.DTNEG BETWEEN :inicio AND :fim`                         |
+| `IS NULL` / `IS NOT NULL`               | `this.DHCONFIRMACAO IS NULL`                                  |
+| Funções SQL (`UPPER`, `LOWER`, `CONCAT`, `COUNT`, `SUM`) | `UPPER(this.NOMEPARC) = UPPER(:nome)`         |
+| Macros Sankhya portáveis                | `this.DTMOV = dbDate()`, `ignorecase(this.NOME) = ignorecase(:nome)` |
+
+> Macros são preferidas à sintaxe específica de banco (`SYSDATE`, `NVL`, `||`, `ROWNUM`). Ver skill `macros` para o catálogo completo.
+
 ---
 
 ### 3.2 `@NativeQuery` — Consultas SQL Nativas
@@ -235,6 +249,75 @@ public class ItemNota {
 public interface ItemNotaRepository extends JapeRepository<ItemNotaPK, ItemNota> {
     // CRUD para chave composta funciona automaticamente
 }
+```
+
+---
+
+### 3.7 `ResultSetMethods` — Desambiguação de Tipo Simples
+
+Quando `@NativeQuery` retorna tipo Java simples (`String`, `Long`, etc.) e o ResultSet tem múltiplos métodos compatíveis (ex.: `getString` vs `getNString`), use o atributo `method` para forçar a leitura específica:
+
+```java
+import br.com.sankhya.studio.persistence.NativeQuery;
+import br.com.sankhya.studio.persistence.ResultSetMethods;
+
+@NativeQuery(value = "SELECT DESCRICAO FROM TGFPRO WHERE CODPROD = :codigo",
+             method = ResultSetMethods.GET_N_STRING)
+String buscarDescricaoNVarchar(Long codigo);
+```
+
+> Caso típico: colunas `NVARCHAR`/`NCHAR` (Unicode) no MSSQL exigem `getNString` para preservar caracteres multi-byte. Sem o `method`, o SDK chama `getString` por padrão.
+
+---
+
+### 3.8 `ParamMatrix` — Tuplas Múltiplas em `IN`
+
+Quando o filtro envolve **múltiplas colunas combinadas** (ex.: `(CODEMP, CODFIL) IN ((1,1), (1,2), (2,3))`), use `ParamMatrix` no parâmetro:
+
+```java
+import br.com.sankhya.studio.persistence.ParamMatrix;
+import java.util.Arrays;
+
+ParamMatrix matrix = ParamMatrix.of(
+    Arrays.asList(1L, 1L),   // (CODEMP=1, CODFIL=1)
+    Arrays.asList(1L, 2L),   // (CODEMP=1, CODFIL=2)
+    Arrays.asList(2L, 3L)    // (CODEMP=2, CODFIL=3)
+);
+
+List<Filial> filiais = filialRepository.findByEmpresaFilial(matrix);
+```
+
+#### Sintaxe diverge entre Oracle e MSSQL
+
+```sql
+-- Oracle aceita IN com tuplas direto:
+(CODEMP, CODFIL) IN (:matrix)
+
+-- MSSQL não aceita; precisa EXISTS + VALUES:
+EXISTS (SELECT 1 FROM (VALUES :matrix) AS T(CODEMP, CODFIL)
+        WHERE T.CODEMP = TGFFIL.CODEMP AND T.CODFIL = TGFFIL.CODFIL)
+```
+
+> **Recomendação:** sempre que usar `ParamMatrix`, **externalize a query em arquivo XML multi-banco** (`<oracle>` + `<mssql>`) — não dá pra escrever uma única clause portável. Ver seção `4. Queries SQL Externas`.
+
+```java
+@NativeQuery(value = "queries/filiais-por-tupla.xml", fromFile = true)
+List<Filial> findByEmpresaFilial(ParamMatrix matrix);
+```
+
+```xml
+<sql>
+    <oracle>
+        SELECT * FROM TGFFIL WHERE (CODEMP, CODFIL) IN (:matrix)
+    </oracle>
+    <mssql>
+        SELECT TGFFIL.* FROM TGFFIL
+        WHERE EXISTS (
+            SELECT 1 FROM (VALUES :matrix) AS T(CODEMP, CODFIL)
+            WHERE T.CODEMP = TGFFIL.CODEMP AND T.CODFIL = TGFFIL.CODFIL
+        )
+    </mssql>
+</sql>
 ```
 
 ---
