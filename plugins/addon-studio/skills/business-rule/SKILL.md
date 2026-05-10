@@ -289,3 +289,10 @@ public class IntegracaoExternaRegra implements Regra {
 - `action-button` — botão dispara fluxo que pode invocar regra
 - `controller` — controller pode invocar regra via barramento
 - `dependency-injection` — @Component da Regra precisa estar registrado no módulo Guice
+
+## Skills relacionadas
+
+- `entity` — entidade alvo do evento
+- `repository` — acesso a dados dentro da regra
+- `dependency-injection` — wiring Guice da regra
+- `test` — JUnit + Mockito da `Regra`

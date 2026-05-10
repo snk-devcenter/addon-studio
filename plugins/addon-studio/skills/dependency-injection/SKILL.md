@@ -460,3 +460,8 @@ public class DynamicProdutoGateway implements ProdutoGateway {
 - `controller` — controllers são @Component injetados via Guice
 - `controller-advice` — advice é @Component registrado no módulo
 - `mapstruct` — mappers são registrados no container Guice
+
+## Skills relacionadas
+
+- `value` — injeção de valores de configuração via `@Value`
+- `addon-studio` — regras universais do projeto

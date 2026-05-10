@@ -356,3 +356,10 @@ Fluxo dev Addon Studio: rode testes antes de `deployAddon`.
 
 - `repository` — JapeRepository tem quirks — leia antes de mockar
 - `dependency-injection` — componentes Guice injetam dependências via construtor — facilita mock
+
+## Skills relacionadas
+
+- `controller` — controllers cobertos por testes
+- `repository` — repositórios cobertos (mock estático JapeRepository)
+- `entity` — fixtures de entidades
+- `mapstruct` — mappers cobertos

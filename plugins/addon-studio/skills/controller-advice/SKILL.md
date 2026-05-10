@@ -196,3 +196,8 @@ public class ErrorResponse {
 ## Related Skills
 
 - `controller` — controllers devem deixar exceção propagar até o advice
+
+## Skills relacionadas
+
+- `controller` — endpoint REST que dispara as exceções tratadas
+- `test` — cobertura de cenários de erro

@@ -171,3 +171,8 @@ public class IntegracaoConfig {
 ## Related Skills
 
 - `dependency-injection` — @Value injeta em @Component gerenciados pelo Guice
+
+## Skills relacionadas
+
+- `dependency-injection` — wiring Guice que injeta os `@Value`
+- `addon-studio` — regras universais do projeto

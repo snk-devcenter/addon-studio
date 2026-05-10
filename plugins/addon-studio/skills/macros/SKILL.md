@@ -185,3 +185,9 @@ GROUP BY VEND.CODVEND, VEND.NOMEVEND, getYear(CAB.DTNEG)
 - `data-dictionary` — macros usadas em campo `<expression>` quando contém SQL (não BeanShell)
 - `database` — macros usadas em dbscripts para portabilidade Oracle/MSSQL
 - `repository` — macros usadas em `@NativeQuery` e `queries/<arquivo>.xml`
+
+## Skills relacionadas
+
+- `database` — dbscripts dual MSSQL/Oracle que usam macros
+- `data-dictionary` — campo `<expression>` portável
+- `repository` — `@NativeQuery` portável

@@ -102,6 +102,54 @@ Agents sao especialistas com workflow ativo, tools restritas e modelo proprio. D
 
 Skills cobrem **regras do SDK e do framework**. Organizacao de pacotes, camadas e padroes de design (Clean Arch, Hexagonal, MVC, DDD) sao decisoes do dev/projeto.
 
+## Como configurar no projeto consumidor
+
+Skill discovery e semantica — agente so dispara skill quando o prompt do dev casa com algum trigger da `description`. Em projeto onde o dev pede so "implementa essa spec", agente pode pular o overview e perder regras universais (Java 8 strict, ISO-8859-1, JAPE nao JPA).
+
+Para forcar discovery + alinhamento, adicione um `CLAUDE.md` (Claude Code) ou `AGENTS.md` (Codex CLI) na raiz do projeto Sankhya com o snippet abaixo. Ele orienta o agente a carregar `addon-studio` overview + skill focada antes de gerar codigo.
+
+```markdown
+# CLAUDE.md / AGENTS.md
+
+Este projeto e um **Sankhya Addon Studio 2.0** (verificavel pelo plugin Gradle
+`br.com.sankhya.addonstudio` aplicado no `build.gradle` ou `build.gradle.kts`).
+
+**Antes de gerar ou alterar codigo**, o agente DEVE:
+
+1. Carregar a skill `addon-studio` (overview, regras universais, naming convention `<PRX><MOD3><CTX>`).
+2. Identificar o dominio do artefato e invocar a skill focada correspondente:
+   - Entidade Java -> `entity`
+   - XML dicionario de dados -> `data-dictionary`
+   - Migration de banco -> `database`
+   - Repositorio -> `repository`
+   - Endpoint REST -> `controller`
+   - Tratamento global de erro -> `controller-advice`
+   - DI Guice -> `dependency-injection`
+   - Mapper DTO/entidade -> `mapstruct`
+   - Botao de acao -> `action-button`
+   - Regra de negocio -> `business-rule`
+   - Job agendado -> `job`
+   - Adapter JSON -> `type-adapter`
+   - Injecao de configuracao -> `value`
+   - SQL portavel Oracle/MSSQL -> `macros`
+   - Teste -> `test`
+3. Apos cada `Write`/`Edit` em arquivo `.java`/`.xml`/`.kt`/`.properties`, garantir ISO-8859-1 (skill `encoding`).
+4. Para build/deploy, usar a skill `build` (`./gradlew clean deployAddon`).
+
+**Anti-patterns universais** (NUNCA fazer neste projeto):
+
+- Usar `@Entity` JPA padrao — use `@JapeEntity`.
+- Usar APIs Java 11+ (`var`, `List.of`, `Optional.orElseThrow(Supplier)`, etc.) — projeto e Java 8 estrito.
+- Misturar `javax.inject.@Inject` com Guice — use `com.google.inject.@Inject`.
+- Salvar arquivos em UTF-8 — Sankhya exige ISO-8859-1.
+- Improvisar convencoes de Spring Boot, Quarkus, Micronaut, etc. — siga as skills do plugin.
+- Em `<treeTable>`, raiz com `CODIGOPAI = NULL` ou `GRAU = 0` — convencao Sankhya e sentinela `-999999999` e `GRAU = 1`.
+
+Em caso de conflito entre regra do projeto e skill, **prevalece a skill**, exceto se este `CLAUDE.md` declarar override explicito.
+```
+
+> **Codex CLI:** o conteudo do `CLAUDE.md` funciona identicamente em `AGENTS.md`. Se o projeto suporta os dois harnesses, mantenha um arquivo (`CLAUDE.md`) e crie o outro como symlink: `ln -s CLAUDE.md AGENTS.md`.
+
 ## Instalacao
 
 A skill funciona nativamente em Claude Code e em OpenAI Codex CLI. Use o fluxo do harness que voce ja tem instalado.

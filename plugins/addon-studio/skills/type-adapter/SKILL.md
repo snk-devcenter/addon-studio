@@ -228,3 +228,8 @@ Ja registrados automaticamente. Nao recriar sem necessidade — apenas sobrescre
 - `entity` — tipos suportados em @JapeEntity
 - `controller` — DTOs e serialização JSON nos endpoints
 - `dependency-injection` — @GlobalTypeAdapter registra-se via módulo Guice
+
+## Skills relacionadas
+
+- `controller` — endpoint REST que serializa/desserializa via adapter
+- `addon-studio` — regras universais do projeto

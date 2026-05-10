@@ -430,3 +430,11 @@ Exemplos completos — controller simples (CRUD) e controller completo (múltipl
 - `mapstruct` — controller usa mapper MapStruct para DTO ↔ entidade
 - `repository` — controller delega persistência ao repository
 - `addon-studio` — regras universais (Java 8, Lombok, ISO-8859-1, exceções tipadas)
+
+## Skills relacionadas
+
+- `controller-advice` — tratamento global de exceções
+- `mapstruct` — DTO ↔ entidade
+- `repository` — camada de acesso a dados consumida
+- `dependency-injection` — wiring Guice do controller
+- `test` — JUnit + Mockito do controller

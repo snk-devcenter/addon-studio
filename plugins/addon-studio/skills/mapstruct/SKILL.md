@@ -316,3 +316,8 @@ Mapper de integracao com plataforma externa (toDomain precisa de upsert)?
 - `dependency-injection` — mappers registram no container Guice
 - `controller` — controllers consomem mappers para conversão DTO ↔ entidade
 - `entity` — entidades-alvo dos mappers
+
+## Skills relacionadas
+
+- `entity` — entidade origem/destino do mapeamento
+- `controller` — DTOs convertidos no endpoint REST

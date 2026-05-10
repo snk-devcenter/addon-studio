@@ -482,3 +482,9 @@ public class PedidoService {
 - `entity` — entidade @JapeEntity sobre a qual o repository opera
 - `macros` — macros SQL para `@NativeQuery` e `queries/<arquivo>.xml`
 - `test` — repository é tipicamente mockado em testes (cuidado com JapeRepository quirks)
+
+## Skills relacionadas
+
+- `entity` — entidade que o repositório opera
+- `macros` — macros SQL em `@NativeQuery`
+- `test` — JUnit + Mockito do repositório

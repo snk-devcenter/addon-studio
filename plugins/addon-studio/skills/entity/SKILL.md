@@ -480,3 +480,10 @@ Entidades completas — PK simples, PK composta + relacionamentos, `@OneToMany` 
 - `database` — dbscript V<NNN>-*.xml que cria a tabela física no MSSQL/Oracle
 - `repository` — interface JapeRepository que opera sobre esta entidade
 - `mapstruct` — mapper DTO ↔ entidade
+
+## Skills relacionadas
+
+- `data-dictionary` — XML do dicionário que descreve a tabela
+- `database` — dbscript que cria a tabela física
+- `repository` — interface `JapeRepository` que opera sobre esta entidade
+- `mapstruct` — mapper DTO ↔ entidade

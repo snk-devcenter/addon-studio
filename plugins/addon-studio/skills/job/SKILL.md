@@ -274,3 +274,10 @@ public class MeuJob implements IJob {
 - `dependency-injection` — @Component do IJob precisa estar registrado no módulo Guice
 - `repository` — jobs tipicamente operam sobre dados via repository
 - `addon-studio` — regras universais Java 8 + Lombok
+
+## Skills relacionadas
+
+- `dependency-injection` — wiring Guice do job
+- `repository` — acesso a dados dentro do `onSchedule`
+- `value` — configuração agendamento via `@Value`/`SANKHYA_PARAM`
+- `database` — migration XML do registro do job

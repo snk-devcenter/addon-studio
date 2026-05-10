@@ -263,3 +263,10 @@ public class ExportarDadosAction implements AcaoRotinaJava {
 - `controller` — alternativa REST quando ação não é botão de tela mas endpoint HTTP
 - `dependency-injection` — @Component do AcaoRotinaJava precisa estar no módulo Guice
 - `business-rule` — regra de negócio dispara via barramento — alternativa a botão para validações
+
+## Skills relacionadas
+
+- `entity` — modelo de dados que o botão lê/escreve
+- `controller` — alternativa REST quando ação for headless
+- `business-rule` — regra de negócio acionada por trás do botão
+- `test` — JUnit 5 + Mockito da `AcaoRotinaJava`

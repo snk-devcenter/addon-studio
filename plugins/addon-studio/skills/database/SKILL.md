@@ -439,3 +439,9 @@ Exemplos completos de XMLs — `V001-CREATE_TABLE_TDCXYZCAD.xml` (PK simples), `
 - `entity` — entidade @JapeEntity da tabela criada por este dbscript
 - `data-dictionary` — XML que descreve metadados da tabela
 - `macros` — macros SQL para portabilidade Oracle/MSSQL no dbscript
+
+## Skills relacionadas
+
+- `entity` — entidade `@JapeEntity` da tabela criada
+- `data-dictionary` — XML do dicionário de dados associado
+- `macros` — macros SQL para portabilidade Oracle/MSSQL
