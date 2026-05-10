@@ -112,7 +112,13 @@ Para forcar discovery + alinhamento, adicione um `CLAUDE.md` (Claude Code) ou `A
 plugins/addon-studio/skills/addon-studio/assets/CLAUDE.md
 ```
 
-Copie esse arquivo direto para a raiz do projeto (e opcionalmente crie symlink para Codex CLI: `cp <plugin-path>/skills/addon-studio/assets/CLAUDE.md ./CLAUDE.md && ln -s CLAUDE.md AGENTS.md`).
+Copie o template para `CLAUDE.md` na raiz do projeto. Para suportar tambem Codex CLI, crie `AGENTS.md` como symlink (idempotente via `ln -sf`):
+
+```bash
+cp <plugin-root>/skills/addon-studio/assets/CLAUDE.md ./CLAUDE.md
+# Opcional — symlink AGENTS.md -> CLAUDE.md (compatibilidade Codex CLI)
+ln -sf CLAUDE.md AGENTS.md
+```
 
 O conteudo do template (referencia inline):
 

@@ -53,8 +53,9 @@ Se o usuário pedir "configurar `CLAUDE.md`", "setup do projeto" ou similar, **c
 
 ```bash
 cp <plugin-root>/skills/addon-studio/assets/CLAUDE.md ./CLAUDE.md
-# Para suportar Codex CLI também:
-ln -s CLAUDE.md AGENTS.md
+# Opcional — symlink AGENTS.md -> CLAUDE.md (compatibilidade Codex CLI).
+# Use `ln -sf` para ser idempotente caso AGENTS.md já exista.
+ln -sf CLAUDE.md AGENTS.md
 ```
 
 ---
