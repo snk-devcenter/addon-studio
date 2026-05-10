@@ -37,6 +37,24 @@ plugins {
 
 > Conflito entre convenção do projeto e skill: **prevalece a skill** (a não ser que o projeto declare regra explícita em `CLAUDE.md` ou `AGENTS.md` na raiz).
 
+### Template `CLAUDE.md`/`AGENTS.md` para projeto consumidor
+
+Plugin entrega um template pronto pra colar na raiz do projeto Sankhya. **Localização canônica:**
+
+```
+<plugin-root>/templates/CLAUDE.md
+```
+
+Em ambiente Claude Code, o path tipicamente é `~/.claude/plugins/cache/snk-devcenter/addon-studio/plugins/addon-studio/templates/CLAUDE.md`. Em Codex CLI, `~/.codex/marketplaces/addon-studio/plugins/addon-studio/templates/CLAUDE.md`.
+
+Se o usuário pedir "configurar `CLAUDE.md`", "setup do projeto" ou similar, **copie esse template** para a raiz do projeto (não regenere o conteúdo do zero — use a fonte canônica):
+
+```bash
+cp <plugin-root>/templates/CLAUDE.md ./CLAUDE.md
+# Para suportar Codex CLI também:
+ln -s CLAUDE.md AGENTS.md
+```
+
 ---
 
 ## Stack tecnológica
