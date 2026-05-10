@@ -37,6 +37,27 @@ plugins {
 
 > Conflito entre convenção do projeto e skill: **prevalece a skill** (a não ser que o projeto declare regra explícita em `CLAUDE.md` ou `AGENTS.md` na raiz).
 
+### Template `CLAUDE.md`/`AGENTS.md` para projeto consumidor
+
+Plugin entrega um template pronto pra colar na raiz do projeto Sankhya. **Localização canônica** (dentro dos `assets/` desta própria skill, convenção Agent Skills):
+
+```
+<plugin-root>/skills/addon-studio/assets/CLAUDE.md
+```
+
+Paths esperados em ambiente real:
+- **Claude Code:** `~/.claude/plugins/cache/snk-devcenter/addon-studio/plugins/addon-studio/skills/addon-studio/assets/CLAUDE.md`
+- **Codex CLI:** `~/.codex/marketplaces/addon-studio/plugins/addon-studio/skills/addon-studio/assets/CLAUDE.md`
+
+Se o usuário pedir "configurar `CLAUDE.md`", "setup do projeto" ou similar, **copie esse template** para a raiz do projeto (não regenere o conteúdo do zero — use a fonte canônica):
+
+```bash
+cp <plugin-root>/skills/addon-studio/assets/CLAUDE.md ./CLAUDE.md
+# Opcional — symlink AGENTS.md -> CLAUDE.md (compatibilidade Codex CLI).
+# Use `ln -sf` para ser idempotente caso AGENTS.md já exista.
+ln -sf CLAUDE.md AGENTS.md
+```
+
 ---
 
 ## Stack tecnológica
