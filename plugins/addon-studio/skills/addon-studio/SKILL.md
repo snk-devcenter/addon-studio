@@ -227,13 +227,13 @@ Antes de criar tabela/entity nova:
 8. Testes JUnit + Mockito (skill `test`).
 9. Build: `gradle deployAddon` (skill `build`).
 
-> **Delegação obrigatória aos sub-agents (Claude Code only):** ao receber spec/MVP/feature, **NÃO implemente inline** — delegue cada bloco do fluxo ao sub-agent especialista correspondente:
-> - Modelagem (passos 1-3, trio CRUD) → `entity-architect`
-> - Migration banco (passo 2 isolado, ALTER, seed) → `dbscript-builder`
-> - Endpoint REST (passos 6-7) → `controller-designer`
-> - Testes (passo 8) → `test-writer`
-> - Erros/diagnóstico → `troubleshooter`
-> - Revisão pré-commit → `addon-reviewer`
+> **Delegação obrigatória aos sub-agents (Claude Code only):** o trigger de delegação é a **natureza do artefato a entregar**, não o formato da solicitação do usuário (que pode vir como spec, ticket, frase solta, "implementa isso", "ajusta aquilo", etc.). Sempre que a tarefa envolver criar ou alterar um dos artefatos abaixo, delegue ao sub-agent especialista — **não implemente inline**:
+> - Tabela ou entidade (XML do dicionário, dbscript, classe `@JapeEntity` — trio CRUD) → `entity-architect`
+> - Arquivo isolado em `dbscripts/` (ALTER, seed, índice) → `dbscript-builder`
+> - Endpoint REST (`@Controller`, DTOs, mapper) → `controller-designer`
+> - Testes JUnit + Mockito → `test-writer`
+> - Erro / stacktrace / build falhando → `troubleshooter`
+> - Revisão antes de commit → `addon-reviewer`
 >
 > Sub-agents rodam em modelos otimizados (`sonnet`/`haiku`), economizam tokens do agente principal e mantêm o contexto principal limpo. **Implementar inline sem delegar é anti-pattern em projetos Sankhya Addon Studio.**
 
