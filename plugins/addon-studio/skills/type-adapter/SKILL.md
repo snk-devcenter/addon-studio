@@ -1,6 +1,6 @@
 ---
 name: type-adapter
-description: Adaptadores de tipo Sankhya com `@GlobalTypeAdapter` (TypeAdapter, JsonSerializer/JsonDeserializer, tipos nativos). Use ao definir adaptadores de serialização JSON ou editar arquivos `*Adapter.java`.
+description: Cria, revisa e refatora adaptadores de tipo Sankhya com `@GlobalTypeAdapter` (`TypeAdapter`, `JsonSerializer`/`JsonDeserializer`, tipos nativos, conversão JSON↔Java). Use ao criar, alterar, revisar, auditar ou padronizar adaptadores de serialização JSON, ao trabalhar com arquivos `*Adapter.java`, ou ao tocar em código com `@GlobalTypeAdapter`/`TypeAdapter`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

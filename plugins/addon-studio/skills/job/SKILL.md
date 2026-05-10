@@ -1,6 +1,6 @@
 ---
 name: job
-description: Implementa @Job Sankhya (IJob + onSchedule + getScheduleConfigHook + CRON, migração via XML). Use ao criar jobs agendados ou editar arquivos `*Job.java`.
+description: Cria, revisa e refatora jobs agendados Sankhya com `@Job` (`IJob` + `onSchedule` + `getScheduleConfigHook` + CRON), incluindo migration via XML. Use ao criar, alterar, revisar, auditar ou padronizar jobs agendados, ao ajustar agendamento CRON, ao trabalhar com arquivos `*Job.java`, ou ao tocar em código com `@Job`/`IJob`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

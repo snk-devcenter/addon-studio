@@ -1,6 +1,6 @@
 ---
 name: database
-description: Cria dbscripts Sankhya (`dbscripts/V<NNN>-*.xml`) com migrations dual MSSQL/Oracle e convenções de nomenclatura. Use ao adicionar ou alterar tabelas em `dbscripts/`.
+description: Cria, audita e padroniza dbscripts Sankhya (`dbscripts/V<NNN>-*.xml`) com migrations dual MSSQL/Oracle. Cobre convenções de nomenclatura, mapeamento de tipos (`NUMBER`/`NUMERIC`/`INT`/`DECIMAL`/`VARCHAR`/`VARCHAR2`/`CHAR`/`DATE`/`DATETIME`/`TIMESTAMP`), estrutura `<sql>`/`<mssql>`/`<oracle>` e atributos `executar`/`tipoObjeto`/`nomeObjeto`. Use ao adicionar, alterar, revisar, padronizar ou auditar arquivos em `dbscripts/`, ao mapear tipos entre Oracle e MSSQL, ou ao tocar em SQL com tags `<mssql>`/`<oracle>`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
