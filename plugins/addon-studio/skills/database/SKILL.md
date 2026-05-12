@@ -177,7 +177,7 @@ Abreviacoes padrao ecossistema Sankhya:
 | Inteiro     | `NUMBER(10)`   | `INT`           | `COD*`/`NU*` sequenciais, contadores, FKs |
 | Decimal     | `NUMBER(18,N)` | `DECIMAL(18,N)` | Valores monetários, percentuais           |
 | Texto       | `VARCHAR2(n)`  | `VARCHAR(n)`    | Texto tamanho variável                    |
-| Flag S/N    | `CHAR(1)`      | `CHAR(1)`       | Flags booleanas                           |
+| Flag S/N    | `VARCHAR2(1)`  | `CHAR(1)`       | Flags booleanas                           |
 | Data/Hora   | `DATE`         | `DATETIME`      | Data e/ou data+hora                       |
 
 ### Diferenças de Sintaxe
@@ -217,7 +217,7 @@ Padrões completos de DDL — `CREATE TABLE` mínimo (somente PK + constraint), 
 | `TEXTO` (com `size`)              | `VARCHAR2(<size>)`      | `VARCHAR(<size>)`       |                                      |
 | `DECIMAL` (com `nuCasasDecimais`) | `NUMBER(18,<N>)`        | `DECIMAL(18,<N>)`       |                                      |
 | `DATA_HORA` ou `DATA`             | `DATE`                  | `DATETIME`              |                                      |
-| `CHECKBOX`                        | `CHAR(1)`               | `CHAR(1)`               |                                      |
+| `CHECKBOX`                        | `VARCHAR2(1)`           | `CHAR(1)`               |                                      |
 | `PESQUISA`                        | Depende do `targetType` | Depende do `targetType` | Ex: `INTEIRO` -> `NUMBER(10)` / `INT` |
 
 ### Mapeamento Banco -> Tipo do Dicionário (inverso)
@@ -229,7 +229,7 @@ Padrões completos de DDL — `CREATE TABLE` mínimo (somente PK + constraint), 
 | `NUMBER(18,N)` | `DECIMAL(18,N)`             | `DECIMAL`                  | Com casas decimais         |
 | `VARCHAR2(n)`  | `VARCHAR(n)`                | `TEXTO` size=n             | Texto livre                |
 | `VARCHAR2(n)`  | `VARCHAR(n)` + opções fixas | `TEXTO` + `<fieldOptions>` | Enum valores definidos     |
-| `CHAR(1)`      | `CHAR(1)` S/N               | `CHECKBOX`                 | Flag booleana              |
+| `VARCHAR2(1)`  | `CHAR(1)` S/N               | `CHECKBOX`                 | Flag booleana              |
 | `DATE`         | `DATETIME` (só data)        | `DATA`                     | Semântica: só data         |
 | `DATE`         | `DATETIME` (com hora)       | `DATA_HORA`                | Semântica: data + hora     |
 
@@ -283,7 +283,7 @@ CREATE TABLE TABELA (CODCAD NUMBER(10) NOT NULL, CONSTRAINT PK_TABELA PRIMARY KE
     CODCAD NUMBER(10) NOT NULL,
     DESCR VARCHAR2(200),
     CODPARC NUMBER(10),
-    ATIVO CHAR(1),
+    ATIVO VARCHAR2(1),
     CONSTRAINT PK_TDCXYZCAD PRIMARY KEY (CODCAD)
     )
 </oracle>
