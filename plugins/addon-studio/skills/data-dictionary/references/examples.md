@@ -68,6 +68,7 @@
 
 ```xml
 <table name="TDCXYZREL" sequenceType="A" sequenceField="NURELACAO">
+    <description>Relacao Origem x Produto</description>
     <primaryKey>
         <field name="CODORIG"/>
         <field name="NURELACAO"/>
@@ -80,6 +81,7 @@
 
 ```xml
 <table name="TDCXYZVIN" sequenceType="M">
+    <description>Vinculo Origem x Produto</description>
     <primaryKey>
         <field name="CODORIG"/>
         <field name="CODPROD"/>
@@ -145,6 +147,7 @@ Entidades Java com `@JapeEntity` ja existem? Segue processo pra gerar XMLs.
 
 ```xml
 <table name="TDCXYZCFG" sequenceType="M">
+    <description>Configuracao</description>
     <primaryKey>
         <field name="CODCONF"/>
     </primaryKey>

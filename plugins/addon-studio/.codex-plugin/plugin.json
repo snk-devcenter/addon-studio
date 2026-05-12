@@ -1,6 +1,6 @@
 {
   "name": "addon-studio",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "Plugin Sankhya Addon Studio 2.0 com 18 skills focadas: addon-studio (overview), entity, repository, controller, controller-advice, data-dictionary, database, dependency-injection, mapstruct, test, action-button, business-rule, job, type-adapter, value, macros, encoding, build.",
   "author": {
     "name": "DevCenter Squad"
