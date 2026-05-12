@@ -269,11 +269,11 @@ Conforme `metadados.xsd`, `dataType` aceita 14 valores:
 
 ### Sub-tag `<description>` (obrigatoria)
 
-Todo `<field>` tem `<description>` **preenchida** com texto descritivo (nao vazia, sem so espacos). **Sem acentos** (ISO-8859-1).
+Todo `<field>` tem `<description>` **preenchida** com texto descritivo (nao vazia, sem so espacos). Acentos permitidos — a skill [`encoding`](../encoding/SKILL.md) converte o arquivo para ISO-8859-1 depois.
 
 ```xml
 <field name="CODPARC" dataType="PESQUISA" ...>
-    <description>Cod. Parceiro</description>
+    <description>Cód. Parceiro</description>
 </field>
 ```
 
@@ -419,18 +419,18 @@ Campos padrao auditoria (usuario + data criacao/alteracao). Use pra rastrear alt
     <expression><![CDATA[if ($col_ATIVO == null) { return "S"; } else { return $col_ATIVO; }]]></expression>
 </field>
 <field name="CODUSU" dataType="PESQUISA" targetInstance="Usuario" targetField="CODUSU" targetType="INTEIRO"
-       readOnly="S" UITabName="Outras Informacoes" order="99" allowSearch="N" visibleOnSearch="N">
-    <description>Cod. Usuario</description>
+       readOnly="S" UITabName="Outras Informações" order="99" allowSearch="N" visibleOnSearch="N">
+    <description>Cód. Usuário</description>
     <expression><![CDATA[return $ctx_usuario_logado;]]></expression>
 </field>
-<field name="DHALTER" dataType="DATA_HORA" readOnly="S" UITabName="Outras Informacoes" order="99"
+<field name="DHALTER" dataType="DATA_HORA" readOnly="S" UITabName="Outras Informações" order="99"
        allowSearch="N" visibleOnSearch="N">
-    <description>Data/Hora Alteracao</description>
+    <description>Data/Hora Alteração</description>
     <expression><![CDATA[return $ctx_dh_atual;]]></expression>
 </field>
-<field name="DHCREATE" dataType="DATA_HORA" readOnly="S" UITabName="Outras Informacoes" order="99"
+<field name="DHCREATE" dataType="DATA_HORA" readOnly="S" UITabName="Outras Informações" order="99"
        allowSearch="N" visibleOnSearch="N">
-    <description>Data/Hora Criacao</description>
+    <description>Data/Hora Criação</description>
     <expression><![CDATA[if ($col_DHCREATE == null) { return $ctx_dh_atual; } else { return $col_DHCREATE; }]]></expression>
 </field>
 ```
@@ -489,7 +489,7 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 11. [ ] Incluir `<expression>` pra calculados.
 12. [ ] Incluir `<fieldOptions>` so em `LISTA`.
 13. [ ] Usar `dataType="PESQUISA"` + `targetInstance`/`targetField`/`targetType` pra lookups.
-14. [ ] `<description>` preenchida em todos `<field>` (nao vazia), sem acentos.
+14. [ ] `<description>` preenchida em todos `<field>` (nao vazia). Acentos permitidos — skill `encoding` ajusta o charset depois.
 
 ## 4.2 Checklist: Gerando XML a partir de entidade Java existente
 
