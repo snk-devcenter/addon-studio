@@ -66,7 +66,7 @@
             ALTER TABLE TDCXYZCAD ADD ATIVO CHAR(1)
         </mssql>
         <oracle>
-            ALTER TABLE TDCXYZCAD ADD (ATIVO CHAR(1))
+            ALTER TABLE TDCXYZCAD ADD (ATIVO VARCHAR2(1))
         </oracle>
     </sql>
 
@@ -152,7 +152,7 @@
             ALTER TABLE TDCXYZFAT ADD ATIVO CHAR(1)
         </mssql>
         <oracle>
-            ALTER TABLE TDCXYZFAT ADD (ATIVO CHAR(1))
+            ALTER TABLE TDCXYZFAT ADD (ATIVO VARCHAR2(1))
         </oracle>
     </sql>
 

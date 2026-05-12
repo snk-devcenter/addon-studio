@@ -96,7 +96,7 @@ Após `CREATE TABLE`, cada coluna adicional criada via `ALTER TABLE ADD` com `ex
     ALTER TABLE TDCXYZCAD ADD ATIVO CHAR(1)
 </mssql>
 <oracle>
-    ALTER TABLE TDCXYZCAD ADD (ATIVO CHAR(1))
+    ALTER TABLE TDCXYZCAD ADD (ATIVO VARCHAR2(1))
 </oracle>
 </sql>
 
