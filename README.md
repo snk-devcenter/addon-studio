@@ -1,6 +1,6 @@
 # Addon Studio Plugin
 
-Plugin com **18 skills focadas + 6 sub-agents** — orienta implementacao em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo setor DevCenter.
+Plugin com **19 skills focadas + 6 sub-agents** — orienta implementacao em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo setor DevCenter.
 
 Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto Agent Skills / agentskills.io).
 
@@ -28,7 +28,9 @@ Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto
         └── skills/
             ├── addon-studio/                       # overview + regras universais + naming + fluxo CRUD
             │   ├── SKILL.md
-            │   └── agents/openai.yaml              # metadata Codex desta skill
+            │   ├── agents/openai.yaml              # metadata Codex desta skill
+            │   └── assets/ADDON.md                 # template de instrucoes injetado no projeto consumidor
+            ├── init/SKILL.md                       # setup: copia ADDON.md pra raiz + @import no CLAUDE.md
             ├── action-button/SKILL.md              # @ActionButton (AcaoRotinaJava)
             ├── build/SKILL.md                      # gradle deployAddon
             ├── business-rule/SKILL.md              # @BusinessRule (Regra)
@@ -50,11 +52,12 @@ Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto
 
 > **Layout multi-plugin:** o repo serve como **marketplace + plugin**. Cada plugin futuro vai ganhar pasta propria em `plugins/<nome>/`. Exigencia do Codex CLI (path local tem que apontar pra subpasta do marketplace root, nao pra raiz).
 
-## Cobertura (18 skills)
+## Cobertura (19 skills)
 
 | Skill | Escopo |
 |-------|--------|
 | `addon-studio` | Overview, regras universais (Java 8 strict, Lombok, ISO-8859-1), naming `<PRX><MOD3><CTX>`, fluxo CRUD |
+| `init` | Setup do projeto: copia `ADDON.md` pra raiz + garante `@ADDON.md` no `CLAUDE.md`. Re-rodar = upgrade idempotente |
 | `entity` | `@JapeEntity` (Lombok, PK simples/composta, relacionamentos) |
 | `data-dictionary` | XML dicionario de dados |
 | `database` | `dbscripts/V<NNN>-*.xml` dual MSSQL/Oracle |
@@ -106,63 +109,49 @@ Skills cobrem **regras do SDK e do framework**. Organizacao de pacotes, camadas 
 
 Skill discovery e semantica — agente so dispara skill quando o prompt do dev casa com algum trigger da `description`. Em projeto onde o dev pede so "implementa essa spec", agente pode pular o overview e perder regras universais (Java 8 strict, ISO-8859-1, JAPE nao JPA).
 
-Para forcar discovery + alinhamento, adicione um `CLAUDE.md` (Claude Code) ou `AGENTS.md` (Codex CLI) na raiz do projeto Sankhya. **Template pronto** disponivel nos `assets/` da skill `addon-studio`:
+Pra forcar discovery + alinhamento, o plugin entrega o arquivo `ADDON.md` (instrucoes pro agente) e o setup automatizado via a skill **`init`**.
+
+### Setup em um comando
+
+Na raiz do projeto Sankhya, peca ao agente:
 
 ```
-plugins/addon-studio/skills/addon-studio/assets/CLAUDE.md
+/addon-studio:init
 ```
 
-Copie o template para `CLAUDE.md` na raiz do projeto. Para suportar tambem Codex CLI, crie `AGENTS.md` como symlink (idempotente via `ln -sf`):
+A skill:
+
+1. Confere que o projeto e mesmo Addon Studio (procura `br.com.sankhya.addonstudio` em `build.gradle`/`build.gradle.kts`).
+2. Copia `ADDON.md` (fonte canonica: `<plugin-root>/skills/addon-studio/assets/ADDON.md`) para a raiz do projeto.
+3. Cria ou atualiza o `CLAUDE.md` da raiz inserindo a linha `@ADDON.md` (idempotente — nao duplica se ja existir, nao mexe em customizacoes do dev).
+
+Resultado:
+
+```
+projeto/
+├── ADDON.md            # gerado pelo plugin — nao editar
+├── CLAUDE.md           # do dev — contem `@ADDON.md` + customizacoes
+├── build.gradle
+└── ...
+```
+
+### Atualizar o `ADDON.md`
+
+Apos atualizar o plugin (`/plugin update addon-studio@snk-devcenter`), rode `/addon-studio:init` de novo. A skill faz overwrite do `ADDON.md` (versao nova entra) sem tocar no `CLAUDE.md` do dev.
+
+### Customizacoes do projeto
+
+Regras especificas do projeto (override de convencao, padrao de pacotes, etc.) vao no `CLAUDE.md` da raiz, **fora** do `ADDON.md`. O plugin nunca regenera o `CLAUDE.md` — so insere o `@ADDON.md` se ausente.
+
+### Codex CLI (AGENTS.md)
+
+Codex CLI usa `AGENTS.md` e nao suporta sintaxe `@import` nativa. Como workaround temporario:
 
 ```bash
-cp <plugin-root>/skills/addon-studio/assets/CLAUDE.md ./CLAUDE.md
-# Opcional — symlink AGENTS.md -> CLAUDE.md (compatibilidade Codex CLI)
-ln -sf CLAUDE.md AGENTS.md
+cp ADDON.md AGENTS.md
 ```
 
-O conteudo do template (referencia inline):
-
-```markdown
-# CLAUDE.md / AGENTS.md
-
-Este projeto e um **Sankhya Addon Studio 2.0** (verificavel pelo plugin Gradle
-`br.com.sankhya.addonstudio` aplicado no `build.gradle` ou `build.gradle.kts`).
-
-**Antes de gerar ou alterar codigo**, o agente DEVE:
-
-1. Carregar a skill `addon-studio` (overview, regras universais, naming convention `<PRX><MOD3><CTX>`).
-2. Identificar o dominio do artefato e invocar a skill focada correspondente:
-   - Entidade Java -> `entity`
-   - XML dicionario de dados -> `data-dictionary`
-   - Migration de banco -> `database`
-   - Repositorio -> `repository`
-   - Endpoint REST -> `controller`
-   - Tratamento global de erro -> `controller-advice`
-   - DI Guice -> `dependency-injection`
-   - Mapper DTO/entidade -> `mapstruct`
-   - Botao de acao -> `action-button`
-   - Regra de negocio -> `business-rule`
-   - Job agendado -> `job`
-   - Adapter JSON -> `type-adapter`
-   - Injecao de configuracao -> `value`
-   - SQL portavel Oracle/MSSQL -> `macros`
-   - Teste -> `test`
-3. Apos cada `Write`/`Edit` em arquivo `.java`/`.xml`/`.kt`/`.properties`, garantir ISO-8859-1 (skill `encoding`).
-4. Para build/deploy, usar a skill `build` (`./gradlew clean deployAddon`).
-
-**Anti-patterns universais** (NUNCA fazer neste projeto):
-
-- Usar `@Entity` JPA padrao — use `@JapeEntity`.
-- Usar APIs Java 11+ (`var`, `List.of`, `Optional.orElseThrow(Supplier)`, etc.) — projeto e Java 8 estrito.
-- Misturar `javax.inject.@Inject` com Guice — use `com.google.inject.@Inject`.
-- Salvar arquivos em UTF-8 — Sankhya exige ISO-8859-1.
-- Improvisar convencoes de Spring Boot, Quarkus, Micronaut, etc. — siga as skills do plugin.
-- Em `<treeTable>`, raiz com `CODIGOPAI = NULL` ou `GRAU = 0` — convencao Sankhya e sentinela `-999999999` e `GRAU = 1`.
-
-Em caso de conflito entre regra do projeto e skill, **prevalece a skill**, exceto se este `CLAUDE.md` declarar override explicito.
-```
-
-> **Codex CLI:** o conteudo do `CLAUDE.md` funciona identicamente em `AGENTS.md`. Se o projeto suporta os dois harnesses, mantenha um arquivo (`CLAUDE.md`) e crie o outro como symlink: `ln -s CLAUDE.md AGENTS.md`.
+(re-rodar quando atualizar o `ADDON.md`). Setup automatico do `AGENTS.md` esta no roadmap.
 
 ## Instalacao
 

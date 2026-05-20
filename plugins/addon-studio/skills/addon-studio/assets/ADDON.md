@@ -1,10 +1,6 @@
-# CLAUDE.md / AGENTS.md — Template para projeto Sankhya Addon Studio
+# ADDON.md — Instruções do plugin Sankhya Addon Studio para o agente
 
-> **Como usar:** copie este arquivo para a raiz do seu projeto Sankhya como `CLAUDE.md` (Claude Code) ou `AGENTS.md` (OpenAI Codex CLI). Para suportar os dois harnesses, mantenha um arquivo e crie o outro como symlink: `ln -s CLAUDE.md AGENTS.md`.
->
-> O template instrui o agente a usar o plugin `addon-studio` como fonte de verdade do projeto, evitando improvisos com convenções de outros stacks (Spring Boot, Quarkus, JPA padrão, etc.).
-
----
+> Arquivo gerado pela skill `/addon-studio:init`. **Não edite à mão** — re-rode a skill para atualizar. Customizações específicas do projeto vão no `CLAUDE.md` (ou `AGENTS.md`) da raiz, fora deste arquivo.
 
 Este projeto é um **Sankhya Addon Studio 2.0** (verificável pelo plugin Gradle `br.com.sankhya.addonstudio` aplicado no `build.gradle` ou `build.gradle.kts`).
 
@@ -39,12 +35,13 @@ Este projeto é um **Sankhya Addon Studio 2.0** (verificável pelo plugin Gradle
 - Improvisar convenções de Spring Boot, Quarkus, Micronaut, etc. — siga as skills do plugin.
 - Em `<treeTable>`, raiz com `CODIGOPAI = NULL` ou `GRAU = 0` — convenção Sankhya é sentinela `CODIGOPAI = -999999999` e `GRAU = 1`.
 
-Em caso de conflito entre regra do projeto e skill, **prevalece a skill**, exceto se este `CLAUDE.md` declarar override explícito.
+**Delegação obrigatória aos sub-agents** (Claude Code only) — trigger é a natureza do artefato, não o formato do pedido:
 
----
+- Tabela/entidade (trio CRUD: XML + dbscript + `@JapeEntity`) → `entity-architect`
+- `dbscripts/` isolado (ALTER, seed, índice) → `dbscript-builder`
+- Endpoint REST (`@Controller` + DTOs + mapper) → `controller-designer`
+- Testes JUnit + Mockito → `test-writer`
+- Erro / stacktrace / build falhando → `troubleshooter`
+- Revisão pré-commit → `addon-reviewer`
 
-## Customizações deste projeto
-
-> Adicione aqui regras específicas do seu projeto que devam sobrescrever as skills do plugin (ex.: convenção de pacotes, padrão de nomenclatura customizada, restrições de design adicionais).
-
-- _Sem customizações declaradas._
+Em caso de conflito entre regra do projeto e skill, **prevalece a skill**, exceto se o `CLAUDE.md`/`AGENTS.md` da raiz declarar override explícito.
