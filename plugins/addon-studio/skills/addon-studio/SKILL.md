@@ -37,26 +37,14 @@ plugins {
 
 > Conflito entre convenção do projeto e skill: **prevalece a skill** (a não ser que o projeto declare regra explícita em `CLAUDE.md` ou `AGENTS.md` na raiz).
 
-### Template `CLAUDE.md`/`AGENTS.md` para projeto consumidor
+### Setup do projeto consumidor
 
-Plugin entrega um template pronto pra colar na raiz do projeto Sankhya. **Localização canônica** (dentro dos `assets/` desta própria skill, convenção Agent Skills):
+Plugin entrega um arquivo `ADDON.md` pronto com as instruções acima formatadas para o agente. Setup é feito pela skill dedicada **`/addon-studio:init`**, que:
 
-```
-<plugin-root>/skills/addon-studio/assets/CLAUDE.md
-```
+1. Copia `ADDON.md` (fonte canônica: `<plugin-root>/skills/addon-studio/assets/ADDON.md`) para a raiz do projeto.
+2. Cria ou atualiza o `CLAUDE.md` da raiz com a linha `@ADDON.md` (idempotente).
 
-Paths esperados em ambiente real:
-- **Claude Code:** `~/.claude/plugins/cache/snk-devcenter/addon-studio/plugins/addon-studio/skills/addon-studio/assets/CLAUDE.md`
-- **Codex CLI:** `~/.codex/marketplaces/addon-studio/plugins/addon-studio/skills/addon-studio/assets/CLAUDE.md`
-
-Se o usuário pedir "configurar `CLAUDE.md`", "setup do projeto" ou similar, **copie esse template** para a raiz do projeto (não regenere o conteúdo do zero — use a fonte canônica):
-
-```bash
-cp <plugin-root>/skills/addon-studio/assets/CLAUDE.md ./CLAUDE.md
-# Opcional — symlink AGENTS.md -> CLAUDE.md (compatibilidade Codex CLI).
-# Use `ln -sf` para ser idempotente caso AGENTS.md já exista.
-ln -sf CLAUDE.md AGENTS.md
-```
+Se o usuário pedir "configurar `CLAUDE.md`", "setup do projeto", "atualizar `ADDON.md`" ou similar, **delegue para `/addon-studio:init`** — não copie manualmente.
 
 ---
 
@@ -243,6 +231,7 @@ Antes de criar tabela/entity nova:
 
 Para tópicos específicos, invoke skill direta:
 
+- `init` — setup inicial: copia `ADDON.md` pra raiz + import no `CLAUDE.md`
 - `entity` — entidades `@JapeEntity`
 - `repository` — `@Repository` / `JapeRepository`
 - `controller` — `@Controller` REST
