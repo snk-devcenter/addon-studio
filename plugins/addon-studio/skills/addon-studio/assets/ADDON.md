@@ -22,6 +22,7 @@ Este projeto é um **Sankhya Addon Studio 2.0** (verificável pelo plugin Gradle
    - Adapter JSON → `type-adapter`
    - Injeção de configuração → `value`
    - SQL portável Oracle/MSSQL → `macros`
+   - Integração HTTP externa / consumir API REST (Retrofit/Moshi/OkHttp) → `retrofit`
    - Teste → `test`
 3. Após cada `Write`/`Edit` em arquivo `.java`/`.xml`/`.kt`/`.properties`, garantir ISO-8859-1 (skill `encoding`).
 4. Para build/deploy, usar a skill `build` (`./gradlew clean deployAddon`).

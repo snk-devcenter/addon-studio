@@ -1,6 +1,6 @@
 # Addon Studio Plugin
 
-Plugin com **19 skills focadas + 6 sub-agents** — orienta implementacao em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo setor DevCenter.
+Plugin com **20 skills focadas + 6 sub-agents** — orienta implementacao em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo setor DevCenter.
 
 Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto Agent Skills / agentskills.io).
 
@@ -45,6 +45,7 @@ Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto
             ├── macros/SKILL.md                     # MacroTranslator SQL macros
             ├── mapstruct/SKILL.md                  # MapStruct mappers
             ├── repository/SKILL.md                 # @Repository / JapeRepository
+            ├── retrofit/SKILL.md                   # Retrofit + Moshi + OkHttp (HTTP externo)
             ├── test/SKILL.md                       # JUnit 5 + Mockito 4.11
             ├── type-adapter/SKILL.md               # @GlobalTypeAdapter
             └── value/SKILL.md                      # @Value / ValueType
@@ -52,7 +53,7 @@ Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto
 
 > **Layout multi-plugin:** o repo serve como **marketplace + plugin**. Cada plugin futuro vai ganhar pasta propria em `plugins/<nome>/`. Exigencia do Codex CLI (path local tem que apontar pra subpasta do marketplace root, nao pra raiz).
 
-## Cobertura (19 skills)
+## Cobertura (20 skills)
 
 | Skill | Escopo |
 |-------|--------|
@@ -62,6 +63,7 @@ Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto
 | `data-dictionary` | XML dicionario de dados |
 | `database` | `dbscripts/V<NNN>-*.xml` dual MSSQL/Oracle |
 | `repository` | `@Repository`, `@Criteria`, `@NativeQuery`, `@Modifying` |
+| `retrofit` | Retrofit + Moshi + OkHttp (deps `moduleLib`, interface client, wiring Guice, interceptors) |
 | `controller` | `@Controller(serviceName SP)`, DTO + `@Valid`, `@Transactional` |
 | `controller-advice` | `@ControllerAdvice` + `@ExceptionHandler`, rollback automatico |
 | `dependency-injection` | Guice (`@Component`, `@CustomModule`, `Multibinder`, `@Singleton`, `Provider<T>`) |
@@ -99,7 +101,7 @@ Agents sao especialistas com workflow ativo, tools restritas e modelo proprio. D
 | `troubleshooter` | haiku | Diagnostica erros: encoding, Guice DI, JPA misturada com JAPE, Java 8 violations, build/deploy. |
 | `dbscript-builder` | haiku | Gera dbscripts `V<NNN>-*.xml` dual MSSQL/Oracle (CREATE_TABLE minimo + ALTER por coluna). |
 
-> **Codex CLI:** agents sao feature exclusiva do Claude Code. As 18 skills funcionam em ambos harnesses; os 6 agents sao ignorados pelo Codex CLI (sem perda — usuarios do Codex usam invocacao explicita das skills).
+> **Codex CLI:** agents sao feature exclusiva do Claude Code. As 20 skills funcionam em ambos harnesses; os 6 agents sao ignorados pelo Codex CLI (sem perda — usuarios do Codex usam invocacao explicita das skills).
 
 ## Sem opiniao arquitetural
 

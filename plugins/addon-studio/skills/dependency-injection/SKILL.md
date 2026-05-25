@@ -214,6 +214,8 @@ public class IntegrationPlatformResolver {
 
 Pra criar instâncias com configuração especial (ex: clientes HTTP).
 
+> Para wiring completo de cliente Retrofit (deps no `build.gradle`, interface, interceptor), ver skill `retrofit`. Os exemplos abaixo cobrem só o lado DI.
+
 ```java
 import br.com.sankhya.studio.stereotypes.CustomModule;
 import com.google.inject.AbstractModule;
@@ -460,8 +462,10 @@ public class DynamicProdutoGateway implements ProdutoGateway {
 - `controller` — controllers são @Component injetados via Guice
 - `controller-advice` — advice é @Component registrado no módulo
 - `mapstruct` — mappers são registrados no container Guice
+- `retrofit` — wiring completo de cliente HTTP (interface + interceptor + `@Provides`)
 
 ## Skills relacionadas
 
 - `value` — injeção de valores de configuração via `@Value`
+- `retrofit` — exemplos práticos de `@Provides @Singleton` para clientes HTTP
 - `addon-studio` — regras universais do projeto

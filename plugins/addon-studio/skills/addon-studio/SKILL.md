@@ -60,7 +60,7 @@ Se o usuário pedir "configurar `CLAUDE.md`", "setup do projeto", "atualizar `AD
 | Logging         | `java.util.logging` via `@Log` Lombok                           |
 | Boilerplate     | Lombok (`@Data`, `@Builder`, `@AllArgsConstructor`, etc.)       |
 | Mapeamento      | MapStruct 1.5.5+ (`componentModel=jakarta` global)              |
-| HTTP externo    | Retrofit + Moshi via `RetrofitCallExecutor` (SDK)               |
+| HTTP externo    | Retrofit + Moshi + OkHttp (ver skill `retrofit`)                |
 | Validação       | Bean Validation (`javax.validation.*`) + `@Valid`               |
 | Testes          | JUnit 5 + Mockito 4.11 (5.x exige Java 11+)                     |
 | Build           | Gradle (`gradle deployAddon`)                                   |
@@ -157,7 +157,7 @@ Tratamento centralizado em controllers — ver skill `controller-advice`.
 | Implementação manual de Repository                               | Usar interface estendendo `JapeRepository<ID, Entity>`  |
 | Usar `JapeWrapper` ou `EntityFacade` direto em controllers       | Sempre via Repository / `JapeRepository`                |
 | Mapper escrito a mão (`new Dto(); dto.setX(...)`)                | Usar MapStruct                                          |
-| `HttpClient` nativo / `URLConnection` para integração externa    | Usar Retrofit + `RetrofitCallExecutor`                  |
+| `HttpClient` nativo / `URLConnection` para integração externa    | Usar Retrofit + Moshi + OkHttp (skill `retrofit`)       |
 | Logger SLF4J ou `System.out`                                     | `@Log` Lombok + `java.util.logging`                     |
 | `new` para instanciar dependência gerenciada                     | `@Inject` via construtor                                |
 | Metadata UI (description, dataType, order) em entidade Java      | Vai no XML do dicionário de dados                       |
