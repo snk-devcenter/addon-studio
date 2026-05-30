@@ -30,7 +30,7 @@ Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto
             │   ├── SKILL.md
             │   ├── agents/openai.yaml              # metadata Codex desta skill
             │   └── assets/ADDON.md                 # template de instrucoes injetado no projeto consumidor
-            ├── init/SKILL.md                       # setup: copia ADDON.md pra raiz + @import no CLAUDE.md
+            ├── init/SKILL.md                       # setup: copia ADDON.md pra docs/ + @import no CLAUDE.md
             ├── action-button/SKILL.md              # @ActionButton (AcaoRotinaJava)
             ├── build/SKILL.md                      # gradle deployAddon
             ├── business-rule/SKILL.md              # @BusinessRule (Regra)
@@ -58,7 +58,7 @@ Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto
 | Skill | Escopo |
 |-------|--------|
 | `addon-studio` | Overview, regras universais (Java 8 strict, Lombok, ISO-8859-1), naming `<PRX><MOD3><CTX>`, fluxo CRUD |
-| `init` | Setup do projeto: copia `ADDON.md` pra raiz + garante `@ADDON.md` no `CLAUDE.md`. Re-rodar = upgrade idempotente |
+| `init` | Setup do projeto: copia `ADDON.md` pra `docs/ADDON.md` + garante `@docs/ADDON.md` no `CLAUDE.md`. Re-rodar = upgrade idempotente |
 | `entity` | `@JapeEntity` (Lombok, PK simples/composta, relacionamentos) |
 | `data-dictionary` | XML dicionario de dados |
 | `database` | `dbscripts/V<NNN>-*.xml` dual MSSQL/Oracle |
@@ -124,36 +124,37 @@ Na raiz do projeto Sankhya, peca ao agente:
 A skill:
 
 1. Confere que o projeto e mesmo Addon Studio (procura `br.com.sankhya.addonstudio` em `build.gradle`/`build.gradle.kts`).
-2. Copia `ADDON.md` (fonte canonica: `<plugin-root>/skills/addon-studio/assets/ADDON.md`) para a raiz do projeto.
-3. Cria ou atualiza o `CLAUDE.md` da raiz inserindo a linha `@ADDON.md` (idempotente — nao duplica se ja existir, nao mexe em customizacoes do dev).
+2. Copia `ADDON.md` (fonte canonica: `<plugin-root>/skills/addon-studio/assets/ADDON.md`) para `docs/ADDON.md` no projeto.
+3. Cria ou atualiza o `CLAUDE.md` da raiz inserindo a linha `@docs/ADDON.md` (idempotente — nao duplica se ja existir, nao mexe em customizacoes do dev).
 
 Resultado:
 
 ```
 projeto/
-├── ADDON.md            # gerado pelo plugin — nao editar
-├── CLAUDE.md           # do dev — contem `@ADDON.md` + customizacoes
+├── docs/
+│   └── ADDON.md        # gerado pelo plugin — nao editar
+├── CLAUDE.md           # do dev — contem `@docs/ADDON.md` + customizacoes
 ├── build.gradle
 └── ...
 ```
 
 ### Atualizar o `ADDON.md`
 
-Apos atualizar o plugin (`/plugin update addon-studio@snk-devcenter`), rode `/addon-studio:init` de novo. A skill faz overwrite do `ADDON.md` (versao nova entra) sem tocar no `CLAUDE.md` do dev.
+Apos atualizar o plugin (`/plugin update addon-studio@snk-devcenter`), rode `/addon-studio:init` de novo. A skill faz overwrite do `docs/ADDON.md` (versao nova entra) sem tocar no `CLAUDE.md` do dev.
 
 ### Customizacoes do projeto
 
-Regras especificas do projeto (override de convencao, padrao de pacotes, etc.) vao no `CLAUDE.md` da raiz, **fora** do `ADDON.md`. O plugin nunca regenera o `CLAUDE.md` — so insere o `@ADDON.md` se ausente.
+Regras especificas do projeto (override de convencao, padrao de pacotes, etc.) vao no `CLAUDE.md` da raiz, **fora** do `docs/ADDON.md`. O plugin nunca regenera o `CLAUDE.md` — so insere o `@docs/ADDON.md` se ausente.
 
 ### Codex CLI (AGENTS.md)
 
 Codex CLI usa `AGENTS.md` e nao suporta sintaxe `@import` nativa. Como workaround temporario:
 
 ```bash
-cp ADDON.md AGENTS.md
+cp docs/ADDON.md AGENTS.md
 ```
 
-(re-rodar quando atualizar o `ADDON.md`). Setup automatico do `AGENTS.md` esta no roadmap.
+(re-rodar quando atualizar o `docs/ADDON.md`). Setup automatico do `AGENTS.md` esta no roadmap.
 
 ## Instalacao
 

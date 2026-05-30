@@ -1,13 +1,13 @@
 ---
 name: init
-description: Setup inicial do projeto Sankhya Addon Studio para colaboração com o agente. Copia o template `ADDON.md` (instruções do plugin) para a raiz do projeto e garante que o `CLAUDE.md` da raiz importe esse arquivo via `@ADDON.md`. Use quando o dev pedir "setup do projeto", "configurar CLAUDE.md", "instalar instruções do addon-studio", "atualizar ADDON.md", ou rodar `/addon-studio:init`. Operação idempotente — pode ser re-executada para receber atualizações do `ADDON.md` em novas versões do plugin.
+description: Setup inicial do projeto Sankhya Addon Studio para colaboração com o agente. Copia o template `ADDON.md` (instruções do plugin) para `docs/ADDON.md` no projeto e garante que o `CLAUDE.md` da raiz importe esse arquivo via `@docs/ADDON.md`. Use quando o dev pedir "setup do projeto", "configurar CLAUDE.md", "instalar instruções do addon-studio", "atualizar ADDON.md", ou rodar `/addon-studio:init`. Operação idempotente — pode ser re-executada para receber atualizações do `ADDON.md` em novas versões do plugin.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
 
 # Init — Setup do projeto Sankhya para o agente
 
-Skill instala/atualiza no projeto consumidor o `ADDON.md` (instruções do plugin para o agente) e garante que o `CLAUDE.md` da raiz importe esse arquivo via `@ADDON.md`.
+Skill instala/atualiza no projeto consumidor o `docs/ADDON.md` (instruções do plugin para o agente) e garante que o `CLAUDE.md` da raiz importe esse arquivo via `@docs/ADDON.md`.
 
 ## Quando usar
 
@@ -34,24 +34,25 @@ O template fica no diretório `assets/` da skill `addon-studio` (convenção Age
 
 Resolva o path concreto a partir do ambiente atual (variáveis de ambiente do harness, ou listagem do diretório de plugins instalados).
 
-### 2. Copiar `ADDON.md` para a raiz do projeto
+### 2. Copiar `ADDON.md` para `docs/` no projeto
 
 ```bash
-cp <plugin-root>/skills/addon-studio/assets/ADDON.md ./ADDON.md
+mkdir -p docs
+cp <plugin-root>/skills/addon-studio/assets/ADDON.md ./docs/ADDON.md
 ```
 
-Overwrite é **esperado** — re-rodar a skill upgrade o arquivo pra versão mais nova. Dev nunca edita `ADDON.md` à mão (override do projeto vai no `CLAUDE.md`, não aqui).
+Overwrite é **esperado** — re-rodar a skill upgrade o arquivo pra versão mais nova. Dev nunca edita `docs/ADDON.md` à mão (override do projeto vai no `CLAUDE.md`, não aqui).
 
-### 3. Garantir `@ADDON.md` no `CLAUDE.md` da raiz
+### 3. Garantir `@docs/ADDON.md` no `CLAUDE.md` da raiz
 
-Claude Code suporta sintaxe de import de arquivo via `@<path>` no `CLAUDE.md`. Garanta que o `CLAUDE.md` da raiz contenha a linha `@ADDON.md`.
+Claude Code suporta sintaxe de import de arquivo via `@<path>` no `CLAUDE.md`. Garanta que o `CLAUDE.md` da raiz contenha a linha `@docs/ADDON.md`.
 
 **Caso A — `CLAUDE.md` não existe:** crie com o seguinte template mínimo:
 
 ````markdown
 # CLAUDE.md
 
-@ADDON.md
+@docs/ADDON.md
 
 ## Customizações deste projeto
 
@@ -60,29 +61,29 @@ Claude Code suporta sintaxe de import de arquivo via `@<path>` no `CLAUDE.md`. G
 - _Sem customizações declaradas._
 ````
 
-**Caso B — `CLAUDE.md` já existe e já contém `@ADDON.md`:** não faça nada (idempotente).
+**Caso B — `CLAUDE.md` já existe e já contém `@docs/ADDON.md`:** não faça nada (idempotente).
 
-**Caso C — `CLAUDE.md` já existe mas não contém `@ADDON.md`:** insira a linha `@ADDON.md` no topo (após o título `#`, se houver), preservando o resto do conteúdo intacto. Avise o dev em uma linha que o import foi adicionado.
+**Caso C — `CLAUDE.md` já existe mas não contém `@docs/ADDON.md`:** insira a linha `@docs/ADDON.md` no topo (após o título `#`, se houver), preservando o resto do conteúdo intacto. Avise o dev em uma linha que o import foi adicionado.
 
 ### 4. Confirmar para o dev
 
 Reporte em 2-3 linhas:
 
-- `ADDON.md` copiado (ou atualizado) para a raiz.
+- `docs/ADDON.md` copiado (ou atualizado).
 - `CLAUDE.md` criado / import adicionado / já estava OK.
 - Próximo passo opcional: dev adiciona regras específicas do projeto na seção "Customizações" do `CLAUDE.md`.
 
 ## Idempotência — checklist
 
-- [ ] `ADDON.md` na raiz é overwrite seguro (conteúdo todo gerado pelo plugin).
-- [ ] `@ADDON.md` no `CLAUDE.md` só é inserido se ausente — nunca duplica.
+- [ ] `docs/ADDON.md` é overwrite seguro (conteúdo todo gerado pelo plugin).
+- [ ] `@docs/ADDON.md` no `CLAUDE.md` só é inserido se ausente — nunca duplica.
 - [ ] Não toca em customizações que o dev escreveu no `CLAUDE.md`.
 
 ## O que NÃO fazer
 
 - Não regenerar o conteúdo do `ADDON.md` do zero — sempre copie do `assets/`. Fonte de verdade é o plugin.
 - Não inserir conteúdo do `ADDON.md` direto no `CLAUDE.md` (era o approach antigo, agora deprecated em favor de `@import`).
-- Não criar/symlinkar `AGENTS.md` automaticamente — Codex CLI não suporta `@import`, ainda não há fluxo equivalente. Se o dev pedir explicitamente, oriente copiar o conteúdo de `ADDON.md` para `AGENTS.md` manualmente.
+- Não criar/symlinkar `AGENTS.md` automaticamente — Codex CLI não suporta `@import`, ainda não há fluxo equivalente. Se o dev pedir explicitamente, oriente copiar o conteúdo de `docs/ADDON.md` para `AGENTS.md` manualmente.
 
 ## Related Skills
 

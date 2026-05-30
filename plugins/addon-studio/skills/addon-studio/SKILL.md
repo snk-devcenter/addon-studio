@@ -41,8 +41,8 @@ plugins {
 
 Plugin entrega um arquivo `ADDON.md` pronto com as instruções acima formatadas para o agente. Setup é feito pela skill dedicada **`/addon-studio:init`**, que:
 
-1. Copia `ADDON.md` (fonte canônica: `<plugin-root>/skills/addon-studio/assets/ADDON.md`) para a raiz do projeto.
-2. Cria ou atualiza o `CLAUDE.md` da raiz com a linha `@ADDON.md` (idempotente).
+1. Copia `ADDON.md` (fonte canônica: `<plugin-root>/skills/addon-studio/assets/ADDON.md`) para `docs/ADDON.md` no projeto.
+2. Cria ou atualiza o `CLAUDE.md` da raiz com a linha `@docs/ADDON.md` (idempotente).
 
 Se o usuário pedir "configurar `CLAUDE.md`", "setup do projeto", "atualizar `ADDON.md`" ou similar, **delegue para `/addon-studio:init`** — não copie manualmente.
 
@@ -231,7 +231,7 @@ Antes de criar tabela/entity nova:
 
 Para tópicos específicos, invoke skill direta:
 
-- `init` — setup inicial: copia `ADDON.md` pra raiz + import no `CLAUDE.md`
+- `init` — setup inicial: copia `ADDON.md` pra `docs/` + import no `CLAUDE.md`
 - `entity` — entidades `@JapeEntity`
 - `repository` — `@Repository` / `JapeRepository`
 - `controller` — `@Controller` REST
