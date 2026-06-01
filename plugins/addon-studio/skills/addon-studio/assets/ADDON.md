@@ -18,6 +18,7 @@ Este projeto é um **Sankhya Addon Studio 2.0** (verificável pelo plugin Gradle
    - Mapper DTO/entidade → `mapstruct`
    - Botão de ação → `action-button`
    - Regra de negócio → `business-rule`
+   - Interceptar busca/carregamento de entidade (filtro transversal no Finder) → `before-load-listener`
    - Job agendado → `job`
    - Adapter JSON → `type-adapter`
    - Injeção de configuração → `value`

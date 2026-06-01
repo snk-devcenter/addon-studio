@@ -1,6 +1,6 @@
 # Addon Studio Plugin
 
-Plugin com **20 skills focadas + 6 sub-agents** — orienta implementacao em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo setor DevCenter.
+Plugin com **21 skills focadas + 6 sub-agents** — orienta implementacao em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo setor DevCenter.
 
 Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto Agent Skills / agentskills.io).
 
@@ -32,6 +32,7 @@ Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto
             │   └── assets/ADDON.md                 # template de instrucoes injetado no projeto consumidor
             ├── init/SKILL.md                       # setup: copia ADDON.md pra docs/ + @import no CLAUDE.md
             ├── action-button/SKILL.md              # @ActionButton (AcaoRotinaJava)
+            ├── before-load-listener/SKILL.md       # @BeforeLoadListener (FinderListener)
             ├── build/SKILL.md                      # gradle deployAddon
             ├── business-rule/SKILL.md              # @BusinessRule (Regra)
             ├── controller/SKILL.md                 # @Controller REST
@@ -53,7 +54,7 @@ Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto
 
 > **Layout multi-plugin:** o repo serve como **marketplace + plugin**. Cada plugin futuro vai ganhar pasta propria em `plugins/<nome>/`. Exigencia do Codex CLI (path local tem que apontar pra subpasta do marketplace root, nao pra raiz).
 
-## Cobertura (20 skills)
+## Cobertura (21 skills)
 
 | Skill | Escopo |
 |-------|--------|
@@ -71,6 +72,7 @@ Compativel nativamente com **Claude Code** e **OpenAI Codex CLI** (padrao aberto
 | `test` | JUnit 5 + Mockito 4.11 (mock estatico, `JapeRepository` quirks) |
 | `action-button` | `@ActionButton` (`AcaoRotinaJava`, `@Form`, `ContextoAcao`) |
 | `business-rule` | `@BusinessRule` (`Regra`, `ContextoRegra`, barramento) |
+| `before-load-listener` | `@BeforeLoadListener` (`FinderListener`, `beforeExecute`, filtro transversal no Finder) |
 | `job` | `@Job` (`IJob`, `onSchedule`, CRON, migracao XML) |
 | `type-adapter` | `@GlobalTypeAdapter` (`TypeAdapter`, `JsonSerializer`/`JsonDeserializer`) |
 | `value` | `@Value` / `ValueType` (`Provider<T>`, `SANKHYA_PARAM`) |
@@ -101,7 +103,7 @@ Agents sao especialistas com workflow ativo, tools restritas e modelo proprio. D
 | `troubleshooter` | haiku | Diagnostica erros: encoding, Guice DI, JPA misturada com JAPE, Java 8 violations, build/deploy. |
 | `dbscript-builder` | haiku | Gera dbscripts `V<NNN>-*.xml` dual MSSQL/Oracle (CREATE_TABLE minimo + ALTER por coluna). |
 
-> **Codex CLI:** agents sao feature exclusiva do Claude Code. As 20 skills funcionam em ambos harnesses; os 6 agents sao ignorados pelo Codex CLI (sem perda — usuarios do Codex usam invocacao explicita das skills).
+> **Codex CLI:** agents sao feature exclusiva do Claude Code. As 21 skills funcionam em ambos harnesses; os 6 agents sao ignorados pelo Codex CLI (sem perda — usuarios do Codex usam invocacao explicita das skills).
 
 ## Sem opiniao arquitetural
 
