@@ -234,6 +234,7 @@ Para tópicos específicos, invoke skill direta:
 - `init` — setup inicial: copia `ADDON.md` pra `docs/` + import no `CLAUDE.md`
 - `entity` — entidades `@JapeEntity`
 - `repository` — `@Repository` / `JapeRepository`
+- `retrofit` — integração HTTP externa (Retrofit + Moshi + OkHttp)
 - `controller` — `@Controller` REST
 - `controller-advice` — `@ControllerAdvice` / `@ExceptionHandler`
 - `data-dictionary` — XML dicionário de dados
@@ -243,6 +244,7 @@ Para tópicos específicos, invoke skill direta:
 - `test` — JUnit + Mockito
 - `action-button` — `@ActionButton`
 - `business-rule` — `@BusinessRule`
+- `before-load-listener` — `@BeforeLoadListener` (intercepta buscas do Finder JAPE)
 - `job` — `@Job`
 - `type-adapter` — `@GlobalTypeAdapter`
 - `value` — `@Value` / `ValueType`
