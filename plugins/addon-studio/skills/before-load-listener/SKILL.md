@@ -75,7 +75,7 @@ public class MinhaInstanciaFinderListener implements FinderListener {
 
 | Atributo   | Obrigatório | Descrição                                                                                  |
 |:-----------|:------------|:-------------------------------------------------------------------------------------------|
-| `instance` | Sim         | Nome da **instância (entidade)** a interceptar — o mesmo valor de `@JapeEntity(entity = "...")` ou de `<entity name="...">` no XML. **Não** é o nome da tabela. |
+| `instance` | Sim         | Nome da **instância (entidade)** a interceptar — o mesmo valor de `@JapeEntity(entity = "...")` ou de `<instance name="...">` no XML do dicionário. **Não** é o nome da tabela. |
 
 > **Gotcha:** `instance` é o **nome lógico da entidade**, não a tabela. Para `@JapeEntity(entity = "CabecalhoNota", table = "TGFCAB")`, usa-se `@BeforeLoadListener(instance = "CabecalhoNota")`.
 
@@ -194,7 +194,7 @@ public class TdcXyzContratoFinderListener implements FinderListener {
 
 1. [ ] Entidade-alvo declarada no dicionário (XML ou `@JapeEntity`) e é **instância do próprio add-on**.
 2. [ ] Classe implementa `br.com.sankhya.jape.core.FinderListener`.
-3. [ ] Anotada com `@BeforeLoadListener(instance = "<NomeDaInstancia>")` — nome = `@JapeEntity(entity = "...")`, **não** a tabela.
+3. [ ] Anotada com `@BeforeLoadListener(instance = "<NomeDaInstancia>")` — nome = `@JapeEntity(entity = "...")` (ou `<instance name="...">` no XML), **não** a tabela.
 4. [ ] Apenas **um** `@BeforeLoadListener` para a instância em todo o projeto.
 5. [ ] `beforeExecute` adiciona critérios via `finder.where("this.CAMPO ...")` com prefixo `this.`.
 6. [ ] Macros portáveis no lugar de SQL específico de banco.

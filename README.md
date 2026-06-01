@@ -103,7 +103,7 @@ Agents sao especialistas com workflow ativo, tools restritas e modelo proprio. D
 | `troubleshooter` | haiku | Diagnostica erros: encoding, Guice DI, JPA misturada com JAPE, Java 8 violations, build/deploy. |
 | `dbscript-builder` | haiku | Gera dbscripts `V<NNN>-*.xml` dual MSSQL/Oracle (CREATE_TABLE minimo + ALTER por coluna). |
 
-> **Codex CLI:** agents sao feature exclusiva do Claude Code. As 20 skills funcionam em ambos harnesses; os 6 agents sao ignorados pelo Codex CLI (sem perda — usuarios do Codex usam invocacao explicita das skills).
+> **Codex CLI:** agents sao feature exclusiva do Claude Code. As 21 skills funcionam em ambos harnesses; os 6 agents sao ignorados pelo Codex CLI (sem perda — usuarios do Codex usam invocacao explicita das skills).
 
 ## Sem opiniao arquitetural
 

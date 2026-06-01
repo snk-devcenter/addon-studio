@@ -31,7 +31,7 @@ plugins {
 
 **Se o projeto aplica esse plugin, este plugin Claude Code (`addon-studio`) é a fonte de verdade — siga as skills daqui.** Antes de gerar/alterar código:
 
-1. Identifique o domínio (entity, repository, controller, controller-advice, dbscript, dicionário de dados, mapstruct, dependency-injection, action-button, business-rule, job, type-adapter, value, macros, encoding, build, test).
+1. Identifique o domínio (entity, repository, retrofit, controller, controller-advice, dbscript, dicionário de dados, mapstruct, dependency-injection, action-button, business-rule, before-load-listener, job, type-adapter, value, macros, encoding, build, test).
 2. Invoque a skill focada correspondente — não improvise nem misture convenções de outros stacks (Spring Boot, Quarkus, JPA padrão, etc.).
 3. Para regras universais (Java 8, Lombok, encoding ISO-8859-1, naming `<PRX><MOD3><CTX>`), volte neste overview.
 
