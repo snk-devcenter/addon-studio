@@ -1,6 +1,6 @@
 ---
 name: entity
-description: Cria, revisa e refatora entidades Java `@JapeEntity` Sankhya — Lombok (`@Data`/`@NoArgsConstructor`/`@AllArgsConstructor`), PK simples/composta com `@Embeddable`, `@Column`, `@Id`, `@JoinColumn`, `@OneToMany`/`@OneToOne`/`@ManyToOne`, `@Relationship`, naming `<PRX><MOD3><CTX>`, mapeamento de tipos (`Integer`/`BigDecimal`/`String`/`Boolean`/`Date`/`Timestamp`). Use ao criar, alterar, revisar, auditar ou padronizar entidades, ao implementar cadastro/CRUD/feature/MVP, ao modelar dados de uma spec/módulo, ou ao tocar em código com `@JapeEntity`.
+description: Cria, revisa e refatora entidades Java `@JapeEntity` Sankhya — Lombok (`@Data`/`@NoArgsConstructor`/`@AllArgsConstructor`), PK simples/composta com `@Embeddable`, `@Column`, `@Id`, `@JoinColumn`, `@OneToMany`/`@OneToOne`/`@ManyToOne`, `@Relationship`, naming `<PRX><MOD3><CTX>`, mapeamento de tipos (`Integer`/`BigDecimal`/`String`/`Boolean`/`Date`/`Timestamp`). Use ao criar, alterar, revisar, auditar ou padronizar entidades, ao modelar a classe de dados de uma spec/tabela, ou ao tocar em código com `@JapeEntity`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
