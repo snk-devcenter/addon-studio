@@ -100,8 +100,8 @@ private String valorFixo;
 ## 5. Exemplo completo
 
 ```java
-import br.com.sankhya.studio.annotations.Value;
-import br.com.sankhya.studio.annotations.enums.ValueType;
+import br.com.sankhya.studio.stereotypes.Value;
+import br.com.sankhya.internal.sdk.injectors.ValueType;
 import br.com.sankhya.studio.stereotypes.Component;
 import com.google.inject.Inject;
 import com.google.inject.Provider;

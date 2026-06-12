@@ -1,8 +1,8 @@
 ---
 name: job
-description: Cria, revisa e refatora jobs agendados Sankhya com `@Job` (`IJob` + `onSchedule` + `getScheduleConfigHook` + CRON), incluindo migration via XML. Use ao criar, alterar, revisar, auditar ou padronizar jobs agendados, ao ajustar agendamento CRON, ao trabalhar com arquivos `*Job.java`, ou ao tocar em código com `@Job`/`IJob`.
+description: Cria, revisa e refatora jobs agendados Sankhya com `@Job` (`extends IJob` + `onSchedule` + `getScheduleConfig` + CRON), incluindo migration via XML. Use ao criar, alterar, revisar, auditar ou padronizar jobs agendados, ao ajustar agendamento CRON, ao trabalhar com arquivos `*Job.java`, ou ao tocar em código com `@Job`/`IJob`.
 license: Proprietary
-compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1. studio-annotations 2.16.0.
 ---
 
 # Jobs Agendados (`@Job`) — Addon Studio 2.0
@@ -20,16 +20,16 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 ## 1. Anatomia de um `@Job`
 
 ```java
+import br.com.sankhya.studio.annotations.Job;
+import br.com.sankhya.studio.persistence.Transactional;
 import br.com.sankhya.studio.stereotypes.IJob;
-import br.com.sankhya.studio.stereotypes.Job;
-import br.com.sankhya.studio.transaction.Transactional;
 import com.google.inject.Inject;
 
 @Job(
-    name = "ProcessadorDeFilaSP",       // Obrigatorio — deve terminar com "SP"
-    frequency = "&0 0/5 * * * ?"        // Obrigatorio — deve comecar com "&"
+    serviceName = "ProcessadorDeFilaSP", // Obrigatorio — convencao: terminar com "SP"
+    frequency = "0 0/5 * * * ?"          // Opcional (default "&60000") — CRON e SEM "&"
 )
-public class ProcessadorDeFilaJob implements IJob {
+public class ProcessadorDeFilaJob extends IJob {  // IJob e CLASSE ABSTRATA — use extends
 
     private final FilaService filaService;
 
@@ -46,44 +46,55 @@ public class ProcessadorDeFilaJob implements IJob {
 }
 ```
 
+> **Imports criticos** (assinaturas reais do `studio-annotations` 2.16.0):
+> - `@Job` → `br.com.sankhya.studio.annotations.Job` (nao `stereotypes.Job`)
+> - `@Transactional` → `br.com.sankhya.studio.persistence.Transactional` (nao `transaction.Transactional`)
+> - `IJob` → `br.com.sankhya.studio.stereotypes.IJob` (**classe abstrata** → `extends`)
+> - `EJBTransactionType` → `br.com.sankhya.studio.annotations.enums.EJBTransactionType`
+
 ---
 
 ## 2. Atributos da anotacao `@Job`
 
 | Atributo          | Obrigatorio | Descricao                                                                                          | Exemplo                          |
 |:------------------|:------------|:---------------------------------------------------------------------------------------------------|:---------------------------------|
-| `name`            | Sim         | Nome do Bean gerado. **Deve terminar com "SP"**.                                                   | `"SincronizadorSP"`              |
-| `frequency`       | Sim         | Frequencia de execucao. **Deve comecar com "&"**. Aceita CRON ou intervalo em ms.                 | `"&0 0/15 * * * ?"` / `"&60000"` |
-| `transactionType` | Nao         | Comportamento transacional padrao. Padrao: `Supports` (controle manual via `@Transactional`).      | `TransactionType.NotSupported`   |
+| `serviceName`     | **Sim**     | Nome unico do job (sem default). Convencao: terminar com "SP".                                      | `"SincronizadorSP"`              |
+| `frequency`       | Nao         | Frequencia padrao. Default `"&60000"` (60s). ms usa prefixo `&`; **CRON e SEM `&`**.               | `"0 0 2 * * ?"` / `"&60000"`     |
+| `transactionType` | Nao         | Comportamento transacional (`EJBTransactionType`). Default: `Supports`.                             | `EJBTransactionType.NotSupported` |
 
 ### Formato do `frequency`
 
 | Formato          | Exemplo               | Descricao                         |
 |:-----------------|:----------------------|:----------------------------------|
-| CRON             | `"&0 0 2 * * ?"`      | Executa todo dia as 02:00         |
-| CRON             | `"&0 0/15 * * * ?"`   | Executa a cada 15 minutos         |
+| CRON (sem `&`)   | `"0 0 2 * * ?"`       | Executa todo dia as 02:00         |
+| CRON (sem `&`)   | `"0 0/15 * * * ?"`    | Executa a cada 15 minutos         |
 | Milissegundos    | `"&120000"`           | Executa a cada 2 minutos (120s)   |
 | Milissegundos    | `"&86400000"`         | Executa a cada 1 dia              |
 
-> Expressao CRON Sankhya usa 6 campos: `segundos minutos horas dia-mes mes dia-semana`.
+> **O prefixo `&` e EXCLUSIVO do intervalo em milissegundos.** Expressao CRON e uma string pura de 6 campos: `segundos minutos horas dia-mes mes dia-semana` — **nunca** com `&`.
 
 ---
 
-## 3. Interface `IJob` — Metodos
+## 3. Classe abstrata `IJob` — Metodos
 
-| Metodo                   | Obrigatorio | Descricao                                                                                          |
-|:-------------------------|:------------|:---------------------------------------------------------------------------------------------------|
-| `onSchedule()`           | Sim         | Logica executada a cada disparo do agendador.                                                      |
-| `getScheduleConfigHook()`| Nao         | Executado **uma unica vez** na inicializacao. Retorna frequencia dinamica (ex: lida de parametro). |
+`IJob` e **classe abstrata** — sempre `extends IJob`, nunca `implements`.
 
-### `getScheduleConfigHook()` — configuracao dinamica
+| Metodo                    | Retorno  | Obrigatorio | Descricao                                                                                       |
+|:--------------------------|:---------|:------------|:------------------------------------------------------------------------------------------------|
+| `onSchedule()`            | `void`   | Sim         | Logica executada a cada disparo do agendador. `abstract` — precisa ser sobrescrito.             |
+| `getScheduleConfig()`     | `String` | Nao         | Retorna a **frequencia dinamica**. Se retornar valor nao-nulo, **prevalece** sobre `frequency`. |
+| `getScheduleConfigHook()` | `void`   | Nao         | **Obsoleto** (retrocompatibilidade). Retorno `void` — **nao** retorna frequencia.                |
+
+### `getScheduleConfig()` — frequencia dinamica
+
+> Quem retorna a frequencia dinamica e `getScheduleConfig()` (`String`), **nao** `getScheduleConfigHook()` (`void`, obsoleto). Se `getScheduleConfig()` retornar valor nao-nulo, ele sobrescreve o atributo `frequency`.
 
 ```java
 @Override
-public String getScheduleConfigHook() {
+public String getScheduleConfig() {
     // Le frequencia de parametro do sistema — sobrepoe o atributo frequency
     String frequencia = SystemParam.getParam("MEUADDON_FREQ_JOB");
-    return frequencia != null ? frequencia : "&3600000"; // fallback: 1 hora
+    return frequencia != null ? frequencia : "&3600000"; // fallback: 1 hora (ms)
 }
 ```
 
@@ -94,13 +105,13 @@ public String getScheduleConfigHook() {
 | Cenario                     | Abordagem                                                          |
 |:----------------------------|:-------------------------------------------------------------------|
 | Job modifica dados          | `@Transactional` no `onSchedule()` — garante atomicidade          |
-| Job somente leitura         | `transactionType = TransactionType.NotSupported` — melhor desempenho |
-| Controle granular por trecho| `transactionType = Supports` (padrao) + `@Transactional` no metodo |
+| Job somente leitura         | `transactionType = EJBTransactionType.NotSupported` — melhor desempenho |
+| Controle granular por trecho| `transactionType = EJBTransactionType.Supports` (padrao) + `@Transactional` no metodo |
 
 ```java
 // Job de escrita — transacao atomica
-@Job(name = "SincronizadorSP", frequency = "&0 0 2 * * ?")
-public class SincronizadorJob implements IJob {
+@Job(serviceName = "SincronizadorSP", frequency = "0 0 2 * * ?")
+public class SincronizadorJob extends IJob {
 
     @Override
     @Transactional
@@ -111,11 +122,11 @@ public class SincronizadorJob implements IJob {
 
 // Job de leitura — sem overhead transacional
 @Job(
-    name = "RelatorioSP",
-    frequency = "&0 0 6 * * ?",
-    transactionType = TransactionType.NotSupported
+    serviceName = "RelatorioSP",
+    frequency = "0 0 6 * * ?",
+    transactionType = EJBTransactionType.NotSupported
 )
-public class RelatorioJob implements IJob {
+public class RelatorioJob extends IJob {
 
     @Override
     public void onSchedule() {
@@ -131,15 +142,15 @@ public class RelatorioJob implements IJob {
 ### Job simples (execucao periodica)
 
 ```java
+import br.com.sankhya.studio.annotations.Job;
+import br.com.sankhya.studio.persistence.Transactional;
 import br.com.sankhya.studio.stereotypes.IJob;
-import br.com.sankhya.studio.stereotypes.Job;
-import br.com.sankhya.studio.transaction.Transactional;
 import com.google.inject.Inject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Job(name = "SincronizadorDeEstoqueSP", frequency = "&0 0 2 * * ?")
-public class SincronizadorDeEstoqueJob implements IJob {
+@Job(serviceName = "SincronizadorDeEstoqueSP", frequency = "0 0 2 * * ?")
+public class SincronizadorDeEstoqueJob extends IJob {
 
     private static final Logger log = Logger.getLogger(SincronizadorDeEstoqueJob.class.getName());
 
@@ -166,8 +177,8 @@ public class SincronizadorDeEstoqueJob implements IJob {
 ### Job com frequencia dinamica via parametro
 
 ```java
-@Job(name = "ProcessadorFilaSP", frequency = "&300000") // fallback: 5 min
-public class ProcessadorFilaJob implements IJob {
+@Job(serviceName = "ProcessadorFilaSP", frequency = "&300000") // default ms: 5 min
+public class ProcessadorFilaJob extends IJob {
 
     private static final Logger log = Logger.getLogger(ProcessadorFilaJob.class.getName());
 
@@ -179,7 +190,7 @@ public class ProcessadorFilaJob implements IJob {
     }
 
     @Override
-    public String getScheduleConfigHook() {
+    public String getScheduleConfig() {  // String — retorna freq; NAO getScheduleConfigHook (void, obsoleto)
         String freq = SystemParam.getParam("MEUADDON_FILA_FREQ");
         return freq != null ? freq : "&300000";
     }
@@ -202,12 +213,12 @@ public class ProcessadorFilaJob implements IJob {
 
 > **Atencao:** ao usar `@Job`, os arquivos `mgeschedule.xml` e `mgechedule-cfg.xml` **nao sao permitidos**. Se existirem, **a compilacao falhara**.
 
-| Legado (`mgeschedule.xml`)         | Novo (`@Job`)                                 |
-|:-----------------------------------|:----------------------------------------------|
-| Classe `SessionBean` com EJB tags  | Classe POJO implementando `IJob`              |
-| Configuracao em XML separado       | Configuracao na propria anotacao              |
-| `getScheduleConfig()` retorna freq | `getScheduleConfigHook()` para config dinamica|
-| `@ejb.transaction type="Supports"` | `transactionType = TransactionType.Supports`  |
+| Legado (`mgeschedule.xml`)         | Novo (`@Job`)                                       |
+|:-----------------------------------|:----------------------------------------------------|
+| Classe `SessionBean` com EJB tags  | Classe POJO `extends IJob`                           |
+| Configuracao em XML separado       | Configuracao na propria anotacao                    |
+| `getScheduleConfig()` retorna freq | `getScheduleConfig()` (override) para freq dinamica |
+| `@ejb.transaction type="Supports"` | `transactionType = EJBTransactionType.Supports`     |
 
 ```java
 // LEGADO — nao usar
@@ -219,8 +230,8 @@ public class MeuJobBean extends SessionBean {
 }
 
 // NOVO — usar
-@Job(name = "MeuJobSP", frequency = "&86400000")
-public class MeuJob implements IJob {
+@Job(serviceName = "MeuJobSP", frequency = "&86400000")
+public class MeuJob extends IJob {
     @Override
     public void onSchedule() { ... }
 }
@@ -234,39 +245,45 @@ public class MeuJob implements IJob {
 - **Tratamento de erros**: sempre `try/catch` no `onSchedule()` — falha sem captura pode impedir execucoes futuras.
 - **Logging**: `Logger` (`java.util.logging`) + nivel adequado. Nunca `System.out`.
 - **Transacao adequada**: `@Transactional` em jobs de escrita; `NotSupported` em jobs somente leitura.
-- **Frequencia configuravel**: Use `getScheduleConfigHook()` + parametro do sistema para evitar hardcode.
+- **Frequencia configuravel**: Use `getScheduleConfig()` (`String`) + parametro do sistema para evitar hardcode.
 - **Assincrono para integracoes externas**: chamadas a APIs dentro do job = `CompletableFuture` ou similar.
 
 ---
 
 ## 8. Anti-Patterns (PROIBIDO)
 
-| Anti-Pattern                                        | Correcao                                               |
-|:----------------------------------------------------|:-------------------------------------------------------|
-| `mgeschedule.xml` junto com `@Job`                  | Remover XMLs — compilacao falha se coexistirem         |
-| `name` sem sufixo "SP"                              | Sempre `<Nome>SP`                                      |
-| `frequency` sem prefixo "&"                         | Sempre `"&<expressao>"`                                |
-| Logica de negocio no `onSchedule()`                 | Mover para Service (`@Component`)                      |
-| Chamada sincrona a API externa no job               | Usar `CompletableFuture` ou fila assincrona            |
-| `System.out.println` para logging                   | Usar `Logger` (`java.util.logging`)                    |
-| `new` em dependencias gerenciadas                   | Injetar via construtor com `@Inject`                   |
-| Job de escrita sem `@Transactional`                 | Adicionar `@Transactional` no `onSchedule()`           |
+| Anti-Pattern                                            | Correcao                                                  |
+|:--------------------------------------------------------|:----------------------------------------------------------|
+| `mgeschedule.xml` junto com `@Job`                      | Remover XMLs — compilacao falha se coexistirem            |
+| `implements IJob` (IJob e classe abstrata)              | `extends IJob`                                            |
+| `import ...stereotypes.Job`                             | `import br.com.sankhya.studio.annotations.Job`            |
+| `import ...transaction.Transactional`                   | `import br.com.sankhya.studio.persistence.Transactional`  |
+| `@Job(name = ...)`                                      | `@Job(serviceName = ...)`                                 |
+| CRON com prefixo `&` (ex.: `"&0 0 2 * * ?"`)            | CRON e SEM `&`; `&` so para intervalo em ms               |
+| `getScheduleConfigHook()` retornando `String` p/ freq   | `getScheduleConfig()` retorna a freq (`Hook` e `void`/obsoleto) |
+| `TransactionType.X`                                     | `EJBTransactionType.X`                                    |
+| Logica de negocio no `onSchedule()`                     | Mover para Service (`@Component`)                         |
+| Chamada sincrona a API externa no job                   | Usar `CompletableFuture` ou fila assincrona              |
+| `System.out.println` para logging                       | Usar `Logger` (`java.util.logging`)                       |
+| `new` em dependencias gerenciadas                       | Injetar via construtor com `@Inject`                      |
+| Job de escrita sem `@Transactional`                     | Adicionar `@Transactional` no `onSchedule()`             |
 
 ---
 
 ## 9. Checklist: Novo `@Job`
 
-1. [ ] Criar classe implementando `IJob` (nomear `<Feature>Job`).
-2. [ ] Anotar com `@Job(name = "<Feature>SP", frequency = "&<expressao>")`.
-3. [ ] Verificar que `name` termina com "SP" e `frequency` comeca com "&".
-4. [ ] Injetar dependencias via construtor com `@Inject` (Guice).
-5. [ ] Implementar `onSchedule()` delegando logica para Service.
-6. [ ] Adicionar `@Transactional` se job modificar dados.
-7. [ ] Definir `transactionType = NotSupported` se job for somente leitura.
-8. [ ] Envolver corpo de `onSchedule()` em `try/catch` com logging adequado.
-9. [ ] Se frequencia for dinamica: implementar `getScheduleConfigHook()`.
-10. [ ] Confirmar que **nao existem** `mgeschedule.xml` nem `mgechedule-cfg.xml` no projeto.
-11. [ ] Registrar no modulo Guice do projeto (ver `dependency-injection`).
+1. [ ] Criar classe `extends IJob` (nomear `<Feature>Job`). `IJob` e classe abstrata.
+2. [ ] Anotar com `@Job(serviceName = "<Feature>SP", frequency = "<expressao>")`.
+3. [ ] `serviceName` unico (convencao: terminar com "SP"). `frequency`: ms usa `&`; **CRON sem `&`**.
+4. [ ] Imports corretos: `annotations.Job`, `persistence.Transactional`, `stereotypes.IJob`, `annotations.enums.EJBTransactionType`.
+5. [ ] Injetar dependencias via construtor com `@Inject` (Guice).
+6. [ ] Implementar `onSchedule()` (retorno `void`) delegando logica para Service.
+7. [ ] Adicionar `@Transactional` se job modificar dados.
+8. [ ] Definir `transactionType = EJBTransactionType.NotSupported` se job for somente leitura.
+9. [ ] Envolver corpo de `onSchedule()` em `try/catch` com logging adequado.
+10. [ ] Se frequencia for dinamica: sobrescrever `getScheduleConfig()` retornando `String` (nao `getScheduleConfigHook()`).
+11. [ ] Confirmar que **nao existem** `mgeschedule.xml` nem `mgechedule-cfg.xml` no projeto.
+12. [ ] Registrar no modulo Guice do projeto (ver `dependency-injection`).
 
 
 ## Related Skills

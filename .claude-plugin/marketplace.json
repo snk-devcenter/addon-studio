@@ -9,7 +9,7 @@
     {
       "name": "addon-studio",
       "description": "Plugin Sankhya Addon Studio 2.0 com 21 skills focadas (addon-studio, init, entity, repository, controller, controller-advice, data-dictionary, database, dependency-injection, mapstruct, test, action-button, business-rule, before-load-listener, job, type-adapter, value, macros, encoding, build, retrofit) e 6 sub-agents (addon-reviewer, entity-architect, controller-designer, test-writer, troubleshooter, dbscript-builder). Setup do projeto via /addon-studio:init (docs/ADDON.md + @import no CLAUDE.md). Convencao de nomenclatura parametrizada por projeto.",
-      "version": "2.9.0",
+      "version": "2.9.1",
       "author": {
         "name": "DevCenter Squad"
       },

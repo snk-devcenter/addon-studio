@@ -1,8 +1,8 @@
 ---
 name: action-button
-description: Cria, revisa e refatora botões de ação Sankhya com `@ActionButton` (`AcaoRotinaJava` + `@Form` + `ContextoAcao`) — incluindo validação, fluxo de tela e mensagens. Use ao criar, alterar, revisar, auditar ou padronizar classes `AcaoRotinaJava`, ao implementar `processarAcao`, ao trabalhar com arquivos `*Action.java`, ou ao tocar em código com a anotação `@ActionButton`.
+description: Cria, revisa e refatora botões de ação Sankhya com `@ActionButton` (`AcaoRotinaJava` + `@Form` + `ContextoAcao`) — incluindo validação, fluxo de tela e mensagens. Use ao criar, alterar, revisar, auditar ou padronizar classes `AcaoRotinaJava`, ao implementar `doAction`, ao trabalhar com arquivos `*Action.java`, ou ao tocar em código com a anotação `@ActionButton`.
 license: Proprietary
-compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1. studio-annotations 2.16.0.
 ---
 
 # Botao de Acao (`@ActionButton`) — Addon Studio 2.0
@@ -38,10 +38,12 @@ Use `@ActionButton` quando o usuario precisar disparar **manualmente** uma rotin
 import br.com.sankhya.extensions.actionbutton.AcaoRotinaJava;
 import br.com.sankhya.extensions.actionbutton.ContextoAcao;
 import br.com.sankhya.studio.annotations.hooks.ActionButton;
+import br.com.sankhya.studio.annotations.hooks.TransactionType;
 
 @ActionButton(
     description = "Enviar para E-commerce",          // Obrigatorio: texto no menu
     instanceName = "CabecalhoNota",                  // Obrigatorio: nome da entidade
+    transactionType = TransactionType.AUTOMATIC,     // Obrigatorio: AUTOMATIC ou MANUAL
     resourceId = "br.com.sankhya.core.mov.central"   // Recomendado: restringir a tela
 )
 public class EnviarEcommerceAction implements AcaoRotinaJava {
@@ -66,15 +68,17 @@ public class EnviarEcommerceAction implements AcaoRotinaJava {
 
 ## 3. Atributos da anotacao `@ActionButton`
 
-| Atributo           | Obrigatorio | Padrao      | Descricao                                                                                   |
-|:-------------------|:------------|:------------|:--------------------------------------------------------------------------------------------|
-| `description`      | Sim         | —           | Texto exibido no menu "Acoes" para o usuario.                                               |
-| `instanceName`     | Sim         | —           | Nome da entidade (instancia) associada ao botao (ex.: `"CabecalhoNota"`).                   |
-| `form`             | Nao         | sem form    | Formulario exibido antes de executar a acao. Ver secao 4.                                   |
-| `transactionType`  | Nao         | `AUTOMATIC` | Comportamento transacional. `AUTOMATIC` = framework gerencia. `REQUIRES_NEW` = tx isolada.  |
-| `accessControlled` | Nao         | `true`      | `true` = visibilidade respeita permissoes de acesso do usuario a tela.                      |
-| `resourceId`       | Nao         | todas telas | Restringe o botao a uma tela especifica pelo seu ID de recurso.                             |
-| `refreshType`      | Nao         | `ITEM`      | O que atualizar apos execucao. `ITEM` = registro atual. `RefreshTypeEnum.ALL` = tela toda.  |
+| Atributo           | Obrigatorio | Padrao            | Descricao                                                                                   |
+|:-------------------|:------------|:------------------|:--------------------------------------------------------------------------------------------|
+| `description`      | Sim         | —                 | Texto exibido no menu "Acoes" para o usuario.                                               |
+| `instanceName`     | Sim         | —                 | Nome da entidade (instancia) associada ao botao (ex.: `"CabecalhoNota"`).                   |
+| `transactionType`  | **Sim**     | — (sem default)   | `TransactionType.AUTOMATIC` (framework gerencia a tx) ou `TransactionType.MANUAL` (controle manual). |
+| `form`             | Nao         | sem form          | Formulario exibido antes de executar a acao. Ver secao 4.                                   |
+| `accessControlled` | Nao         | `false`           | `true` = visibilidade respeita as permissoes de acesso do usuario a tela. Default `false`. |
+| `resourceId`       | Nao         | `""` (todas telas)| Restringe o botao a uma tela especifica pelo seu ID de recurso.                             |
+| `refreshType`      | Nao         | `NONE_ITEM`       | O que atualizar apos execucao. Valores: `NONE_ITEM`, `SELECTED_ITEMS`, `PARENT_ITEM`, `MASTER_ITEM`, `ALL_ITEMS`. |
+
+> **`transactionType` nao tem default — e obrigatorio.** Valores validos: apenas `TransactionType.AUTOMATIC` e `TransactionType.MANUAL`. **Nao existe `REQUIRES_NEW`** (esse pertence ao `EJBTransactionType` de `@Controller`/`@Job`, nao ao hook do botao).
 
 ```java
 // Exemplo com todos os atributos
@@ -82,9 +86,9 @@ public class EnviarEcommerceAction implements AcaoRotinaJava {
     description = "Aprovar Nota",
     instanceName = "CabecalhoNota",
     resourceId = "br.com.sankhya.core.mov.centraldenotas",
-    transactionType = TransactionType.REQUIRES_NEW,
+    transactionType = TransactionType.AUTOMATIC,
     accessControlled = true,
-    refreshType = RefreshTypeEnum.ALL
+    refreshType = RefreshTypeEnum.ALL_ITEMS
 )
 ```
 
@@ -100,7 +104,9 @@ Exibido ao usuario antes de `doAction()` ser chamado. Framework coleta os dados 
 |:-------------|:-----------------------------|:----------------------------|
 | `LIST`       | `String` (value da `@Option`)| Selecao de opcoes fixas     |
 | `DATE`       | `java.sql.Timestamp`         | Data/hora                   |
-| `CHECKBOX`   | `"S"` ou `"N"` como `String` | Flag booleano               |
+| `BOOLEAN`    | `"S"` ou `"N"` como `String` | Flag booleano               |
+
+> **Valores de `FieldType` (studio-annotations 2.16.0):** `TEXT`, `INTEGER`, `SEARCH`, `DECIMAL`, `DATE`, `DATE_TIME`, `BOOLEAN`, `LIST`. **Nao existe `CHECKBOX`** — use `BOOLEAN`. Campo `SEARCH` exige `instance`; campo `LIST` exige `options`.
 
 ### Anatomia do `@Form`
 
@@ -126,7 +132,7 @@ form = @Form(
         @Field(
             name = "FLAG",
             label = "Incluir detalhes?",
-            type = FieldType.CHECKBOX
+            type = FieldType.BOOLEAN
         )
     }
 )
@@ -141,7 +147,7 @@ String formato = (String) contexto.getParam("FORMATO");
 // DATE -> java.sql.Timestamp
 java.sql.Timestamp dataRef = (java.sql.Timestamp) contexto.getParam("DATA_REF");
 
-// CHECKBOX -> "S" ou "N"
+// BOOLEAN -> "S" ou "N"
 boolean incluir = "S".equals(contexto.getParam("FLAG"));
 ```
 
@@ -170,6 +176,7 @@ import com.google.inject.Inject;
 @ActionButton(
     description = "Exportar Dados para Planilha",
     instanceName = "CabecalhoNota",
+    transactionType = TransactionType.AUTOMATIC,
     resourceId = "br.com.sankhya.core.mov.centraldenotas",
     form = @Form(
         fields = {
@@ -192,7 +199,7 @@ import com.google.inject.Inject;
             @Field(
                 name = "INCLUIR_ITENS",
                 label = "Incluir Itens da Nota?",
-                type = FieldType.CHECKBOX
+                type = FieldType.BOOLEAN
             )
         }
     )
@@ -226,7 +233,7 @@ public class ExportarDadosAction implements AcaoRotinaJava {
 - **Logica em Services**: `doAction()` orquestra — nao implementa regra de negocio. Delegue para `@Component`.
 - **`resourceId` sempre que possivel**: Evita poluir menu "Acoes" de outras telas que usam a mesma entidade.
 - **Feedback obrigatorio**: Sempre chame `contexto.setMensagemRetorno()`. Usuario sem retorno pensa que nada ocorreu.
-- **`accessControlled = true`**: Mantenha o padrao. Altere para `false` somente com justificativa explicita.
+- **`accessControlled`**: Default e `false`. Defina `true` quando a visibilidade do botao deve respeitar as permissoes de acesso do usuario a tela.
 - **Descricoes objetivas**: "Enviar para E-commerce" e correto. "Processar" ou "Executar" sao ambiguos.
 
 ---
@@ -235,6 +242,10 @@ public class ExportarDadosAction implements AcaoRotinaJava {
 
 | Anti-Pattern | Correcao |
 |:-------------|:---------|
+| Omitir `transactionType` (e obrigatorio) | Sempre definir `TransactionType.AUTOMATIC` ou `MANUAL` |
+| `transactionType = TransactionType.REQUIRES_NEW` | Nao existe — usar `AUTOMATIC` ou `MANUAL` |
+| `type = FieldType.CHECKBOX` | Nao existe — usar `FieldType.BOOLEAN` |
+| `refreshType = RefreshTypeEnum.ALL` / `ITEM` | Usar `ALL_ITEMS` / `NONE_ITEM` (valores reais) |
 | Logica de negocio no `doAction()` | Mover para Service (`@Component`) |
 | Nao chamar `setMensagemRetorno()` | Sempre fornecer feedback ao usuario |
 | Usar para logica automatica (salvar/excluir) | Usar `@BusinessRule` ou Listener |
@@ -247,14 +258,14 @@ public class ExportarDadosAction implements AcaoRotinaJava {
 ## 9. Checklist: Novo `@ActionButton`
 
 1. [ ] Criar classe implementando `AcaoRotinaJava` (nomear `<Feature>Action`).
-2. [ ] Anotar com `@ActionButton(description = "...", instanceName = "...")`.
+2. [ ] Anotar com `@ActionButton(description = "...", instanceName = "...", transactionType = TransactionType.AUTOMATIC)`.
 3. [ ] Definir `resourceId` para restringir a tela especifica.
-4. [ ] Se precisar de dados do usuario: definir `@Form` com `@Field`s adequados.
+4. [ ] Se precisar de dados do usuario: definir `@Form` com `@Field`s adequados (`FieldType` valido).
 5. [ ] Injetar dependencias via construtor com `@Inject` (Guice).
 6. [ ] Implementar `doAction()` delegando logica para Service.
 7. [ ] Chamar `contexto.setMensagemRetorno()` em todos os caminhos (sucesso e erro).
-8. [ ] Definir `transactionType` se precisar de transacao isolada (`REQUIRES_NEW`).
-9. [ ] Definir `refreshType` se precisar atualizar mais que o registro atual.
+8. [ ] Confirmar `transactionType` (**obrigatorio**): `AUTOMATIC` (framework gerencia) ou `MANUAL` (controle manual).
+9. [ ] Definir `refreshType` se precisar atualizar mais que o registro atual (`ALL_ITEMS`, `SELECTED_ITEMS`, etc.).
 10. [ ] Registrar o `@Component` no modulo Guice do projeto (ver `dependency-injection`).
 
 
