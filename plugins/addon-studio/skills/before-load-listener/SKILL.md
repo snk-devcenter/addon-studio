@@ -52,7 +52,7 @@ A entidade **precisa estar declarada no Dicionário de Dados** — de uma das du
 import br.com.sankhya.jape.core.FinderListener;
 import br.com.sankhya.jape.metadata.EntityMetaData;
 import br.com.sankhya.jape.wrapper.FinderWrapper;
-import br.com.sankhya.studio.annotations.BeforeLoadListener;
+import br.com.sankhya.studio.persistence.BeforeLoadListener;
 import lombok.extern.java.Log;
 
 @Log

@@ -259,10 +259,10 @@ Quando `@NativeQuery` retorna tipo Java simples (`String`, `Long`, etc.) e o Res
 
 ```java
 import br.com.sankhya.studio.persistence.NativeQuery;
-import br.com.sankhya.studio.persistence.ResultSetMethods;
+// ResultSetMethods e enum ANINHADO em NativeQuery — sem import proprio; use NativeQuery.ResultSetMethods
 
 @NativeQuery(value = "SELECT DESCRICAO FROM TGFPRO WHERE CODPROD = :codigo",
-             method = ResultSetMethods.GET_N_STRING)
+             method = NativeQuery.ResultSetMethods.GET_N_STRING)
 String buscarDescricaoNVarchar(Long codigo);
 ```
 
@@ -275,7 +275,7 @@ String buscarDescricaoNVarchar(Long codigo);
 Quando o filtro envolve **múltiplas colunas combinadas** (ex.: `(CODEMP, CODFIL) IN ((1,1), (1,2), (2,3))`), use `ParamMatrix` no parâmetro:
 
 ```java
-import br.com.sankhya.studio.persistence.ParamMatrix;
+import br.com.sankhya.sdk.data.structures.ParamMatrix;
 import java.util.Arrays;
 
 ParamMatrix matrix = ParamMatrix.of(
