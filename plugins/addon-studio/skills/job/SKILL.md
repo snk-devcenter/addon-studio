@@ -2,7 +2,7 @@
 name: job
 description: Cria, revisa e refatora jobs agendados Sankhya com `@Job` (`extends IJob` + `onSchedule` + `getScheduleConfig` + CRON), incluindo migration via XML. Use ao criar, alterar, revisar, auditar ou padronizar jobs agendados, ao ajustar agendamento CRON, ao trabalhar com arquivos `*Job.java`, ou ao tocar em código com `@Job`/`IJob`.
 license: Proprietary
-compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1. studio-annotations 2.16.0.
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
 
 # Jobs Agendados (`@Job`) — Addon Studio 2.0
@@ -46,7 +46,7 @@ public class ProcessadorDeFilaJob extends IJob {  // IJob e CLASSE ABSTRATA — 
 }
 ```
 
-> **Imports criticos** (assinaturas reais do `studio-annotations` 2.16.0):
+> **Imports criticos** (assinaturas reais do SDK):
 > - `@Job` → `br.com.sankhya.studio.annotations.Job` (nao `stereotypes.Job`)
 > - `@Transactional` → `br.com.sankhya.studio.persistence.Transactional` (nao `transaction.Transactional`)
 > - `IJob` → `br.com.sankhya.studio.stereotypes.IJob` (**classe abstrata** → `extends`)

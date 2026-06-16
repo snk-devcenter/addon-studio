@@ -2,7 +2,7 @@
 name: action-button
 description: Cria, revisa e refatora botões de ação Sankhya com `@ActionButton` (`AcaoRotinaJava` + `@Form` + `ContextoAcao`) — incluindo validação, fluxo de tela e mensagens. Use ao criar, alterar, revisar, auditar ou padronizar classes `AcaoRotinaJava`, ao implementar `doAction`, ao trabalhar com arquivos `*Action.java`, ou ao tocar em código com a anotação `@ActionButton`.
 license: Proprietary
-compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1. studio-annotations 2.16.0.
+compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
 
 # Botao de Acao (`@ActionButton`) — Addon Studio 2.0
@@ -106,7 +106,7 @@ Exibido ao usuario antes de `doAction()` ser chamado. Framework coleta os dados 
 | `DATE`       | `java.sql.Timestamp`         | Data/hora                   |
 | `BOOLEAN`    | `"S"` ou `"N"` como `String` | Flag booleano               |
 
-> **Valores de `FieldType` (studio-annotations 2.16.0):** `TEXT`, `INTEGER`, `SEARCH`, `DECIMAL`, `DATE`, `DATE_TIME`, `BOOLEAN`, `LIST`. **Nao existe `CHECKBOX`** — use `BOOLEAN`. Campo `SEARCH` exige `instance`; campo `LIST` exige `options`.
+> **Valores de `FieldType`:** `TEXT`, `INTEGER`, `SEARCH`, `DECIMAL`, `DATE`, `DATE_TIME`, `BOOLEAN`, `LIST`. **Nao existe `CHECKBOX`** — use `BOOLEAN`. Campo `SEARCH` exige `instance`; campo `LIST` exige `options`.
 
 ### Anatomia do `@Form`
 
