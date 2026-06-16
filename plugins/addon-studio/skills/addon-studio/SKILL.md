@@ -32,7 +32,7 @@ plugins {
 **Se o projeto aplica esse plugin, este plugin Claude Code (`addon-studio`) é a fonte de verdade — siga as skills daqui.** Antes de gerar/alterar código:
 
 1. Identifique o domínio (entity, repository, retrofit, controller, controller-advice, dbscript, dicionário de dados, mapstruct, dependency-injection, action-button, business-rule, before-load-listener, job, type-adapter, value, macros, encoding, build, test).
-2. Invoque a skill focada correspondente — não improvise nem misture convenções de outros stacks (Spring Boot, Quarkus, JPA padrão, etc.).
+2. Invoque a skill focada correspondente — não improvise nem misture convenções de outros stacks (Spring Boot, Quarkus, JPA padrão, etc.) **nem decompile o `.jar` do SDK** para "descobrir" a anotação/assinatura: a skill é a referência de API (imports e assinaturas reais do SDK). Jar é artefato de build, não fonte de convenção.
 3. Para regras universais (Java 8, Lombok, encoding ISO-8859-1, naming `<PRX><MOD3><CTX>`), volte neste overview.
 
 > Conflito entre convenção do projeto e skill: **prevalece a skill** (a não ser que o projeto declare regra explícita em `CLAUDE.md` ou `AGENTS.md` na raiz).
@@ -164,6 +164,7 @@ Tratamento centralizado em controllers — ver skill `controller-advice`.
 | `@Inject` de `javax.inject`                                      | Usar `com.google.inject.Inject`                         |
 | `throw new RuntimeException(...)` cru                            | Exceção tipada                                          |
 | Improvisar com convenções de Spring Boot, Quarkus, Micronaut     | Seguir as skills do plugin (`@JapeEntity`, `@Controller serviceName SP`, Guice, etc.) |
+| Decompilar/`javap`/`unzip` no `.jar` do SDK p/ achar **qualquer** símbolo (anotação, classe, interface, enum, assinatura — `@JapeEntity`, `@Controller`, `IJob`, …) | Invocar a skill focada — ela fixa imports e assinaturas reais do SDK. Símbolo sem skill: perguntar ao dev, não ir ao jar |
 | Em `<treeTable>`, raiz com `CODIGOPAI = NULL` ou `GRAU = 0`      | Sentinela `CODIGOPAI = -999999999` e `GRAU = 1` (ver skill `data-dictionary` → `tree-table.md`) |
 | APIs Java 11+ (`var`, `List.of`, `String.isBlank`, records, etc.) | Equivalentes Java 8 — ver "Restrições Java 8" acima      |
 
