@@ -1,9 +1,0 @@
----
-name: init
-displayName: "Sankhya Addon Studio — Init / Setup"
-description: "Setup inicial do projeto Sankhya Addon Studio: copia ADDON.md (instruções do plugin para o agente) para docs/ADDON.md e garante import @docs/ADDON.md no CLAUDE.md. Idempotente — re-rodar atualiza ADDON.md sem mexer em customizações do dev."
-allow_implicit_invocation: true
-ui:
-  category: "development"
-  shortDescription: "Setup: copia ADDON.md pra docs/ + import no CLAUDE.md. Re-rodar = upgrade."
----
