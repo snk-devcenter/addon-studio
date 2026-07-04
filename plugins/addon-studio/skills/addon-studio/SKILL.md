@@ -35,7 +35,7 @@ plugins {
 2. Invoque a skill focada correspondente — não improvise nem misture convenções de outros stacks (Spring Boot, Quarkus, JPA padrão, etc.) **nem decompile o `.jar` do SDK** para "descobrir" a anotação/assinatura: a skill é a referência de API (imports e assinaturas reais do SDK). Jar é artefato de build, não fonte de convenção.
 3. Para regras universais (Java 8, Lombok, encoding ISO-8859-1, naming `<PRX><MOD3><CTX>`), volte neste overview.
 
-> Conflito entre convenção do projeto e skill: **prevalece a skill** (a não ser que o projeto declare regra explícita em `CLAUDE.md` ou `AGENTS.md` na raiz).
+> Conflito entre convenção do projeto e skill: **prevalece a skill** (a não ser que o projeto declare regra explícita em `CLAUDE.md` na raiz).
 
 ### Setup do projeto consumidor
 

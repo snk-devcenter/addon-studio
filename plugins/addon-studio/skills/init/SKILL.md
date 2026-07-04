@@ -27,10 +27,9 @@ grep -l "br.com.sankhya.addonstudio" build.gradle build.gradle.kts 2>/dev/null
 
 ### 1. Localizar o `ADDON.md` canônico
 
-O template fica no diretório `assets/` da skill `addon-studio` (convenção Agent Skills). Paths em ambiente real:
+O template fica no diretório `assets/` da skill `addon-studio` (convenção Agent Skills). Path em ambiente real:
 
-- **Claude Code:** `~/.claude/plugins/cache/snk-devcenter/addon-studio/plugins/addon-studio/skills/addon-studio/assets/ADDON.md`
-- **Codex CLI:** `~/.codex/marketplaces/addon-studio/plugins/addon-studio/skills/addon-studio/assets/ADDON.md`
+- `~/.claude/plugins/cache/snk-devcenter/addon-studio/plugins/addon-studio/skills/addon-studio/assets/ADDON.md`
 
 Resolva o path concreto a partir do ambiente atual (variáveis de ambiente do harness, ou listagem do diretório de plugins instalados).
 
@@ -83,7 +82,6 @@ Reporte em 2-3 linhas:
 
 - Não regenerar o conteúdo do `ADDON.md` do zero — sempre copie do `assets/`. Fonte de verdade é o plugin.
 - Não inserir conteúdo do `ADDON.md` direto no `CLAUDE.md` (era o approach antigo, agora deprecated em favor de `@import`).
-- Não criar/symlinkar `AGENTS.md` automaticamente — Codex CLI não suporta `@import`, ainda não há fluxo equivalente. Se o dev pedir explicitamente, oriente copiar o conteúdo de `docs/ADDON.md` para `AGENTS.md` manualmente.
 
 ## Related Skills
 

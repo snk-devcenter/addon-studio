@@ -1,5 +1,7 @@
 # Addon Studio Plugin
 
+[![release](https://img.shields.io/badge/release-v2.11.0-blue)](https://github.com/snk-devcenter/addon-studio/releases/latest)
+
 Plugin para **Claude Code** com **21 skills focadas + 6 sub-agents** que orientam implementacao em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo setor DevCenter.
 
 As skills sao a **fonte de verdade da API do SDK**: assinaturas validadas contra os jars reais (`studio-annotations`, `sdk-sankhya`). Seguir as skills gera codigo que compila e deploya — sem o agente precisar inspecionar jars.
