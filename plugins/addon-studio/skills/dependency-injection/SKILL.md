@@ -412,6 +412,30 @@ public class DynamicProdutoGateway implements ProdutoGateway {
 
 > Guice resolve `ProdutoGateway` -> `DynamicProdutoGateway` automático porque `DynamicProdutoGateway` é `@Component` e implementa interface.
 
+### Limite: UM `@Component` por interface (`Guice/BindingAlreadySet`)
+
+O `DependencyInjector` gerado binda **cada** `@Component` a **todas** as interfaces que ele implementa (`bind(Interface.class).to(Impl.class)`). Consequência: no máximo **um** `@Component` por interface **no addon inteiro** (o limite cruza pacotes — cada pacote gera seu `DependencyInjector`, mas todos entram no mesmo injector no deploy).
+
+Dois `@Component` implementando a mesma interface derrubam o **deploy** — mesmo que nenhum ponto de injeção peça a interface (todos pedindo o tipo concreto não salva):
+
+```
+[Guice/BindingAlreadySet]: okhttp3.Interceptor was bound multiple times.
+```
+
+> **Feedback tardio:** build e testes passam. O erro só aparece na criação do injector no Wildfly, durante o deploy.
+
+**Fix:** a classe "excedente" perde o stereotype (`@Component`/`@Singleton`) e é provida via `@Provides @Singleton` num `@CustomModule` — `@Provides` binda **apenas o tipo concreto**, sem tocar na interface:
+
+```java
+@Provides
+@Singleton
+public MeuSegundoInterceptor provideMeuSegundoInterceptor() {
+    return new MeuSegundoInterceptor();
+}
+```
+
+Pontos de injeção que pedem o tipo concreto continuam funcionando sem alteração.
+
 ---
 
 ## 10. Checklist
@@ -454,6 +478,7 @@ public class DynamicProdutoGateway implements ProdutoGateway {
 | `@Singleton` sem `@Component` e sem módulo | Guice não encontra. Adicione um dos dois. |
 | Mapper MapStruct com `uses` sem `injectionStrategy` | Adicione `injectionStrategy = InjectionStrategy.CONSTRUCTOR`. |
 | `@Provides` em classe sem `@CustomModule` | Guice não encontra provider. Adicione `@CustomModule`. |
+| `Guice/BindingAlreadySet` no deploy (build/testes passam) | Dois `@Component` implementam a mesma interface. Remova o stereotype de um deles e proveja via `@Provides @Singleton` do tipo concreto em `@CustomModule` (ver seção 9). |
 
 
 ## Related Skills
