@@ -1,6 +1,6 @@
 ---
 name: listener
-description: Cria, revisa e padroniza listeners de persistência Sankhya com `@Listener` (classe estende `PersistenceEventAdapter`) — reage a eventos CRUD (before/after insert, update, delete) de qualquer entidade JAPE, inclusive instâncias nativas. Use ao criar, alterar, revisar, auditar ou padronizar reação a gravação/exclusão de registros, ao validar ou preencher campos automaticamente no insert/update, ao implementar auditoria de alterações, ao reagir a mudança de status de um registro, ao bloquear operações com exceção em `before*`, ao trabalhar com classes `*Listener` de persistência, ou ao tocar em código com `@Listener`/`PersistenceEventAdapter`/`PersistenceEvent`.
+description: Cria, revisa e padroniza listeners de persistência Sankhya com `@Listener` (classe estende `PersistenceEventAdapter`) — reage a eventos CRUD (before/after insert, update, delete) de qualquer entidade JAPE, inclusive instâncias nativas. Use ao criar, alterar, revisar, auditar ou padronizar reação a gravação/exclusão de registros, ao validar ou preencher campos automaticamente no insert/update, ao implementar auditoria de alterações, ao reagir a mudança de status de um registro, ao bloquear operações com exceção em `before*`, ao trabalhar com classes `*Listener` de persistência, ou ao tocar em código com `@Listener`/`PersistenceEventAdapter`/`PersistenceEvent`. NÃO usar para interceptar busca/carregamento/leitura de entidades (`FinderListener`, filtro em query) — isso é `@BeforeLoadListener`, skill `before-load-listener`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -8,6 +8,8 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 # Listener de Persistência (`@Listener`) — Addon Studio 2.0
 
 `@Listener` executa lógica personalizada **em eventos de persistência (CRUD) de uma entidade JAPE** — antes/depois de insert, update e delete. Funciona em entidades do próprio add-on **e em instâncias nativas do sistema** (`CabecalhoNota`, `Parceiro`, `Produto`, etc.). A anotação registra o listener automaticamente — **sem edição manual de XML**.
+
+> ⚠️ **`@Listener` ≠ `@BeforeLoadListener`.** São mecanismos distintos, com anotação, interface, evento e escopo diferentes: `@Listener` reage a **escrita** (insert/update/delete, via `PersistenceEventAdapter`); `@BeforeLoadListener` intercepta **leitura** (busca/carregamento no Finder, via `FinderListener`) — e só funciona em instâncias do próprio add-on. Tarefa de leitura/filtro de busca → skill `before-load-listener`.
 
 ---
 

@@ -237,8 +237,8 @@ Para tópicos específicos, invoke skill direta:
 - `test` — JUnit + Mockito
 - `action-button` — `@ActionButton`
 - `business-rule` — `@BusinessRule`
-- `listener` — `@Listener` (eventos de persistência CRUD — before/after insert/update/delete)
-- `before-load-listener` — `@BeforeLoadListener` (intercepta buscas do Finder JAPE)
+- `listener` — `@Listener` (**escrita**: eventos CRUD before/after insert/update/delete — não confundir com `before-load-listener`)
+- `before-load-listener` — `@BeforeLoadListener` (**leitura**: intercepta buscas do Finder JAPE — não confundir com `listener`)
 - `job` — `@Job`
 - `type-adapter` — `@GlobalTypeAdapter`
 - `value` — `@Value` / `ValueType`
