@@ -44,7 +44,8 @@ Framework scaneia e registra classes com:
 |:---------|:-------|:--------------|:----|
 | `@Controller` | `br.com.sankhya.studio.annotations` | **Automático** — NÃO adicionar `@Component` | Entrypoints REST (equivale ao `@Service` EJB) |
 | `@Repository` | `br.com.sankhya.studio.stereotypes` | **Automático** — NÃO adicionar `@Component` | Interfaces de acesso a dados (`JapeRepository`) |
-| `@Component` | `br.com.sankhya.studio.stereotypes` | **Automático** | Classes gerais: Services, Services, Adapters, Gateways, Mappers auxiliares |
+| `@Component` | `br.com.sankhya.studio.stereotypes` | **Automático** | Classes gerais: Services, Adapters, Gateways, Mappers auxiliares |
+| `@Service` | `br.com.sankhya.studio.annotations` | **Automático** — NÃO adicionar `@Component` | Serviços expostos como serviço EJB (`serviceName` + `transactionType`, mesmos atributos de `@Controller`) |
 | `@ControllerAdvice` | `br.com.sankhya.studio.web` | **Automático** | Tratamento global de exceções |
 | `@CustomModule` | `br.com.sankhya.studio.stereotypes` | **Automático** | Módulos Guice customizados (equivale a `AbstractModule`) |
 
@@ -64,38 +65,11 @@ Framework scaneia e registra classes com:
 
 ### 3.1 `@Controller` — Entrypoints REST
 
-```java
-import br.com.sankhya.studio.annotations.Controller;
-import br.com.sankhya.studio.annotations.enums.EJBTransactionType;
-import br.com.sankhya.studio.persistence.Transactional;
-import com.google.inject.Inject;
+Regras DI relevantes:
 
-@Controller(
-    serviceName = "MeuControllerSP",
-    transactionType = EJBTransactionType.Supports
-)
-public class MeuController {
-
-    private final MeuService meuService;
-
-    @Inject
-    public MeuController(MeuService meuService) {
-        this.meuService = meuService;
-    }
-
-    @Transactional
-    public MeuDTO executar(MeuRequest request) {
-        // ...
-    }
-}
-```
-
-**Regras:**
-- `serviceName` obrigatório, sufixo `"SP"`.
-- `transactionType` define tipo transação EJB (`Supports`, `Required`, etc.).
-- Métodos que alteram dados precisam `@Transactional`.
-- Retorno: DTO direto (ou `void`) — framework serializa em `responseBody`. Nunca `ResponseEntity` (Spring). Ver `controller`.
+- `@Inject` de `com.google.inject.Inject` no construtor; deps `private final`.
 - **NÃO** adicionar `@Component` — `@Controller` já gerenciado pelo framework.
+- Anatomia completa (`serviceName`, `transactionType`, `@Transactional`, DTOs): ver skill `controller`.
 
 ### 3.2 `@Repository` — Interfaces de Acesso a Dados
 
@@ -274,7 +248,7 @@ public class RetrofitCallExecutor {
 
 | Usar `@Singleton` | Não usar (padrão) |
 |:-------------------|:-------------------|
-| Clientes HTTP, executors, factories | Services, Services de domínio |
+| Clientes HTTP, executors, factories | Services de domínio |
 | Resolvers e registries | Gateways e Adapters |
 | Interceptors (OkHttp, Auth) | Controllers |
 | Caches e pools | Mappers auxiliares |
@@ -325,39 +299,7 @@ public class MeuAuthInterceptor implements Interceptor {
 
 ## 7. MapStruct e o Container Guice
 
-Mappers MapStruct registrados automaticamente no Guice (config global `defaultComponentModel = "jakarta"`).
-
-### Mapper simples (sem dependências)
-
-```java
-@Mapper
-public interface MeuMapper {
-    MeuDTO toDto(MinhaEntidade entity);
-}
-```
-
-Injetável direto:
-
-```java
-@Inject
-public MeuController(MeuMapper mapper) { ... }
-```
-
-### Mapper com `uses` (dependência de classe `@Component`)
-
-```java
-@Mapper(
-    uses = {StringMappingNormalizer.class},
-    injectionStrategy = InjectionStrategy.CONSTRUCTOR
-)
-public interface MeuIntegrationMapper {
-    MinhaEntidade toDomain(MeuDTO dto);
-}
-```
-
-**Regras:**
-- Classe em `uses` **deve** ser `@Component`.
-- Use `injectionStrategy = InjectionStrategy.CONSTRUCTOR` pra garantir CDI injete via construtor.
+Mappers MapStruct registrados automaticamente no Guice (config global `defaultComponentModel = "jakarta"`) — injetáveis direto via `@Inject` no construtor. Classe em `uses` **deve** ser `@Component`; com `uses` (ou `abstract class` com `@Inject`), declare `injectionStrategy = InjectionStrategy.CONSTRUCTOR` pra garantir que o Guice injete via construtor. Detalhes e tipos de mapper: ver skill `mapstruct`.
 
 ---
 
@@ -411,6 +353,8 @@ public class DynamicProdutoGateway implements ProdutoGateway {
 ```
 
 > Guice resolve `ProdutoGateway` -> `DynamicProdutoGateway` automático porque `DynamicProdutoGateway` é `@Component` e implementa interface.
+
+> **Exceção — JIT binding do Guice:** classe **concreta** com construtor público sem argumentos (ou construtor `@Inject`) é resolvida just-in-time pelo Guice mesmo sem stereotype (ex.: `RetrofitClientFactory` da skill `retrofit`). **Interface** sempre exige implementação `@Component` ou binding em `@CustomModule`.
 
 ### Limite: UM `@Component` por interface (`Guice/BindingAlreadySet`)
 
@@ -481,16 +425,11 @@ Pontos de injeção que pedem o tipo concreto continuam funcionando sem alteraç
 | `Guice/BindingAlreadySet` no deploy (build/testes passam) | Dois `@Component` implementam a mesma interface. Remova o stereotype de um deles e proveja via `@Provides @Singleton` do tipo concreto em `@CustomModule` (ver seção 9). |
 
 
-## Related Skills
-
-- `addon-studio` — regras universais sobre @Inject (com.google.inject) e proibição de `new`
-- `controller` — controllers são @Component injetados via Guice
-- `controller-advice` — advice é @Component registrado no módulo
-- `mapstruct` — mappers são registrados no container Guice
-- `retrofit` — wiring completo de cliente HTTP (interface + interceptor + `@Provides`)
-
 ## Skills relacionadas
 
+- `addon-studio` — regras universais sobre @Inject (com.google.inject) e proibição de `new`
+- `controller` — controllers gerenciados automaticamente pelo framework — NÃO anotar @Component
+- `controller-advice` — advice gerenciado automaticamente pelo framework — NÃO anotar @Component
+- `mapstruct` — mappers são registrados no container Guice
+- `retrofit` — wiring completo de cliente HTTP (interface + interceptor + `@Provides`) e exemplos práticos de `@Provides @Singleton`
 - `value` — injeção de valores de configuração via `@Value`
-- `retrofit` — exemplos práticos de `@Provides @Singleton` para clientes HTTP
-- `addon-studio` — regras universais do projeto

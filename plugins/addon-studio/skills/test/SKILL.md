@@ -1,6 +1,6 @@
 ---
 name: test
-description: Escreve, revisa e amplia testes JUnit 5 + Mockito 4.11 para Sankhya Addon Studio — mock estático de `JapeRepository`, fixtures, controllers, services, repositories, mappers. Use ao criar, alterar, revisar ou ampliar cobertura de testes em `src/test/java/`, ao diagnosticar testes flaky/falhando, ou ao tocar em código com `@Test`/`@Mock`/`@InjectMocks`.
+description: Escreve, revisa e amplia testes JUnit 5 + Mockito 4.11 para Sankhya Addon Studio — mock de `JapeRepository` via `@Mock`, mock estático de `JapeSession`/`SessionFile` (mockito-inline), fixtures, controllers, services, repositories, mappers. Use ao criar, alterar, revisar ou ampliar cobertura de testes em `src/test/java/`, ao diagnosticar testes flaky/falhando, ou ao tocar em código com `@Test`/`@Mock`/`@InjectMocks`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -120,6 +120,9 @@ com.example.addon.ProcessarEntidadeServiceTest
 ## Template de teste unitario
 
 ```java
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -198,6 +201,69 @@ void deveExecutar_quandoSessionPropertyAtiva() throws Exception {
 ```
 
 Use `try-with-resources` pra garantir mock estatico fechado apos teste.
+
+## Teste de controller (orquestracao)
+
+Controller so orquestra — nao contem logica de negocio (ver skill `controller`). Teste verifica delegacao pra service e mapper:
+
+```java
+@ExtendWith(MockitoExtension.class)
+class PedidoControllerTest {
+
+    @Mock
+    private CriarPedidoService criarPedidoService;
+
+    @Mock
+    private PedidoRestMapper mapper;
+
+    @InjectMocks
+    private PedidoController controller;
+
+    @Test
+    void deveDelegarParaServiceEMapper_quandoCriarPedido() {
+        // arrange
+        CriarPedidoRequest request = new CriarPedidoRequest();
+        Pedido pedido = new Pedido();
+        PedidoResponse response = new PedidoResponse();
+
+        when(mapper.toPedido(request)).thenReturn(pedido);
+        when(criarPedidoService.execute(pedido)).thenReturn(pedido);
+        when(mapper.toCriarResponse(pedido)).thenReturn(response);
+
+        // act
+        PedidoResponse resultado = controller.criarPedido(request);
+
+        // assert
+        assertThat(resultado).isSameAs(response);
+        verify(criarPedidoService, times(1)).execute(pedido);
+    }
+}
+```
+
+## Teste de mapper (MapStruct)
+
+Mapper simples (`interface`, sem `uses`/`@Inject`) nao precisa de mock — instancie a implementacao gerada via `Mappers.getMapper`:
+
+```java
+import org.mapstruct.factory.Mappers;
+
+class PedidoRestMapperTest {
+
+    private final PedidoRestMapper mapper = Mappers.getMapper(PedidoRestMapper.class);
+
+    @Test
+    void deveMapearCampos_quandoConverterRequest() {
+        CriarPedidoRequest request = new CriarPedidoRequest();
+        request.setDescricao("Pedido de teste");
+
+        Pedido pedido = mapper.toPedido(request);
+
+        assertThat(pedido.getDescricao()).isEqualTo("Pedido de teste");
+    }
+}
+```
+
+> Mapper `abstract class` com `@Inject` (repository/deps) nao funciona com `Mappers.getMapper` sem container: instancie a impl gerada (`new PedidoMapperImpl()`) atribuindo mocks aos campos, ou cubra o mapper via teste do service que o usa.
 
 ## Armadilha: objetos iguais por Lombok `@Data` conflitam em stubs
 
@@ -352,14 +418,10 @@ Fluxo dev Addon Studio: rode testes antes de `deployAddon`.
 - [ ] Stubs sem acentos nas asserções de mensagem.
 
 
-## Related Skills
-
-- `repository` — JapeRepository tem quirks — leia antes de mockar
-- `dependency-injection` — componentes Guice injetam dependências via construtor — facilita mock
-
 ## Skills relacionadas
 
+- `repository` — JapeRepository tem quirks — leia antes de mockar (mock via `@Mock`; estático só `JapeSession`/`SessionFile`)
+- `dependency-injection` — componentes Guice injetam dependências via construtor — facilita mock
 - `controller` — controllers cobertos por testes
-- `repository` — repositórios cobertos (mock estático JapeRepository)
 - `entity` — fixtures de entidades
 - `mapstruct` — mappers cobertos

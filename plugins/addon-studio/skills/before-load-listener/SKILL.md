@@ -51,7 +51,7 @@ A entidade **precisa estar declarada no Dicionário de Dados** — de uma das du
 ```java
 import br.com.sankhya.jape.core.FinderListener;
 import br.com.sankhya.jape.metadata.EntityMetaData;
-import br.com.sankhya.jape.wrapper.FinderWrapper;
+import br.com.sankhya.jape.util.FinderWrapper;
 import br.com.sankhya.studio.persistence.BeforeLoadListener;
 import lombok.extern.java.Log;
 
@@ -61,13 +61,19 @@ public class MinhaInstanciaFinderListener implements FinderListener {
 
     @Override
     public void beforeExecute(EntityMetaData entity, FinderWrapper finder) throws Exception {
-        // Adiciona um critério de busca adicional
-        finder.where("this.ATIVO = 'S'");
+        // Adiciona um criterio de busca — setWhere SUBSTITUI a clausula inteira,
+        // por isso compomos com o filtro ja existente via getWhere()
+        String where = finder.getWhere();
+        finder.setWhere(where == null || where.isEmpty()
+            ? "this.ATIVO = 'S'"
+            : where + " AND this.ATIVO = 'S'");
 
         log.info("Filtro de seguranca aplicado para a entidade: " + entity.getName());
     }
 }
 ```
+
+> **Atenção:** `setWhere(String)` **substitui** a cláusula WHERE por completo. Para *adicionar* um critério sem descartar o filtro que já veio na consulta, sempre componha com `getWhere()` + `" AND ..."`, como acima.
 
 ---
 
@@ -94,10 +100,10 @@ public interface FinderListener {
 | Parâmetro                | Tipo                                          | Uso                                                            |
 |:-------------------------|:----------------------------------------------|:--------------------------------------------------------------|
 | `entity`                 | `br.com.sankhya.jape.metadata.EntityMetaData` | Metadados da entidade interceptada (`entity.getName()`, etc.).|
-| `finder`                 | `br.com.sankhya.jape.wrapper.FinderWrapper`   | Builder da consulta — adicionar critérios via `finder.where(...)`. |
+| `finder`                 | `br.com.sankhya.jape.util.FinderWrapper`      | Builder da consulta — compor critérios via `finder.getWhere()`/`finder.setWhere(...)`. |
 
 - Método declara `throws Exception` — exceção lançada **bloqueia** a busca e propaga ao chamador.
-- `finder.where(String clause)` adiciona critério à query. **Prefixo `this.` obrigatório** em todo campo da clause (mesma convenção do `@Criteria` — ver `repository`).
+- `finder.setWhere(String clause)` **substitui** a cláusula WHERE inteira — para adicionar critério, componha com `finder.getWhere()` + `" AND ..."`. **Prefixo `this.` obrigatório** em todo campo da clause (mesma convenção do `@Criteria` — ver `repository`).
 
 ---
 
@@ -113,7 +119,9 @@ public class TdcXyzPedidoFinderListener implements FinderListener {
     @Override
     public void beforeExecute(EntityMetaData entity, FinderWrapper finder) throws Exception {
         BigDecimal codUsu = JapeSession.getContext().getUserID();
-        finder.where("this.CODUSUCAD = " + codUsu);
+        String where = finder.getWhere();
+        String criterio = "this.CODUSUCAD = " + codUsu;
+        finder.setWhere(where == null || where.isEmpty() ? criterio : where + " AND " + criterio);
         log.info("Buscas de " + entity.getName() + " filtradas pelo usuario " + codUsu);
     }
 }
@@ -145,7 +153,8 @@ public class TdcXyzContratoFinderListener implements FinderListener {
     @Override
     public void beforeExecute(EntityMetaData entity, FinderWrapper finder) throws Exception {
         String filialClause = escopoService.clauseFiliaisPermitidas(); // ex.: "this.CODFIL IN (1, 3)"
-        finder.where(filialClause);
+        String where = finder.getWhere();
+        finder.setWhere(where == null || where.isEmpty() ? filialClause : where + " AND " + filialClause);
     }
 }
 ```
@@ -182,7 +191,8 @@ public class TdcXyzContratoFinderListener implements FinderListener {
 | Múltiplos `@BeforeLoadListener` para a mesma instância             | Apenas **um** por entidade — múltiplos = erro de compilação       |
 | Esquecer de declarar a entidade no dicionário (XML / `@JapeEntity`)| Sem declaração o listener não é injetado                          |
 | Consulta pesada ao banco dentro de `beforeExecute`                 | Método roda em toda busca — manter leve / cachear                 |
-| Omitir prefixo `this.` na clause do `finder.where(...)`            | Usar `this.CAMPO = ...` — obrigatório                             |
+| Omitir prefixo `this.` na clause do `finder.setWhere(...)`         | Usar `this.CAMPO = ...` — obrigatório                             |
+| `setWhere(criterio)` direto, descartando o filtro existente        | Compor: `getWhere()` + `" AND "` + critério                       |
 | SQL específico de banco na clause (`SYSDATE`, `NVL`, `ROWNUM`)     | Usar macros Sankhya portáveis (`dbDate()`, `nullValue()`, etc.)   |
 | `new` em dependência gerenciada                                    | `@Inject` via construtor (Guice)                                  |
 | `@Inject` de `javax.inject`                                        | Usar `com.google.inject.Inject`                                   |
@@ -196,25 +206,19 @@ public class TdcXyzContratoFinderListener implements FinderListener {
 2. [ ] Classe implementa `br.com.sankhya.jape.core.FinderListener`.
 3. [ ] Anotada com `@BeforeLoadListener(instance = "<NomeDaInstancia>")` — nome = `@JapeEntity(entity = "...")` (ou `<instance name="...">` no XML), **não** a tabela.
 4. [ ] Apenas **um** `@BeforeLoadListener` para a instância em todo o projeto.
-5. [ ] `beforeExecute` adiciona critérios via `finder.where("this.CAMPO ...")` com prefixo `this.`.
+5. [ ] `beforeExecute` compõe critérios via `getWhere()` + `" AND "` + `setWhere(...)` (nunca `setWhere` seco — substitui o filtro existente), com prefixo `this.` nos campos.
 6. [ ] Macros portáveis no lugar de SQL específico de banco.
 7. [ ] Método **leve** — sem consultas pesadas (roda em toda busca).
 8. [ ] Dependências (service/repository) via `@Inject` construtor (Guice), se necessárias.
 9. [ ] `@Log` Lombok para logging (`java.util.logging`).
 10. [ ] Filtros dinâmicos por usuário via `JapeSession.getContext().getUserID()`.
 
-## Related Skills
+## Skills relacionadas
 
 - `entity` — entidade-alvo precisa estar declarada via `@JapeEntity`
 - `data-dictionary` — declaração XML; atributo `finder-listener` automatizado pela anotação
-- `repository` — sintaxe `this.CAMPO` da clause (igual ao `@Criteria`)
-- `macros` — SQL portável Oracle/MSSQL na clause do `finder.where(...)`
-- `dependency-injection` — wiring Guice do service/repository injetado no listener
-
-## Skills relacionadas
-
-- `entity` — entidade interceptada
-- `repository` — alternativa por-query (`@Criteria`) ao filtro transversal
+- `repository` — sintaxe `this.CAMPO` da clause (igual ao `@Criteria`); alternativa por-query ao filtro transversal
+- `macros` — SQL portável Oracle/MSSQL na clause do `finder.setWhere(...)`
 - `business-rule` — hook transacional comercial (escopo distinto)
-- `dependency-injection` — `@Inject` no listener
+- `dependency-injection` — wiring Guice do service/repository injetado no listener
 - `test` — JUnit + Mockito do `beforeExecute`

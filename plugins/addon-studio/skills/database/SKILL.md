@@ -386,7 +386,7 @@ V003-ALTER_TABLE_TGFCAB.xml
 
 ## Exemplos Completos
 
-Exemplos completos de XMLs — `V001-CREATE_TABLE_TDCXYZCAD.xml` (PK simples), `V002-CREATE_TABLE_TDCXYZFAT.xml` (PK composta), `V003-ALTER_TABLE_TGFCAB.xml` (tabela nativa) e `v_insert_config.xml` (dados de configuração) — em [`references/examples.md`](references/examples.md).
+Exemplos completos de XMLs — `V001-CREATE_TABLE_TDCXYZCAD.xml` (PK simples), `V002-CREATE_TABLE_TDCXYZFAT.xml` (PK composta), `V003-ALTER_TABLE_TGFCAB.xml` (tabela nativa) e `V005-INSERT_DATA_TDCXYZCFG.xml` (dados de configuração) — em [`references/examples.md`](references/examples.md).
 
 ---
 
@@ -430,18 +430,13 @@ Exemplos completos de XMLs — `V001-CREATE_TABLE_TDCXYZCAD.xml` (PK simples), `
 
 ### Dados de configuração
 
-- [ ] Nomear arquivo descritivamente (ex: `v_insert_config.xml`)
+- [ ] Verificar último `V<NNN>-*.xml` existente para definir `N+1` (3 dígitos, zero-padded)
+- [ ] Nomear arquivo `V<NNN>-INSERT_DATA_<TABELA>.xml` (ex: `V005-INSERT_DATA_TDCXYZCFG.xml`)
 - [ ] Usar `executar="SEMPRE"` com `INSERT ... WHERE NOT EXISTS` ou `MERGE` para idempotência
 
 
-## Related Skills
-
-- `entity` — entidade @JapeEntity da tabela criada por este dbscript
-- `data-dictionary` — XML que descreve metadados da tabela
-- `macros` — macros SQL para portabilidade Oracle/MSSQL no dbscript
-
 ## Skills relacionadas
 
-- `entity` — entidade `@JapeEntity` da tabela criada
-- `data-dictionary` — XML do dicionário de dados associado
-- `macros` — macros SQL para portabilidade Oracle/MSSQL
+- `entity` — entidade `@JapeEntity` da tabela criada por este dbscript
+- `data-dictionary` — XML do dicionário que descreve os metadados da tabela
+- `macros` — macros SQL **não** se aplicam a dbscripts (ver `macros` §7); portabilidade Oracle/MSSQL aqui é via split `<mssql>`/`<oracle>`

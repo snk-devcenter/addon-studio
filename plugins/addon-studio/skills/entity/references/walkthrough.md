@@ -118,7 +118,7 @@ Entidade usa novo enum — crie classe Java conforme secao 9.
 ## Passo 5 — Validar
 
 - Entidade tem `@Data`, `@NoArgsConstructor`, `@AllArgsConstructor`?
-- `@JapeEntity` tem só `entity` e `table`?
+- `@JapeEntity` tem só `entity`, `table` e, se tabela/instância nativa, `isNativeTable`/`isNativeInstance`?
 - Todos `@Column` têm só `name`?
 - Todos `@JoinColumn` têm só `name` e `referencedColumnName`?
 - Sem `@Expression`, `@GeneratedValue`, `@Option`, `@Property`?

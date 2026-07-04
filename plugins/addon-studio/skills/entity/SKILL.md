@@ -269,6 +269,7 @@ Nenhum outro atributo. Ponto.
 | `CHECKBOX`                       | `Boolean`                              |
 | `PESQUISA` (FK)                  | `BigDecimal` ou `Integer` (tipo da FK) |
 | Campo com opções (enum no banco) | Enum Java (veja seção 9)               |
+| Demais `dataType`s (`CAIXA_TEXTO`, `HORA`, `LISTA`, `HTML`, `ARQUIVO`, ...) | Ver tabela completa em `data-dictionary/references/xml-to-java.md` |
 
 ### Quando usar `Integer` vs `BigDecimal`
 
@@ -474,16 +475,9 @@ Entidades completas — PK simples, PK composta + relacionamentos, `@OneToMany` 
 | Usar `Integer` para PKs nativas (NUNOTA, CODPARC)       | Use `BigDecimal` — padrão do Sankhya Om.                  |
 
 
-## Related Skills
-
-- `data-dictionary` — XML do dicionário de dados que descreve a tabela mapeada por esta entidade
-- `database` — dbscript V<NNN>-*.xml que cria a tabela física no MSSQL/Oracle
-- `repository` — interface JapeRepository que opera sobre esta entidade
-- `mapstruct` — mapper DTO ↔ entidade
-
 ## Skills relacionadas
 
-- `data-dictionary` — XML do dicionário que descreve a tabela
-- `database` — dbscript que cria a tabela física
+- `data-dictionary` — XML do dicionário de dados que descreve a tabela mapeada por esta entidade
+- `database` — dbscript `V<NNN>-*.xml` que cria a tabela física no MSSQL/Oracle
 - `repository` — interface `JapeRepository` que opera sobre esta entidade
 - `mapstruct` — mapper DTO ↔ entidade

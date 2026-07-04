@@ -123,16 +123,16 @@ public class IntegracaoConfig {
     @Value(value = "http.timeout", type = ValueType.SYSTEM_PROPERTY, defaultValue = "30000")
     private Integer timeout;
 
-    private final RetrofitCallExecutor executor;
+    private final IntegracaoHttpDispatcher dispatcher;
 
     @Inject
-    public IntegracaoConfig(RetrofitCallExecutor executor) {
-        this.executor = executor;
+    public IntegracaoConfig(IntegracaoHttpDispatcher dispatcher) {
+        this.dispatcher = dispatcher;
     }
 
     public void enviar(Payload payload) {
         if (!integracaoAtiva.get()) return;
-        executor.execute(apiBaseUrl.get(), apiKey.get(), payload, timeout);
+        dispatcher.enviar(apiBaseUrl.get(), apiKey.get(), payload, timeout);
     }
 }
 ```
@@ -231,11 +231,7 @@ Restricoes do XSD (`parameters.xsd`) que derrubam o build/deploy:
 8. [ ] Campo nao e `final`.
 
 
-## Related Skills
-
-- `dependency-injection` — @Value injeta em @Component gerenciados pelo Guice
-
 ## Skills relacionadas
 
-- `dependency-injection` — wiring Guice que injeta os `@Value`
+- `dependency-injection` — wiring Guice que injeta os `@Value`; `@Value` só funciona em `@Component` (e demais estereótipos) gerenciados pelo Guice
 - `addon-studio` — regras universais do projeto

@@ -216,15 +216,7 @@ Antes de criar tabela/entity nova:
 8. Testes JUnit + Mockito (skill `test`).
 9. Build: `gradle deployAddon` (skill `build`).
 
-> **Delegação obrigatória aos sub-agents (Claude Code only):** o trigger de delegação é a **natureza do artefato a entregar**, não o formato da solicitação do usuário (que pode vir como spec, ticket, frase solta, "implementa isso", "ajusta aquilo", etc.). Sempre que a tarefa envolver criar ou alterar um dos artefatos abaixo, delegue ao sub-agent especialista — **não implemente inline**:
-> - Tabela ou entidade (XML do dicionário, dbscript, classe `@JapeEntity` — trio CRUD) → `entity-architect`
-> - Arquivo isolado em `dbscripts/` (ALTER, seed, índice) → `dbscript-builder`
-> - Endpoint REST (`@Controller`, DTOs, mapper) → `controller-designer`
-> - Testes JUnit + Mockito → `test-writer`
-> - Erro / stacktrace / build falhando → `troubleshooter`
-> - Revisão antes de commit → `addon-reviewer`
->
-> Sub-agents rodam em modelos otimizados (`sonnet`/`haiku`), economizam tokens do agente principal e mantêm o contexto principal limpo. **Implementar inline sem delegar é anti-pattern em projetos Sankhya Addon Studio.**
+> **Delegação obrigatória aos sub-agents (Claude Code only):** tabela de delegação: ver `ADDON.md` (always-on no projeto).
 
 ---
 
@@ -255,10 +247,10 @@ Para tópicos específicos, invoke skill direta:
 
 ---
 
-## Related Skills
+## Skills relacionadas
 
 - `entity` — primeiro artefato de uma feature CRUD
 - `data-dictionary` — XML metadata da tabela
 - `database` — dbscript de migration
 - `controller` — endpoint REST que consome a feature
-- `encoding` — regra crítica de Latin-1 aplicada em todo arquivo `.java`/`.xml`/`.kt`
+- `encoding` — regra crítica de Latin-1 aplicada em todo arquivo `.java`/`.xml`/`.kt`/`.properties`

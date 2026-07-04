@@ -1,6 +1,6 @@
 ---
 name: business-rule
-description: Cria, revisa e refatora regras de negócio Sankhya com `@BusinessRule` (interface `Regra` + `ContextoRegra`) para barramento de eventos, liberação de limite e regras transacionais. Use ao criar, alterar, revisar, auditar ou padronizar regras de negócio, ao implementar `executar`/`onPreSave`/`onPostSave`, ao trabalhar com arquivos `*Regra.java`, ou ao tocar em código com `@BusinessRule`.
+description: Cria, revisa e refatora regras de negócio Sankhya com `@BusinessRule` (interface `Regra` + `ContextoRegra`) para barramento de eventos, liberação de limite e regras transacionais. Use ao criar, alterar, revisar, auditar ou padronizar regras de negócio, ao implementar `beforeInsert`/`beforeUpdate`/`beforeDelete`/`afterInsert`/`afterUpdate`/`afterDelete`, ao trabalhar com arquivos `*Regra.java`, ou ao tocar em código com `@BusinessRule`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -33,6 +33,7 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 ## 2. Anatomia de um `@BusinessRule`
 
 ```java
+import br.com.sankhya.jape.vo.DynamicVO;
 import br.com.sankhya.modelcore.comercial.Regra;
 import br.com.sankhya.modelcore.comercial.ContextoRegra;
 import br.com.sankhya.studio.annotations.hooks.BusinessRule;
@@ -55,7 +56,12 @@ public class ValidacaoDescontoRegra implements Regra {
         descontoService.validar(notaVO, ctx.getBarramentoRegra());
     }
 
-    // Demais metodos da interface podem ficar vazios se nao forem necessarios
+    // A interface exige os 6 metodos (sem default) — deixe vazios os que nao usar
+    @Override public void beforeInsert(ContextoRegra ctx) throws Exception {}
+    @Override public void afterInsert(ContextoRegra ctx) throws Exception {}
+    @Override public void afterUpdate(ContextoRegra ctx) throws Exception {}
+    @Override public void beforeDelete(ContextoRegra ctx) throws Exception {}
+    @Override public void afterDelete(ContextoRegra ctx) throws Exception {}
 }
 ```
 
@@ -71,7 +77,7 @@ public class ValidacaoDescontoRegra implements Regra {
 
 ## 4. Interface `Regra` — Metodos disponíveis
 
-Implemente apenas os metodos que forem necessarios. Os demais podem ficar com corpo vazio.
+A interface declara **6 metodos abstratos, sem default** — toda classe `implements Regra` precisa declarar os 6. Implemente a logica nos necessarios e deixe corpo vazio nos demais.
 
 | Metodo             | Quando dispara                                      | Foco da `@BusinessRule`                   |
 |:-------------------|:----------------------------------------------------|:------------------------------------------|
@@ -85,6 +91,8 @@ Implemente apenas os metodos que forem necessarios. Os demais podem ficar com co
 ---
 
 ## 5. `ContextoRegra` — API
+
+> Imports usados nos trechos: `br.com.sankhya.jape.vo.DynamicVO` e, para propriedades de sessao, `br.com.sankhya.jape.core.JapeSession`.
 
 ### Acessar dados da nota
 
@@ -157,9 +165,11 @@ public void beforeUpdate(ContextoRegra ctx) throws Exception {
 ### Exemplo 1: Solicitacao de liberacao de limite
 
 ```java
+import br.com.sankhya.jape.core.JapeSession;
+import br.com.sankhya.jape.vo.DynamicVO;
 import br.com.sankhya.modelcore.comercial.Regra;
 import br.com.sankhya.modelcore.comercial.ContextoRegra;
-import br.com.sankhya.modelcore.util.LiberacaoSolicitada;
+import br.com.sankhya.modelcore.comercial.LiberacaoSolicitada;
 import br.com.sankhya.studio.annotations.hooks.BusinessRule;
 import com.google.inject.Inject;
 import java.math.BigDecimal;
@@ -188,6 +198,13 @@ public class LiberacaoDescontoRegra implements Regra {
         ctx.getBarramentoRegra().addLiberacaoSolicitada(lib);
         ctx.getBarramentoRegra().addMensagem("Solicitacao de liberacao enviada para desconto acima de 10%.");
     }
+
+    // interface exige os 6; deixe vazios os que nao usar
+    @Override public void beforeInsert(ContextoRegra ctx) throws Exception {}
+    @Override public void afterInsert(ContextoRegra ctx) throws Exception {}
+    @Override public void afterUpdate(ContextoRegra ctx) throws Exception {}
+    @Override public void beforeDelete(ContextoRegra ctx) throws Exception {}
+    @Override public void afterDelete(ContextoRegra ctx) throws Exception {}
 }
 ```
 
@@ -211,6 +228,13 @@ public class AdicionaObservacaoConfirmacaoRegra implements Regra {
         String novaObs  = "Nota conferida e confirmada pelo sistema.";
         notaVO.setProperty("OBSERVACAO", obsAtual == null ? novaObs : obsAtual + "\n" + novaObs);
     }
+
+    // interface exige os 6; deixe vazios os que nao usar
+    @Override public void beforeInsert(ContextoRegra ctx) throws Exception {}
+    @Override public void afterInsert(ContextoRegra ctx) throws Exception {}
+    @Override public void afterUpdate(ContextoRegra ctx) throws Exception {}
+    @Override public void beforeDelete(ContextoRegra ctx) throws Exception {}
+    @Override public void afterDelete(ContextoRegra ctx) throws Exception {}
 }
 ```
 
@@ -242,6 +266,13 @@ public class IntegracaoExternaRegra implements Regra {
         // Assincrono — nao bloqueia thread da confirmacao
         CompletableFuture.runAsync(() -> integracaoService.enviar(nuNota));
     }
+
+    // interface exige os 6; deixe vazios os que nao usar
+    @Override public void beforeInsert(ContextoRegra ctx) throws Exception {}
+    @Override public void beforeUpdate(ContextoRegra ctx) throws Exception {}
+    @Override public void afterInsert(ContextoRegra ctx) throws Exception {}
+    @Override public void beforeDelete(ContextoRegra ctx) throws Exception {}
+    @Override public void afterDelete(ContextoRegra ctx) throws Exception {}
 }
 ```
 
@@ -281,18 +312,14 @@ public class IntegracaoExternaRegra implements Regra {
 7. [ ] Delegar logica de negocio para Service (`@Component`).
 8. [ ] Integracoes externas: usar mecanismo assincrono.
 9. [ ] Fornecer feedback ao usuario via `addMensagem()` ou excecao com mensagem clara.
-10. [ ] Registrar no modulo Guice do projeto (ver `dependency-injection`).
+10. [ ] Registrar no modulo Guice os **services/dependencias injetados** na classe — a classe da regra em si nao precisa de binding (o SDK a descobre pela anotacao `@BusinessRule`). Ver `dependency-injection`.
 
-
-## Related Skills
-
-- `action-button` — botão dispara fluxo que pode invocar regra
-- `controller` — controller pode invocar regra via barramento
-- `dependency-injection` — @Component da Regra precisa estar registrado no módulo Guice
 
 ## Skills relacionadas
 
+- `action-button` — botão dispara fluxo que pode invocar regra
+- `controller` — controller pode invocar regra via barramento
 - `entity` — entidade alvo do evento
 - `repository` — acesso a dados dentro da regra
-- `dependency-injection` — wiring Guice da regra
+- `dependency-injection` — wiring Guice dos services injetados na regra
 - `test` — JUnit + Mockito da `Regra`

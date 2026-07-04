@@ -34,9 +34,9 @@ Casos típicos:
         </instances>
 
         <fields>
-            <field name="CODCCU" dataType="INTEIRO" required="S"/>
-            <field name="DESCRCCU" dataType="TEXTO" size="100" required="S"/>
-            <field name="ATIVO" dataType="CHECKBOX" required="S"/>
+            <field name="CODCCU" dataType="INTEIRO" required="S" allowSearch="S" visibleOnSearch="S"/>
+            <field name="DESCRCCU" dataType="TEXTO" size="100" required="S" allowSearch="S" visibleOnSearch="S"/>
+            <field name="ATIVO" dataType="CHECKBOX" required="S" allowSearch="N" visibleOnSearch="N"/>
         </fields>
     </treeTable>
 </metadados>
@@ -56,7 +56,7 @@ Filhos (`xs:all`, mesmo de `<table>`): `<description>`, `<primaryKey>`, `<instan
 
 ## Campos de controle hierárquico (obrigatórios)
 
-Toda `<treeTable>` exige 3 campos de controle que o framework usa para navegação tree, validação de níveis e exibição da UI hierárquica. **No projeto Sankhya Addon Studio, esses campos são declarados manualmente em todos os artefatos** (dbscript + entity Java) — não há Auto DDL.
+Toda `<treeTable>` exige 3 campos de controle que o framework usa para navegação tree, validação de níveis e exibição da UI hierárquica. **Esses campos são declarados manualmente no dbscript e na entity Java** (não há Auto DDL), mas **não devem ser listados em `<fields>` do XML da `<treeTable>`** — o framework os gerencia automaticamente a partir da tag `<treeTable>` (ver exemplo "Estrutura XML" acima, que declara só PK e campos próprios).
 
 > **Atenção — nomes fixos do framework:** os 3 nomes abaixo (`CODIGOPAI`, `ANALITICO`, `GRAU`) são **literais fixos do Sankhya** — não podem ser renomeados (`CODPAI`, `CODORIG`, `PARENT_ID`, `NIVEL` **não funcionam**). O framework procura por essas colunas exatas para montar a UI hierárquica. Se viu `CODPAI` em algum exemplo, era cenário de **PK composta entre tabelas distintas** (relação pai/filho horizontal), não hierarquia recursiva.
 
@@ -112,7 +112,7 @@ Toda `<treeTable>` exige 3 campos de controle que o framework usa para navegaç�
          tipoObjeto="COLUMN" nomeObjeto="ATIVO"
          descricao="Adicionar campo ATIVO em TDCXYZCCU">
         <mssql>ALTER TABLE TDCXYZCCU ADD ATIVO CHAR(1) DEFAULT 'S' NOT NULL</mssql>
-        <oracle>ALTER TABLE TDCXYZCCU ADD (ATIVO CHAR(1) DEFAULT 'S' NOT NULL)</oracle>
+        <oracle>ALTER TABLE TDCXYZCCU ADD (ATIVO VARCHAR2(1) DEFAULT 'S' NOT NULL)</oracle>
     </sql>
 
 </scripts>

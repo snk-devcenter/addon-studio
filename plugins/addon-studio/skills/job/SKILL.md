@@ -90,11 +90,17 @@ public class ProcessadorDeFilaJob extends IJob {  // IJob e CLASSE ABSTRATA — 
 > Quem retorna a frequencia dinamica e `getScheduleConfig()` (`String`), **nao** `getScheduleConfigHook()` (`void`, obsoleto). Se `getScheduleConfig()` retornar valor nao-nulo, ele sobrescreve o atributo `frequency`.
 
 ```java
+// import br.com.sankhya.modelcore.util.MGECoreParameter;
+
 @Override
 public String getScheduleConfig() {
     // Le frequencia de parametro do sistema — sobrepoe o atributo frequency
-    String frequencia = SystemParam.getParam("MEUADDON_FREQ_JOB");
-    return frequencia != null ? frequencia : "&3600000"; // fallback: 1 hora (ms)
+    try {
+        String frequencia = MGECoreParameter.getParameterAsString("MEUADDON_FREQ_JOB");
+        return frequencia != null ? frequencia : "&3600000"; // fallback: 1 hora (ms)
+    } catch (Exception e) {
+        return "&3600000"; // getParameterAsString declara throws Exception; o override nao
+    }
 }
 ```
 
@@ -177,6 +183,8 @@ public class SincronizadorDeEstoqueJob extends IJob {
 ### Job com frequencia dinamica via parametro
 
 ```java
+import br.com.sankhya.modelcore.util.MGECoreParameter;
+
 @Job(serviceName = "ProcessadorFilaSP", frequency = "&300000") // default ms: 5 min
 public class ProcessadorFilaJob extends IJob {
 
@@ -191,8 +199,12 @@ public class ProcessadorFilaJob extends IJob {
 
     @Override
     public String getScheduleConfig() {  // String — retorna freq; NAO getScheduleConfigHook (void, obsoleto)
-        String freq = SystemParam.getParam("MEUADDON_FILA_FREQ");
-        return freq != null ? freq : "&300000";
+        try {
+            String freq = MGECoreParameter.getParameterAsString("MEUADDON_FILA_FREQ");
+            return freq != null ? freq : "&300000";
+        } catch (Exception e) {
+            return "&300000";
+        }
     }
 
     @Override
@@ -283,18 +295,13 @@ public class MeuJob extends IJob {
 9. [ ] Envolver corpo de `onSchedule()` em `try/catch` com logging adequado.
 10. [ ] Se frequencia for dinamica: sobrescrever `getScheduleConfig()` retornando `String` (nao `getScheduleConfigHook()`).
 11. [ ] Confirmar que **nao existem** `mgeschedule.xml` nem `mgechedule-cfg.xml` no projeto.
-12. [ ] Registrar no modulo Guice do projeto (ver `dependency-injection`).
+12. [ ] Registrar no modulo Guice os **services/dependencias injetados** na classe — o job em si nao precisa de binding (o SDK o descobre pela anotacao `@Job`). Ver `dependency-injection`.
 
-
-## Related Skills
-
-- `dependency-injection` — @Component do IJob precisa estar registrado no módulo Guice
-- `repository` — jobs tipicamente operam sobre dados via repository
-- `addon-studio` — regras universais Java 8 + Lombok
 
 ## Skills relacionadas
 
-- `dependency-injection` — wiring Guice do job
-- `repository` — acesso a dados dentro do `onSchedule`
+- `dependency-injection` — wiring Guice dos services injetados no job
+- `repository` — jobs tipicamente operam sobre dados via repository
 - `value` — configuração agendamento via `@Value`/`SANKHYA_PARAM`
 - `database` — migration XML do registro do job
+- `addon-studio` — regras universais Java 8 + Lombok

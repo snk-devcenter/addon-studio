@@ -9,7 +9,7 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 
 > **REGRA CRITICA — SEM EXCECOES**
 
-Todo arquivo `.java`, `.xml` e `.kt` em projetos Addon Studio **deve ser salvo em ISO-8859-1 (Latin-1)**.
+Todo arquivo `.java`, `.xml`, `.kt` e `.properties` em projetos Addon Studio **deve ser salvo em ISO-8859-1 (Latin-1)**.
 
 ---
 
@@ -25,53 +25,54 @@ O servidor Sankhya (Wildfly legado) e o compilador de addons esperam Latin-1. Ar
 |:----------------|:-----------------------------------------------------------------------------------------|
 | `.java` / `.kt` | Salvo em ISO-8859-1. Acentos diretamente no encoding **ou** escapados como `é`, `ç` etc. |
 | `.xml` (datadictionary, dbscripts) | Salvo em ISO-8859-1. Cabecalho **obrigatorio**: `<?xml version="1.0" encoding="ISO-8859-1" ?>` |
+| `.properties`   | Salvo em ISO-8859-1 (formato historico do Java 8 para properties).                       |
 
 ---
 
 ## O problema com LLMs
 
-LLMs geram arquivos em UTF-8 por padrao. Apos criar ou editar qualquer `.java`, `.xml` ou `.kt`, **converta o encoding** antes de usar.
+LLMs geram arquivos em UTF-8 por padrao. Apos criar ou editar qualquer `.java`, `.xml`, `.kt` ou `.properties`, **converta o encoding** antes de usar.
+
+> **Antes de converter, cheque o charset atual** (`file -i arquivo.java`). So converta se o resultado for `charset=utf-8`. Arquivo ja em ISO-8859-1 reconvertido de "UTF-8" pode ter acentos corrompidos; e `errors='ignore'`/`errors='replace'` apagam ou trocam caracteres silenciosamente.
 
 ### Mac / Linux — `iconv` (nativo, preferido)
 
 ```bash
-# Arquivo especifico
-iconv -f UTF-8 -t ISO-8859-1 arquivo.java -o arquivo.java
+# Arquivo especifico — NUNCA use o mesmo arquivo como entrada e saida (trunca o arquivo!)
+iconv -f UTF-8 -t ISO-8859-1 arquivo.java -o arquivo.java.tmp && mv arquivo.java.tmp arquivo.java
 
 # Todos os .java do projeto
 find . -name "*.java" -exec sh -c 'iconv -f UTF-8 -t ISO-8859-1 "$1" -o "$1.tmp" && mv "$1.tmp" "$1"' _ {} \;
 
-# Todos os .xml do projeto
+# Todos os .xml do projeto (idem para *.kt e *.properties)
 find . -name "*.xml" -exec sh -c 'iconv -f UTF-8 -t ISO-8859-1 "$1" -o "$1.tmp" && mv "$1.tmp" "$1"' _ {} \;
 ```
-
-> **Dica:** se o arquivo ja esta em ISO-8859-1 puro (sem chars fora da faixa Latin-1), `iconv` finaliza sem erro. Seguro rodar mesmo sem necessidade.
 
 ### Windows — Python3 (fallback)
 
 `iconv` nao esta disponivel nativamente no Windows. Use Python3 (disponivel em `python.org` ou Microsoft Store):
 
 ```python
-# Arquivo especifico
+# Arquivo especifico — so converte se estiver de fato em UTF-8
 python3 -c "
 import sys
 p = sys.argv[1]
-c = open(p, 'r', encoding='utf-8', errors='ignore').read()
-open(p, 'w', encoding='iso-8859-1', errors='replace').write(c)
+c = open(p, 'r', encoding='utf-8').read()
+open(p, 'w', encoding='iso-8859-1').write(c)
 " arquivo.java
 ```
 
 ```python
-# Todos os .java e .xml do projeto (rodar na raiz)
+# Todos os .java, .xml, .kt e .properties do projeto (rodar na raiz)
 python3 -c "
 import os, glob
-for ext in ('**/*.java', '**/*.xml', '**/*.kt'):
+for ext in ('**/*.java', '**/*.xml', '**/*.kt', '**/*.properties'):
     for p in glob.glob(ext, recursive=True):
         try:
             c = open(p, 'r', encoding='utf-8').read()
-            open(p, 'w', encoding='iso-8859-1', errors='replace').write(c)
+            open(p, 'w', encoding='iso-8859-1').write(c)
         except (UnicodeDecodeError, UnicodeEncodeError):
-            pass
+            pass  # nao esta em UTF-8 (ja Latin-1) ou tem char sem equivalente — nao tocar
 "
 ```
 
@@ -81,14 +82,17 @@ Salve como `scripts/fix-encoding.sh` no projeto para uso rapido:
 
 ```bash
 #!/bin/sh
-# Converte .java, .xml e .kt para ISO-8859-1
+# Converte .java, .xml, .kt e .properties para ISO-8859-1
 # Usa iconv (Mac/Linux) ou python3 (Windows/fallback)
 
-FILES=$(find . \( -name "*.java" -o -name "*.xml" -o -name "*.kt" \) -not -path "*/build/*" -not -path "*/.gradle/*")
+FILES=$(find . \( -name "*.java" -o -name "*.xml" -o -name "*.kt" -o -name "*.properties" \) -not -path "*/build/*" -not -path "*/.gradle/*")
 
 if command -v iconv > /dev/null 2>&1; then
     echo "$FILES" | while read -r f; do
-        iconv -f UTF-8 -t ISO-8859-1 "$f" -o "$f.tmp" && mv "$f.tmp" "$f"
+        # so converte se o arquivo estiver de fato em UTF-8
+        case $(file -bi "$f") in *utf-8*)
+            iconv -f UTF-8 -t ISO-8859-1 "$f" -o "$f.tmp" && mv "$f.tmp" "$f" ;;
+        esac
     done
 else
     python3 -c "
@@ -96,9 +100,9 @@ import sys, os
 for p in sys.argv[1:]:
     try:
         c = open(p, 'r', encoding='utf-8').read()
-        open(p, 'w', encoding='iso-8859-1', errors='replace').write(c)
+        open(p, 'w', encoding='iso-8859-1').write(c)
     except (UnicodeDecodeError, UnicodeEncodeError):
-        pass
+        pass  # nao esta em UTF-8 ou tem char sem equivalente — nao tocar
 " $FILES
 fi
 
@@ -157,12 +161,7 @@ Alternativa segura (portavel, sem depender de encoding): escapes Unicode.
 | Deixar arquivo gerado por LLM sem converter         | Rodar `iconv` (Mac/Linux) ou Python3 (Windows) apos cada criacao/edicao |
 
 
-## Related Skills
-
-- `addon-studio` — regra universal: ISO-8859-1 obrigatório em `.java`/`.xml`/`.kt`
-- `build` — build falha silenciosamente se encoding estiver errado
-
 ## Skills relacionadas
 
-- `build` — garantir Latin-1 antes do empacotamento
-- `addon-studio` — regra universal ISO-8859-1
+- `addon-studio` — regra universal: ISO-8859-1 obrigatório em `.java`/`.xml`/`.kt`/`.properties`
+- `build` — build falha silenciosamente se encoding estiver errado; garantir Latin-1 antes do empacotamento

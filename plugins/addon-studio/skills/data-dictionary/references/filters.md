@@ -57,11 +57,11 @@ Filtros declarativos exibidos acima da grade de resultados em telas geradas via 
 | `field` | Sim | — | Nome da coluna alvo (deve existir em `<fields>`) |
 | `label` | Não | `<description>` do `<field>` | Texto visível ao usuário |
 | `type` | Não | `PADRAO` | Tipo do componente: `PADRAO` / `MULTI_SELECAO` / `PERIODO` |
-| `useLikeExpression` | Não | `false` | Se `true`, gera `LIKE '%valor%'` em vez de `=`. Use em campos texto livre. |
-| `required` | Não | `false` | Se `true`, usuário precisa preencher antes de executar a busca |
-| `keepLast` | Não | `true` | Mantém o último valor entre sessões |
-| `considerRelationFilter` | Não | `true` | Considera filtros de relacionamento ao montar query |
-| `voidExpression` | Não | `false` | Permite expressão vazia (sem condição) |
+| `useLikeExpression` | Não | `"N"` | Se `"S"`, gera `LIKE '%valor%'` em vez de `=`. Use em campos texto livre. |
+| `required` | Não | `"N"` | Se `"S"`, usuário precisa preencher antes de executar a busca |
+| `keepLast` | Não | `"S"` | Mantém o último valor entre sessões |
+| `considerRelationFilter` | Não | `"S"` | Considera filtros de relacionamento ao montar query |
+| `voidExpression` | Não | `"N"` | Permite expressão vazia (sem condição) |
 
 ## Tipos de filtro (`type`)
 
@@ -122,7 +122,7 @@ UI: 2 date-pickers ("De" / "Até"). Query: `... WHERE DHCRIACAO BETWEEN <de> AND
 
 ```xml
 <fields>
-    <field name="STATUS" dataType="LISTA" size="20" required="S">
+    <field name="STATUS" dataType="LISTA" size="20" required="S" allowSearch="S" visibleOnSearch="S">
         <description>Status</description>
         <fieldOptions>
             <option value="ABERTO">Aberto</option>
@@ -144,7 +144,8 @@ UI: combo permitindo selecionar múltiplos status simultaneamente.
 ```xml
 <fields>
     <field name="CODUSU" dataType="PESQUISA"
-           targetInstance="Usuario" targetField="CODUSU" targetType="INTEIRO">
+           targetInstance="Usuario" targetField="CODUSU" targetType="INTEIRO"
+           allowSearch="S" visibleOnSearch="S">
         <description>Usuario Responsavel</description>
     </field>
 </fields>

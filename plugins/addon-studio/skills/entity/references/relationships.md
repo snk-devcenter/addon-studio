@@ -62,7 +62,7 @@ public class Pai {
 public class Filha {
     @Id
     @Column(name = "ID")
-    private Long id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumns({
@@ -100,7 +100,7 @@ FK aponta para PK composta — use `@JoinColumns` agrupando múltiplos `@JoinCol
 public class ChaveSimples {
     @Id
     @Column(name = "ID")
-    private Long id;
+    private Integer id;
 
     @OneToOne
     @JoinColumns({
@@ -143,7 +143,7 @@ private TipoOperacao tipoOperacao;
 
 - **Nomes descritivos**: `FK_PAI_COL1` ou `CODEMP_CONTRATO` em vez de `EMP`/`COL`. Reduz ambiguidade quando há múltiplas FKs compostas no mesmo entity.
 - **Mesma ordem** em `@JoinColumns` e no `@Embeddable` da PK alvo. Inconsistência causa join quebrado em runtime sem erro de compilação.
-- **`name` vs `referencedColumnName`**: `name` = coluna **local** (na tabela com `@JoinColumn`); `referencedColumnName` = coluna **na tabela alvo**. Inverter quebra silenciosamente — ver secao 3.6.1 do `data-dictionary`.
+- **`name` vs `referencedColumnName`**: `name` = coluna **local** (na tabela com `@JoinColumn`); `referencedColumnName` = coluna **na tabela alvo**. Inverter quebra silenciosamente — ver `data-dictionary/references/xml-to-java.md`, seção "FK que referencia campo nao-PK".
 
 ## `@ManyToOne` + `@JoinColumn` — Filho -> Pai
 
