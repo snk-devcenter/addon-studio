@@ -7,11 +7,7 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 
 # Tratamento Global de Excecoes (`@ControllerAdvice`) — Addon Studio 2.0
 
-`@ControllerAdvice` centraliza tratamento de excecoes de todos `@Controller` e `@Service`. Excecao capturada = **rollback automatico** da transacao ativa.
-
-> **Beta / Acesso Antecipado**: funcionalidade sujeita a mudancas.
->
-> **Referencia complementar:** `controller` — controllers devem deixar excecao propagar.
+`@ControllerAdvice` centraliza tratamento de excecoes de todos `@Controller`. Excecao capturada = **rollback automatico** da transacao ativa.
 
 ---
 
@@ -190,7 +186,6 @@ public class ErrorResponse {
 6. [ ] DTO de resposta nao expoe stack trace nem dados sensiveis.
 7. [ ] **Nao** declarar `@ExceptionHandler({Exception.class})`.
 8. [ ] Confirmar que excecoes lancadas pela camada de servico estao mapeadas.
-
 
 ## Skills relacionadas
 
