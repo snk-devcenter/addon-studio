@@ -42,10 +42,9 @@ Framework scaneia e registra classes com:
 
 | Anotação | Pacote | Gerenciamento | Uso |
 |:---------|:-------|:--------------|:----|
-| `@Controller` | `br.com.sankhya.studio.annotations` | **Automático** — NÃO adicionar `@Component` | Entrypoints REST (equivale ao `@Service` EJB) |
+| `@Controller` | `br.com.sankhya.studio.annotations` | **Automático** — NÃO adicionar `@Component` | Entrypoints REST |
 | `@Repository` | `br.com.sankhya.studio.stereotypes` | **Automático** — NÃO adicionar `@Component` | Interfaces de acesso a dados (`JapeRepository`) |
 | `@Component` | `br.com.sankhya.studio.stereotypes` | **Automático** | Classes gerais: Services, Adapters, Gateways, Mappers auxiliares |
-| `@Service` | `br.com.sankhya.studio.annotations` | **Automático** — NÃO adicionar `@Component` | Serviços expostos como serviço EJB (`serviceName` + `transactionType`, mesmos atributos de `@Controller`) |
 | `@ControllerAdvice` | `br.com.sankhya.studio.web` | **Automático** | Tratamento global de exceções |
 | `@CustomModule` | `br.com.sankhya.studio.stereotypes` | **Automático** | Módulos Guice customizados (equivale a `AbstractModule`) |
 
@@ -127,7 +126,7 @@ public class ImportarProdutoService {
 
 ### 3.4 `@ControllerAdvice` — Tratamento Global de Exceções
 
-Tratamento centralizado de exceções vindas dos `@Controller`/`@Service`. Auto-gerenciado — não adicionar `@Component`.
+Tratamento centralizado de exceções vindas dos `@Controller`. Auto-gerenciado — não adicionar `@Component`.
 
 > Ver `controller-advice` para anatomia completa, regras críticas (handler nunca retorna `void`, múltiplas exceções por handler, rollback automático, proibição de `Exception.class`) e níveis de log.
 

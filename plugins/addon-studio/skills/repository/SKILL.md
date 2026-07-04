@@ -400,7 +400,7 @@ SDK valida queries externas durante compilação:
 1. **Use `Optional<T>`** para resultados de `@Criteria` que podem não existir. Para `findByPK`, o retorno é `T` (nullable) — use null-check manual
 2. **Nomes descritivos** — prefira `findByPlaca` a genérico `buscar`
 3. **Valide params no serviço** antes de chamar repositório
-4. **Separe responsabilidades** — lógica negócio no `@Service`, não no repositório
+4. **Separe responsabilidades** — lógica de negócio no service (`@Component`), não no repositório
 5. **Use `@Transactional`** para toda operação `@Modifying`
 6. **Evite `SELECT *`** — mapeie só campos necessários
 7. **Use paginação** para consultas com muitos registros (padrão: 500 por sessão)
