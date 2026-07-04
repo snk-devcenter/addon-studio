@@ -9,12 +9,6 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 
 `@Job` substitui a configuracao via `mgeschedule.xml` por abordagem declarativa diretamente na classe Java. Jobs sao gerenciados pelo SDK e suportam injecao de dependencias.
 
-> **Beta / Acesso Antecipado**: funcionalidade sujeita a mudancas. Contato: developer@sankhya.com.br.
->
-> **Referencias complementares:**
-> - `addon-studio` — Stack + restricoes Java 8
-> - `dependency-injection` — Injecao de dependencia (Guice)
-
 ---
 
 ## 1. Anatomia de um `@Job`
@@ -296,7 +290,6 @@ public class MeuJob extends IJob {
 10. [ ] Se frequencia for dinamica: sobrescrever `getScheduleConfig()` retornando `String` (nao `getScheduleConfigHook()`).
 11. [ ] Confirmar que **nao existem** `mgeschedule.xml` nem `mgechedule-cfg.xml` no projeto.
 12. [ ] Registrar no modulo Guice os **services/dependencias injetados** na classe — o job em si nao precisa de binding (o SDK o descobre pela anotacao `@Job`). Ver `dependency-injection`.
-
 
 ## Skills relacionadas
 

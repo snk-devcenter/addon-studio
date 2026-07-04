@@ -9,10 +9,6 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 
 `@Value` injeta valores de configuracao (env vars, system properties, parametros Sankhya) diretamente em campos de componentes gerenciados pelo Guice. Conversao de tipo automatica. Thread-safe.
 
-> **Beta / Acesso Antecipado**: funcionalidade sujeita a mudancas.
->
-> **Referencia complementar:** `dependency-injection`
-
 ---
 
 ## 1. Atributos
@@ -229,7 +225,6 @@ Restricoes do XSD (`parameters.xsd`) que derrubam o build/deploy:
 6. [ ] Decidir Eager vs Lazy: `Provider<T>` se o valor for opcional/custoso — lembrando que congela apos o primeiro `.get()`.
 7. [ ] Flag que precisa mudar sem restart? **Nao** usar `@Value` — pattern da secao 6.
 8. [ ] Campo nao e `final`.
-
 
 ## Skills relacionadas
 

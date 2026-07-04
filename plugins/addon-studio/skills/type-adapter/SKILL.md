@@ -9,12 +9,6 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 
 `@GlobalTypeAdapter` registra adaptadores customizados no SDK para converter tipos entre JSON, objetos Java e valores Jape (camada de persistencia). Aplicado automaticamente em todo marshal/unmarshal de DTOs.
 
-> **Beta / Acesso Antecipado**: funcionalidade sujeita a mudancas. Contato: developer@sankhya.com.br.
->
-> **Referencias complementares:**
-> - `entity` — Tipos suportados em `@JapeEntity`
-> - `controller` — DTOs e serialização JSON
-
 ---
 
 ## 1. Quando criar um adaptador global
@@ -224,7 +218,6 @@ Ja registrados automaticamente. Nao recriar sem necessidade — apenas sobrescre
 6. [ ] Lancar `JsonParseException` (nunca silenciar) em erros de `deserialize`.
 7. [ ] Manter `setType` com corpo vazio se subtipo concreto nao for relevante.
 8. [ ] Registrar no modulo Guice os **services/dependencias injetados** na classe — o adapter em si nao precisa de binding (o SDK o descobre pela anotacao `@GlobalTypeAdapter`). Ver `dependency-injection`.
-
 
 ## Skills relacionadas
 

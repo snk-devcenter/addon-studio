@@ -9,13 +9,6 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 
 `@BeforeLoadListener` executa lógica personalizada **sempre que uma entidade é carregada ou pesquisada via JAPE**. Intercepta a execução do *Finder* — permite adicionar filtros, ordenações ou validar parâmetros de busca **antes** da query chegar ao banco. A anotação automatiza o atributo `finder-listener` no XML da entidade — **sem edição manual de XML**.
 
-> **Beta / Acesso Antecipado:** funcionalidade do SDK Sankhya sujeita a mudanças. Acesso via e-mail a `developer@sankhya.com.br` informando a `appkey`.
->
-> **Referências complementares:**
-> - `entity` / `data-dictionary` — entidade-alvo precisa estar declarada
-> - `repository` — sintaxe `this.CAMPO` da clause (mesma do `@Criteria`)
-> - `dependency-injection` — `@Inject` de service/repository no listener
-
 ---
 
 ## 1. Quando usar — `@BeforeLoadListener` vs `@Criteria` vs `@Listener` vs `@BusinessRule`
