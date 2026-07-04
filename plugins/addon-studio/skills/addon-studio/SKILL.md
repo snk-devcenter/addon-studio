@@ -31,7 +31,7 @@ plugins {
 
 **Se o projeto aplica esse plugin, este plugin Claude Code (`addon-studio`) é a fonte de verdade — siga as skills daqui.** Antes de gerar/alterar código:
 
-1. Identifique o domínio (entity, repository, retrofit, controller, controller-advice, dbscript, dicionário de dados, mapstruct, dependency-injection, action-button, business-rule, before-load-listener, job, type-adapter, value, macros, encoding, build, test).
+1. Identifique o domínio (entity, repository, retrofit, controller, controller-advice, dbscript, dicionário de dados, mapstruct, dependency-injection, action-button, business-rule, listener, before-load-listener, job, type-adapter, value, macros, encoding, build, test).
 2. Invoque a skill focada correspondente — não improvise nem misture convenções de outros stacks (Spring Boot, Quarkus, JPA padrão, etc.) **nem decompile o `.jar` do SDK** para "descobrir" a anotação/assinatura: a skill é a referência de API (imports e assinaturas reais do SDK). Jar é artefato de build, não fonte de convenção.
 3. Para regras universais (Java 8, Lombok, encoding ISO-8859-1, naming `<PRX><MOD3><CTX>`), volte neste overview.
 
@@ -237,6 +237,7 @@ Para tópicos específicos, invoke skill direta:
 - `test` — JUnit + Mockito
 - `action-button` — `@ActionButton`
 - `business-rule` — `@BusinessRule`
+- `listener` — `@Listener` (eventos de persistência CRUD — before/after insert/update/delete)
 - `before-load-listener` — `@BeforeLoadListener` (intercepta buscas do Finder JAPE)
 - `job` — `@Job`
 - `type-adapter` — `@GlobalTypeAdapter`

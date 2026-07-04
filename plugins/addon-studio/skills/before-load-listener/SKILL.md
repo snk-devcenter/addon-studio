@@ -126,7 +126,7 @@ public class TdcXyzPedidoFinderListener implements FinderListener {
 
 ## 7. Injeção de dependência
 
-Diferente dos listeners JAPE tradicionais, `@BeforeLoadListener` **suporta `@Inject`** (Guice). Delegue lógica de leitura de contexto/config a um service ou repository injetado via construtor:
+Assim como o `@Listener` de persistência, `@BeforeLoadListener` **suporta `@Inject`** (Guice). Delegue lógica de leitura de contexto/config a um service ou repository injetado via construtor:
 
 ```java
 import com.google.inject.Inject;
@@ -212,6 +212,7 @@ public class TdcXyzContratoFinderListener implements FinderListener {
 - `data-dictionary` — declaração XML; atributo `finder-listener` automatizado pela anotação
 - `repository` — sintaxe `this.CAMPO` da clause (igual ao `@Criteria`); alternativa por-query ao filtro transversal
 - `macros` — SQL portável Oracle/MSSQL na clause do `finder.setWhere(...)`
+- `listener` — `@Listener` (eventos CRUD de persistência — escopo distinto: gravação, não busca)
 - `business-rule` — hook transacional comercial (escopo distinto)
 - `dependency-injection` — wiring Guice do service/repository injetado no listener
 - `test` — JUnit + Mockito do `beforeExecute`
