@@ -323,6 +323,8 @@ factory.create(
 
 Pipeline OkHttp: cada interceptor envolve o próximo (request desce, response sobe).
 
+> **Atenção — segundo interceptor `@Component` quebra o deploy:** cada `@Component` é bindado automaticamente às interfaces que implementa; dois `@Component implements Interceptor` no mesmo addon geram `[Guice/BindingAlreadySet]: okhttp3.Interceptor was bound multiple times` na subida do Wildfly (build e testes passam). A partir do segundo interceptor, remova o stereotype e proveja via `@Provides @Singleton` do tipo concreto — ver skill `dependency-injection` (seção 9).
+
 ---
 
 ## 5. Executando chamadas
