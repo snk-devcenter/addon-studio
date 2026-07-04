@@ -2,7 +2,7 @@
 
 [![release](https://img.shields.io/badge/release-v2.11.1-blue)](https://github.com/snk-devcenter/addon-studio/releases/latest)
 
-Plugin para **Claude Code** com **21 skills focadas + 6 sub-agents** que orientam implementacao em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo setor DevCenter.
+Plugin para **Claude Code** com **22 skills focadas + 6 sub-agents** que orientam implementacao em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo setor DevCenter.
 
 As skills sao a **fonte de verdade da API do SDK**: assinaturas validadas contra os jars reais (`studio-annotations`, `sdk-sankhya`). Seguir as skills gera codigo que compila e deploya — sem o agente precisar inspecionar jars.
 
@@ -59,6 +59,7 @@ Trabalhe normalmente — as skills disparam sozinhas quando o assunto casa:
 | "preciso de um endpoint que recebe esse payload" | `controller` (+ `mapstruct`, `controller-advice`) |
 | "consome essa API externa" | `retrofit` |
 | "agenda esse processamento pra rodar de noite" | `job` |
+| "preenche esse campo automatico quando gravar o registro" | `listener` |
 | "esse parametro nao atualiza sem restart" | `value` |
 | "erro Guice/BindingAlreadySet no deploy" | `dependency-injection` |
 | "escreve testes pra esse service" | `test` |
@@ -92,7 +93,7 @@ Especialistas com workflow ativo, tools restritas e modelo proprio — executam 
 
 O plugin instala um hook PostToolUse que mantem `.java`/`.xml`/`.kt`/`.properties` em **ISO-8859-1** automaticamente apos cada edicao — sem acao manual.
 
-## Cobertura (21 skills)
+## Cobertura (22 skills)
 
 | Skill | Escopo |
 |-------|--------|
@@ -110,6 +111,7 @@ O plugin instala um hook PostToolUse que mantem `.java`/`.xml`/`.kt`/`.propertie
 | `test` | JUnit 5 + Mockito 4.11 (quirks `JapeRepository`, mock estatico `JapeSession`/`SessionFile`) |
 | `action-button` | `@ActionButton` (`AcaoRotinaJava`, `@Form`, `ContextoAcao`) |
 | `business-rule` | `@BusinessRule` (`Regra`, `ContextoRegra`, barramento) |
+| `listener` | `@Listener` (`PersistenceEventAdapter`, eventos CRUD before/after insert/update/delete) |
 | `before-load-listener` | `@BeforeLoadListener` (`FinderListener`, filtro transversal no Finder) |
 | `job` | `@Job` (`IJob`, `onSchedule`, CRON, migracao XML) |
 | `type-adapter` | `@GlobalTypeAdapter` (`TypeAdapter`, `JsonSerializer`/`JsonDeserializer`) |
@@ -154,7 +156,7 @@ Skills cobrem **regras do SDK e do framework**. Organizacao de pacotes, camadas 
         ├── .claude-plugin/plugin.json  # manifest do plugin
         ├── hooks/hooks.json            # hook PostToolUse de encoding
         ├── agents/                     # 6 sub-agents
-        └── skills/                     # 21 skills (1 dir por skill, SKILL.md cada)
+        └── skills/                     # 22 skills (1 dir por skill, SKILL.md cada)
             └── addon-studio/assets/ADDON.md   # template injetado no projeto consumidor
 ```
 

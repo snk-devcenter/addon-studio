@@ -1,6 +1,6 @@
 ---
 name: before-load-listener
-description: Cria, revisa e padroniza interceptadores de busca Sankhya com `@BeforeLoadListener` (interface `FinderListener` + método `beforeExecute`) — injeta filtros/critérios dinâmicos no Finder JAPE antes da query chegar ao banco. Use ao criar, alterar, revisar, auditar ou padronizar interceptação de buscas/carregamento de entidades, ao implementar `beforeExecute`, ao aplicar filtro de segurança/multi-tenant transversal a uma entidade, ao trabalhar com classes `*FinderListener`, ou ao tocar em código com `@BeforeLoadListener`/`FinderListener`.
+description: Cria, revisa e padroniza interceptadores de busca Sankhya com `@BeforeLoadListener` (interface `FinderListener` + método `beforeExecute`) — injeta filtros/critérios dinâmicos no Finder JAPE antes da query chegar ao banco. Use ao criar, alterar, revisar, auditar ou padronizar interceptação de buscas/carregamento de entidades, ao implementar `beforeExecute`, ao aplicar filtro de segurança/multi-tenant transversal a uma entidade, ao trabalhar com classes `*FinderListener`, ou ao tocar em código com `@BeforeLoadListener`/`FinderListener`. NÃO usar para reagir a gravação/exclusão (eventos CRUD insert/update/delete, `PersistenceEventAdapter`) — isso é `@Listener`, skill `listener`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -8,6 +8,8 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 # Interceptador de Buscas (`@BeforeLoadListener`) — Addon Studio 2.0
 
 `@BeforeLoadListener` executa lógica personalizada **sempre que uma entidade é carregada ou pesquisada via JAPE**. Intercepta a execução do *Finder* — permite adicionar filtros, ordenações ou validar parâmetros de busca **antes** da query chegar ao banco. A anotação automatiza o atributo `finder-listener` no XML da entidade — **sem edição manual de XML**.
+
+> ⚠️ **`@BeforeLoadListener` ≠ `@Listener`.** São mecanismos distintos: `@BeforeLoadListener` intercepta **leitura** (busca/carregamento, via `FinderListener`) e só funciona em instâncias do próprio add-on; `@Listener` reage a **escrita** (insert/update/delete, via `PersistenceEventAdapter`) e aceita também instâncias nativas. Tarefa de gravação/exclusão → skill `listener`.
 
 ---
 
@@ -126,7 +128,7 @@ public class TdcXyzPedidoFinderListener implements FinderListener {
 
 ## 7. Injeção de dependência
 
-Diferente dos listeners JAPE tradicionais, `@BeforeLoadListener` **suporta `@Inject`** (Guice). Delegue lógica de leitura de contexto/config a um service ou repository injetado via construtor:
+Assim como o `@Listener` de persistência, `@BeforeLoadListener` **suporta `@Inject`** (Guice). Delegue lógica de leitura de contexto/config a um service ou repository injetado via construtor:
 
 ```java
 import com.google.inject.Inject;
@@ -212,6 +214,7 @@ public class TdcXyzContratoFinderListener implements FinderListener {
 - `data-dictionary` — declaração XML; atributo `finder-listener` automatizado pela anotação
 - `repository` — sintaxe `this.CAMPO` da clause (igual ao `@Criteria`); alternativa por-query ao filtro transversal
 - `macros` — SQL portável Oracle/MSSQL na clause do `finder.setWhere(...)`
+- `listener` — `@Listener` (eventos CRUD de persistência — escopo distinto: gravação, não busca)
 - `business-rule` — hook transacional comercial (escopo distinto)
 - `dependency-injection` — wiring Guice do service/repository injetado no listener
 - `test` — JUnit + Mockito do `beforeExecute`
