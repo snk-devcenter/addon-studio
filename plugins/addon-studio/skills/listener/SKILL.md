@@ -179,21 +179,21 @@ public void beforeUpdate(PersistenceEvent event) throws Exception {
 
 ```java
 @Log
-@Listener(instanceNames = "TdcXyzFilaEnvio")
-public class TdcXyzFilaEnvioListener extends PersistenceEventAdapter {
+@Listener(instanceNames = "TdcXyzPedido")
+public class TdcXyzPedidoListener extends PersistenceEventAdapter {
 
-    private final EnvioWorkerPool workerPool;
+    private final LimiteCreditoService limiteService;
 
     @Inject
-    public TdcXyzFilaEnvioListener(EnvioWorkerPool workerPool) {
-        this.workerPool = workerPool;
+    public TdcXyzPedidoListener(LimiteCreditoService limiteService) {
+        this.limiteService = limiteService;
     }
 
     @Override
-    public void afterInsert(PersistenceEvent event) throws Exception {
-        TdcXyzFilaEnvio fila = EntityMapper.fromVO(event.getVo(), TdcXyzFilaEnvio.class);
-        if (!fila.isPendente()) return;   // guard clause anti-loop — ver §8
-        workerPool.submeter(fila);        // fire-and-forget, nao bloqueia a transacao
+    public void beforeInsert(PersistenceEvent event) throws Exception {
+        DynamicVO vo = (DynamicVO) event.getVo();
+        // Excecao tipada do service bloqueia a gravacao com mensagem de negocio
+        limiteService.validar(vo.asBigDecimalOrZero("CODPARC"), vo.asBigDecimalOrZero("VLRTOT"));
     }
 }
 ```
@@ -219,11 +219,11 @@ Listener que grava **na própria instância que escuta** (direta ou indiretament
 ```java
 @Override
 public void afterUpdate(PersistenceEvent event) throws Exception {
-    TdcXyzFilaEnvio fila = EntityMapper.fromVO(event.getVo(), TdcXyzFilaEnvio.class);
-    // Worker atualiza STATUS para PROCESSANDO/PROCESSADO/ERRO — sem este filtro,
-    // cada update do worker dispararia o afterUpdate de novo (loop)
-    if (!fila.isPendente()) return;
-    workerPool.submeter(fila);
+    DynamicVO vo = (DynamicVO) event.getVo();
+    // O service muda o STATUS do proprio registro — sem este guard,
+    // o update do service dispararia este afterUpdate de novo (loop)
+    if (!"P".equals(vo.asString("STATUS"))) return;
+    processamentoService.processar(vo.asBigDecimal("NUPED"));
 }
 ```
 
