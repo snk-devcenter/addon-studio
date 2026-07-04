@@ -1,6 +1,6 @@
 # Addon Studio Plugin
 
-[![release](https://img.shields.io/badge/release-v2.11.0-blue)](https://github.com/snk-devcenter/addon-studio/releases/latest)
+[![release](https://img.shields.io/badge/release-v2.11.1-blue)](https://github.com/snk-devcenter/addon-studio/releases/latest)
 
 Plugin para **Claude Code** com **21 skills focadas + 6 sub-agents** que orientam implementacao em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo setor DevCenter.
 
@@ -8,14 +8,17 @@ As skills sao a **fonte de verdade da API do SDK**: assinaturas validadas contra
 
 ## Instalacao
 
-Dentro do Claude Code:
+Dentro do Claude Code, adicione o marketplace:
 
 ```
 /plugin marketplace add snk-devcenter/addon-studio
-/plugin install addon-studio@snk-devcenter
 ```
 
-> O repo e privado — o Claude Code usa sua autenticacao `gh`/git/SSH normal para resolver `owner/repo`.
+Depois instale o plugin:
+
+```
+/plugin install addon-studio@snk-devcenter
+```
 
 ## Setup do projeto (obrigatorio, 1 comando)
 
@@ -87,7 +90,7 @@ Especialistas com workflow ativo, tools restritas e modelo proprio — executam 
 
 ### Hook de encoding
 
-O plugin instala um hook PostToolUse que mantem `.java`/`.xml`/`.kt` em **ISO-8859-1** automaticamente apos cada edicao — sem acao manual.
+O plugin instala um hook PostToolUse que mantem `.java`/`.xml`/`.kt`/`.properties` em **ISO-8859-1** automaticamente apos cada edicao — sem acao manual.
 
 ## Cobertura (21 skills)
 
@@ -104,7 +107,7 @@ O plugin instala um hook PostToolUse que mantem `.java`/`.xml`/`.kt` em **ISO-88
 | `controller-advice` | `@ControllerAdvice` + `@ExceptionHandler`, rollback automatico |
 | `dependency-injection` | Guice (`@Component`, `@CustomModule`, `Multibinder`, `@Singleton`, `Provider<T>`) |
 | `mapstruct` | `componentModel=jakarta`, `injectionStrategy=CONSTRUCTOR`, padrao create/merge |
-| `test` | JUnit 5 + Mockito 4.11 (mock estatico, `JapeRepository` quirks) |
+| `test` | JUnit 5 + Mockito 4.11 (quirks `JapeRepository`, mock estatico `JapeSession`/`SessionFile`) |
 | `action-button` | `@ActionButton` (`AcaoRotinaJava`, `@Form`, `ContextoAcao`) |
 | `business-rule` | `@BusinessRule` (`Regra`, `ContextoRegra`, barramento) |
 | `before-load-listener` | `@BeforeLoadListener` (`FinderListener`, filtro transversal no Finder) |

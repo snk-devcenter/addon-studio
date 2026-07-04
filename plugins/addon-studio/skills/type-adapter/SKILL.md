@@ -51,6 +51,7 @@ Implemente somente as interfaces necessarias para o caso de uso.
 ## 3. Anatomia de um `@GlobalTypeAdapter`
 
 ```java
+import br.com.sankhya.studio.adapters.TypeAdapter;
 import br.com.sankhya.studio.stereotypes.GlobalTypeAdapter;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -59,6 +60,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import java.lang.reflect.Type;
 
 @GlobalTypeAdapter
 public class MeuTipoAdapter
@@ -116,6 +118,7 @@ public class MeuTipoAdapter
 `java.time.ZonedDateTime` nao tem suporte nativo no Gson. Adaptador completo com as tres interfaces:
 
 ```java
+import br.com.sankhya.studio.adapters.TypeAdapter;
 import br.com.sankhya.studio.stereotypes.GlobalTypeAdapter;
 import com.google.gson.*;
 import java.lang.reflect.Type;
@@ -220,16 +223,12 @@ Ja registrados automaticamente. Nao recriar sem necessidade — apenas sobrescre
 5. [ ] Tratar `null` em todos os caminhos de `fromVO` e `toVO`.
 6. [ ] Lancar `JsonParseException` (nunca silenciar) em erros de `deserialize`.
 7. [ ] Manter `setType` com corpo vazio se subtipo concreto nao for relevante.
-8. [ ] Registrar no modulo Guice do projeto (ver `dependency-injection`).
+8. [ ] Registrar no modulo Guice os **services/dependencias injetados** na classe — o adapter em si nao precisa de binding (o SDK o descobre pela anotacao `@GlobalTypeAdapter`). Ver `dependency-injection`.
 
-
-## Related Skills
-
-- `entity` — tipos suportados em @JapeEntity
-- `controller` — DTOs e serialização JSON nos endpoints
-- `dependency-injection` — @GlobalTypeAdapter registra-se via módulo Guice
 
 ## Skills relacionadas
 
-- `controller` — endpoint REST que serializa/desserializa via adapter
+- `entity` — tipos suportados em @JapeEntity
+- `controller` — DTOs e serialização JSON nos endpoints; endpoint REST que serializa/desserializa via adapter
+- `dependency-injection` — wiring Guice dos services injetados no adapter
 - `addon-studio` — regras universais do projeto

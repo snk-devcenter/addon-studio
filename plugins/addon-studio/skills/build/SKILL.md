@@ -24,12 +24,7 @@ gradle clean deployAddon
 Comando compila addon e faz deploy auto no Wildfly local dev.
 
 
-## Related Skills
-
-- `encoding` — build pode quebrar se arquivos não estiverem em ISO-8859-1
-- `addon-studio` — regras universais Java 8 + Lombok que o build espera
-
 ## Skills relacionadas
 
-- `encoding` — rodar `iconv` após cada `Write`/`Edit` antes de empacotar
-- `addon-studio` — regras universais do projeto Sankhya
+- `encoding` — build pode quebrar se arquivos não estiverem em ISO-8859-1; rodar `iconv` após cada `Write`/`Edit` antes de empacotar
+- `addon-studio` — regras universais Java 8 + Lombok que o build espera

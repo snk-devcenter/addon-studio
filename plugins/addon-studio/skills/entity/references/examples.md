@@ -75,7 +75,7 @@ public class TdcXyzProduto {
     private String nomeProduto;
 
     @OneToMany(
-        cascade = Cascade.ALL,
+        cascade = {Cascade.CREATE, Cascade.MERGE},
         relationship = {
             @Relationship(fromField = "CODPRODUTO", toField = "CODPRODUTO")
         }

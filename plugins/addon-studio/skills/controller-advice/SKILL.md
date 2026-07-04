@@ -162,7 +162,6 @@ public class ErrorResponse {
 | `IntegrationNetworkException` | `WARNING` |
 | `JapeSessionInterruptedError` | `SEVERE`  |
 | `IOException` / `SQLException`| `SEVERE`  |
-| `RuntimeException`            | `SEVERE`  |
 
 ---
 
@@ -193,11 +192,7 @@ public class ErrorResponse {
 8. [ ] Confirmar que excecoes lancadas pela camada de servico estao mapeadas.
 
 
-## Related Skills
-
-- `controller` — controllers devem deixar exceção propagar até o advice
-
 ## Skills relacionadas
 
-- `controller` — endpoint REST que dispara as exceções tratadas
+- `controller` — endpoint REST que dispara as exceções tratadas; controllers devem deixar exceção propagar até o advice
 - `test` — cobertura de cenários de erro

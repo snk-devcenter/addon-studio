@@ -5,7 +5,7 @@ license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
 
-# MapStruct ? Addon Studio 2.0
+# MapStruct — Addon Studio 2.0
 
 MapStruct = biblioteca padrao pra conversao DTO <-> Entidade Dominio. **Nunca** faca mapper manual — use MapStruct.
 
@@ -277,8 +277,8 @@ Mapper de integracao com plataforma externa (toDomain precisa de upsert)?
 1. Declarar `abstract class`.
 2. Adicionar `injectionStrategy = InjectionStrategy.CONSTRUCTOR` no `@Mapper` — obrigatorio pra `abstract class` com `@Inject`.
 3. Adicionar `builder = @Builder(disableBuilder = true)` no `@Mapper`.
-3. Injetar repository com `@Inject` como campo protegido — field injection obrigatoria por limitacao MapStruct (nota 6.7).
-5. Implementar `toDomain()` concreto: `findBy<ChaveExterna>()` ? `doUpdate` se existe, `doMap` se nao.
+4. Injetar repository com `@Inject` como campo protegido — field injection obrigatoria por limitacao MapStruct (ver nota "Por que field injection" em [`references/patterns.md`](references/patterns.md)).
+5. Implementar `toDomain()` concreto: `findBy<ChaveExterna>()` → `doUpdate` se existe, `doMap` se nao.
 6. Declarar `doMap(DTO)` `protected abstract` com `@Mapping(target="<pkInterna>", ignore=true)`.
 7. Declarar `doUpdate(@MappingTarget Entity, DTO)` `protected abstract` com `@Mapping(target="<pkInterna>", ignore=true)`.
 8. No `doUpdate`, ignorar campos dominio que origem externa nao deve sobrescrever.
@@ -304,20 +304,15 @@ Mapper de integracao com plataforma externa (toDomain precisa de upsert)?
 | Constructor injection (`@Inject` no construtor da `abstract class`) pra repositorios | Reverter pra field injection (`@Inject` no campo). MapStruct nao gera `super(...)` com params do construtor da abstrata; classe gerada nao instancia. |
 | Classe em `uses` sem `@Component` | Adicionar `@Component` na auxiliar. |
 | `@AfterMapping` nao executado | Adicionar `builder = @Builder(disableBuilder = true)` no `@Mapper` e usar `abstract class`. |
-| Mapper `abstract class` sem `builder = @Builder(disableBuilder = true)` | Adicionar atributo ? sem ele MapStruct pode usar Builder Lombok e ignorar setters. |
+| Mapper `abstract class` sem `builder = @Builder(disableBuilder = true)` | Adicionar atributo — sem ele MapStruct pode usar Builder Lombok e ignorar setters. |
 | Mapper manual (`new MeuDTO(); dto.setX(...)`) | Usar MapStruct. Nunca mapper manual. |
 | Campo target nao populado | Verificar se `@Mapping` correto. Mesmo nome = automatico; diferentes precisam `@Mapping` explicito. |
 | Erro compilacao "Ambiguous mapping methods" | Renomear metodos pra evitar conflitos assinatura ou usar `@Named` pra qualificar. |
 | Erro compilacao com Lombok | Verificar `lombok-mapstruct-binding` nas deps do `annotationProcessor`. |
 
 
-## Related Skills
+## Skills relacionadas
 
 - `dependency-injection` — mappers registram no container Guice
 - `controller` — controllers consomem mappers para conversão DTO ↔ entidade
-- `entity` — entidades-alvo dos mappers
-
-## Skills relacionadas
-
-- `entity` — entidade origem/destino do mapeamento
-- `controller` — DTOs convertidos no endpoint REST
+- `entity` — entidades origem/destino dos mapeamentos

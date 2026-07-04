@@ -105,19 +105,22 @@ Framework monta a tela a partir de:
         </instance>
     </instances>
     <fields>
-        <field name="CODATD" dataType="INTEIRO" required="S" UITabName="__main" order="1">
+        <field name="CODATD" dataType="INTEIRO" required="S" allowSearch="S" visibleOnSearch="S"
+               UITabName="__main" order="1">
             <description>Codigo</description>
         </field>
-        <field name="DESCATD" dataType="TEXTO" size="100" required="S" UITabName="__main" order="2">
+        <field name="DESCATD" dataType="TEXTO" size="100" required="S" allowSearch="S" visibleOnSearch="S"
+               UITabName="__main" order="2">
             <description>Descricao</description>
         </field>
         <field name="CODUSU" dataType="PESQUISA"
                targetInstance="Usuario" targetField="CODUSU" targetType="INTEIRO"
-               required="S" UITabName="__main" order="3">
+               required="S" allowSearch="S" visibleOnSearch="S" UITabName="__main" order="3">
             <description>Usuario</description>
             <expression><![CDATA[return $ctx_usuario_logado;]]></expression>
         </field>
-        <field name="DHCRIACAO" dataType="DATA_HORA" readOnly="S" UITabName="__main" order="4">
+        <field name="DHCRIACAO" dataType="DATA_HORA" readOnly="S" allowSearch="N" visibleOnSearch="N"
+               UITabName="__main" order="4">
             <description>Data Criacao</description>
             <expression><![CDATA[return $ctx_dh_atual;]]></expression>
         </field>

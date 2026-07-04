@@ -25,6 +25,7 @@ public class MeuController {
 ## No Gateway de integracao (via construtor)
 
 ```java
+@Component
 public class MeuPlatformGateway implements MeuGateway {
 
     private final MeuApiClient client;

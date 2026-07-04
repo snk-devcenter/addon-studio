@@ -39,6 +39,7 @@ import br.com.sankhya.extensions.actionbutton.AcaoRotinaJava;
 import br.com.sankhya.extensions.actionbutton.ContextoAcao;
 import br.com.sankhya.studio.annotations.hooks.ActionButton;
 import br.com.sankhya.studio.annotations.hooks.TransactionType;
+import com.google.inject.Inject;
 
 @ActionButton(
     description = "Enviar para E-commerce",          // Obrigatorio: texto no menu
@@ -266,18 +267,13 @@ public class ExportarDadosAction implements AcaoRotinaJava {
 7. [ ] Chamar `contexto.setMensagemRetorno()` em todos os caminhos (sucesso e erro).
 8. [ ] Confirmar `transactionType` (**obrigatorio**): `AUTOMATIC` (framework gerencia) ou `MANUAL` (controle manual).
 9. [ ] Definir `refreshType` se precisar atualizar mais que o registro atual (`ALL_ITEMS`, `SELECTED_ITEMS`, etc.).
-10. [ ] Registrar o `@Component` no modulo Guice do projeto (ver `dependency-injection`).
+10. [ ] Registrar no modulo Guice os **services/dependencias injetados** na classe — a action em si nao precisa de binding (o SDK a descobre pela anotacao `@ActionButton`). Ver `dependency-injection`.
 
-
-## Related Skills
-
-- `controller` — alternativa REST quando ação não é botão de tela mas endpoint HTTP
-- `dependency-injection` — @Component do AcaoRotinaJava precisa estar no módulo Guice
-- `business-rule` — regra de negócio dispara via barramento — alternativa a botão para validações
 
 ## Skills relacionadas
 
 - `entity` — modelo de dados que o botão lê/escreve
-- `controller` — alternativa REST quando ação for headless
-- `business-rule` — regra de negócio acionada por trás do botão
+- `controller` — alternativa REST quando ação não é botão de tela mas endpoint HTTP
+- `business-rule` — regra de negócio dispara via barramento — alternativa a botão para validações
+- `dependency-injection` — wiring Guice dos services injetados na action
 - `test` — JUnit 5 + Mockito da `AcaoRotinaJava`

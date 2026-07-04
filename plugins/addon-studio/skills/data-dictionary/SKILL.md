@@ -462,13 +462,13 @@ Exemplos completos de XML — tabela com sequência AUTO/MANUAL, PK simples e co
 
 ---
 
-## Geração XML a partir de @JapeEntity (Java → XML)
+## 2. Geração XML a partir de @JapeEntity (Java → XML)
 
 Workflow para gerar XML do dicionário a partir de uma `@JapeEntity` Java existente — fluxo, mapeamento `@JapeEntity` → tag raiz/instância, mapeamento PK e sequência, mapeamento `@Column` → `<field>`, limpeza da entidade Java pós-geração — em [`references/java-to-xml.md`](references/java-to-xml.md).
 
 ---
 
-## Geração @JapeEntity a partir de XML (XML → Java)
+## 3. Geração @JapeEntity a partir de XML (XML → Java)
 
 Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário — fluxo, mapeamento de tag raiz/instância, PK simples e composta, `<field>` → `@Column`, `<relationShip>` → `@OneToMany`, PESQUISA com navegação → `@OneToOne`/`@JoinColumn`, edge cases (FK que referencia campo não-PK), campos que não vão para Java, anotações Lombok padrão — em [`references/xml-to-java.md`](references/xml-to-java.md). Exemplo completo XML→Java em [`references/examples.md`](references/examples.md).
 
@@ -534,14 +534,8 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 | Esquecer `<nativeInstance>` quando o `entity` Java reusa nome nativo (`CabecalhoNota`, `Parceiro`, `Produto`, etc.) | Trocar `<instance>` por `<nativeInstance>` no XML e adicionar `isNativeInstance = true` no `@JapeEntity`. |
 
 
-## Related Skills
-
-- `entity` — classe Java @JapeEntity que mapeia a tabela definida neste XML
-- `database` — dbscript que materializa a tabela no banco
-- `macros` — MacroTranslator macros para portar SQL no campo `<expression>`
-
 ## Skills relacionadas
 
-- `entity` — classe Java `@JapeEntity` que mapeia esta tabela
+- `entity` — classe Java `@JapeEntity` que mapeia a tabela definida neste XML
 - `database` — dbscript que materializa a tabela no banco
-- `macros` — macros para `<expression>` portável Oracle/MSSQL
+- `macros` — macros do MacroTranslator para SQL portável Oracle/MSSQL no campo `<expression>`

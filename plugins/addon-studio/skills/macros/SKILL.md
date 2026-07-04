@@ -127,7 +127,7 @@ List<CompetenciaDTO> agruparPorCompetencia();
 
 // Tratamento de null
 @NativeQuery("SELECT nullValue(VLRDESCONTO, 0) FROM TGFCAB WHERE NUNOTA = :nu")
-BigDecimal descontoOrZero(Long nu);
+BigDecimal descontoOrZero(BigDecimal nu);
 
 // Limite de linhas portatil
 @NativeQuery("SELECT maxLines(10) NUNOTA, VLRNOTA FROM TGFCAB ORDER BY DTNEG DESC")
@@ -180,14 +180,8 @@ GROUP BY VEND.CODVEND, VEND.NOMEVEND, getYear(CAB.DTNEG)
 - **DDL** em `dbscripts/` — scripts de banco ja sao split via tags `<mssql>`/`<oracle>`. Macros nao se aplicam ali.
 
 
-## Related Skills
-
-- `data-dictionary` — macros usadas em campo `<expression>` quando contém SQL (não BeanShell)
-- `database` — macros usadas em dbscripts para portabilidade Oracle/MSSQL
-- `repository` — macros usadas em `@NativeQuery` e `queries/<arquivo>.xml`
-
 ## Skills relacionadas
 
-- `database` — dbscripts dual MSSQL/Oracle que usam macros
-- `data-dictionary` — campo `<expression>` portável
-- `repository` — `@NativeQuery` portável
+- `data-dictionary` — macros usadas em campo `<expression>` quando contém SQL (não BeanShell)
+- `repository` — macros usadas em `@NativeQuery` e `queries/<arquivo>.xml`
+- `database` — dbscripts **não** usam macros (ver seção 7); portabilidade ali é via split `<mssql>`/`<oracle>`

@@ -134,14 +134,7 @@
 
 ---
 
-# PARTE 2 - GERANDO O DICIONARIO A PARTIR DE ENTIDADES JAVA
-
-Entidades Java com `@JapeEntity` ja existem? Segue processo pra gerar XMLs.
-
-
----
-
-## XML -> Java completo (3.9)
+## XML -> Java completo
 
 **XML (`TDCXYZCFG.xml`):**
 
@@ -184,8 +177,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -197,7 +188,7 @@ public class TdcXyzConfiguracao {
 
     @Id
     @Column(name = "CODCONF")
-    private BigDecimal codConfiguracao;
+    private Integer codConfiguracao;
 
     @Column(name = "ATIVO")
     private Boolean ativo;
@@ -209,8 +200,4 @@ public class TdcXyzConfiguracao {
     private String clientId;
 }
 ```
-
----
-
-# PARTE 4 - CHECKLISTS E ERROS COMUNS
 

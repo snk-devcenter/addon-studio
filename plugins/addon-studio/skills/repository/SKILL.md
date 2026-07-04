@@ -22,12 +22,12 @@ import br.com.sankhya.sdk.data.repository.JapeRepository;
 import br.com.sankhya.studio.stereotypes.Repository;
 
 @Repository
-public interface VeiculoRepository extends JapeRepository<Long, Veiculo> {
+public interface VeiculoRepository extends JapeRepository<BigDecimal, Veiculo> {
     // métodos customizados aqui
 }
 ```
 
-- **`Long`** → tipo chave primária (primeiro param)
+- **`BigDecimal`** → tipo chave primária (primeiro param). PK de tabela **nativa** Sankhya = `BigDecimal`; PK de tabela do **addon** = `Integer` (ver `entity`)
 - **`Veiculo`** → classe entidade (segundo param)
 
 ---
@@ -69,20 +69,20 @@ Optional<Veiculo> findByPlaca(String placa);
 List<Veiculo> findByAtivo(Boolean ativo);
 
 @Criteria(clause = "this.CODEMP = :empresa AND this.STATUS = :status")
-List<Pedido> findByEmpresaAndStatus(Long empresa, String status);
+List<Pedido> findByEmpresaAndStatus(BigDecimal empresa, String status);
 ```
 
 > **Quando usar `@Parameter`:**
 >
-> - **Opcional** quando o nome do parâmetro Java casa com o `:nome` da clause — basta declarar `Long empresa, String status` (vincula automaticamente).
+> - **Opcional** quando o nome do parâmetro Java casa com o `:nome` da clause — basta declarar `BigDecimal empresa, String status` (vincula automaticamente).
 > - **Obrigatório** quando os nomes diferem. Sintaxe correta: **`@Parameter(name = "...")`** — sempre com `name = ` explícito. A forma posicional `@Parameter("...")` **causa erro de compilação**.
 
 ```java
 // Nome do parâmetro Java != :nome da clause → @Parameter(name = "...") obrigatório
 @Criteria(clause = "this.DTNEG BETWEEN :dataInicio AND :dataFim")
 List<Pedido> findByPeriodo(
-    @Parameter(name = "dataInicio") LocalDate inicio,
-    @Parameter(name = "dataFim") LocalDate fim
+    @Parameter(name = "dataInicio") java.sql.Date inicio,
+    @Parameter(name = "dataFim") java.sql.Date fim
 );
 ```
 
@@ -92,7 +92,7 @@ List<Pedido> findByPeriodo(
 |:----------------------------------------|:--------------------------------------------------------------|
 | Comparação (`=`, `>`, `<`, `>=`, `<=`, `!=`) | `this.VLRNOTA >= :valor`                                  |
 | `LIKE`                                  | `this.PLACA LIKE :prefix`                                     |
-| `IN` com `List<?>`                      | `this.CODPROD IN (:codigos)` (parâmetro `List<Long> codigos`) |
+| `IN` com `List<?>`                      | `this.CODPROD IN (:codigos)` (parâmetro `List<BigDecimal> codigos`) |
 | `BETWEEN`                               | `this.DTNEG BETWEEN :inicio AND :fim`                         |
 | `IS NULL` / `IS NOT NULL`               | `this.DHCONFIRMACAO IS NULL`                                  |
 | Funções SQL (`UPPER`, `LOWER`, `CONCAT`, `COUNT`, `SUM`) | `UPPER(this.NOMEPARC) = UPPER(:nome)`         |
@@ -124,7 +124,7 @@ Crie interface anotada com `@NativeQuery.Result` para mapear colunas retornadas:
 @NativeQuery.Result
 interface VeiculoDTO {
 
-    Long getCodVeiculo();   // mapeia coluna CODVEICULO
+    BigDecimal getCodVeiculo();   // mapeia coluna CODVEICULO
 
     String getPlaca();      // mapeia coluna PLACA
 }
@@ -137,7 +137,7 @@ Nomes dos getters devem coincidir **exatamente** com nomes/aliases das colunas. 
 ```java
 
 @NativeQuery("SELECT DESCRPROD FROM TGFPRO WHERE CODPROD = :codigo")
-String buscarDescricaoPorCodigo(Long codigo);
+String buscarDescricaoPorCodigo(BigDecimal codigo);
 
 @NativeQuery("SELECT COUNT(1) FROM TGFPRO")
 Long contarTotalDeProdutos();
@@ -163,11 +163,11 @@ Long contarPendentes(JdbcWrapper jdbc);
 
 @Modifying
 @NativeQuery("UPDATE TGFPRO SET VLRVENDA = VLRVENDA * :fator WHERE CODGRUPOPROD = :grupo")
-void reajustarPrecoPorGrupo(BigDecimal fator, Long grupo);
+void reajustarPrecoPorGrupo(BigDecimal fator, BigDecimal grupo);
 
 @Modifying
 @NativeQuery("DELETE FROM TDCXYZLOG WHERE DTEXPIRACAO < :data")
-void excluirLogsExpirados(LocalDate data);
+void excluirLogsExpirados(java.sql.Date data);
 ```
 
 > **`@Modifying` deve retornar `void` ou `Boolean`.** KSP rejeita `int` com erro de compilação.
@@ -177,7 +177,7 @@ Sempre envolva `@Modifying` em método `@Transactional`.
 ```java
 
 @Transactional
-public void limparLogsAntigos(LocalDate data) throws Exception {
+public void limparLogsAntigos(java.sql.Date data) throws Exception {
     logRepository.excluirLogsExpirados(data);
 }
 ```
@@ -216,7 +216,7 @@ List<Nota> findByNomeParceiro(String nome);
 
 // Macro nullValue() — substitui null por padrao (NVL/ISNULL portatil)
 @NativeQuery("SELECT nullValue(VLRDESCONTO, 0) FROM TGFCAB WHERE NUNOTA = :nu")
-BigDecimal descontoOuZero(Long nu);
+BigDecimal descontoOuZero(BigDecimal nu);
 ```
 
 > Macros traduzem automaticamente entre Oracle e MSSQL. Lista completa (datas, texto, conversoes, agregacoes): ver `macros`. **Sempre prefira macro a sintaxe especifica de banco** (`SYSDATE`, `NVL`, `||`, `ROWNUM`, etc.).
@@ -231,18 +231,19 @@ BigDecimal descontoOuZero(Long nu);
 public class ItemNotaPK {
 
     @Column(name = "NUNOTA")
-    private Long numeroUnico;
+    private BigDecimal numeroUnico;
     @Column(name = "SEQUENCIA")
-    private Long sequenciaItem;
+    private BigDecimal sequenciaItem;
 }
 
-@JapeEntity(entity = "ItemNota", table = "TGFITE")
+@JapeEntity(entity = "ItemNota", table = "TGFITE",
+            isNativeTable = true, isNativeInstance = true)
 public class ItemNota {
 
     @Id
     private ItemNotaPK id;
     @Column(name = "CODPROD")
-    private Long codProduto;
+    private BigDecimal codProduto;
 }
 
 @Repository
@@ -263,7 +264,7 @@ import br.com.sankhya.studio.persistence.NativeQuery;
 
 @NativeQuery(value = "SELECT DESCRICAO FROM TGFPRO WHERE CODPROD = :codigo",
              method = NativeQuery.ResultSetMethods.GET_N_STRING)
-String buscarDescricaoNVarchar(Long codigo);
+String buscarDescricaoNVarchar(BigDecimal codigo);
 ```
 
 > Caso típico: colunas `NVARCHAR`/`NCHAR` (Unicode) no MSSQL exigem `getNString` para preservar caracteres multi-byte. Sem o `method`, o SDK chama `getString` por padrão.
@@ -276,12 +277,13 @@ Quando o filtro envolve **múltiplas colunas combinadas** (ex.: `(CODEMP, CODFIL
 
 ```java
 import br.com.sankhya.sdk.data.structures.ParamMatrix;
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 ParamMatrix matrix = ParamMatrix.of(
-    Arrays.asList(1L, 1L),   // (CODEMP=1, CODFIL=1)
-    Arrays.asList(1L, 2L),   // (CODEMP=1, CODFIL=2)
-    Arrays.asList(2L, 3L)    // (CODEMP=2, CODFIL=3)
+    Arrays.asList(BigDecimal.valueOf(1), BigDecimal.valueOf(1)),   // (CODEMP=1, CODFIL=1)
+    Arrays.asList(BigDecimal.valueOf(1), BigDecimal.valueOf(2)),   // (CODEMP=1, CODFIL=2)
+    Arrays.asList(BigDecimal.valueOf(2), BigDecimal.valueOf(3))    // (CODEMP=2, CODFIL=3)
 );
 
 List<Filial> filiais = filialRepository.findByEmpresaFilial(matrix);
@@ -415,13 +417,13 @@ List<Produto> findAll();
 
 // Correto: sempre use filtros obrigatórios
 @Criteria(clause = "this.ATIVO = 'S' AND this.CODEMP = :empresa")
-List<Produto> findAtivosByEmpresa(Long empresa);
+List<Produto> findAtivosByEmpresa(BigDecimal empresa);
 
 // Errado: lógica de negócio dentro do repositório
 @Repository
-public interface PedidoRepository extends JapeRepository<Long, Pedido> {
+public interface PedidoRepository extends JapeRepository<BigDecimal, Pedido> {
 
-    default void aprovarPedido(Long nunota) { /* ... */ }
+    default void aprovarPedido(BigDecimal nunota) { /* ... */ }
 }
 
 // Correto: lógica de negócio no serviço
@@ -429,7 +431,7 @@ public interface PedidoRepository extends JapeRepository<Long, Pedido> {
 public class PedidoService {
 
     @Transactional
-    public void aprovarPedido(Long nunota) throws Exception {
+    public void aprovarPedido(BigDecimal nunota) throws Exception {
         Pedido pedido = repository.findByPK(nunota);
         if (pedido == null) throw new IllegalArgumentException("Pedido não encontrado: " + nunota);
         repository.save(pedido);
@@ -458,49 +460,52 @@ List<Veiculo> findByPlacaStartingWith(String prefix);
 ## 8. Exemplo Completo
 
 ```java
-// Entidade
-@JapeEntity(entity = "CabecalhoNota", table = "TGFCAB")
+// Entidade (tabela e instância nativas — flags + Lombok obrigatórios, ver `entity` §1.2)
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@JapeEntity(entity = "CabecalhoNota", table = "TGFCAB",
+            isNativeTable = true, isNativeInstance = true)
 public class Pedido {
 
     @Id
     @Column(name = "NUNOTA")
-    private Long numero;
+    private BigDecimal numero;
     @Column(name = "CODPARC")
-    private Long codigoCliente;
+    private BigDecimal codigoCliente;
     @Column(name = "VLRNOTA")
     private BigDecimal valor;
     @Column(name = "STATUS")
     private String status;
     @Column(name = "DHALTER")
-    private LocalDateTime dataAlteracao;
+    private Timestamp dataAlteracao;
 }
 
 // DTO de resultado
 @NativeQuery.Result
 public interface PedidoResumoDTO {
 
-    Long getNumero();
+    BigDecimal getNumero();
 
     BigDecimal getValor();
 }
 
 // Repositório
 @Repository
-public interface PedidoRepository extends JapeRepository<Long, Pedido> {
+public interface PedidoRepository extends JapeRepository<BigDecimal, Pedido> {
 
     @Criteria(clause = "this.CODPARC = :codigoCliente")
-    List<Pedido> findByCliente(Long codigoCliente);
+    List<Pedido> findByCliente(BigDecimal codigoCliente);
 
     @NativeQuery("SELECT NUNOTA as numero, VLRNOTA as valor FROM TGFCAB WHERE STATUS = :status AND CODEMP = :empresa")
     List<PedidoResumoDTO> findResumoPorStatus(
         String status,
-        Long empresa
+        BigDecimal empresa
     );
 
     @Modifying
     @NativeQuery("DELETE FROM TGFCAB WHERE STATUS = 'R' AND DHALTER < :dataLimite")
-    void deleteRascunhosAntigos(LocalDateTime dataLimite);
+    void deleteRascunhosAntigos(Timestamp dataLimite);
 }
 
 // Serviço
@@ -516,11 +521,11 @@ public class PedidoService {
 
     @Transactional
     public void limparRascunhosAntigos() throws Exception {
-        LocalDateTime limite = LocalDateTime.now().minusDays(30);
+        Timestamp limite = Timestamp.valueOf(LocalDateTime.now().minusDays(30));
         pedidoRepository.deleteRascunhosAntigos(limite);
     }
 
-    public List<Pedido> buscarPedidosDoCliente(Long codigoCliente) throws Exception {
+    public List<Pedido> buscarPedidosDoCliente(BigDecimal codigoCliente) throws Exception {
         if (codigoCliente == null) {
             throw new IllegalArgumentException("Código do cliente é obrigatório.");
         }
@@ -563,14 +568,8 @@ public class PedidoService {
 | Import errado de `@NativeQuery`                  | Usar `br.com.sankhya.studio.persistence.NativeQuery`, não `br.com.sankhya.sdk.data.repository.NativeQuery` |
 
 
-## Related Skills
-
-- `entity` — entidade @JapeEntity sobre a qual o repository opera
-- `macros` — macros SQL para `@NativeQuery` e `queries/<arquivo>.xml`
-- `test` — repository é tipicamente mockado em testes (cuidado com JapeRepository quirks)
-
 ## Skills relacionadas
 
-- `entity` — entidade que o repositório opera
-- `macros` — macros SQL em `@NativeQuery`
-- `test` — JUnit + Mockito do repositório
+- `entity` — entidade `@JapeEntity` sobre a qual o repositório opera
+- `macros` — macros SQL para `@NativeQuery` e `queries/<arquivo>.xml`
+- `test` — JUnit + Mockito do repositório; repository é tipicamente mockado em testes (cuidado com quirks do `JapeRepository`)

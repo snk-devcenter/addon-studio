@@ -378,7 +378,7 @@ Três abordagens válidas. Skill não opina.
 | Abordagem | Quando usar |
 |:----------|:------------|
 | Constante `static final` no módulo | URL fixa, mudou só com release |
-| `@Value("integration.parceiro.url")` injetado no `@Provides` | URL varia por ambiente (dev/homol/prod) — ver skill `value` |
+| Campo `@Value(value = "INTEGRATION_PARCEIRO_URL", type = ValueType.ENV_VAR, defaultValue = "...")` num `@Component` de config, injetado como parâmetro do `@Provides` | URL varia por ambiente (dev/homol/prod) — sintaxe completa na skill `value` |
 | Tabela de configuração no banco | URL gerenciada pelo cliente final em runtime — usar factory pattern (avançado) |
 
 ---
@@ -425,15 +425,12 @@ Estes patterns são comuns mas opcionais. Skill não detalha — implemente conf
 
 ---
 
-## Related Skills
+## Skills relacionadas
 
 - `dependency-injection` — `@CustomModule`, `@Provides`, `@Singleton`, `Provider<T>`, `Multibinder`
 - `value` — injetar base URL e timeouts via `@Value`
 - `addon-studio` — regras universais (Java 8, `@Inject` de `com.google.inject`)
 - `test` — testar gateway com `MockWebServer` (OkHttp)
 - `controller-advice` — mapear `IntegrationApiException`/`IntegrationNetworkException` para HTTP errors do addon
-
-## Skills relacionadas
-
 - `build` — comandos Gradle (`gradle deployAddon`)
 - `encoding` — garantir ISO-8859-1 após criar arquivos `.java`

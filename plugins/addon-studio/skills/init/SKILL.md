@@ -12,7 +12,7 @@ Skill instala/atualiza no projeto consumidor o `docs/ADDON.md` (instruções do 
 ## Quando usar
 
 - Primeira vez configurando o projeto pra colaboração com o agente.
-- Após atualizar o plugin (`/plugin update addon-studio@snk-devcenter`) — re-rodar pega a versão mais recente do `ADDON.md`.
+- Após atualizar o plugin (`/plugin update addon-studio`) — re-rodar pega a versão mais recente do `ADDON.md`.
 - Dev pediu "setup", "configurar CLAUDE.md", "instalar instruções", "atualizar ADDON.md".
 
 ## Pré-requisito (sanity check)
@@ -27,17 +27,15 @@ grep -l "br.com.sankhya.addonstudio" build.gradle build.gradle.kts 2>/dev/null
 
 ### 1. Localizar o `ADDON.md` canônico
 
-O template fica no diretório `assets/` da skill `addon-studio` (convenção Agent Skills). Path em ambiente real:
+O template fica no diretório `assets/` da skill `addon-studio` (convenção Agent Skills). Use a variável de ambiente `${CLAUDE_PLUGIN_ROOT}` (disponível para skills de plugin — aponta para a raiz do plugin instalado):
 
-- `~/.claude/plugins/cache/snk-devcenter/addon-studio/plugins/addon-studio/skills/addon-studio/assets/ADDON.md`
-
-Resolva o path concreto a partir do ambiente atual (variáveis de ambiente do harness, ou listagem do diretório de plugins instalados).
+- `${CLAUDE_PLUGIN_ROOT}/skills/addon-studio/assets/ADDON.md`
 
 ### 2. Copiar `ADDON.md` para `docs/` no projeto
 
 ```bash
 mkdir -p docs
-cp <plugin-root>/skills/addon-studio/assets/ADDON.md ./docs/ADDON.md
+cp "${CLAUDE_PLUGIN_ROOT}/skills/addon-studio/assets/ADDON.md" ./docs/ADDON.md
 ```
 
 Overwrite é **esperado** — re-rodar a skill upgrade o arquivo pra versão mais nova. Dev nunca edita `docs/ADDON.md` à mão (override do projeto vai no `CLAUDE.md`, não aqui).
@@ -83,7 +81,7 @@ Reporte em 2-3 linhas:
 - Não regenerar o conteúdo do `ADDON.md` do zero — sempre copie do `assets/`. Fonte de verdade é o plugin.
 - Não inserir conteúdo do `ADDON.md` direto no `CLAUDE.md` (era o approach antigo, agora deprecated em favor de `@import`).
 
-## Related Skills
+## Skills relacionadas
 
 - `addon-studio` — overview que o `ADDON.md` instrui o agente a carregar
 - `encoding` — `ADDON.md` deve ficar em UTF-8 (é arquivo de instrução, não código Sankhya); ignore a regra ISO-8859-1 para este arquivo específico
