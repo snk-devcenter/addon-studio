@@ -135,14 +135,19 @@ Exemplos ilustrativos (`<PRX>`=`TDC`, `<MOD3>`=`XYZ`):
 
 > **NOTA:** exemplos abaixo usam `TDC` como prefixo ilustrativo. Substituir pelo `<PRX>` real do projeto.
 
-### Nome de Constraint (PK)
+### Nome de Constraint
 
-**Padrao:** `PK_<NOME_TABELA>`
+| Tipo  | Padrao                     | Exemplo                                       |
+|:------|:---------------------------|:----------------------------------------------|
+| PK    | `PK_<NOME_TABELA>`         | `CONSTRAINT PK_TDCXYZCAD PRIMARY KEY (CODCAD)` |
+| CHECK | `CK_<NOME_TABELA>_<COLUNA>` | `CONSTRAINT CK_TDCXYZCAD_ATIVO CHECK (ATIVO IN ('S', 'N'))` |
 
 ```sql
 CONSTRAINT PK_TDCXYZCAD PRIMARY KEY (CODCAD)
 CONSTRAINT PK_TDCXYZFAT PRIMARY KEY (CODPARC, DTFAT)
 ```
+
+> **Oracle limita identificadores a 30 caracteres** (ate 12.1). `CK_<TABELA>_<COLUNA>` com nomes longos estoura — encurtar o sufixo e **confirmar com o dev**, nunca truncar em silencio.
 
 ### Nome de Campos
 
@@ -205,7 +210,7 @@ Abreviacoes padrao ecossistema Sankhya:
 
 ## Padrões de Script por Operação
 
-Padrões completos de DDL — `CREATE TABLE` mínimo (somente PK + constraint), `ALTER TABLE` para adicionar/modificar colunas (uma por `<sql>`), tabelas nativas (`nativeTable`), relação dicionário ↔ scripts e `INSERT` para dados de configuração — em [`references/script-patterns.md`](references/script-patterns.md).
+Padrões completos de DDL — `CREATE TABLE` mínimo (somente PK + constraint), `ALTER TABLE` para adicionar/modificar colunas (uma por `<sql>`), CHECK constraints para `LISTA`/`CHECKBOX`, tabelas nativas (`nativeTable`), relação dicionário ↔ scripts e `INSERT` para dados de configuração — em [`references/script-patterns.md`](references/script-patterns.md).
 
 ---
 
@@ -217,8 +222,28 @@ Padrões completos de DDL — `CREATE TABLE` mínimo (somente PK + constraint), 
 | `TEXTO` (com `size`)              | `VARCHAR2(<size>)`      | `VARCHAR(<size>)`       |                                      |
 | `DECIMAL` (com `nuCasasDecimais`) | `NUMBER(18,<N>)`        | `DECIMAL(18,<N>)`       |                                      |
 | `DATA_HORA` ou `DATA`             | `DATE`                  | `DATETIME`              |                                      |
-| `CHECKBOX`                        | `VARCHAR2(1)`           | `CHAR(1)`               |                                      |
+| `CHECKBOX`                        | `VARCHAR2(1)`           | `CHAR(1)`               | **+ CHECK `IN ('S', 'N')`**          |
+| `LISTA` (com `<fieldOptions>`)    | `VARCHAR2(<size>)`      | `VARCHAR(<size>)`       | **+ CHECK `IN (<values das options>)`** |
 | `PESQUISA`                        | Depende do `targetType` | Depende do `targetType` | Ex: `INTEIRO` -> `NUMBER(10)` / `INT` |
+
+### CHECK Constraints — Domínio Fechado
+
+Campo `LISTA` (valores das `<option>`) e campo `CHECKBOX` (`'S'`/`'N'`) geram **CHECK constraint** em `<sql>` próprio, logo após o `ALTER TABLE ADD` da coluna. Nome: `CK_<TABELA>_<COLUNA>`, com `tipoObjeto="CONSTRAINT"`.
+
+```xml
+<sql nomeTabela="TDCXYZCAD" ordem="6" executar="SE_NAO_EXISTIR"
+     tipoObjeto="CONSTRAINT" nomeObjeto="CK_TDCXYZCAD_ATIVO"
+     descricao="Restringir o campo ATIVO aos valores S e N">
+    <mssql>
+        ALTER TABLE TDCXYZCAD ADD CONSTRAINT CK_TDCXYZCAD_ATIVO CHECK (ATIVO IN ('S', 'N'))
+    </mssql>
+    <oracle>
+        ALTER TABLE TDCXYZCAD ADD CONSTRAINT CK_TDCXYZCAD_ATIVO CHECK (ATIVO IN ('S', 'N'))
+    </oracle>
+</sql>
+```
+
+Padrões completos — `LISTA`, tabela nativa, evolução das opções (DROP + recreate) — em [`references/script-patterns.md`](references/script-patterns.md).
 
 ### Mapeamento Banco -> Tipo do Dicionário (inverso)
 
@@ -227,9 +252,9 @@ Padrões completos de DDL — `CREATE TABLE` mínimo (somente PK + constraint), 
 | `NUMBER(10)`   | `INT`                       | `INTEIRO`                  | Sem FK                     |
 | `NUMBER(10)`   | `INT`                       | `PESQUISA`                 | Com relacionamento (FK)    |
 | `NUMBER(18,N)` | `DECIMAL(18,N)`             | `DECIMAL`                  | Com casas decimais         |
-| `VARCHAR2(n)`  | `VARCHAR(n)`                | `TEXTO` size=n             | Texto livre                |
-| `VARCHAR2(n)`  | `VARCHAR(n)` + opções fixas | `TEXTO` + `<fieldOptions>` | Enum valores definidos     |
-| `VARCHAR2(1)`  | `CHAR(1)` S/N               | `CHECKBOX`                 | Flag booleana              |
+| `VARCHAR2(n)`  | `VARCHAR(n)`                | `TEXTO` size=n             | Texto livre, sem CHECK     |
+| `VARCHAR2(n)` + CHECK `IN (...)` | `VARCHAR(n)` + CHECK `IN (...)` | `LISTA` + `<fieldOptions>` | Enum valores definidos |
+| `VARCHAR2(1)` + CHECK `IN ('S','N')` | `CHAR(1)` + CHECK `IN ('S','N')` | `CHECKBOX`      | Flag booleana              |
 | `DATE`         | `DATETIME` (só data)        | `DATA`                     | Semântica: só data         |
 | `DATE`         | `DATETIME` (com hora)       | `DATA_HORA`                | Semântica: data + hora     |
 
@@ -346,7 +371,35 @@ Scripts migração **imutáveis** após deploy. Sempre criar novo `V<N+1>_<OPERA
 
 Relacionamentos entre tabelas definidos **exclusivamente** em `datadictionary/` via `PESQUISA`. Não usar `FOREIGN KEY` ou `REFERENCES` no SQL.
 
-### 11. Versionamento fora do padrão
+### 11. Campo de domínio fechado sem CHECK
+
+```xml
+<!-- ERRADO — campo LISTA/CHECKBOX sem constraint: banco aceita qualquer valor -->
+<oracle>
+    ALTER TABLE TDCXYZCAD ADD (ATIVO VARCHAR2(1))
+</oracle>
+
+    <!-- CORRETO — ALTER TABLE ADD seguido de <sql> com a CHECK -->
+<oracle>
+ALTER TABLE TDCXYZCAD ADD (ATIVO VARCHAR2(1))
+</oracle>
+    <!-- + <sql tipoObjeto="CONSTRAINT" nomeObjeto="CK_TDCXYZCAD_ATIVO"> com CHECK (ATIVO IN ('S', 'N')) -->
+```
+
+> `<fieldOptions>` e `CHECKBOX` restringem a **UI**. Sem CHECK, integração/listener/SQL direto grava valor fora do domínio.
+
+### 12. CHECK dentro do `ALTER TABLE ADD` da coluna
+
+```xml
+<!-- ERRADO — constraint no mesmo <sql> da coluna: executar/tipoObjeto só verifica um objeto -->
+<oracle>
+    ALTER TABLE TDCXYZCAD ADD (ATIVO VARCHAR2(1) CHECK (ATIVO IN ('S', 'N')))
+</oracle>
+```
+
+> Um `<sql>` = um objeto. Constraint junto da coluna gera nome auto (`SYS_C00…` no Oracle), impossível de referenciar em DROP depois — e `executar="SE_NAO_EXISTIR"` com `tipoObjeto="COLUMN"` pula a CHECK se a coluna já existir.
+
+### 13. Versionamento fora do padrão
 
 ```
 <!-- ERRADO -->
@@ -381,6 +434,8 @@ V003-ALTER_TABLE_TGFCAB.xml
 15. **Não alterar tabelas nativas** — só adicionar colunas customizadas com prefixo addon
 16. **Prefixo coluna customizada** — usar `<PREFIXO_ADDON>_` em colunas adicionadas em tabelas nativas
 17. **PK sequencial sem `ID`** — usar `COD*` para cadastros e `NU*` para movimentos/documentos
+18. **CHECK para domínio fechado** — campo `LISTA` (valores das `<option>`) e `CHECKBOX` (`'S'`/`'N'`) exigem `CK_<TABELA>_<COLUNA>` em `<sql>` próprio, `tipoObjeto="CONSTRAINT"`, após o `ALTER TABLE ADD` da coluna
+19. **CHECK imutável** — mudar opções = DROP + recreate em novo `V<NNN>`, com `UPDATE` de migração antes se houver dado fora do novo domínio
 
 ---
 
@@ -400,6 +455,8 @@ Exemplos completos de XMLs — `V001-CREATE_TABLE_TDCXYZCAD.xml` (PK simples), `
 - [ ] CREATE TABLE com **só** colunas PK + `CONSTRAINT PK_<TABELA>`
 - [ ] Incluir **ambas** tags `<mssql>` e `<oracle>` em cada `<sql>`
 - [ ] ALTER TABLE ADD para **cada** coluna não-PK (um `<sql>` por coluna)
+- [ ] CHECK constraint (`<sql>` próprio, `tipoObjeto="CONSTRAINT"`) para **cada** campo `LISTA` e `CHECKBOX`
+- [ ] Nome da CHECK = `CK_<TABELA>_<COLUNA>`, dentro do limite de 30 chars do Oracle
 - [ ] `ordem` única e sequencial no arquivo
 - [ ] **Não colocar ponto-e-vírgula** no final SQL
 - [ ] **Perguntar usuário** se deseja incluir campos auditoria (`DHALTER`, `DHCREATE`, `CODUSU`)
@@ -413,6 +470,7 @@ Exemplos completos de XMLs — `V001-CREATE_TABLE_TDCXYZCAD.xml` (PK simples), `
 - [ ] Nomear arquivo `V<NNN>-ALTER_TABLE_<TABELA>.xml`
 - [ ] **NÃO** criar CREATE TABLE
 - [ ] ALTER TABLE ADD **só** para colunas com prefixo addon (ex: `XYZ_`)
+- [ ] CHECK constraint para campos `LISTA`/`CHECKBOX` — **só** nas colunas do addon, nunca em coluna nativa
 - [ ] Incluir **ambas** tags `<mssql>` e `<oracle>` em cada `<sql>`
 - [ ] Ignorar colunas nativas (sem prefixo addon) — já existem no banco
 - [ ] `ordem` única e sequencial no arquivo
@@ -427,6 +485,16 @@ Exemplos completos de XMLs — `V001-CREATE_TABLE_TDCXYZCAD.xml` (PK simples), `
 - [ ] Incluir **ambas** tags `<mssql>` e `<oracle>` em cada `<sql>`
 - [ ] `ordem` única e sequencial no arquivo
 - [ ] **Não colocar ponto-e-vírgula** no final SQL
+
+### Alteração de CHECK constraint (mudou `<fieldOptions>` de campo já deployado)
+
+- [ ] **Nunca** editar o `V<NNN>` que criou a CHECK — script aplicado é imutável (regra 9)
+- [ ] Verificar último `V<NNN>-*.xml` existente para definir `N+1` (3 dígitos, zero-padded)
+- [ ] Nomear arquivo `V<NNN>-ALTER_CONSTRAINT_<TABELA>.xml`
+- [ ] DROP CONSTRAINT com `executar="SE_EXISTIR"` (`ordem` 1)
+- [ ] Opção **removida** do domínio: `UPDATE` de migração do dado antigo antes do ADD — **perguntar ao dev** o valor de destino
+- [ ] ADD CONSTRAINT com opções novas e `executar="SE_NAO_EXISTIR"` (última `ordem`)
+- [ ] Atualizar `<fieldOptions>` no datadictionary para refletir o mesmo domínio
 
 ### Dados de configuração
 

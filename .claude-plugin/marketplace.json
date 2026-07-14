@@ -9,7 +9,7 @@
     {
       "name": "addon-studio",
       "description": "Plugin Sankhya Addon Studio 2.0 (Wildfly/EJB + SDK JAPE) com 22 skills focadas e 6 sub-agents. Skills = fonte de verdade da API do SDK, validadas contra os jars. Setup do projeto via /addon-studio:init (docs/ADDON.md + @import no CLAUDE.md). Convencao de nomenclatura parametrizada por projeto.",
-      "version": "2.12.1",
+      "version": "2.13.0",
       "author": {
         "name": "DevCenter Squad"
       },
