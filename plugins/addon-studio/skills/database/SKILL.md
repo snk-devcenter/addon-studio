@@ -1,6 +1,6 @@
 ---
 name: database
-description: Cria, audita e padroniza dbscripts Sankhya (`dbscripts/V<NNN>-*.xml`) com migrations dual MSSQL/Oracle. Cobre convenções de nomenclatura, mapeamento de tipos (`NUMBER`/`NUMERIC`/`INT`/`DECIMAL`/`VARCHAR`/`VARCHAR2`/`CHAR`/`DATE`/`DATETIME`/`TIMESTAMP`), estrutura `<sql>`/`<mssql>`/`<oracle>` e atributos `executar`/`tipoObjeto`/`nomeObjeto`. Use ao adicionar, alterar, revisar, padronizar ou auditar arquivos em `dbscripts/`, ao mapear tipos entre Oracle e MSSQL, ou ao tocar em SQL com tags `<mssql>`/`<oracle>`.
+description: Cria, audita e padroniza dbscripts Sankhya (`dbscripts/V<NNN>-*.xml`) com migrations dual MSSQL/Oracle. Cobre convenções de nomenclatura, mapeamento de tipos (`NUMBER`/`NUMERIC`/`INT`/`FLOAT`/`DECIMAL`/`VARCHAR`/`VARCHAR2`/`CHAR`/`DATE`/`DATETIME`/`TIMESTAMP`), estrutura `<sql>`/`<mssql>`/`<oracle>` e atributos `executar`/`tipoObjeto`/`nomeObjeto`. Use ao adicionar, alterar, revisar, padronizar ou auditar arquivos em `dbscripts/`, ao mapear tipos entre Oracle e MSSQL, ou ao tocar em SQL com tags `<mssql>`/`<oracle>`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -180,10 +180,14 @@ Abreviacoes padrao ecossistema Sankhya:
 | Tipo lógico | Oracle         | SQL Server      | Uso                                       |
 |:------------|:---------------|:----------------|:------------------------------------------|
 | Inteiro     | `NUMBER(10)`   | `INT`           | `COD*`/`NU*` sequenciais, contadores, FKs |
-| Decimal     | `NUMBER(18,N)` | `DECIMAL(18,N)` | Valores monetários, percentuais           |
+| Decimal     | `FLOAT(126)`   | `FLOAT(53)`     | Valores monetários, percentuais           |
 | Texto       | `VARCHAR2(n)`  | `VARCHAR(n)`    | Texto tamanho variável                    |
 | Flag S/N    | `VARCHAR2(1)`  | `CHAR(1)`       | Flags booleanas                           |
 | Data/Hora   | `DATE`         | `DATETIME`      | Data e/ou data+hora                       |
+
+> **Decimal é `FLOAT`, não `DECIMAL`/`NUMBER(18,N)`.** Tabelas nativas Sankhya usam `FLOAT` nos dois bancos (`FLOAT(126)` Oracle, `FLOAT(53)` SQL Server), sem escala na coluna. Casas decimais são do dicionário (`nuCasasDecimais`), não do DDL. Coluna de addon segue o nativo: mesmo tipo em JOIN/comparação com tabela nativa, e JAPE lê como `BigDecimal` do mesmo jeito.
+>
+> **Cuidado:** o nome é igual, a precisão não. Oracle `FLOAT(126)` é subtipo de `NUMBER` — decimal exato. SQL Server `FLOAT(53)` é IEEE 754 binário — sujeito a resíduo de arredondamento. Em cálculo financeiro, arredondar no Java com `BigDecimal`; nunca comparar `FLOAT` por igualdade exata em SQL.
 
 ### Diferenças de Sintaxe
 
@@ -220,7 +224,7 @@ Padrões completos de DDL — `CREATE TABLE` mínimo (somente PK + constraint), 
 |:----------------------------------|:------------------------|:------------------------|:-------------------------------------|
 | `INTEIRO`                         | `NUMBER(10)`            | `INT`                   |                                      |
 | `TEXTO` (com `size`)              | `VARCHAR2(<size>)`      | `VARCHAR(<size>)`       |                                      |
-| `DECIMAL` (com `nuCasasDecimais`) | `NUMBER(18,<N>)`        | `DECIMAL(18,<N>)`       |                                      |
+| `DECIMAL` (com `nuCasasDecimais`) | `FLOAT(126)`            | `FLOAT(53)`             | Escala **não** vai na coluna — `nuCasasDecimais` manda |
 | `DATA_HORA` ou `DATA`             | `DATE`                  | `DATETIME`              |                                      |
 | `CHECKBOX`                        | `VARCHAR2(1)`           | `CHAR(1)`               | **+ CHECK `IN ('S', 'N')`**          |
 | `LISTA` (com `<fieldOptions>`)    | `VARCHAR2(<size>)`      | `VARCHAR(<size>)`       | **+ CHECK `IN (<values das options>)`** |
@@ -251,7 +255,8 @@ Padrões completos — `LISTA`, tabela nativa, evolução das opções (DROP + r
 |:---------------|:----------------------------|:---------------------------|:---------------------------|
 | `NUMBER(10)`   | `INT`                       | `INTEIRO`                  | Sem FK                     |
 | `NUMBER(10)`   | `INT`                       | `PESQUISA`                 | Com relacionamento (FK)    |
-| `NUMBER(18,N)` | `DECIMAL(18,N)`             | `DECIMAL`                  | Com casas decimais         |
+| `FLOAT(126)`   | `FLOAT(53)`                 | `DECIMAL`                  | Com casas decimais         |
+| `NUMBER(18,N)` | `DECIMAL(18,N)`             | `DECIMAL`                  | Legado — coluna antiga, ler normal; não usar em coluna nova |
 | `VARCHAR2(n)`  | `VARCHAR(n)`                | `TEXTO` size=n             | Texto livre, sem CHECK     |
 | `VARCHAR2(n)` + CHECK `IN (...)` | `VARCHAR(n)` + CHECK `IN (...)` | `LISTA` + `<fieldOptions>` | Enum valores definidos |
 | `VARCHAR2(1)` + CHECK `IN ('S','N')` | `CHAR(1)` + CHECK `IN ('S','N')` | `CHECKBOX`      | Flag booleana              |
