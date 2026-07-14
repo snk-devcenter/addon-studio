@@ -52,10 +52,10 @@
          tipoObjeto="COLUMN" nomeObjeto="VLRTOTAL"
          descricao="Adicionar campo VLRTOTAL na tabela TDCXYZCAD">
         <mssql>
-            ALTER TABLE TDCXYZCAD ADD VLRTOTAL DECIMAL(18,2)
+            ALTER TABLE TDCXYZCAD ADD VLRTOTAL FLOAT(53)
         </mssql>
         <oracle>
-            ALTER TABLE TDCXYZCAD ADD (VLRTOTAL NUMBER(18,2))
+            ALTER TABLE TDCXYZCAD ADD (VLRTOTAL FLOAT(126))
         </oracle>
     </sql>
 
@@ -138,10 +138,10 @@
          tipoObjeto="COLUMN" nomeObjeto="VLRTOTAL"
          descricao="Adicionar campo VLRTOTAL na tabela TDCXYZFAT">
         <mssql>
-            ALTER TABLE TDCXYZFAT ADD VLRTOTAL DECIMAL(18,2)
+            ALTER TABLE TDCXYZFAT ADD VLRTOTAL FLOAT(53)
         </mssql>
         <oracle>
-            ALTER TABLE TDCXYZFAT ADD (VLRTOTAL NUMBER(18,2))
+            ALTER TABLE TDCXYZFAT ADD (VLRTOTAL FLOAT(126))
         </oracle>
     </sql>
 
