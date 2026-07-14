@@ -162,7 +162,31 @@ Define entidade (instancia JAPE) da tabela. Existem duas tags possiveis dentro d
 </instances>
 ```
 
-`name` = nome logico da entidade (bate com `@JapeEntity(entity = "...")`).
+### Atributos de `<instance>` / `<nativeInstance>`
+
+| Atributo         | Obrigatorio | Descricao                                                                                     |
+|:-----------------|:------------|:----------------------------------------------------------------------------------------------|
+| `name`           | Sim         | Nome logico da entidade (bate com `@JapeEntity(entity = "...")`).                              |
+| `resourceId`     | Nao         | Identificador do recurso da instancia no Sankhya. Formato `br.com.sankhya.<projeto>.<idtela>`. |
+| `parentInstance` | Nao         | `resourceId` da instancia **nativa** da qual esta deriva. Declara a instancia como alias/derivada da nativa. |
+
+**`parentInstance` — alias de instancia nativa.** Use quando o addon cria uma instancia propria sobre uma tabela nativa mas quer herdar o vinculo com a instancia nativa correspondente (telas, permissoes, comportamento). O valor e o `resourceId` da nativa, **nao** o `name`:
+
+```xml
+<nativeTable name="<TABELA_NATIVA>">
+    <instances>
+        <instance name="<Prx><Mod><Ctx>"
+                  resourceId="br.com.sankhya.<projeto>.<idtela>"
+                  parentInstance="<resourceId da instancia nativa alvo>">
+            <description>...</description>
+        </instance>
+    </instances>
+</nativeTable>
+```
+
+> O `resourceId` da instancia nativa alvo **nao** e adivinhavel — confira no dicionario do ambiente (`TDDINS`) ou no metadata nativo. Nunca invente o valor a partir do nome da instancia.
+
+> Sem `parentInstance`, a instancia nasce solta — perde o vinculo com a nativa. Omitir o atributo na geracao **dropa a informacao silenciosamente** (o XSD nao exige).
 
 > **Por que `<nativeInstance>` ao inves de `<instance>`:** ambas as tags geram a mesma entidade no runtime, mas `<nativeInstance>` sinaliza para o builder que a instancia **ja existe** no Sankhya nativo e **nao** deve ser regravada no `metadata.xml` final. Se uma instancia nativa for declarada como `<instance>`, o deploy do addon re-mapeia o owner da instancia para o addon e quebra regras de negocio, validacoes e telas nativas que dependem dela. Pareie sempre com `isNativeInstance = true` no `@JapeEntity` correspondente (ver `entity` secao 1.2).
 
@@ -189,21 +213,27 @@ Componentes do prefixo addon:
 
 ---
 
-## 1.7 Relacionamentos (`<relationShip>`) - OneToMany
+## 1.7 Relacionamentos (`<relationShip>`)
 
-Entidade com filhos (`@OneToMany`) declara `<relationShip>` dentro `<instance>`.
+Entidade com relacao (`@OneToMany`, `@OneToOne`) declara `<relationShip>` dentro `<instance>`/`<nativeInstance>`.
 
-| Atributo XML  | Significado                              |
-|:--------------|:-----------------------------------------|
-| `entityName`  | Nome entidade filha                   |
-| `localName`   | Campo tabela pai (origem)    |
-| `targetName`  | Campo tabela filha (destino) |
+### Atributos do `<relation>`
+
+| Atributo XML    | Obrigatorio | Default     | Significado                                                                     |
+|:----------------|:------------|:------------|:--------------------------------------------------------------------------------|
+| `entityName`    | Sim         | -           | Nome da instancia relacionada.                                                  |
+| `relation`      | Nao         | `OneToOne`  | Tipo: `OneToOne`, `OneToMany`, `ManyToOne`, `ManyToMany`. **Default e `OneToOne` — informar sempre em relacao 1:N.** |
+| `insert`        | Nao         | -           | `"S"`/`"N"`. So com `OneToOne`: inclui a entidade relacionada que tenha `merge-on-root`. |
+| `update`        | Nao         | -           | `"S"`/`"N"`. So com `OneToOne`: atualiza a entidade relacionada que tenha `merge-on-root`. |
+| `removeCascade` | Nao         | -           | `"S"`/`"N"`. So com `OneToMany`: exclui os dados relacionados (equivale a `delete on cascade`). |
+
+Filhos: `<expression>` (opcional) e `<fields>` (obrigatorio). Cada `<field>` do `<fields>` tem `localName` (coluna da tabela atual) e `targetName` (coluna da relacionada).
 
 ```xml
 <instance name="TdcXyzProduto">
     <description>Produtos</description>
     <relationShip>
-        <relation entityName="TdcXyzVinculoProduto">
+        <relation entityName="TdcXyzVinculoProduto" relation="OneToMany" removeCascade="S">
             <fields>
                 <field localName="CODPRODUTO" targetName="CODPRODUTO"/>
             </fields>
@@ -211,6 +241,57 @@ Entidade com filhos (`@OneToMany`) declara `<relationShip>` dentro `<instance>`.
     </relationShip>
 </instance>
 ```
+
+### Sub-tag `<expression>` do `<relation>` (opcional)
+
+Configura o relacionamento e/ou filtra a entidade destino. Aceita **tres formatos** (combinaveis no mesmo `<expression>`):
+
+**1) `@ref-param[...]` — configuracao do relacionamento (reflete no dynaform)**
+
+| Opcao                       | Efeito                                                                                          |
+|:----------------------------|:------------------------------------------------------------------------------------------------|
+| `description=`              | Descricao da aba no dynaform (ex.: `description=Contatos`).                                     |
+| `force-one-to-one=true`     | Forca entidade com chave dupla por data a aparecer como **pesquisa** em vez de aba. Ex.: `TipoOperacao`, `TipoNegociacao`. |
+| `result-only-analytic=true` | Exibe so registros analiticos da entidade hierarquica destino.                                  |
+| `show-on-ui=false`          | Com dynaform, a aba nao aparece na tela.                                                        |
+| `auto-search=true`          | Busca automatica da relacionada.                                                                |
+| `merge-on-root=true`        | Junta as 2 entidades na tela — o usuario ve uma coisa so. Pareia com `insert`/`update` no `<relation>`. |
+| `merge-to-find=true`        | Junta as entidades na busca.                                                                    |
+| `APP_PROFILE=P:(...)`       | Exibe so se o cliente tiver os modulos da chave. Formato `P:(<CHAVE>{<CODMOD>},...)` — chave e codigo saem do modulo licenciado, nao invente. |
+
+**2) `@form-filter[...]` — filtro de formulario**
+
+Pode depender de campo dos **dois** formularios. Alias `form.` = formulario de origem; alias `this.` = formulario de destino.
+
+**3) Filtro simples** — depende so da entidade destino. Alias `this.`.
+
+```xml
+<!-- 1) @ref-param: aba nomeada, forcada como pesquisa -->
+<relation entityName="TdcXyzTipo" relation="OneToOne">
+    <expression><![CDATA[@ref-param[description=Tipo, force-one-to-one=true]]]></expression>
+    <fields>
+        <field localName="CODTIPO" targetName="CODTIPO"/>
+    </fields>
+</relation>
+
+<!-- 2) @form-filter: cruza campo do form de origem (form.) com o destino (this.) -->
+<relation entityName="TdcXyzVinculo" relation="OneToMany">
+    <expression><![CDATA[@form-filter[EXISTS (SELECT 1 FROM TDCXYZCTR C WHERE C.CODEMP = form.CODEMP AND this.CODVINCULO = C.CODVINCULO)]]]></expression>
+    <fields>
+        <field localName="CODPRODUTO" targetName="CODPRODUTO"/>
+    </fields>
+</relation>
+
+<!-- 3) Filtro simples: so a entidade destino -->
+<relation entityName="TdcXyzVinculo" relation="OneToMany">
+    <expression><![CDATA[this.ATIVO='S']]></expression>
+    <fields>
+        <field localName="CODPRODUTO" targetName="CODPRODUTO"/>
+    </fields>
+</relation>
+```
+
+> `force-one-to-one` decide **OneToOne vs aba** no dynaform; `description=` nomeia a aba. Omitir `<expression>` na geracao perde cardinalidade correta, filtro e nome de aba — o XSD nao exige, entao a falta e silenciosa.
 
 ---
 
@@ -228,6 +309,8 @@ Cada `<field>` = coluna + metadata.
 | `nuCasasDecimais` | int    | Nao         | -       | Casas decimais (DECIMAL).                               |
 | `required`        | String | Nao         | `"N"`   | Obrigatorio: `"S"` ou `"N"`.                                 |
 | `readOnly`        | String | Nao         | `"N"`   | Somente leitura: `"S"` ou `"N"`.                             |
+| `nullable`        | String | Nao         | `"S"`   | Permite valor nulo: `"S"` ou `"N"`.                          |
+| `allowDefault`    | String | Nao         | `"S"`   | Permite valor padrao: `"S"` ou `"N"`.                        |
 | `allowSearch`     | String | Sim         | `"N"`   | Permite pesquisa: `"S"` ou `"N"`. **Sempre informar.**       |
 | `visibleOnSearch` | String | Sim         | `"N"`   | Visivel na pesquisa: `"S"` ou `"N"`. **Sempre informar.**    |
 | `isPresentation`  | String | Nao         | `"N"`   | Campo apresentacao entidade.                           |
@@ -243,6 +326,8 @@ Cada `<field>` = coluna + metadata.
 > \* Obrigatorios com `dataType="PESQUISA"`.
 
 > **Case:** `UITabName` (nao `uiTabName`), `UIGroupName` (nao `uiGroupName`), `nuCasasDecimais` (nao `precision`).
+
+> **`nullable` vs `required`:** `nullable="N"` restringe o **dado** (campo nao aceita nulo); `required="S"` restringe a **UI** (dynaform exige preenchimento). Nao sao sinonimos — campo obrigatorio na tela pode aceitar nulo no banco (registro gravado por integracao/listener) e vice-versa.
 
 ### Tipos de dados
 
@@ -481,8 +566,8 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 3. [ ] Definir `sequenceType` e `sequenceField` conforme estrategia.
 4. [ ] Declarar `<description>` da `<table>` (vai pra `TDDTAB.DESCRTAB`, NOT NULL).
 5. [ ] Declarar `<primaryKey>` com campos PK.
-6. [ ] Declarar `<instance>` com nome entidade + `<description>` propria da instancia.
-7. [ ] Declarar `<relationShip>` pra cada pai-filho.
+6. [ ] Declarar `<instance>` com nome entidade + `<description>` propria da instancia. Instancia derivada de nativa? Informar `parentInstance` (+ `resourceId`).
+7. [ ] Declarar `<relationShip>` pra cada relacao. Informar `relation` (default e `OneToOne` — 1:N exige `relation="OneToMany"`) e `<expression>` quando houver filtro, `force-one-to-one` ou nome de aba.
 8. [ ] Declarar **todos** campos + atributos.
 9. [ ] Informar `allowSearch` e `visibleOnSearch` em **todos**.
 10. [ ] Nomes corretos: `UITabName`, `UIGroupName`, `nuCasasDecimais`, `required="S"/"N"`.
@@ -527,6 +612,7 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 | `<description>` vazia ou ausente em `<field>`     | Preencher `<description>` obrigatorio.      |
 | Omitir `<description>` filha de `<table>` (so na `<instance>`) | Adicionar `<description>` propria de `<table>`. Sem ela, deploy falha com `DESCRTAB NULL em TDDTAB`. |
 | Omitir `sequenceType` na tag `<table>`            | Sempre informar `sequenceType` (+ `sequenceField` se AUTO).      |
+| Omitir `relation` em `<relation>` de uma relacao 1:N | Informar `relation="OneToMany"`. O default do XSD e `OneToOne` — omitir gera cardinalidade errada sem erro de validacao. |
 | Atributos extras no `@Column` Java      | Manter **so** `name` — resto no XML.               |
 | Usar `@Expression` ou `@GeneratedValue` no Java  | Remover — vao pra `<expression>` e `sequenceType` no XML.       |
 | `@JoinColumn` com `name` e `referencedColumnName` invertidos | `name` = campo local (na tabela com `@JoinColumn`). `referencedColumnName` = campo na referenciada. Ver [`references/xml-to-java.md`](references/xml-to-java.md), seção "FK que referencia campo nao-PK". |
