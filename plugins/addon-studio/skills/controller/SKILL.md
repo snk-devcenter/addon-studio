@@ -90,7 +90,35 @@ Define comportamento transacional **padrao** todos metodos classe.
 
 ## 3. Controle Transacional com `@Transactional`
 
-Anotacao `@Transactional` em metodo **sempre tem precedencia** sobre `transactionType` da classe.
+`@Transactional` so pode ser aplicado em **metodo** (`@Target(METHOD)`) e **sempre tem precedencia** sobre `transactionType` da classe.
+
+### Valores de `Transactional.TxType`
+
+Import: `br.com.sankhya.studio.persistence.Transactional`.
+
+| `TxType` | Semantica |
+|:---------|:----------|
+| `REQUIRED` | **Default** do `@Transactional` bare. Usa a transacao existente; cria uma se nao houver. |
+| `REQUIRES_NEW` | Sempre cria transacao nova, suspendendo a atual se existir. |
+| `MANDATORY` | Exige transacao ativa; lanca excecao se nao houver. |
+| `NOT_SUPPORTED` | Executa fora de transacao; suspende a atual se existir. |
+| `NEVER` | Lanca excecao se houver transacao ativa. |
+
+> **Nao existe `TxType.SUPPORTS`.** Esses cinco valores sao o enum inteiro.
+
+### `EJBTransactionType` (classe) vs `TxType` (metodo)
+
+Sao enums **distintos e nao equivalentes** — nao ha par para todo valor:
+
+| `EJBTransactionType` (classe) | Equivalente em `TxType` (metodo) |
+|:------------------------------|:---------------------------------|
+| `Supports` (padrao)           | **nenhum** — `SUPPORTS` nao existe no `TxType` |
+| `Required`                    | `REQUIRED` |
+| `NotSupported`                | `NOT_SUPPORTED` |
+
+`REQUIRES_NEW`, `MANDATORY` e `NEVER` so existem por metodo — nao ha equivalente de classe.
+
+> Metodo que deve seguir `Supports`: **omita** `@Transactional` — ele herda o `transactionType` da classe. `Supports` nao e expressavel por metodo.
 
 ```java
 @Controller(serviceName = "MeuControllerSP", transactionType = EJBTransactionType.NotSupported)
@@ -418,6 +446,8 @@ Exemplos completos — controller simples (CRUD) e controller completo (múltipl
 | Controller chamando Gateway diretamente | Usar Service como intermediario |
 | `serviceName` sem sufixo `SP` | Sempre `<Nome>SP` |
 | Esquecer `@Transactional` em metodo de escrita | Adicionar `@Transactional` |
+| `@Transactional(Transactional.TxType.SUPPORTS)` | Nao existe — omitir `@Transactional` (metodo herda `Supports` da classe) |
+| `@Transactional` na classe | So vale em metodo (`@Target(METHOD)`) — use `transactionType` no `@Controller` |
 | Esquecer `@Valid` no parametro | Adicionar `@Valid` para ativar validacao |
 | Adicionar `@Component` no controller | `@Controller` ja e gerenciado — nao misturar |
 | Capturar excecao e retornar `null` | Deixar a excecao propagar para o `@ControllerAdvice` |

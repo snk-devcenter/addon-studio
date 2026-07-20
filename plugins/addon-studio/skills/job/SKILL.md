@@ -108,6 +108,20 @@ public String getScheduleConfig() {
 | Job somente leitura         | `transactionType = EJBTransactionType.NotSupported` — melhor desempenho |
 | Controle granular por trecho| `transactionType = EJBTransactionType.Supports` (padrao) + `@Transactional` no metodo |
 
+### Valores de `Transactional.TxType`
+
+`@Transactional` so pode ser aplicado em **metodo** (`@Target(METHOD)`) e tem precedencia sobre o `transactionType` da classe.
+
+| `TxType` | Semantica |
+|:---------|:----------|
+| `REQUIRED` | **Default** do `@Transactional` bare. Usa a transacao existente; cria uma se nao houver. |
+| `REQUIRES_NEW` | Sempre cria transacao nova, suspendendo a atual se existir. |
+| `MANDATORY` | Exige transacao ativa; lanca excecao se nao houver. |
+| `NOT_SUPPORTED` | Executa fora de transacao; suspende a atual se existir. |
+| `NEVER` | Lanca excecao se houver transacao ativa. |
+
+> **Nao existe `TxType.SUPPORTS`** — esses cinco valores sao o enum inteiro. `EJBTransactionType` (classe) e `Transactional.TxType` (metodo) sao enums **distintos e nao equivalentes**: `Required` → `REQUIRED` e `NotSupported` → `NOT_SUPPORTED`, mas `Supports` **nao tem equivalente por metodo** (para segui-lo, omita `@Transactional`), e `REQUIRES_NEW`/`MANDATORY`/`NEVER` nao tem equivalente de classe.
+
 ```java
 // Job de escrita — transacao atomica
 @Job(serviceName = "SincronizadorSP", frequency = "0 0 2 * * ?")
@@ -273,6 +287,7 @@ public class MeuJob extends IJob {
 | `System.out.println` para logging                       | Usar `Logger` (`java.util.logging`)                       |
 | `new` em dependencias gerenciadas                       | Injetar via construtor com `@Inject`                      |
 | Job de escrita sem `@Transactional`                     | Adicionar `@Transactional` no `onSchedule()`             |
+| `@Transactional(Transactional.TxType.SUPPORTS)`         | Nao existe — omitir `@Transactional` (metodo herda `Supports` da classe) |
 
 ---
 
