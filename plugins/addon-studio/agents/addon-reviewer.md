@@ -32,6 +32,8 @@ Para conhecimento de domínio, carregue a skill via `Read` em `${CLAUDE_PLUGIN_R
 ## Checks universais (valem para todo arquivo, não mudam com o SDK)
 
 - [ ] Encoding ISO-8859-1 em `.java`/`.xml`/`.kt` (não UTF-8) — quebra runtime silenciosamente
+- [ ] Acento destruído por round-trip de edição — `file -i` **não** pega, arquivo com `?` no lugar de `ê` é Latin-1 válido. Rodar nos arquivos alterados:
+      `grep -lF "$(printf '\357\277\275')" <arquivos>` (U+FFFD gravado pela tool) e conferir no `git diff` se algum acento virou `?`. Achado → 🔴 Blocker, restaurar via git (ver skill `encoding`, seção "Perda silenciosa de acento")
 - [ ] Java 8 strict: sem `var`, `List.of`/`Map.of`/`Set.of`, `String.isBlank`, `Stream.toList`, records, text blocks — nenhuma API pós-Java 8
 - [ ] `@Inject` sempre de `com.google.inject.Inject`, nunca `javax.inject.Inject`
 
