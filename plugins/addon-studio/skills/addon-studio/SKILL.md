@@ -243,6 +243,7 @@ Para tópicos específicos, invoke skill direta:
 - `type-adapter` — `@GlobalTypeAdapter`
 - `value` — `@Value` / `ValueType`
 - `macros` — MacroTranslator SQL macros
+- `sankhya-utils` — utilitários `com.sankhya.util` já no classpath (null-safety, `BigDecimal`, data, XML/JSON)
 - `encoding` — ISO-8859-1
 - `build` — `gradle deployAddon`
 

@@ -1,8 +1,8 @@
 # Addon Studio Plugin
 
-[![release](https://img.shields.io/badge/release-v2.15.0-blue)](https://github.com/snk-devcenter/addon-studio/releases/latest)
+[![release](https://img.shields.io/badge/release-v2.16.0-blue)](https://github.com/snk-devcenter/addon-studio/releases/latest)
 
-Plugin para **Claude Code** com **22 skills focadas + 6 sub-agents** que orientam implementacao em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo setor DevCenter.
+Plugin para **Claude Code** com **23 skills focadas + 6 sub-agents** que orientam implementacao em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo setor DevCenter.
 
 As skills sao a **fonte de verdade da API do SDK**: assinaturas validadas contra os jars reais (`studio-annotations`, `sdk-sankhya`). Seguir as skills gera codigo que compila e deploya — sem o agente precisar inspecionar jars.
 
@@ -63,6 +63,7 @@ Trabalhe normalmente — as skills disparam sozinhas quando o assunto casa:
 | "esse parametro nao atualiza sem restart" | `value` |
 | "erro Guice/BindingAlreadySet no deploy" | `dependency-injection` |
 | "escreve testes pra esse service" | `test` |
+| "tem util do Sankhya pra isso?" / null-check repetido no diff | `sankhya-utils` |
 
 ### Invocacao explicita
 
@@ -93,7 +94,7 @@ Especialistas com workflow ativo, tools restritas e modelo proprio — executam 
 
 O plugin instala um hook PostToolUse que mantem `.java`/`.xml`/`.kt`/`.properties` em **ISO-8859-1** automaticamente apos cada edicao — sem acao manual.
 
-## Cobertura (22 skills)
+## Cobertura (23 skills)
 
 | Skill | Escopo |
 |-------|--------|
@@ -117,6 +118,7 @@ O plugin instala um hook PostToolUse que mantem `.java`/`.xml`/`.kt`/`.propertie
 | `type-adapter` | `@GlobalTypeAdapter` (`TypeAdapter`, `JsonSerializer`/`JsonDeserializer`) |
 | `value` | `@Value` / `ValueType`, `parameter.xml`, feature flag togglavel (`MGECoreParameter`) |
 | `macros` | MacroTranslator SQL (`dbDate`, `nullValue`, `ignorecase`, etc.) |
+| `sankhya-utils` | Utilitarios `com.sankhya.util` (`StringUtils`, `BigDecimalUtil`, `TimeUtils`, `XMLUtils`, `SQLUtils`, `ResourceLock`) |
 | `encoding` | ISO-8859-1 obrigatorio em `.java`/`.xml`/`.kt` |
 | `build` | `gradle deployAddon` |
 
@@ -156,7 +158,7 @@ Skills cobrem **regras do SDK e do framework**. Organizacao de pacotes, camadas 
         ├── .claude-plugin/plugin.json  # manifest do plugin
         ├── hooks/hooks.json            # hook PostToolUse de encoding
         ├── agents/                     # 6 sub-agents
-        └── skills/                     # 22 skills (1 dir por skill, SKILL.md cada)
+        └── skills/                     # 23 skills (1 dir por skill, SKILL.md cada)
             └── addon-studio/assets/ADDON.md   # template injetado no projeto consumidor
 ```
 
