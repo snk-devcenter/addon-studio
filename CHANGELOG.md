@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [2.18.0] - 2026-07-25
+
 ### Adicionado
 
 - `CHANGELOG.md` e `CLAUDE.md` na raiz: fluxo de contribuição, política de versionamento e checklist de corte de release.
@@ -189,5 +191,6 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v2.17.0...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v2.18.0...HEAD
+[2.18.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.17.0...v2.18.0
 [2.17.0]: https://github.com/snk-devcenter/addon-studio/releases/tag/v2.17.0
