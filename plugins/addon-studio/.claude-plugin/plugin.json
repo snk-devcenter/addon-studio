@@ -7,7 +7,7 @@
   },
   "homepage": "https://github.com/snk-devcenter/addon-studio",
   "repository": "https://github.com/snk-devcenter/addon-studio.git",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "keywords": [
     "sankhya",
     "addon-studio",

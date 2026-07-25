@@ -1,12 +1,13 @@
 # Addon Studio Plugin
 
-[![release](https://img.shields.io/badge/release-v2.17.0-blue)](https://github.com/snk-devcenter/addon-studio/releases/latest)
+[![release](https://img.shields.io/github/v/release/snk-devcenter/addon-studio?label=release&color=blue)](https://github.com/snk-devcenter/addon-studio/releases/latest)
+[![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-Plugin para **Claude Code** com **24 skills focadas + 6 sub-agents** que orientam implementacao em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo setor DevCenter.
+Plugin para **Claude Code** com **24 skills focadas + 6 sub-agents** que orientam implementação em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo DevCenter Squad.
 
-As skills sao a **fonte de verdade da API do SDK**: assinaturas validadas contra os jars reais (`studio-annotations`, `sdk-sankhya`). Seguir as skills gera codigo que compila e deploya — sem o agente precisar inspecionar jars.
+As skills são a **fonte de verdade da API do SDK**: assinaturas validadas contra os jars reais (`studio-annotations`, `sdk-sankhya`). Seguir as skills gera código que compila e deploya — sem o agente precisar inspecionar jars.
 
-## Instalacao
+## Instalação
 
 Dentro do Claude Code, adicione o marketplace:
 
@@ -20,7 +21,7 @@ Depois instale o plugin:
 /plugin install addon-studio@snk-devcenter
 ```
 
-## Setup do projeto (obrigatorio, 1 comando)
+## Setup do projeto (obrigatório, 1 comando)
 
 Na raiz do projeto Sankhya, rode:
 
@@ -30,22 +31,22 @@ Na raiz do projeto Sankhya, rode:
 
 A skill `init`:
 
-1. Confere que o projeto e Addon Studio (procura `br.com.sankhya.addonstudio` no `build.gradle`/`build.gradle.kts`).
+1. Confere que o projeto é Addon Studio (procura `br.com.sankhya.addonstudio` no `build.gradle`/`build.gradle.kts`).
 2. Copia o `ADDON.md` do plugin para `docs/ADDON.md` no projeto.
-3. Insere a linha `@docs/ADDON.md` no `CLAUDE.md` da raiz (cria o arquivo se nao existir; idempotente — nao duplica nem mexe nas suas customizacoes).
+3. Insere a linha `@docs/ADDON.md` no `CLAUDE.md` da raiz (cria o arquivo se não existir; idempotente — não duplica nem mexe nas suas customizações).
 
 Resultado:
 
 ```
 projeto/
 ├── docs/
-│   └── ADDON.md        # gerado pelo plugin — nao editar
-├── CLAUDE.md           # seu — contem `@docs/ADDON.md` + customizacoes do projeto
+│   └── ADDON.md        # gerado pelo plugin — não editar
+├── CLAUDE.md           # seu — contém `@docs/ADDON.md` + customizações do projeto
 ├── build.gradle
 └── ...
 ```
 
-**Por que precisa?** Skill discovery e semantica — o agente so carrega uma skill quando o prompt casa com a `description` dela. Num prompt generico ("implementa essa spec"), o agente pode pular as regras universais (Java 8 strict, ISO-8859-1, JAPE nao JPA). O `ADDON.md` importado no `CLAUDE.md` garante que essas regras estejam **sempre** no contexto.
+**Por que precisa?** Skill discovery é semântica — o agente só carrega uma skill quando o prompt casa com a `description` dela. Num prompt genérico ("implementa essa spec"), o agente pode pular as regras universais (Java 8 strict, ISO-8859-1, JAPE não JPA). O `ADDON.md` importado no `CLAUDE.md` garante que essas regras estejam **sempre** no contexto.
 
 ## Como usar
 
@@ -53,20 +54,20 @@ projeto/
 
 Trabalhe normalmente — as skills disparam sozinhas quando o assunto casa:
 
-| Voce pede | Skill que dispara |
+| Você pede | Skill que dispara |
 |-----------|-------------------|
 | "cria a entidade da tabela TDCXYZCAB" | `entity` (+ `data-dictionary`, `database` se for trio completo) |
 | "preciso de um endpoint que recebe esse payload" | `controller` (+ `mapstruct`, `controller-advice`) |
 | "consome essa API externa" | `retrofit` |
 | "agenda esse processamento pra rodar de noite" | `job` |
-| "preenche esse campo automatico quando gravar o registro" | `listener` |
-| "esse parametro nao atualiza sem restart" | `value` |
+| "preenche esse campo automático quando gravar o registro" | `listener` |
+| "esse parâmetro não atualiza sem restart" | `value` |
 | "erro Guice/BindingAlreadySet no deploy" | `dependency-injection` |
 | "escreve testes pra esse service" | `test` |
 | "tem util do Sankhya pra isso?" / null-check repetido no diff | `sankhya-utils` |
-| "cria a tela HTML5 desse cadastro" / "botao novo na tela do addon" | `sankhya-js` |
+| "cria a tela HTML5 desse cadastro" / "botão novo na tela do addon" | `sankhya-js` |
 
-### Invocacao explicita
+### Invocação explícita
 
 Qualquer skill pode ser chamada direto como slash command:
 
@@ -80,20 +81,20 @@ Qualquer skill pode ser chamada direto como slash command:
 
 ### Sub-agents
 
-Especialistas com workflow ativo, tools restritas e modelo proprio — executam decisao + acao (diferente de skills, que sao conhecimento). Aparecem em `/agents` e sao auto-invocados conforme contexto, ou explicitamente ("usa o addon-reviewer nesse diff"):
+Especialistas com workflow ativo, tools restritas e modelo próprio — executam decisão + ação (diferente de skills, que são conhecimento). Aparecem em `/agents` e são auto-invocados conforme contexto, ou explicitamente ("usa o addon-reviewer nesse diff"):
 
 | Agent | Modelo | Escopo |
 |-------|:------:|--------|
-| `addon-reviewer` | sonnet | Review pre-commit: encoding, Java 8, Lombok, Guice DI, `@JapeEntity`, anti-patterns. Saida em Blockers/Warnings/Suggestions. |
-| `entity-architect` | sonnet | Modela trio CRUD end-to-end: XML dicionario + dbscript migration + entidade `@JapeEntity`. |
-| `controller-designer` | sonnet | Desenha endpoint REST: `@Controller` + DTOs + MapStruct Mapper + (se aplicavel) `@ControllerAdvice`. |
+| `addon-reviewer` | sonnet | Review pré-commit: encoding, Java 8, Lombok, Guice DI, `@JapeEntity`, anti-patterns. Saída em Blockers/Warnings/Suggestions. |
+| `entity-architect` | sonnet | Modela trio CRUD end-to-end: XML dicionário + dbscript migration + entidade `@JapeEntity`. |
+| `controller-designer` | sonnet | Desenha endpoint REST: `@Controller` + DTOs + MapStruct Mapper + (se aplicável) `@ControllerAdvice`. |
 | `test-writer` | sonnet | Escreve JUnit 5 + Mockito 4.11 com quirks de `JapeRepository`. Roda `./gradlew test` pra validar. |
-| `troubleshooter` | haiku | Diagnostica erros: encoding, Guice DI, JPA misturada com JAPE, Java 8 violations, build/deploy. |
+| `troubleshooter` | sonnet | Diagnostica erros: encoding, Guice DI, JPA misturada com JAPE, Java 8 violations, build/deploy. |
 | `dbscript-builder` | haiku | Gera dbscripts `V<NNN>-*.xml` dual MSSQL/Oracle. |
 
 ### Hook de encoding
 
-O plugin instala um hook PostToolUse que mantem `.java`/`.xml`/`.kt`/`.properties` em **ISO-8859-1** automaticamente apos cada edicao — sem acao manual.
+O plugin instala um hook PostToolUse que converte `.java`/`.xml`/`.kt`/`.properties` para **ISO-8859-1** após cada edição. Quando o acento já foi destruído na leitura (byte vira `U+FFFD`), o hook **aborta em vez de converter** e avisa o agente — nesse caso o trecho acentuado precisa ser restaurado (`git checkout -- <arquivo>`) e a edição reaplicada.
 
 ## Cobertura (24 skills)
 
@@ -102,70 +103,84 @@ O plugin instala um hook PostToolUse que mantem `.java`/`.xml`/`.kt`/`.propertie
 | `addon-studio` | Overview, regras universais (Java 8 strict, Lombok, ISO-8859-1), naming `<PRX><MOD3><CTX>`, fluxo CRUD |
 | `init` | Setup do projeto: `docs/ADDON.md` + `@import` no `CLAUDE.md`. Re-rodar = upgrade idempotente |
 | `entity` | `@JapeEntity` (Lombok, PK simples/composta, relacionamentos) |
-| `data-dictionary` | XML dicionario de dados (`datadictionary/<TABELA>.xml`) |
+| `data-dictionary` | XML dicionário de dados (`datadictionary/<TABELA>.xml`) |
 | `database` | `dbscripts/V<NNN>-*.xml` dual MSSQL/Oracle |
 | `repository` | `@Repository`, `@Criteria`, `@NativeQuery`, `@Modifying` |
 | `retrofit` | Retrofit + Moshi + OkHttp (deps `moduleLib`, interface client, wiring Guice, interceptors) |
 | `controller` | `@Controller(serviceName SP)`, DTO + `@Valid`, `@Transactional` |
-| `controller-advice` | `@ControllerAdvice` + `@ExceptionHandler`, rollback automatico |
+| `controller-advice` | `@ControllerAdvice` + `@ExceptionHandler`, rollback automático |
 | `dependency-injection` | Guice (`@Component`, `@CustomModule`, `Multibinder`, `@Singleton`, `Provider<T>`) |
-| `mapstruct` | `componentModel=jakarta`, `injectionStrategy=CONSTRUCTOR`, padrao create/merge |
-| `test` | JUnit 5 + Mockito 4.11 (quirks `JapeRepository`, mock estatico `JapeSession`/`SessionFile`) |
+| `mapstruct` | `componentModel=jakarta`, `injectionStrategy=CONSTRUCTOR`, padrão create/merge |
+| `test` | JUnit 5 + Mockito 4.11 (quirks `JapeRepository`, mock estático `JapeSession`/`SessionFile`) |
 | `action-button` | `@ActionButton` (`AcaoRotinaJava`, `@Form`, `ContextoAcao`) |
 | `business-rule` | `@BusinessRule` (`Regra`, `ContextoRegra`, barramento) |
 | `listener` | `@Listener` (`PersistenceEventAdapter`, eventos CRUD before/after insert/update/delete) |
 | `before-load-listener` | `@BeforeLoadListener` (`FinderListener`, filtro transversal no Finder) |
-| `job` | `@Job` (`IJob`, `onSchedule`, CRON, migracao XML) |
+| `job` | `@Job` (`IJob`, `onSchedule`, CRON, migração XML) |
 | `type-adapter` | `@GlobalTypeAdapter` (`TypeAdapter`, `JsonSerializer`/`JsonDeserializer`) |
-| `value` | `@Value` / `ValueType`, `parameter.xml`, feature flag togglavel (`MGECoreParameter`) |
+| `value` | `@Value` / `ValueType`, `parameter.xml`, feature flag toggável (`MGECoreParameter`) |
 | `macros` | MacroTranslator SQL (`dbDate`, `nullValue`, `ignorecase`, etc.) |
-| `sankhya-utils` | Utilitarios `com.sankhya.util` (`StringUtils`, `BigDecimalUtil`, `TimeUtils`, `XMLUtils`, `SQLUtils`, `ResourceLock`) |
-| `encoding` | ISO-8859-1 obrigatorio em `.java`/`.xml`/`.kt` |
+| `sankhya-utils` | Utilitários `com.sankhya.util` (`StringUtils`, `BigDecimalUtil`, `TimeUtils`, `XMLUtils`, `SQLUtils`, `ResourceLock`) |
+| `encoding` | ISO-8859-1 obrigatório em `.java`/`.xml`/`.kt`/`.properties` |
 | `build` | `gradle deployAddon` |
-| `sankhya-js` | Telas HTML5 do modulo `-vc` (AngularJS 1.x): `gerarTela`, `sk-application`/`sk-dynaform`/`sk-datagrid`, `ServiceProxy`, registro no menu |
+| `sankhya-js` | Telas HTML5 do módulo `-vc` (AngularJS 1.x): `gerarTela`, `sk-application`/`sk-dynaform`/`sk-datagrid`, `ServiceProxy`, registro no menu |
 
-## Atualizacao
+## Atualização
 
 ```
 /plugin update addon-studio@snk-devcenter
 ```
 
-Depois re-rode `/addon-studio:init` no projeto: a skill sobrescreve o `docs/ADDON.md` com a versao nova **sem tocar** no seu `CLAUDE.md`.
+Depois re-rode `/addon-studio:init` no projeto: a skill sobrescreve o `docs/ADDON.md` com a versão nova **sem tocar** no seu `CLAUDE.md`.
 
-## Customizacoes do projeto
+## Customizações do projeto
 
-Regras especificas (override de convencao, padrao de pacotes, arquitetura) vao no `CLAUDE.md` da raiz — **fora** do `docs/ADDON.md`, que e regenerado a cada update. O plugin nunca reescreve o `CLAUDE.md`; so insere o `@docs/ADDON.md` se ausente.
+Regras específicas (override de convenção, padrão de pacotes, arquitetura) vão no `CLAUDE.md` da raiz — **fora** do `docs/ADDON.md`, que é regenerado a cada update. O plugin nunca reescreve o `CLAUDE.md`; só insere o `@docs/ADDON.md` se ausente.
 
-## Convencao de nomenclatura (parametrizada por projeto)
+## Convenção de nomenclatura (parametrizada por projeto)
 
-Padrao parametrizado por `<PRX>` (prefixo) + `<MOD3>` (modulo). A skill detecta o padrao existente no projeto; se ausente, **pergunta ao dev** antes de gerar artefatos.
+Padrão parametrizado por `<PRX>` (prefixo) + `<MOD3>` (módulo). A skill detecta o padrão existente no projeto; se ausente, **pergunta ao dev** antes de gerar artefatos.
 
-| Artefato                              | Padrao                            | Exemplo (PRX=TDC, MOD3=XYZ)  |
+| Artefato                              | Padrão                            | Exemplo (PRX=TDC, MOD3=XYZ)  |
 |:--------------------------------------|:----------------------------------|:-----------------------------|
 | Tabela do addon                       | `<PRX><MOD3><CTX>` UPPER          | `TDCXYZCAB`                  |
 | `@JapeEntity(entity = "...")`         | `<Prx><Mod><Ctx>` Pascal          | `TdcXyzCabecalho`            |
 | Coluna custom em tabela nativa        | `<MOD3>_NOMECAMPO` UPPER          | `XYZ_STATUS`                 |
 
-## Sem opiniao arquitetural
+## Sem opinião arquitetural
 
-Skills cobrem **regras do SDK e do framework**. Organizacao de pacotes, camadas e padroes de design (Clean Arch, Hexagonal, MVC, DDD) sao decisoes do dev/projeto.
+Skills cobrem **regras do SDK e do framework**. Organização de pacotes, camadas e padrões de design (Clean Arch, Hexagonal, MVC, DDD) são decisões do dev/projeto.
 
 ## Estrutura do repo
 
 ```
 .
-├── .claude-plugin/marketplace.json     # catalogo do marketplace
+├── CHANGELOG.md                        # histórico de mudanças
+├── CLAUDE.md                           # regras de contribuição e corte de release
+├── .claude-plugin/marketplace.json     # catálogo do marketplace
 └── plugins/
     └── addon-studio/
         ├── .claude-plugin/plugin.json  # manifest do plugin
-        ├── hooks/hooks.json            # hook PostToolUse de encoding
+        ├── hooks/                      # hooks.json + to-iso88591.sh (PostToolUse de encoding)
         ├── agents/                     # 6 sub-agents
         └── skills/                     # 24 skills (1 dir por skill, SKILL.md cada)
             └── addon-studio/assets/ADDON.md   # template injetado no projeto consumidor
 ```
 
-> **Layout multi-plugin:** o repo serve como marketplace + plugin; plugin futuro ganha pasta propria em `plugins/<nome>/`.
+> **Layout multi-plugin:** o repo serve como marketplace + plugin; plugin futuro ganha pasta própria em `plugins/<nome>/`.
+
+## Contribuindo
+
+Regras de contribuição, política de versionamento e checklist de corte de release estão no [CLAUDE.md](CLAUDE.md). O essencial:
+
+- Branch a partir de `main` (`feat/<slug>`, `fix/<slug>`, `docs/<slug>`), commit em Conventional Commits.
+- Toda PR alimenta a seção `[Não publicado]` do [CHANGELOG.md](CHANGELOG.md).
+- **PR não altera versão** — o bump acontece só no corte da release.
 
 ## Versionamento
 
-[SemVer](https://semver.org/lang/pt-BR/), tag git por release (`v2.11.0`, ...). Changelog nas [releases](https://github.com/snk-devcenter/addon-studio/releases).
+[SemVer](https://semver.org/lang/pt-BR/), tag git por release (`v2.11.0`, ...). Histórico completo no [CHANGELOG.md](CHANGELOG.md); notas de cada versão nas [releases](https://github.com/snk-devcenter/addon-studio/releases).
+
+## Licença
+
+[MIT](LICENSE) — Copyright (c) 2026 DevCenter Squad.
