@@ -74,4 +74,5 @@ Checagem final: `plugin.json`, `marketplace.json` e o topo do `CHANGELOG.md` apo
 - **Nunca carimbar a versão do SDK** em prosa ou frontmatter: o SDK lança semanalmente e o carimbo contradiz a skill como fonte de verdade.
 - **Roteamento é feito pela `description` da skill**, não pelo `ADDON.md`. Skill nova não edita o `ADDON.md` — lá entram só regras always-on, que valem para qualquer prompt.
 - **Exemplos sem dado real de cliente**: prefixo parametrizado `<PRX>`, sem branding, sem `resourceId` nativo ou perfil de app concreto.
+- **Snippet não declara `package` do projeto consumidor.** Só imports. Um `package ...infrastructure.integration` num exemplo é lido pelo modelo como layout recomendado e vence qualquer prosa de "sem opinião arquitetural" — código copiável fala mais alto que disclaimer. Vale também para nome de diretório e árvore de arquivos em prosa. Exceção: `package` de classe do **SDK**, quando o snippet documenta onde o símbolo mora.
 - Skills e docs deste repo são markdown **UTF-8**. A regra ISO-8859-1 é conteúdo ensinado às skills (vale para `.java`/`.xml`/`.kt`/`.properties` do projeto consumidor), não para os arquivos daqui.

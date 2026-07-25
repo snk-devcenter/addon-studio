@@ -321,7 +321,9 @@ Fluxo comum (**ilustrativo** — skill nao opina sobre arquitetura, ajuste a sua
 
 ## 9. Interfaces e implementacoes via Guice
 
-Interfaces (Ports) abstraem implementacao concreta. Guice resolve a implementacao quando ela e marcada com `@Component` e implementa a interface.
+Interfaces abstraem implementacao concreta. Guice resolve a implementacao quando ela e marcada com `@Component` e implementa a interface.
+
+> **Interface so quando ha polimorfismo real** — duas ou mais implementacoes, ou troca em runtime (Multibinder, resolucao por parametro). Com uma unica implementacao, injete a classe concreta: `@Component` sozinho ja e resolvido pelo Guice, e a interface extra nao adiciona nada alem de um arquivo. O limite de **um `@Component` por interface** (abaixo) pune justamente a interface criada por habito.
 
 **Interface:**
 

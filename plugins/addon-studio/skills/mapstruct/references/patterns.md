@@ -4,7 +4,7 @@
 
 ```java
 @Mapping(source = "nomeExterno", target = "nomeInterno")
-MeuDomainObj toDomain(MeuDTO dto);
+MeuEntity toDomain(MeuDTO dto);
 ```
 
 ## Campos nested (objetos aninhados)
@@ -15,7 +15,7 @@ Mapear campo flat DTO pra campo dentro objeto aninhado no dominio:
 // DTO.codCliente -> Domain.cliente.idCliente
 @Mapping(source = "codCliente", target = "cliente.idCliente")
 @Mapping(source = "codVendedor", target = "vendedor.idVendedor")
-MeuExternalObj fromDomain(MeuDomainObj domain);
+MeuExternalObj fromDomain(MeuEntity domain);
 ```
 
 Tambem le de nested:
@@ -23,7 +23,7 @@ Tambem le de nested:
 ```java
 // Domain.municipio.ibge -> DTO.codigoIbge
 @Mapping(source = "municipio.ibge", target = "codigoIbge")
-MeuDTO fromDomain(MeuDomainObj domain);
+MeuDTO fromDomain(MeuEntity domain);
 ```
 
 ## Ignorar campos target
@@ -31,7 +31,7 @@ MeuDTO fromDomain(MeuDomainObj domain);
 ```java
 @Mapping(target = "campoIgnorado", ignore = true)
 @Mapping(target = "outroIgnorado", ignore = true)
-MeuDomainObj toDomain(MeuDTO dto);
+MeuEntity toDomain(MeuDTO dto);
 ```
 
 > Com `unmappedTargetPolicy=IGNORE` global, campos nao mapeados ja ignorados. Use `ignore = true` quando quiser **explicito** sobre intencao.
@@ -40,7 +40,7 @@ MeuDomainObj toDomain(MeuDTO dto);
 
 ```java
 @Mapping(target = "ativo", constant = "true")
-MeuDomainObj toDomain(MeuDTO dto);
+MeuEntity toDomain(MeuDTO dto);
 ```
 
 > Valor sempre `String`. MapStruct converte pro tipo target auto (`"true"` -> `Boolean.TRUE`).
@@ -59,13 +59,13 @@ public interface MeuMapper {
     // API externa -> Dominio
     @Mapping(source = "idExterno", target = "codInterno")
     @Mapping(source = "nome", target = "descricao")
-    MeuDomainObj toDomain(MeuExternalDTO dto);
+    MeuEntity toDomain(MeuExternalDTO dto);
 
     // Dominio -> API externa
     @Mapping(source = "codInterno", target = "idExterno")
     @Mapping(source = "descricao", target = "nome")
     @Mapping(target = "campoSomenteExterno", ignore = true)
-    MeuExternalDTO fromDomain(MeuDomainObj domain);
+    MeuExternalDTO fromDomain(MeuEntity domain);
 }
 ```
 
@@ -74,9 +74,9 @@ public interface MeuMapper {
 Source e target com mesmo nome e tipo = mapeamento **automatico**. Sem `@Mapping` necessario.
 
 ```java
-// Se MeuDTO.nome e MeuDomainObj.nome existem com mesmo tipo:
+// Se MeuDTO.nome e MeuEntity.nome existem com mesmo tipo:
 // NAO precisa: @Mapping(source = "nome", target = "nome")
-MeuDomainObj toDomain(MeuDTO dto);
+MeuEntity toDomain(MeuDTO dto);
 ```
 
 > `@Mapping` explicito pra campos mesmo nome **permitido** pra documentar, nao obrigatorio.

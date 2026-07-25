@@ -9,16 +9,16 @@
 )
 public class AlvoController {
 
-    private final ImportarAlvoService importarAlvoService;
+    private final AlvoService alvoService;
 
     @Inject
-    public AlvoController(ImportarAlvoService importarAlvoService) {
-        this.importarAlvoService = importarAlvoService;
+    public AlvoController(AlvoService alvoService) {
+        this.alvoService = alvoService;
     }
 
     @Transactional
-    public List<AlvoDTO> importar() {
-        return importarAlvoService.execute();
+    public List<AlvoResponse> importar() {
+        return alvoService.importar();
     }
 }
 ```
@@ -32,49 +32,45 @@ public class AlvoController {
 )
 public class PedidoController {
 
-    private final CriarPedidoService criarPedidoService;
-    private final CancelarPedidoService cancelarPedidoService;
-    private final EmitirPedidoService emitirPedidoService;
-    private final GerarPdfService gerarPdfService;
+    private final PedidoService pedidoService;
+    private final ImpressaoService impressaoService;
     private final PedidoRestMapper mapper;
 
     @Inject
     public PedidoController(
-        CriarPedidoService criarPedidoService,
-        CancelarPedidoService cancelarPedidoService,
-        EmitirPedidoService emitirPedidoService,
-        GerarPdfService gerarPdfService,
+        PedidoService pedidoService,
+        ImpressaoService impressaoService,
         PedidoRestMapper mapper
     ) {
-        this.criarPedidoService = criarPedidoService;
-        this.cancelarPedidoService = cancelarPedidoService;
-        this.emitirPedidoService = emitirPedidoService;
-        this.gerarPdfService = gerarPdfService;
+        this.pedidoService = pedidoService;
+        this.impressaoService = impressaoService;
         this.mapper = mapper;
     }
 
     @Transactional
     public CriarPedidoResponse criar(@Valid CriarPedidoRequest request) {
-        Pedido pedido = mapper.toPedido(request);
-        Pedido resultado = criarPedidoService.execute(pedido);
+        Pedido pedido = mapper.toPedido(request);          // DTO -> entidade @JapeEntity
+        Pedido resultado = pedidoService.criar(pedido);
         return mapper.toCriarResponse(resultado);
     }
 
     @Transactional
     public EmitirPedidoResponse emitir(@Valid EmitirPedidoRequest request) {
-        Resultado resultado = emitirPedidoService.execute(request.getNuPedido());
-        Impressao impressao = gerarPdfService.execute(resultado);
+        Pedido emitido = pedidoService.emitir(request.getNuPedido());
+        Impressao impressao = impressaoService.gerarPdf(emitido);
 
         ServiceContext ctx = ServiceContext.getCurrent();
         ctx.putHttpSessionAttribute(impressao.getLabel(), impressao.getFile());
 
-        return mapper.toEmitirResponse(resultado);
+        return mapper.toEmitirResponse(emitido);
     }
 
     @Transactional
     public void cancelar(@Valid CancelarPedidoRequest request) {
-        cancelarPedidoService.execute(request.getNuPedido());
+        pedidoService.cancelar(request.getNuPedido());
     }
 }
 ```
+
+> Duas deps de service porque sao duas responsabilidades distintas (pedido e impressao) — nao uma classe por endpoint. `emitir` e `cancelar` moram no mesmo `PedidoService` que `criar`.
 

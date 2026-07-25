@@ -14,14 +14,22 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - `CHANGELOG.md` e `CLAUDE.md` na raiz: fluxo de contribuição, política de versionamento e checklist de corte de release.
 - Licença MIT: arquivo `LICENSE`, badge e seção no `README.md`.
+- `ADDON.md`: regra always-on de que a skill é fonte de verdade da API e nunca da arquitetura — pacotes, camadas e design seguem o que já existe no projeto; sem precedente, o agente pergunta.
 
 ### Alterado
 
 - `plugin.json`: `license` de `UNLICENSED` para `MIT`.
+- Skill `controller`: seção nova fixa a entidade `@JapeEntity` como o objeto que atravessa controller → service; modelo de domínio separado da entidade vira decisão explícita do projeto, não default de CRUD.
+- Skills `controller` e `mapstruct`: exemplos nomeiam a entidade no lugar de `MeuDomain`/`MeuDomainObj` — tipos que a skill nunca definia e que o agente lia como terceiro modelo.
+- Skill `controller`: convenção de service passa a ser `<Feature>Service` com métodos nomeados (`PedidoService.criar`), em vez de uma classe por endpoint com `execute()` único.
+- Skill `dependency-injection`: interface só quando há polimorfismo real — implementação única injeta a classe concreta.
 - `README.md`: badge de release passa a ser dinâmica (lê a última release), texto restaurado com acentuação, seção "Contribuindo" apontando para o fluxo de PR.
 
 ### Corrigido
 
+- Skills `retrofit` e `action-button`: exemplos declaravam `package` do projeto consumidor (`...infrastructure.integration.*`), fazendo o agente inferir Clean Architecture como layout padrão do addon.
+- Skill `dependency-injection`: interface Guice descrita como "Port", vocabulário de arquitetura hexagonal em texto neutro.
+- Skill `mapstruct`: exemplo de injeção resolvia a chamada dentro do controller (`// ... logica ...`), contradizendo a regra de controller sem regra de negócio.
 - `README.md`: sub-agent `troubleshooter` estava documentado como `haiku` — o agent declara `model: sonnet`.
 - `README.md`: descrição do hook de encoding não mencionava o abort em `U+FFFD` (comportamento desde a 2.15.0); skill `encoding` também cobre `.properties`.
 

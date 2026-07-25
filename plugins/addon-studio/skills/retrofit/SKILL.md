@@ -51,8 +51,6 @@ dependencies {
 Declare a API como **interface** anotada com Retrofit. **Sempre retorno `Call<T>`** (síncrono — executor trata `.execute()`).
 
 ```java
-package br.com.sankhya.devcenter.meuaddon.infrastructure.integration.parceiro;
-
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -164,8 +162,6 @@ Indicado quando addon tem **múltiplas integrações HTTP** — encapsula timeou
 **Boilerplate:**
 
 ```java
-package br.com.sankhya.devcenter.meuaddon.infrastructure.integration.shared;
-
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import retrofit2.Converter;

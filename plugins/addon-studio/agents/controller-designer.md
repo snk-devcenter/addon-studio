@@ -67,7 +67,7 @@ Antes de gerar:
    - `@Valid` em parâmetros DTO Request
    - `@Transactional` em métodos de escrita
    - Retorno: DTO Response direto ou `void`
-   - **Sem** lógica de negócio — delegar para serviço da camada de aplicação
+   - **Sem** lógica de negócio — delegar para o `<Feature>Service`
    - **Sem** `try/catch` — deixar `@ControllerAdvice` tratar
 
 5. **@ControllerAdvice** (se não existir): `<Feature>ControllerAdvice.java`
@@ -118,7 +118,7 @@ Após gerar, reportar:
 
 ### Próximos passos sugeridos
 
-1. Implementar serviço da camada de aplicação (`<Feature>Service`) — agent não faz isso (decisão arquitetural do dev)
+1. Implementar o `<Feature>Service` com a regra de negócio — agent não faz isso (decisão arquitetural do dev)
 2. Validar encoding ISO-8859-1 nos novos `.java`
 3. Escrever testes JUnit + Mockito (agent `test-writer`)
 4. Build: `./gradlew clean deployAddon`

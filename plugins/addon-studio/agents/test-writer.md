@@ -32,7 +32,7 @@ Para conhecimento de domínio, carregue a skill via `Read` em `${CLAUDE_PLUGIN_R
 | Tipo SUT | Estratégia de teste |
 |----------|---------------------|
 | `@Controller` | Mock service + mapper, testa orquestração + validação `@Valid` (via DTO inválido). |
-| Service da camada de aplicação | Mock repositories + gateways. Testa lógica de domínio. |
+| Service (`<Feature>Service`) | Mock repositories + gateways. Testa lógica de domínio. |
 | `@Repository` | **Geralmente não testar diretamente** — é apenas declaração. Testar via service que o usa. |
 | MapStruct `@Mapper` | Testar mapeamento direto se houver lógica custom (`@AfterMapping`, classe auxiliar `@Component`). Mappers triviais (só `@Mapping`) — desnecessário. |
 | `@BusinessRule` (Regra) | Mock dependências, simular `ContextoRegra`. |
