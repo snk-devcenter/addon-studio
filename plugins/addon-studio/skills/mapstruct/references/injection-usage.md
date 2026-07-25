@@ -6,27 +6,29 @@
 @Controller(serviceName = "MeuControllerSP", transactionType = EJBTransactionType.Supports)
 public class MeuController {
 
+    private final MeuService meuService;
     private final MeuRestMapper mapper;
 
     @Inject
-    public MeuController(MeuRestMapper mapper) {
+    public MeuController(MeuService meuService, MeuRestMapper mapper) {
+        this.meuService = meuService;
         this.mapper = mapper;
     }
 
     @Transactional
-    public MeuResponse executar(MeuRequest request) {
-        MeuDomainObj domain = mapper.toDomain(request);
-        // ... logica ...
-        return mapper.toResponse(domain);
+    public MeuResponse criar(@Valid MeuRequest request) {
+        MeuEntity entidade = mapper.toDomain(request);
+        MeuEntity salva = meuService.criar(entidade);   // regra de negocio no service
+        return mapper.toResponse(salva);
     }
 }
 ```
 
-## No Gateway de integracao (via construtor)
+## Na classe de integracao (via construtor)
 
 ```java
 @Component
-public class MeuPlatformGateway implements MeuGateway {
+public class MeuPlatformGateway {
 
     private final MeuApiClient client;
     private final RetrofitCallExecutor executor;
@@ -41,8 +43,7 @@ public class MeuPlatformGateway implements MeuGateway {
         this.mapper = mapper;
     }
 
-    @Override
-    public List<MeuDomainObj> findAll() {
+    public List<MeuEntity> buscarTodos() {
         MeuApiResponse root = executor.execute(client.buscarTodos());
         return root.getItens().stream()
             .map(mapper::toDomain)

@@ -167,8 +167,6 @@ boolean incluir = "S".equals(contexto.getParam("FLAG"));
 ## 6. Exemplo completo com formulario
 
 ```java
-package br.com.fabricante.addon.exemplos;
-
 import br.com.sankhya.extensions.actionbutton.AcaoRotinaJava;
 import br.com.sankhya.extensions.actionbutton.ContextoAcao;
 import br.com.sankhya.studio.annotations.hooks.*;

@@ -7,7 +7,9 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 
 # MapStruct — Addon Studio 2.0
 
-MapStruct = biblioteca padrao pra conversao DTO <-> Entidade Dominio. **Nunca** faca mapper manual — use MapStruct.
+MapStruct = biblioteca padrao pra conversao DTO <-> entidade. **Nunca** faca mapper manual — use MapStruct.
+
+> **"Dominio", nesta skill e nas demais do plugin, e a entidade `@JapeEntity`.** Os metodos `toDomain`/`fromDomain` convertem DTO <-> entidade — nao existe um terceiro modelo entre eles. Criar POJO de dominio separado da entidade e decisao explicita do projeto (ver skill `controller`, "O que atravessa controller -> service"), nunca inferida a partir do nome dos metodos.
 
 > **Referencia complementar:** veja `dependency-injection` pra como mappers registram no container Guice.
 >
@@ -87,11 +89,11 @@ import org.mapstruct.Mapping;
 @Mapper
 public interface MeuRestMapper {
 
-    MeuDomainObj toDomain(MeuRequest dto);
+    MeuEntity toDomain(MeuRequest dto);
 
     @Mapping(source = "campo1", target = "campoDto1")
     @Mapping(source = "campo2", target = "campoDto2")
-    MeuResponse toResponse(MeuDomainObj domain);
+    MeuResponse toResponse(MeuEntity domain);
 }
 ```
 
@@ -140,7 +142,7 @@ public interface MeuIntegrationMapper {
     @Mapping(source = "idExterno", target = "idOrigem")
     @Mapping(source = "nome", target = "descricao")
     @Mapping(target = "ativo", constant = "true")
-    MeuDomainObj toDomain(MeuExternalDTO dto);
+    MeuEntity toDomain(MeuExternalDTO dto);
 }
 ```
 
@@ -169,7 +171,7 @@ public abstract class MeuMapper {
     @Mapping(source = "idExterno", target = "cultura.idOrigem")
     @Mapping(source = "idAlvo", target = "alvo.idOrigem")
     @Mapping(source = "doseMin", target = "doseMinima")
-    public abstract MeuDomainObj toDomain(MeuExternalDTO dto);
+    public abstract MeuEntity toDomain(MeuExternalDTO dto);
 }
 ```
 
@@ -190,8 +192,8 @@ Padroes de mapeamento — campos com nomes diferentes, nested (objetos aninhados
 
 > Skill nao opina sobre pacotes. Padrao comum:
 >
-> - **REST mappers**: junto do Controller (DTO Request/Response ↔ objeto de dominio).
-> - **Integration mappers**: junto do Gateway concreto da plataforma externa (DTO da API ↔ objeto de dominio).
+> - **REST mappers**: junto do Controller (DTO Request/Response ↔ entidade `@JapeEntity`).
+> - **Integration mappers**: junto do client concreto da plataforma externa (DTO da API ↔ entidade `@JapeEntity`).
 > - **Classes auxiliares compartilhadas** (`@Component` usados via `uses = {...}`): em local de utilidades compartilhadas.
 
 ### Convencao de nome
@@ -208,10 +210,10 @@ Padroes de mapeamento — campos com nomes diferentes, nested (objetos aninhados
 
 | Direcao | Nome do metodo | Assinatura |
 |:--------|:---------------|:-----------|
-| DTO externo -> Dominio | `toDomain` | `DomainObj toDomain(ExternalDTO dto)` |
-| Dominio -> DTO externo | `fromDomain` | `ExternalDTO fromDomain(DomainObj domain)` |
-| Request -> Dominio | `to<NomeObj>` | `DomainObj to<NomeObj>(Request dto)` |
-| Dominio -> Response | `to<NomeResponse>` | `Response to<NomeResponse>(DomainObj domain)` |
+| DTO externo -> entidade | `toDomain` | `Entity toDomain(ExternalDTO dto)` |
+| Entidade -> DTO externo | `fromDomain` | `ExternalDTO fromDomain(Entity domain)` |
+| Request -> entidade | `to<NomeEntidade>` | `Entity to<NomeEntidade>(Request dto)` |
+| Entidade -> Response | `to<NomeResponse>` | `Response to<NomeResponse>(Entity domain)` |
 
 ### Exemplos
 

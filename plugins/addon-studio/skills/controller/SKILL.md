@@ -27,29 +27,41 @@ import com.google.inject.Inject;
 import javax.validation.Valid;
 
 @Controller(
-    serviceName = "MeuFeatureControllerSP",            // Obrigatorio, sufixo "SP"
+    serviceName = "PedidoControllerSP",                 // Obrigatorio, sufixo "SP"
     transactionType = EJBTransactionType.Supports       // Opcional (Supports e o padrao)
 )
-public class MeuFeatureController {
+public class PedidoController {
 
-    private final MeuService meuService;                // Dependencias como final
-    private final MeuRestMapper mapper;
+    private final PedidoService pedidoService;          // Dependencias como final
+    private final PedidoRestMapper mapper;
 
     @Inject                                             // Injecao via construtor
-    public MeuFeatureController(MeuService meuService,
-                                MeuRestMapper mapper) {
-        this.meuService = meuService;
+    public PedidoController(PedidoService pedidoService,
+                            PedidoRestMapper mapper) {
+        this.pedidoService = pedidoService;
         this.mapper = mapper;
     }
 
     @Transactional                                      // Metodos que alteram dados
-    public MeuResponse executar(@Valid MeuRequest request) {
-        MeuDomain domain = mapper.toDomain(request);    // DTO -> Domain
-        MeuDomain resultado = meuService.execute(domain);
-        return mapper.toResponse(resultado);             // Domain -> DTO
+    public CriarPedidoResponse criar(@Valid CriarPedidoRequest request) {
+        Pedido pedido = mapper.toPedido(request);       // DTO -> entidade @JapeEntity
+        Pedido salvo = pedidoService.criar(pedido);
+        return mapper.toCriarResponse(salvo);           // entidade -> DTO
     }
 }
 ```
+
+### O que atravessa controller -> service
+
+O objeto que sai do mapper e entra no service e a **entidade `@JapeEntity`** — ou um valor simples (`BigDecimal nuPedido`), quando o service nao precisa do registro inteiro.
+
+**Nao existe terceiro modelo entre DTO e entidade.** O caminho padrao tem dois modelos e um mapper:
+
+```
+Request DTO  ->  @JapeEntity  ->  Response DTO
+```
+
+Um objeto de dominio separado da entidade so se paga quando existe logica que **nao** mapeia 1:1 com tabela — orquestracao entre varias entidades, maquina de estados propria, calculo com invariante que a tabela nao expressa. Isso e decisao consciente do projeto, tomada com o dev: **nao e o default de CRUD** e nao deve ser inferido a partir dos exemplos desta skill.
 
 ---
 
@@ -125,11 +137,11 @@ Sao enums **distintos e nao equivalentes** — nao ha par para todo valor:
 public class MeuController {
 
     // Usa o padrao da classe (NotSupported) — sem transacao
-    public List<MeuDTO> listar() { ... }
+    public List<MeuResponse> listar() { ... }
 
     // Sobrepoe o padrao — executa em transacao propria
     @Transactional
-    public MeuDTO criar(@Valid MeuRequest request) { ... }
+    public MeuResponse criar(@Valid MeuRequest request) { ... }
 
     // Sobrepoe com transacao nova (isolada)
     @Transactional(Transactional.TxType.REQUIRES_NEW)
@@ -150,7 +162,7 @@ public class MeuController {
 
 ## 4. DTOs (Request / Response)
 
-Controllers **nunca** expoe entidades dominio diretamente. Use DTOs = contratos entrada/saida.
+Controllers **nunca** expoe a entidade `@JapeEntity` diretamente na response. Use DTOs = contratos entrada/saida.
 
 ### Organizacao
 
@@ -208,7 +220,7 @@ public class CriarPedidoResponse {
 | `@NotEmpty` | Collection/String nao vazia | `@NotEmpty(message = "...")` |
 | `@DecimalMin` | Valor minimo (BigDecimal) | `@DecimalMin(value = "0.01", message = "...")` |
 | `@Size` | Tamanho min/max de String ou Collection | `@Size(min = 1, max = 200)` |
-| `@Valid` | Validacao em cascata (objetos nested) | `@Valid MeuDTO dto` |
+| `@Valid` | Validacao em cascata (objetos nested) | `@Valid MeuRequest request` |
 
 > `@Valid` em parametro metodo controller ativa validacao automatica. Falha = framework retorna erro antes executar metodo.
 
@@ -328,7 +340,7 @@ public PedidoResponse criarPedido(@Valid CriarPedidoRequest request) {
 // Sem retorno de dados
 @Transactional
 public void cancelar(@Valid CancelarPedidoRequest request) {
-    cancelarPedidoService.execute(request.getNuPedido());
+    pedidoService.cancelar(request.getNuPedido());
 }
 ```
 
@@ -347,10 +359,10 @@ Excecoes lancadas em metodos do controller devem ser tratadas em classe `@Contro
 ## 8. Fluxo Padrao de um Metodo
 
 ```
-Request DTO —@Valid—> Controller —mapper—> Domain Object
+Request DTO —@Valid—> Controller —mapper—> @JapeEntity
                         |
-                        |— Service.execute(domain)
-                        |       |— (logica na sua camada de servico)
+                        |— Service.<operacao>(entidade)
+                        |       |— regra de negocio + repository
                         |
                         |— mapper.toResponse(resultado)
                         |
@@ -361,9 +373,9 @@ Request DTO —@Valid—> Controller —mapper—> Domain Object
 
 ```java
 @Transactional
-public PedidoResponse criarPedido(@Valid CriarPedidoRequest request) {
+public CriarPedidoResponse criarPedido(@Valid CriarPedidoRequest request) {
     Pedido pedido = mapper.toPedido(request);
-    Pedido resultado = criarPedidoService.execute(pedido);
+    Pedido resultado = pedidoService.criar(pedido);
     return mapper.toCriarResponse(resultado);
 }
 ```
@@ -373,17 +385,17 @@ public PedidoResponse criarPedido(@Valid CriarPedidoRequest request) {
 ```java
 @Transactional
 public void cancelar(@Valid CancelarPedidoRequest request) {
-    cancelarPedidoService.execute(request.getNuPedido());
+    pedidoService.cancelar(request.getNuPedido());
 }
 ```
 
 ### Metodo somente com saida (consulta)
 
 ```java
-public List<ProdutoDTO> listarProdutos() {
-    List<Produto> produtos = listarProdutosService.execute();
+public List<ProdutoResponse> listarProdutos() {
+    List<Produto> produtos = produtoService.listar();
     return produtos.stream()
-        .map(mapper::toDTO)
+        .map(mapper::toResponse)
         .collect(Collectors.toList());
 }
 ```
@@ -393,7 +405,7 @@ public List<ProdutoDTO> listarProdutos() {
 ```java
 @Transactional
 public void sincronizar() {
-    sincronizarService.execute();
+    sincronizacaoService.sincronizar();
 }
 ```
 
@@ -414,6 +426,9 @@ Exemplos completos — controller simples (CRUD) e controller completo (múltipl
 | Nome Request DTO | `<Acao>Request` ou `<Acao><Feature>Request` | `CriarPedidoRequest` |
 | Nome Response DTO | `<Acao>Response` ou `<Acao><Feature>Response` | `EmitirPedidoResponse` |
 | Nome Mapper | `<Feature>RestMapper` | `PedidoRestMapper` |
+| Nome Service | `<Feature>Service`, com metodos nomeados por operacao | `PedidoService.criar(...)`, `.cancelar(...)` |
+
+> **Service por feature, nao por endpoint.** Um `<Feature>Service` com metodos nomeados e o padrao — mantem o construtor do controller enxuto. Quebrar em classe por operacao (`CriarPedidoService.execute(...)`) e legitimo quando a operacao cresce a ponto de ter deps proprias, mas e decisao do projeto: **nao gerar um service por endpoint por default.**
 
 ---
 
@@ -422,16 +437,16 @@ Exemplos completos — controller simples (CRUD) e controller completo (múltipl
 1. [ ] Criar classe Controller (organizar conforme arquitetura do projeto).
 2. [ ] Anotar com `@Controller(serviceName = "<Feature>ControllerSP")`.
 3. [ ] Definir `transactionType` adequado (ou usar padrao `Supports`).
-4. [ ] Injetar dependencias (servicos da camada de aplicacao, mappers) via construtor com `@Inject`.
+4. [ ] Injetar dependencias (services, mappers) via construtor com `@Inject`.
 5. [ ] Criar Request DTOs com validacao (`@NotNull`, `@NotBlank`, etc.).
 6. [ ] Criar Response DTOs.
 7. [ ] Criar MapStruct Mapper (ver `mapstruct`).
 8. [ ] Usar `@Valid` em parametro dos metodos que recebem DTOs.
 9. [ ] Usar `@Transactional` em metodos que alteram dados.
 10. [ ] Retornar tipo adequado conforme regra negocio (DTO resposta ou `void`).
-11. [ ] **NAO** colocar logica negocio — delegar para sua camada de servico.
+11. [ ] **NAO** colocar logica negocio — delegar para o service.
 12. [ ] **NAO** capturar excecoes — deixar `@ControllerAdvice` tratar.
-13. [ ] Verificar se `@ControllerAdvice` cobre excecoes vindas da camada de servico.
+13. [ ] Verificar se `@ControllerAdvice` cobre excecoes lancadas pelo service.
 
 ---
 
@@ -439,8 +454,9 @@ Exemplos completos — controller simples (CRUD) e controller completo (múltipl
 
 | Anti-Pattern | Correcao |
 |:-------------|:---------|
-| Retornar entidade do dominio diretamente | Usar Response DTO + MapStruct |
-| Logica de negocio no controller | Mover para sua camada de servico |
+| Retornar entidade `@JapeEntity` diretamente | Usar Response DTO + MapStruct |
+| Logica de negocio no controller | Mover para o service |
+| Criar um objeto de dominio intermediario entre DTO e `@JapeEntity` por default | Mapear direto para a entidade — terceiro modelo so por decisao explicita do projeto |
 | `try/catch` no controller para excecoes de negocio | Deixar o `@ControllerAdvice` tratar |
 | Controller acessando Repository diretamente | Usar Service como intermediario |
 | Controller chamando Gateway diretamente | Usar Service como intermediario |
@@ -457,7 +473,7 @@ Exemplos completos — controller simples (CRUD) e controller completo (múltipl
 
 - `controller-advice` — tratamento global de exceções lançadas pelo controller
 - `dependency-injection` — wiring Guice do controller (injeção de serviços)
-- `mapstruct` — controller usa mapper MapStruct para DTO ↔ entidade
-- `repository` — controller delega persistência ao repository
+- `mapstruct` — controller usa mapper MapStruct para DTO ↔ entidade `@JapeEntity`
+- `repository` — service delega persistência ao repository (controller nunca acessa repository direto)
 - `addon-studio` — regras universais (Java 8, Lombok, ISO-8859-1, exceções tipadas)
 - `test` — JUnit + Mockito do controller

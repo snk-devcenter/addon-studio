@@ -210,7 +210,7 @@ Antes de criar tabela/entity nova:
 2. Script banco em `dbscripts/V<NNN>-CREATE_TABLE_<TABELA>.xml` (skill `database`).
 3. Entidade `@JapeEntity` Java (skill `entity`).
 4. Repository estendendo `JapeRepository` (skill `repository`).
-5. Serviço aplicação (`@Component`, organização a critério projeto — skill `dependency-injection`).
+5. Service `<Feature>Service` (`@Component`) com a regra de negócio — skill `dependency-injection`.
 6. Controller REST `@Controller(serviceName = "...SP")` (skill `controller`).
 7. Request/Response DTOs + Mapper MapStruct (skill `mapstruct`).
 8. Testes JUnit + Mockito (skill `test`).
