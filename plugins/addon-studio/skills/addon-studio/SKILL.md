@@ -31,7 +31,7 @@ plugins {
 
 **Se o projeto aplica esse plugin, este plugin Claude Code (`addon-studio`) é a fonte de verdade — siga as skills daqui.** Antes de gerar/alterar código:
 
-1. Identifique o domínio (entity, repository, retrofit, controller, controller-advice, dbscript, dicionário de dados, mapstruct, dependency-injection, action-button, business-rule, listener, before-load-listener, job, type-adapter, value, macros, encoding, build, test).
+1. Identifique o domínio (entity, repository, retrofit, controller, controller-advice, dbscript, dicionário de dados, mapstruct, dependency-injection, action-button, business-rule, listener, before-load-listener, job, type-adapter, value, macros, tela HTML5 do addon, encoding, build, test).
 2. Invoque a skill focada correspondente — não improvise nem misture convenções de outros stacks (Spring Boot, Quarkus, JPA padrão, etc.) **nem decompile o `.jar` do SDK** para "descobrir" a anotação/assinatura: a skill é a referência de API (imports e assinaturas reais do SDK). Jar é artefato de build, não fonte de convenção.
 3. Para regras universais (Java 8, Lombok, encoding ISO-8859-1, naming `<PRX><MOD3><CTX>`), volte neste overview.
 
@@ -214,7 +214,8 @@ Antes de criar tabela/entity nova:
 6. Controller REST `@Controller(serviceName = "...SP")` (skill `controller`).
 7. Request/Response DTOs + Mapper MapStruct (skill `mapstruct`).
 8. Testes JUnit + Mockito (skill `test`).
-9. Build: `gradle deployAddon` (skill `build`).
+9. Tela HTML5, quando o cadastro precisar de UI própria (skill `sankhya-js`) — CRUD simples resolve com `<dynamicForm>` no menu.
+10. Build: `gradle deployAddon` (skill `build`).
 
 > **Delegação obrigatória aos sub-agents (Claude Code only):** tabela de delegação: ver `ADDON.md` (always-on no projeto).
 
@@ -244,6 +245,7 @@ Para tópicos específicos, invoke skill direta:
 - `value` — `@Value` / `ValueType`
 - `macros` — MacroTranslator SQL macros
 - `sankhya-utils` — utilitários `com.sankhya.util` já no classpath (null-safety, `BigDecimal`, data, XML/JSON)
+- `sankhya-js` — telas HTML5 do módulo `<addon>-vc` (AngularJS 1.x: `sk-application`, `sk-dynaform`, `ServiceProxy`, `gerarTela`)
 - `encoding` — ISO-8859-1
 - `build` — `gradle deployAddon`
 
