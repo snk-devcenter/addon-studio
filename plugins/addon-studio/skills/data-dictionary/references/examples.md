@@ -42,22 +42,24 @@
 </metadados>
 ```
 
-### Tabela com sequencia MANUAL
+### Tabela de log com sequencia AUTO
+
+Log, registro, historico e auditoria seguem o default `"A"` — a PK e sequencia gerada pelo framework, igual a cadastro:
 
 ```xml
-<table name="TDCXYZCFG" sequenceType="M">
-    <description>Configuracao</description>
+<table name="TDCXYZLOG" sequenceType="A" sequenceField="NULOG">
+    <description>Log de Processamento</description>
     <primaryKey>
-        <field name="CODCONF"/>
+        <field name="NULOG"/>
     </primaryKey>
     <instances>
-        <instance name="TdcXyzConfiguracao">
-            <description>Configuracao</description>
+        <instance name="TdcXyzLogProcessamento">
+            <description>Log de Processamento</description>
         </instance>
     </instances>
     <fields>
-        <field name="CODCONF" dataType="INTEIRO" readOnly="S" order="1" allowSearch="N" visibleOnSearch="N">
-            <description>Cod. Configuracao</description>
+        <field name="NULOG" dataType="INTEIRO" readOnly="S" order="1" allowSearch="S" visibleOnSearch="S">
+            <description>Nro. Log</description>
         </field>
         <!-- ... demais campos ... -->
     </fields>
@@ -77,7 +79,9 @@
 </table>
 ```
 
-### PK Composta (MANUAL)
+### Tabela com sequencia MANUAL (excecao)
+
+`sequenceType="M"` **so** quando a PK nao tem coluna pra sequenciar ou o valor vem de fora — aqui, PK composta so de FKs (tabela de vinculo). Config/log/cadastro **nao** entram nesse caso:
 
 ```xml
 <table name="TDCXYZVIN" sequenceType="M">
@@ -86,7 +90,19 @@
         <field name="CODORIG"/>
         <field name="CODPROD"/>
     </primaryKey>
-    <!-- ... -->
+    <instances>
+        <instance name="TdcXyzVinculoProduto">
+            <description>Vinculo Origem x Produto</description>
+        </instance>
+    </instances>
+    <fields>
+        <field name="CODORIG" dataType="INTEIRO" order="1" allowSearch="S" visibleOnSearch="S">
+            <description>Cod. Origem</description>
+        </field>
+        <field name="CODPROD" dataType="INTEIRO" order="2" allowSearch="S" visibleOnSearch="S">
+            <description>Cod. Produto</description>
+        </field>
+    </fields>
 </table>
 ```
 
@@ -139,7 +155,7 @@
 **XML (`TDCXYZCFG.xml`):**
 
 ```xml
-<table name="TDCXYZCFG" sequenceType="M">
+<table name="TDCXYZCFG" sequenceType="A" sequenceField="CODCONF">
     <description>Configuracao</description>
     <primaryKey>
         <field name="CODCONF"/>

@@ -191,27 +191,34 @@
 </scripts>
 ```
 
-## V005-INSERT_DATA_TDCXYZCFG.xml — Dados de configuração
+## V005-INSERT_DATA_TDCXYZCTL.xml — Dados iniciais
+
+PK derivada de `MAX+1` (o dicionário é dono da sequência) e idempotência pela **chave de negócio** (`ROTINA`), não pela PK:
 
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <scripts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="../.gradle/scripts.xsd">
 
-    <sql nomeTabela="TDCXYZCFG" ordem="1" executar="SEMPRE"
-         tipoObjeto="TABLE" nomeObjeto="INSERT_CONFIG"
-         descricao="Insere um registro padrao de configuracao">
+    <sql nomeTabela="TDCXYZCTL" ordem="1" executar="SEMPRE"
+         tipoObjeto="TABLE" nomeObjeto="INSERT_ROTINA_X"
+         descricao="Registra a rotina X no controle">
         <mssql>
-            INSERT INTO TDCXYZCFG (CODCFG)
-            SELECT 1 WHERE NOT EXISTS (SELECT 1 FROM TDCXYZCFG)
+            INSERT INTO TDCXYZCTL (CODCTL, ROTINA)
+            SELECT COALESCE(MAX(CODCTL), 0) + 1, 'ROTINA_X'
+            FROM TDCXYZCTL
+            WHERE NOT EXISTS (SELECT 1 FROM TDCXYZCTL WHERE ROTINA = 'ROTINA_X')
         </mssql>
         <oracle>
-            INSERT INTO TDCXYZCFG (CODCFG)
-            SELECT 1 FROM DUAL
-            WHERE NOT EXISTS (SELECT 1 FROM TDCXYZCFG)
+            INSERT INTO TDCXYZCTL (CODCTL, ROTINA)
+            SELECT NVL(MAX(CODCTL), 0) + 1, 'ROTINA_X'
+            FROM TDCXYZCTL
+            WHERE NOT EXISTS (SELECT 1 FROM TDCXYZCTL WHERE ROTINA = 'ROTINA_X')
         </oracle>
     </sql>
 
 </scripts>
 ```
+
+> Seed com PK literal (`SELECT 1`) disputa a próxima chave da sequência do framework. Registro único de configuração: não semear — deixar nascer pela tela/aplicação.
 

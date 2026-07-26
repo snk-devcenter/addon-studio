@@ -10,6 +10,15 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Corrigido
+
+- Skill `data-dictionary`: PK automática (`sequenceType="A"`) passa a ser o default explícito para tabela nova do addon — config, log, registro e tabela de apoio incluídos. `"M"` fica restrito a PK composta só de FKs, código de negócio externo ou espelho de chave nativa, com o sintoma nomeado (`ORA-01400` ao gravar pela tela).
+- Skill `data-dictionary`: exemplos de `sequenceType="M"` deixam de usar tabela de configuração — era o trecho copiado para tabelas que deveriam ter PK automática; o caso manual agora é tabela de vínculo com PK composta de FKs.
+- Skill `database`: seed de dados iniciais deriva a PK de `MAX(<PK>)+1` e testa idempotência pela chave de negócio, em vez de fixar chave literal que disputa a sequência do framework; registro único de configuração não é semeado. DDL da PK sem `IDENTITY`/`CREATE SEQUENCE`.
+- Skill `entity`: PK automática documentada como default, com a consequência no código — não setar a PK antes do `save` num insert.
+- Sub-agents `entity-architect` e `dbscript-builder`: `sequenceType` deixa de ser pergunta aberta ao dev (assume `"A"`) e PK literal em seed entra nos anti-patterns.
+- Sub-agent `addon-reviewer`: PK manual em tabela de config/log/apoio e seed com PK literal passam a ser blockers de revisão.
+
 ## [2.18.0] - 2026-07-25
 
 ### Adicionado

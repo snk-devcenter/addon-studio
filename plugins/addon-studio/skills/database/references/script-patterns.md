@@ -360,24 +360,31 @@ Tabelas nativas Sankhya (tag `<nativeTable>` no dicionário) **NÃO têm CREATE 
 
 ---
 
-## INSERT — Dados de Configuração
+## INSERT — Dados Iniciais
+
+A PK da tabela é gerada pelo dicionário (`sequenceType="A"`). O seed **não fixa a chave**: deriva de `MAX(<PK>)+1` e testa existência pela **chave de negócio**, não pela PK — fixar `1`, `2`, `3` disputa espaço com o próximo valor do framework e derruba a gravação pela tela.
 
 ```xml
 
-<sql nomeTabela="TDCXYZCFG" ordem="1" executar="SEMPRE"
-     tipoObjeto="TABLE" nomeObjeto="INSERT_CONFIG"
-     descricao="Inserir registro padrao de configuracao">
+<sql nomeTabela="TDCXYZCTL" ordem="1" executar="SEMPRE"
+     tipoObjeto="TABLE" nomeObjeto="INSERT_ROTINA_X"
+     descricao="Registrar rotina X no controle">
     <mssql>
-        INSERT INTO TDCXYZCFG (CODCFG)
-        SELECT 1 WHERE NOT EXISTS (SELECT 1 FROM TDCXYZCFG)
+        INSERT INTO TDCXYZCTL (CODCTL, ROTINA)
+        SELECT COALESCE(MAX(CODCTL), 0) + 1, 'ROTINA_X'
+        FROM TDCXYZCTL
+        WHERE NOT EXISTS (SELECT 1 FROM TDCXYZCTL WHERE ROTINA = 'ROTINA_X')
     </mssql>
     <oracle>
-        INSERT INTO TDCXYZCFG (CODCFG)
-        SELECT 1 FROM DUAL
-        WHERE NOT EXISTS (SELECT 1 FROM TDCXYZCFG)
+        INSERT INTO TDCXYZCTL (CODCTL, ROTINA)
+        SELECT NVL(MAX(CODCTL), 0) + 1, 'ROTINA_X'
+        FROM TDCXYZCTL
+        WHERE NOT EXISTS (SELECT 1 FROM TDCXYZCTL WHERE ROTINA = 'ROTINA_X')
     </oracle>
 </sql>
 ```
 
-> **Dica:** INSERTs com `executar="SEMPRE"`, usar `MERGE` ou `INSERT ... WHERE NOT EXISTS` para idempotência. Oracle usar `FROM DUAL`, SQL Server omitir.
+> **Dica:** INSERTs com `executar="SEMPRE"`, usar `MERGE` ou `INSERT ... WHERE NOT EXISTS` para idempotência. Oracle usar `FROM DUAL` quando não há tabela na origem, SQL Server omitir.
+
+> **Registro único de configuração:** não semear. Deixar o registro nascer pela tela ou pela aplicação — assim a PK sai da sequência do framework e não existe chave literal pra colidir.
 

@@ -192,6 +192,8 @@ Macros SQL Sankhya (`dbDate`, `nullValue`, etc.) funcionam em `<expression>` do 
 - [ ] `ordem` duplicada dentro do mesmo arquivo
 - [ ] Alterar dbscript já aplicado (criar novo `V<NNN>` em vez)
 - [ ] `FOREIGN KEY` constraint no DDL — não declarar (Sankhya gerencia via `<relationShip>` no dicionário)
+- [ ] `IDENTITY` / `GENERATED AS IDENTITY` / `CREATE SEQUENCE` / trigger de sequência para a PK — quem gera é o dicionário (`sequenceType="A"`), coluna é `INT`/`NUMBER(10)` simples
+- [ ] Seed (`INSERT`) com PK literal (`SELECT 1`) — derivar `MAX(<PK>)+1` (`COALESCE`/`NVL`) e usar `WHERE NOT EXISTS` pela chave de negócio; chave fixa disputa o próximo valor da sequência do framework
 - [ ] Versionamento `V<NNN>` fora do padrão (sem `V`, sem zero-padding, etc.)
 - [ ] **Coluna física no banco para campo com `calculated="S"`** — apenas campos com a flag `calculated="S"` no XML do dicionário **não** geram DDL. Campos com `<expression>` mas **sem** `calculated="S"` (default `N`) **continuam tendo coluna persistida** — `<expression>` roda só em INSERT/UPDATE e o valor fica na coluna. Critério de filtro ao gerar dbscript: ler atributo `calculated` do `<field>`, **não** a presença ou ausência de `<expression>`.
 

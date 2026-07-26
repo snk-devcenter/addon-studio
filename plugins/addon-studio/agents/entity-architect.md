@@ -97,6 +97,8 @@ Após gerar:
 - **Apenas `<field>` SEM `calculated="S"`** tem coluna no dbscript (DDL)
 - Campos com `calculated="S"` **NÃO** geram coluna no dbscript, mas **mantêm** `@Column` normal na entity
 - PK do XML bate com `@Id`/`@EmbeddedId` da entity
+- `sequenceType="A"` + `sequenceField` = coluna PK, salvo exceção justificada (PK só de FKs, código de negócio externo, espelho de nativa). `"M"` em tabela de config/log/apoio é defeito — tela grava sem chave e estoura `ORA-01400`
+- Seed de dados no dbscript não fixa PK literal — deriva `MAX(<PK>)+1` e testa existência pela chave de negócio
 - Relacionamentos do XML batem com `@OneToMany`/`@OneToOne` da entity
 - `<nativeTable>` no XML ⇔ `isNativeTable = true` na entity; `<nativeInstance>` no XML ⇔ `isNativeInstance = true` na entity
 
@@ -110,7 +112,7 @@ Após gerar:
 4. Campos: lista completa com `dataType` conforme schema `metadados.xsd` — `TEXTO`, `CAIXA_TEXTO`, `INTEIRO`, `DECIMAL`, `DATA`, `DATA_HORA`, `HORA`, `CHECKBOX`, `LISTA`, `PESQUISA`, `HTML`, `ARQUIVO`, `MULTIPLOS_ARQUIVOS`, `IMAGEM`. Atenção: `TEXTO`/`CAIXA_TEXTO` exigem `size`; `LISTA` exige sub-tag `<fieldOptions>`; `PESQUISA` exige `targetInstance`+`targetField`+`targetType`.
 5. Relacionamentos com outras tabelas?
 6. Auditoria (`DHALTER`, `DHCREATE`, `CODUSU`)?
-7. Sequência (`sequenceType`): `A` (auto) ou `M` (manual)?
+7. Sequência (`sequenceType`): **não perguntar** — assumir `A` + `sequenceField` = coluna PK (inclui config, log, registro, tabela de apoio). Só considerar `M` se a PK for composta só de FKs, código de negócio informado por fora, ou espelho de chave nativa (skill `data-dictionary`, seção "Como determinar `sequenceType`")
 
 ## Output format
 

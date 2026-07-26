@@ -59,6 +59,7 @@ Estruturar feedback em 3 níveis de severidade:
 ### 🔴 Blockers (must-fix antes de merge)
 - Violação que quebra runtime ou compromete segurança
 - Inclui: encoding errado, JPA padrão em vez de @JapeEntity, `new` em dep gerenciada, RuntimeException cru, controller com try/catch, repository manual
+- Inclui: `<table sequenceType="M">` em tabela de config/log/registro/apoio do addon (tela grava sem chave → `ORA-01400`); seed em dbscript com PK literal em tabela de PK automática. `"M"` só passa com PK composta só de FKs, código de negócio externo ou espelho de chave nativa — ver skill `data-dictionary`, seção "Como determinar `sequenceType`"
 
 ### 🟡 Warnings (should-fix)
 - Violação que funciona mas foge do padrão e dificulta manutenção
