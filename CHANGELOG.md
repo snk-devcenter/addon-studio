@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [2.18.1] - 2026-07-26
+
 ### Corrigido
 
 - Skill `data-dictionary`: PK automática (`sequenceType="A"`) passa a ser o default explícito para tabela nova do addon — config, log, registro e tabela de apoio incluídos. `"M"` fica restrito a PK composta só de FKs, código de negócio externo ou espelho de chave nativa, com o sintoma nomeado (`ORA-01400` ao gravar pela tela).
@@ -200,6 +202,7 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v2.18.0...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v2.18.1...HEAD
+[2.18.1]: https://github.com/snk-devcenter/addon-studio/compare/v2.18.0...v2.18.1
 [2.18.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.17.0...v2.18.0
 [2.17.0]: https://github.com/snk-devcenter/addon-studio/releases/tag/v2.17.0
