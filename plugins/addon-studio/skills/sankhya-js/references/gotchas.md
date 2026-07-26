@@ -163,7 +163,32 @@ Se `$translate.use()` retornar `undefined`, `SkI18nService.getLang()` devolve `'
 
 ---
 
-## 14. `workspace` global injetado pelo GWT
+## 14. Interface do framework: implementacao parcial **lanca**
+
+`ObjectUtils.isImplementorOf(obj, Interface)` nao avisa — derruba:
+
+```javascript
+if (!obj.hasOwnProperty(method)) {
+    throw new Error(objName + ' não é uma implementação de ' + implementor.name);
+}
+```
+
+Passa direto so se `obj.__proto__ === Interface.prototype`. Fora disso, **cada** metodo do prototype da interface precisa existir como **own property** do objeto — heranca por prototype chain nao conta, e metodo que a interface declara mas o framework nunca chama tambem e exigido.
+
+Chamado no init de: `IDynaformInterceptor`, `IFormInterceptor`, `IDatagridInterceptor`, `IFilterPanelInterceptor`, `IGridPrinterInterceptor`, `IDynaformConfigObserver`, `CriteriaProvider`, `FieldBinder`, `IDataSetObserver`, `RecordValidator`, `Criteria`, `DataSource`.
+
+Sintoma: a tela morre no carregamento com `Objeto não é uma implementação de IDynaformInterceptor` — `objName` cai em `'Objeto'` quando o interceptor nao tem campo `name`, o que nao ajuda a localizar qual dos interceptors da tela e o culpado.
+
+Forma segura:
+
+```javascript
+ObjectUtils.implements(self, IDynaformInterceptor);  // angular.extend do prototype: vira own property
+self.acceptField = function (fieldMD, dynaform, dataset) { return fieldMD.name !== 'AD_INTERNO'; };
+```
+
+---
+
+## 15. `workspace` global injetado pelo GWT
 
 ```javascript
 /**A variavel 'workspace' e 'PROFILEID' são injetadas no contexto pelo GWT;*/

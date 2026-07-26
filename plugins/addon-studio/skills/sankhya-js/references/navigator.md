@@ -4,6 +4,10 @@ Barra de botoes ligada a um `dataset`: primeiro/anterior/proximo/ultimo, novo, e
 
 Arquivos: navigator.directive.js, navigator.controller.js.
 
+> **Dentro de um `sk-dynaform` esta pagina nao se aplica.** O dynaform monta o navigator no proprio template, sem HTML da tela onde por atributo. O controle ali e programatico, por `dynaform.getNavigatorAPI()` — chaves, defaults e armadilhas em [form.md secao 2.1](form.md). Esta pagina cobre o `sk-navigator` que **voce** escreve no HTML, junto de um `sk-dataset` proprio.
+>
+> Para uma toolbar completa sobre dataset (navigator + gridconfig + gridprinter + anexos + pesquisa de entidade) sem montar um dynaform, existe `sk-taskbar`, que recebe as mesmas chaves em um objeto: `<sk-taskbar sk-dataset="ctrl.dataset" sk-navigator-options="ctrl.navOptions">`. O objeto aceita `disableNavigator`, `showNavigation`, `showAddButton`, `showCopyButton`, `showRemoveButton`, `showRefreshButton`, `showCancelButton`, `showSaveButton`, `showEditButton` e `compactAddBtn`; chave omitida cai no default (tudo `true`).
+
 ## Directive
 
 ```html
@@ -36,7 +40,7 @@ Arquivos: navigator.directive.js, navigator.controller.js.
 **Visibilidade (todos `=?`)**
 | Atributo | Efeito |
 |---|---|
-| `show-crud` | umbrella — controla add/remove e chama `dataset.setEnableDeleteFromNavigator` |
+| `show-crud` | umbrella; **sem prefixo `sk-`** (o binding e `showCrud: '=?showCrud'`). Ver detalhe abaixo |
 | `sk-show-navigation` | mostra/oculta primeiro/anterior/proximo/ultimo |
 | `sk-show-add-button` / `sk-show-copy-button` / `sk-show-remove-button` / `sk-show-editar-button` | granular por botao CRUD |
 | `sk-show-refresh-button` / `sk-show-cancel-button` / `sk-show-save-button` | granular de acao |
@@ -91,6 +95,27 @@ Todos chamam `enableDisableNavControls()` no fim para recalcular estado dos boto
 
 ## Fluxos especiais
 
+### `show-crud="false"` — o que sai e o que fica
+
+Cada grupo do template testa `!(showCrud === false)`. Com `show-crud="false"` saem:
+
+- botao novo (`sk-btn-novo`)
+- grupo salvar + descartar
+- grupo excluir / duplicar / editar
+- botao atualizar
+
+**Fica de fora do umbrella o grupo de navegacao** — primeiro/anterior/proximo/ultimo continuam visiveis, porque o `ng-if` deles nao consulta `showCrud`. Ou seja, `show-crud="false"` entrega exatamente uma barra somente-leitura navegavel; para tirar tambem a navegacao, somar `sk-show-navigation="false"`.
+
+A comparacao e `=== false` estrita: `show-crud="0"`, `show-crud="'false'"` (string) ou o atributo ausente **nao** desligam nada.
+
+Alem da UI, o `$watch('dataset')` faz:
+
+```javascript
+$scope.dataset.setEnableDeleteFromNavigator(!($scope.showCrud === false || $scope.showRemoveButton === false));
+```
+
+Isso e o que impede o delete por outros caminhos (teclado, menu de contexto do grid) — esconder o botao com `sk-show-remove-button="false"` tem o mesmo efeito colateral.
+
 ### Navegacao com dirty + `sk-always-navigation`
 
 ```javascript
@@ -142,7 +167,13 @@ Quando ativo, prev/next delegam para `gridInstance.previousRow()`/`nextRow()` em
 
 No select, se o campo esta em `sk-tab-item` e `sk-tabs-selected-index` esta bindado, atualiza o index e so entao destaca (`$timeout 50ms`). Adiciona classe `highlighted-field` no `.form-group` pai e faz `scrollIntoView`.
 
-`openSearch` pula se `$scope.isInsideDynaform` — o dynaform ja oferece essa busca nativamente.
+A guarda real e `sk-enable-search-fields`: `openSearch` so abre com `enableSearchFields` truthy, e nenhum dos dois navigators do dynaform recebe esse atributo.
+
+```javascript
+if(!$scope.isInsideDynaform && $scope.enableSearchFields){ ... }
+```
+
+`isInsideDynaform` **nao existe** — nao esta no `scope` da directive nem e atribuido em lugar nenhum do `sankhya-js`. Sempre `undefined`, logo a primeira metade da condicao e sempre verdadeira. Nao tente setar via atributo: por ser scope isolado, nao chega.
 
 ### Alerta de edicao
 
@@ -154,13 +185,15 @@ Driven pelo parametro MGE `global.notifica.alteracao.dataset`. Quando ativo, pop
 
 2. **`setDataGridMode(true)` sem `gridInstance` lanca**. Erro literal: `'Para usar datagridmode e obrigatorio a instancia do grid.'`. Sempre passar a instancia (obtida via `datagrid.api` ou `SkComponentRegistry`).
 
-3. **`show-crud === false` alem de esconder add/remove chama `dataset.setEnableDeleteFromNavigator(false)`**. Isso afeta tambem delete por teclado ou menu de contexto.
+3. **`show-crud === false` nao esconde a navegacao e afeta o delete fora da barra**. Escopo exato do umbrella e o efeito em `setEnableDeleteFromNavigator` na secao "`show-crud="false"` — o que sai e o que fica".
+
+3.1. **`sk-show-editar-button` testa `=== true`, os outros testam `=== false`.** O botao editar-registro fica oculto por default e so aparece com o valor booleano `true` — nao basta a ausencia do atributo como nos demais. Nao confundir com `sk-show-edit-button` (edicao multipla), que segue a regra normal.
 
 4. **`sk-external-insertion-mode=true` reescreve todas as regras de visibilidade**. Se ativado por engano, add/save/cancel/prev/next aparecem em momentos inesperados. So usar em fluxos que gerenciam insertion externamente.
 
 5. **`sk-always-navigation` com dirty dispara `dataset.save()` automatico**. Pode acionar regras do backend, validacoes, eventos `before-post` do form. Usuarios clicando prev/next rapido podem gerar saves em cascata.
 
-6. **`KeyboardManager.bind('Ctrl+F', openSearch)` nao e desregistrado no `$destroy`**. N navigators = N bindings. Colide com `Ctrl+F` do `sk-application` (que dispara `KeyboardEvents.FIND`). Em telas com multiplos navigators o comportamento vira loteria. Evitar montar mais de um `sk-navigator` por tela.
+6. **`KeyboardManager.bind('Ctrl+F', openSearch)` nao e desregistrado no `$destroy`**. N navigators = N bindings. Colide com `Ctrl+F` do `sk-application` (que dispara `KeyboardEvents.FIND`). Em telas com multiplos navigators o comportamento vira loteria. Evitar montar mais de um `sk-navigator` por tela — lembrando que **o dynaform ja monta dois** (toolbar principal + `sk-fixed-bar`), entao um `sk-navigator` seu numa tela de dynaform e o terceiro binding. O que impede os dois do dynaform de abrirem o panel e so `enableSearchFields` estar `undefined` — o bind existe e responde.
 
 7. **Deep copy metadata carrega uma vez por troca de dataset**. Flag `_deepCopyMDLoaded` impede reload ate o dataset ser substituido por outra instancia. Mudar `entityName` do mesmo dataset nao retriggera. Para forcar reload, trocar a referencia do dataset.
 
