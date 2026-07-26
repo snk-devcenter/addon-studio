@@ -35,6 +35,8 @@ Atributo `name` da tag raiz vem de `@JapeEntity(table = "...")`. Atributo `name`
 | `@EmbeddedId` com um campo `@GeneratedValue(AUTO)` | `"A"` | nome coluna |
 | `@EmbeddedId` sem AUTO (todos manuais ou sem `@GeneratedValue`) | `"M"` | - |
 
+> `@GeneratedValue(MANUAL)` numa entidade existente costuma ser erro herdado, nao decisao. Antes de propagar `"M"` pro XML, conferir contra as excecoes da SKILL secao 1.4 ("Como determinar `sequenceType`") — tabela de config/log/apoio e sempre `"A"`.
+
 ---
 
 ## Mapeamento de Atributos `@Column` -> `<field>`

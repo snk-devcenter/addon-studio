@@ -13,6 +13,8 @@ private Integer codEntidade;
 
 > PK sequencial: nao use coluna com prefixo `ID`. Use `COD*` (cadastros) ou `NU*` (movimentos/documentos).
 
+> **PK e automatica por padrao.** A geracao fica no XML do dicionario (`sequenceType="A" sequenceField="<coluna>"`) — vale pra cadastro, configuracao, log, registro e tabela de apoio. Consequencia no codigo: **nao setar a PK** antes de `save` num insert (nem no service, nem no mapper) — o framework preenche. Ver skill `data-dictionary`, secao "Como determinar `sequenceType`", pras poucas excecoes de PK manual.
+
 ## PK Composta (`@Embeddable`)
 
 Tabela com PK composta — crie classe separada anotada com `@Embeddable`.

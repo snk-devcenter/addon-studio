@@ -21,7 +21,7 @@ Entidade Java = representação domínio de tabela banco. **Limpa** — contém 
 | `@JoinColumn` só tem `name` e `referencedColumnName` | `@JoinColumn(name = "...", referencedColumnName = "...")` |
 | `@JapeEntity` tem `entity`, `table`, `isNativeTable` e `isNativeInstance` | Addon puro: `@JapeEntity(entity = "...", table = "...")`. Tabela nativa Sankhya: adicionar `isNativeTable = true`. Instância também nativa: adicionar `isNativeInstance = true`. Veja seção 1.2. |
 | Sem `@Expression`                                    | Expressões ficam no XML (`<expression>`).                 |
-| Sem `@GeneratedValue`                                | Sequência fica no XML (`sequenceType`/`sequenceField`).   |
+| Sem `@GeneratedValue`                                | Sequência fica no XML (`sequenceType`/`sequenceField`) — default `"A"`, PK automática. |
 | Sem `@Option` / `@Property`                          | Opções ficam no XML (`<fieldOptions>`).                   |
 | Lombok obrigatório                                   | `@Data`, `@NoArgsConstructor`, `@AllArgsConstructor`.     |
 | Convencao de nomenclatura no `entity`/`table`        | Veja secao 1.1.                                           |

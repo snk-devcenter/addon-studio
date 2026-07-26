@@ -62,7 +62,7 @@ Entidade Java (`@JapeEntity`) = classe dominio **limpa** — so `@Column(name = 
 | Atributo        | Descricao                                                                                                       |
 |:----------------|:----------------------------------------------------------------------------------------------------------------|
 | `name`          | Nome tabela no banco.                                                                               |
-| `sequenceType`  | `"A"` (automatico) ou `"M"` (manual).                                                                           |
+| `sequenceType`  | `"A"` (automatico) ou `"M"` (manual). **Default `"A"`** — `"M"` so nas excecoes da secao "Como determinar". |
 | `sequenceField` | Coluna PK que recebe sequencia. **Obrigatorio com `sequenceType="A"`; omitir com `sequenceType="M"`.** |
 
 ### Elemento filho obrigatorio: `<description>`
@@ -86,25 +86,42 @@ Entidade Java (`@JapeEntity`) = classe dominio **limpa** — so `@Column(name = 
 
 ### Como determinar `sequenceType`
 
-| Caso                                    | XML                                         |
-|:-----------------------------------------|:--------------------------------------------|
-| PK simples geracao automatica        | `sequenceType="A" sequenceField="<coluna>"` |
-| PK simples geracao manual            | `sequenceType="M"` (sem `sequenceField`)    |
-| PK composta - algum campo auto       | `sequenceType="A" sequenceField="<coluna>"` |
-| PK composta - todos manuais              | `sequenceType="M"` (sem `sequenceField`)    |
+**Default do ecossistema: `"A"` (automatica).** Tabela nova do addon com PK propria nasce `sequenceType="A" sequenceField="<coluna PK>"` — quem gera o valor e o framework. Cadastro, **configuracao, log, registro, historico, auditoria, fila de integracao**: todos `"A"`. Nao perguntar ao dev qual usar: assumir `"A"` e so tratar `"M"` se a PK cair numa das excecoes abaixo.
+
+`"M"` e excecao e precisa de justificativa. Unicos casos legitimos:
+
+| Caso legitimo para `"M"`                                                    | Por que                                                            |
+|:----------------------------------------------------------------------------|:-------------------------------------------------------------------|
+| PK composta so de FKs (tabela de ligacao/vinculo)                           | Nao existe coluna pra sequenciar — o valor sai das FKs             |
+| PK e codigo de negocio informado pelo usuario ou por sistema externo         | O valor tem significado fora do addon; framework nao pode inventar |
+| PK espelha chave de registro nativo Sankhya (1:1 com `NUNOTA`, `CODPARC`, ...) | O valor ja existe no registro nativo                              |
+
+> **Por que `"M"` fora desses casos esta errado:** joga a geracao da PK pra aplicacao (`MAX+1` — corrida sob concorrencia) e quebra a gravacao pela tela do dicionario, que conta com a sequencia do framework. **Sintoma tipico:** usuario clica em "novo" na tela gerada, grava, e estoura `ORA-01400: cannot insert NULL into (<TABELA>.<PK>)` — a tela nao preenche PK que o framework nao gera. Tabela de log/config/apoio com PK manual e defeito, nao escolha de design.
+>
+> A armadilha e tabela de apoio "que so o dbscript alimenta": se ela tem `<instance>`, tem tela — e alguem vai clicar em novo. Ter seed no dbscript **nao** e motivo pra `"M"`.
+
+| Estrutura da PK                                              | XML                                                    |
+|:-------------------------------------------------------------|:-------------------------------------------------------|
+| PK simples (caso comum)                                      | `sequenceType="A" sequenceField="<coluna>"`            |
+| PK composta com uma coluna sequencial (ex.: `NUITEM`)        | `sequenceType="A" sequenceField="<coluna sequencial>"` |
+| PK composta so de FKs / PK = codigo de negocio externo       | `sequenceType="M"` (sem `sequenceField`)               |
 
 **Exemplos XML:**
 
 ```xml
-<!-- AUTO -->
+<!-- AUTO — padrao, inclui config/log/historico -->
 <table name="TDCXYZPRD" sequenceType="A" sequenceField="CODPRODUTO">
     <description>Produtos</description>
     ...
 </table>
 
-<!-- MANUAL -->
-<table name="TDCXYZCFG" sequenceType="M">
-    <description>Configuracao</description>
+<!-- MANUAL — excecao: PK composta so de FKs (tabela de vinculo) -->
+<table name="TDCXYZVIN" sequenceType="M">
+    <description>Vinculo Origem x Produto</description>
+    <primaryKey>
+        <field name="CODORIG"/>
+        <field name="CODPROD"/>
+    </primaryKey>
     ...
 </table>
 ```
@@ -563,7 +580,7 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 
 1. [ ] Criar `<NOME_TABELA>.xml` em `datadictionary/`.
 2. [ ] `<table>` pra novas ou `<nativeTable>` pra nativas. Em `<nativeTable>`, escolher `<instance>` (instancia nova do addon) ou `<nativeInstance>` (instancia nativa Sankhya — nome reusa entidade do ERP).
-3. [ ] Definir `sequenceType` e `sequenceField` conforme estrategia.
+3. [ ] `sequenceType="A"` + `sequenceField="<coluna PK>"` (default — inclui config/log/historico). `"M"` so nas excecoes da secao 1.4.
 4. [ ] Declarar `<description>` da `<table>` (vai pra `TDDTAB.DESCRTAB`, NOT NULL).
 5. [ ] Declarar `<primaryKey>` com campos PK.
 6. [ ] Declarar `<instance>` com nome entidade + `<description>` propria da instancia. Instancia derivada de nativa? Informar `parentInstance` (+ `resourceId`).
@@ -612,6 +629,8 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 | `<description>` vazia ou ausente em `<field>`     | Preencher `<description>` obrigatorio.      |
 | Omitir `<description>` filha de `<table>` (so na `<instance>`) | Adicionar `<description>` propria de `<table>`. Sem ela, deploy falha com `DESCRTAB NULL em TDDTAB`. |
 | Omitir `sequenceType` na tag `<table>`            | Sempre informar `sequenceType` (+ `sequenceField` se AUTO).      |
+| `sequenceType="M"` em tabela de config, log, registro, historico ou cadastro do addon | Trocar por `sequenceType="A" sequenceField="<coluna PK>"`. `"M"` so em PK composta de FKs, codigo de negocio externo ou PK espelhada de nativa. |
+| `sequenceType="A"` sem `sequenceField`            | `sequenceField` e obrigatorio com `"A"` — informar a coluna PK que recebe a sequencia. |
 | Omitir `relation` em `<relation>` de uma relacao 1:N | Informar `relation="OneToMany"`. O default do XSD e `OneToOne` — omitir gera cardinalidade errada sem erro de validacao. |
 | Atributos extras no `@Column` Java      | Manter **so** `name` — resto no XML.               |
 | Usar `@Expression` ou `@GeneratedValue` no Java  | Remover — vao pra `<expression>` e `sequenceType` no XML.       |

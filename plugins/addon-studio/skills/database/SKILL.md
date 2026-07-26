@@ -21,7 +21,7 @@ dbscripts/
 |-- V002-CREATE_TABLE_TDCXYZFAT.xml
 |-- V003-ALTER_TABLE_TGFCAB.xml
 |-- V004-ALTER_TABLE_TDCXYZCAD.xml
-|-- V005-INSERT_DATA_TDCXYZCFG.xml
+|-- V005-INSERT_DATA_TDCXYZCTL.xml
 |-- V<NNN>-<OPERACAO>_<TABELA>.xml
 ```
 
@@ -170,6 +170,8 @@ Abreviacoes padrao ecossistema Sankhya:
 > **Colunas customizadas em tabelas nativas Sankhya** (ex: `TGFCAB`) usam prefixo do **modulo** do addon + `_` (ex: `<MOD>_NOMECAMPO`) para evitar conflito com core Sankhya e com outros addons. Nunca usar prefixo generico tipo `AD_`.
 
 > **Chaves primarias sequenciais:** nao usar prefixo `ID`. Para **cadastros**, usar `COD` (ex: `CODCAD`, `CODCFG`); para **movimentos/documentos**, usar `NU` (ex: `NUNOTA`, `NUIMP`).
+
+> **Quem gera a PK e o dicionario, nao o banco.** Toda tabela nova do addon nasce com PK automatica (`sequenceType="A"` no `datadictionary/`, ver skill `data-dictionary`) — inclusive config, log, registro e tabela de apoio. No DDL a coluna PK e `NUMBER(10)`/`INT` simples: **sem** `IDENTITY`, `GENERATED AS IDENTITY`, `CREATE SEQUENCE` ou trigger de sequencia.
 
 ---
 
@@ -441,12 +443,13 @@ V003-ALTER_TABLE_TGFCAB.xml
 17. **PK sequencial sem `ID`** — usar `COD*` para cadastros e `NU*` para movimentos/documentos
 18. **CHECK para domínio fechado** — campo `LISTA` (valores das `<option>`) e `CHECKBOX` (`'S'`/`'N'`) exigem `CK_<TABELA>_<COLUNA>` em `<sql>` próprio, `tipoObjeto="CONSTRAINT"`, após o `ALTER TABLE ADD` da coluna
 19. **CHECK imutável** — mudar opções = DROP + recreate em novo `V<NNN>`, com `UPDATE` de migração antes se houver dado fora do novo domínio
+20. **Seed nunca fixa PK literal** — tabela do addon tem PK automática (dicionário), então `INSERT` de dados iniciais deriva a chave (`MAX(<PK>)+1`) e usa `WHERE NOT EXISTS` pela **chave de negócio**, nunca pela PK. Registro único de configuração: preferir que nasça pela tela/aplicação, sem seed
 
 ---
 
 ## Exemplos Completos
 
-Exemplos completos de XMLs — `V001-CREATE_TABLE_TDCXYZCAD.xml` (PK simples), `V002-CREATE_TABLE_TDCXYZFAT.xml` (PK composta), `V003-ALTER_TABLE_TGFCAB.xml` (tabela nativa) e `V005-INSERT_DATA_TDCXYZCFG.xml` (dados de configuração) — em [`references/examples.md`](references/examples.md).
+Exemplos completos de XMLs — `V001-CREATE_TABLE_TDCXYZCAD.xml` (PK simples), `V002-CREATE_TABLE_TDCXYZFAT.xml` (PK composta), `V003-ALTER_TABLE_TGFCAB.xml` (tabela nativa) e `V005-INSERT_DATA_TDCXYZCTL.xml` (dados iniciais com PK derivada) — em [`references/examples.md`](references/examples.md).
 
 ---
 
@@ -501,11 +504,14 @@ Exemplos completos de XMLs — `V001-CREATE_TABLE_TDCXYZCAD.xml` (PK simples), `
 - [ ] ADD CONSTRAINT com opções novas e `executar="SE_NAO_EXISTIR"` (última `ordem`)
 - [ ] Atualizar `<fieldOptions>` no datadictionary para refletir o mesmo domínio
 
-### Dados de configuração
+### Dados iniciais (seed)
 
 - [ ] Verificar último `V<NNN>-*.xml` existente para definir `N+1` (3 dígitos, zero-padded)
-- [ ] Nomear arquivo `V<NNN>-INSERT_DATA_<TABELA>.xml` (ex: `V005-INSERT_DATA_TDCXYZCFG.xml`)
+- [ ] Nomear arquivo `V<NNN>-INSERT_DATA_<TABELA>.xml` (ex: `V005-INSERT_DATA_TDCXYZCTL.xml`)
 - [ ] Usar `executar="SEMPRE"` com `INSERT ... WHERE NOT EXISTS` ou `MERGE` para idempotência
+- [ ] PK derivada de `MAX(<PK>)+1` (`COALESCE` no MSSQL, `NVL` no Oracle) — **nunca** valor literal, a sequência é do dicionário
+- [ ] `WHERE NOT EXISTS` pela **chave de negócio** do registro, não pela PK
+- [ ] Registro único de configuração: não semear — deixar nascer pela tela/aplicação
 
 
 ## Skills relacionadas
