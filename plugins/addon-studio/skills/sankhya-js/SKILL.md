@@ -1,6 +1,6 @@
 ---
 name: sankhya-js
-description: Telas HTML5 do addon (módulo `<addon>-vc`, `src/main/webapp/html5/<Tela>/`) escritas em AngularJS 1.x sobre o framework proprietário `sankhya-js` (módulo `snk`) — `sk-application`, `sk-dynaform`, `sk-dataset`, `sk-datagrid`, `sk-form`, `sk-wizard`, `sk-navigator`, `sk-pesquisa-input`, `SanPopup`, `PopUpParameter`, `MessageUtils`, `ServiceProxy`, `MetadataProvider`, `SkComponentRegistry`, `SkWorkspace`. Use ao criar, alterar, revisar ou depurar tela do addon, ao gerar tela com `gradle gerarTela`, ao consumir um `@Controller ...SP` do próprio addon a partir da tela, ao montar dynaform sobre `<instance>` do dicionário de dados, ao registrar a tela no menu via `<ui url="/$ctx/<Tela>.xhtml5">`, ou ao tocar em `.js`/`.html`/`.css` sob `webapp/html5/`. NÃO usar para o frontend novo de Design System (`snk-application` Stencil/web components em `frontend/<App>`, `gradle compileDS`), React ou Flex.
+description: Telas HTML5 do addon (módulo `<addon>-vc`, `src/main/webapp/html5/<Tela>/`) escritas em AngularJS 1.x sobre o framework proprietário `sankhya-js` (módulo `snk`) — `sk-application`, `sk-dynaform`, `sk-dataset`, `sk-datagrid`, `sk-form`, `sk-wizard`, `sk-navigator`, `sk-pesquisa-input`, `sk-text-input`, `sk-file-input`, `SanPopup`, `PopUpParameter`, `MessageUtils`, `ServiceProxy`, `MetadataProvider`, `SkComponentRegistry`, `SkWorkspace`. Use ao criar, alterar, revisar ou depurar tela do addon, ao gerar tela com `gradle gerarTela`, ao consumir um `@Controller ...SP` do próprio addon a partir da tela, ao montar dynaform sobre `<instance>` do dicionário de dados, ao registrar a tela no menu via `<ui url="/$ctx/<Tela>.xhtml5">`, ou ao tocar em `.js`/`.html`/`.css` sob `webapp/html5/`. NÃO usar para o frontend novo de Design System (`snk-application` Stencil/web components em `frontend/<App>`, `gradle compileDS`), React ou Flex.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 — telas HTML5 do módulo `<addon>-vc` (AngularJS 1.x + framework `sankhya-js`). Arquivos do `webapp` em UTF-8.
 ---
@@ -173,7 +173,7 @@ Cache por `entidade + locale`. Serve tanto para entidade nativa quanto para a do
 - [references/form.md](references/form.md) — `sk-form`, `sk-dynaform`, interceptors, `getNavigatorAPI()` (esconder botões CRUD do dynaform)
 - [references/dataset.md](references/dataset.md) — `sk-dataset`: entity/standalone, listeners, CRUD
 - [references/datagrid.md](references/datagrid.md) — `sk-datagrid`: backends, colunas custom
-- [references/inputs.md](references/inputs.md) — `sk-text-input`, `sk-combobox`, `sk-date-time-input`, `sk-switch`, `sk-checkbox`
+- [references/inputs.md](references/inputs.md) — os ~30 inputs da família `FieldBinder`, com índice de qual usar: texto (`sk-text-input`, `sk-text-area`, `sk-masked-input`), número (`sk-number-input`, `sk-numeric-stepper`), data/hora, escolha (`sk-combobox`, `sk-radio-input`, `sk-switch`, `sk-checkbox-list`), documento (`sk-cgc-cpf-input`, `sk-cep-input`, `sk-phone-input`) e arquivo (`sk-file-input`)
 - [references/navigator.md](references/navigator.md) — `sk-navigator`: barra CRUD + navegação
 - [references/filter-panel.md](references/filter-panel.md) — `sk-filter-panel` + `sk-filter-panel-btn`
 - [references/pesquisa.md](references/pesquisa.md) — `sk-pesquisa-input` + `SkPesquisaService`
