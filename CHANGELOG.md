@@ -10,17 +10,20 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [2.18.2] - 2026-07-27
+
 ### Adicionado
 
-- Skill `sankhya-js` documenta `dynaform.getNavigatorAPI()` — o único caminho para esconder botões CRUD de uma tela de dynaform — com chaves, defaults, encadeamento e a distinção de `dynaform.navigatorApi`.
-- Skill `sankhya-js` documenta `sk-taskbar` e seu `sk-navigator-options` como toolbar sobre dataset sem dynaform.
-- Skill `sankhya-js` avisa que `ObjectUtils.isImplementorOf` lança quando o objeto não declara todos os métodos da interface, com a saída via `ObjectUtils.implements`.
+- Skill `sankhya-js` documenta `dynaform.getNavigatorAPI()` — único caminho para esconder botão CRUD de tela de dynaform, já que o `sk-navigator` é interno ao template e nem `sk-dynaform` nem `<dynamicForm>` têm atributo para isso: as chaves de `navigatorOptions` com defaults, o encadeamento getter/setter e a distinção de `dynaform.navigatorApi` (o `SkNavigatorController` do `sk-api`).
+- Skill `sankhya-js`: armadilhas do navigator do dynaform — a barra fixa (`sk-fixed-bar`) não recebe remove/refresh/cancel/save, e os `sk-show-*` são `AND` com o `toolBarManager` do Helper de backend (exceto `showAddButton`/`showEditButton`), então a API só esconde e nunca força aparecer.
+- Skill `sankhya-js` documenta `sk-taskbar` + `sk-navigator-options` como toolbar sobre dataset sem dynaform.
+- Skill `sankhya-js`: `ObjectUtils.isImplementorOf` lança quando o objeto não declara todos os métodos da interface como own property — vale para as 12 interfaces do framework, com a saída via `ObjectUtils.implements`.
 
 ### Corrigido
 
-- Skill `sankhya-js` marca `interceptNavigator`, `interceptDynaform` e `interceptPersonalizedFilter` do `IDynaformInterceptor` como código morto — declarados na interface, nunca chamados.
+- Skill `sankhya-js` marca `interceptNavigator`, `interceptDynaform` e `interceptPersonalizedFilter` do `IDynaformInterceptor` como código morto — declarados na interface, nunca chamados; dos 7 métodos, só 4 rodam.
 - Skill `sankhya-js` corrige o escopo de `show-crud="false"` no `sk-navigator`: também esconde salvar/descartar/atualizar e **não** esconde a navegação.
-- Skill `sankhya-js` remove a orientação de implementar "pelo menos os métodos que pretende usar" em interceptor — implementação parcial derruba a tela no init.
+- Skill `sankhya-js` deixa de orientar interceptor com "pelo menos os métodos que pretende usar" — implementação parcial derruba a tela no init.
 - Skill `sankhya-js` corrige a guarda do `Ctrl+F` do `sk-navigator`: `isInsideDynaform` nunca é atribuído; quem controla é `sk-enable-search-fields`.
 
 ## [2.18.1] - 2026-07-26
@@ -215,7 +218,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v2.18.1...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v2.18.2...HEAD
+[2.18.2]: https://github.com/snk-devcenter/addon-studio/compare/v2.18.1...v2.18.2
 [2.18.1]: https://github.com/snk-devcenter/addon-studio/compare/v2.18.0...v2.18.1
 [2.18.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.17.0...v2.18.0
 [2.17.0]: https://github.com/snk-devcenter/addon-studio/releases/tag/v2.17.0
