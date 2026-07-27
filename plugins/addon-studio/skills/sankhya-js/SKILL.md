@@ -156,7 +156,7 @@ Cache por `entidade + locale`. Serve tanto para entidade nativa quanto para a do
 ### Componentes
 
 - [references/application.md](references/application.md) — `sk-application`: container raiz, singleton, ciclo de vida
-- [references/form.md](references/form.md) — `sk-form`, `sk-dynaform`, interceptors
+- [references/form.md](references/form.md) — `sk-form`, `sk-dynaform`, interceptors, `getNavigatorAPI()` (esconder botões CRUD do dynaform)
 - [references/dataset.md](references/dataset.md) — `sk-dataset`: entity/standalone, listeners, CRUD
 - [references/datagrid.md](references/datagrid.md) — `sk-datagrid`: backends, colunas custom
 - [references/inputs.md](references/inputs.md) — `sk-text-input`, `sk-combobox`, `sk-date-time-input`, `sk-switch`, `sk-checkbox`

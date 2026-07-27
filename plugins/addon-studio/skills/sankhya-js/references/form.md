@@ -181,8 +181,8 @@ Exposta em `self.*` no controller. ~150 metodos. Agrupados:
 - `getFilterPanelInstance()` / `setCustomFilterPanel(elem)`.
 - `hasDynamicFilter()` / `hasForceEnablePersonalizedFilter()` / `showTourDynamicFilter()`.
 - `filterFieldsPersonalizedFilter(fn)` / `filterInstanceName`.
-- `getNavigatorAPI()` — navegador superior.
-- `setNavigatorSaveHandler(fn)` / `setNavigatorAddHandler(fn)`.
+- `getNavigatorAPI()` — toggles de visibilidade da barra CRUD (ver secao 2.1).
+- `setNavigatorSaveHandler(fn)` / `setNavigatorAddHandler(fn)` — atalhos para `navigatorApi.setSaveHandler` / `setAddHandler`.
 - `hideBtnIsFavorite()`.
 
 **Abas / blocos**
@@ -242,6 +242,72 @@ O controller se registra como observer do dataset. Estes metodos sao invocados p
 - `insertionModeActivated()`.
 - `saveAvoided(reason)`.
 - `allEvents(event)` — catch-all.
+
+### 2.1. Controlar a barra CRUD do dynaform (`getNavigatorAPI()`)
+
+O `sk-navigator` do dynaform e **interno ao template** — nao ha HTML da tela onde colocar `show-crud` ou `sk-show-add-button`. O unico ponto de controle e programatico, via `dynaform.getNavigatorAPI()`.
+
+**Nao existe atributo do `sk-dynaform` que desligue o CRUD.** Nem `<dynamicForm>` no dicionario de dados. Quem precisa de dynaform sem CRUD chama essa API.
+
+`getNavigatorAPI()` devolve um wrapper gerado por `ObjectUtils.buildPublicAPIFromObject($scope.navigatorOptions)`. Cada chave vira um metodo que e **getter sem argumento e setter encadeavel com argumento**:
+
+```javascript
+api.showAddButton()        // -> true  (getter)
+api.showAddButton(false)   // -> a propria api (setter, encadeia)
+```
+
+Chaves e defaults:
+
+| Metodo | Default | Efeito |
+|---|---|---|
+| `disableNavigator` | `false` | `sk-disabled` na barra: `pointer-events:none; opacity:.3`. **CSS apenas** — atalho de teclado e delete pelo grid continuam funcionando |
+| `showNavigation` | `true` | primeiro/anterior/proximo/ultimo |
+| `showAddButton` | `true` | botao novo |
+| `showCopyButton` | `!isHierarchyDynaform()` | duplicar (+ dropdown de deep copy) |
+| `showRemoveButton` | `true` | excluir |
+| `showRefreshButton` | `true` | atualizar |
+| `showCancelButton` | `true` | descartar |
+| `showSaveButton` | `true` | salvar |
+| `showEditButton` | `true` | edicao multipla (existe em `navigatorOptions`, mas fica de fora da lista do ngdoc) |
+| `disableSearch` | `false` | **nao** e o `Ctrl+F` do navigator — desabilita a pesquisa de entidade, favoritos, recentes e o botao de filtro personalizado do dynaform |
+
+Dynaform somente-leitura (mantendo navegacao entre registros):
+
+```javascript
+function onDynaformLoaded(dynaform, dataset) {
+  dynaform.getNavigatorAPI()
+      .showAddButton(false)
+      .showCopyButton(false)
+      .showRemoveButton(false)
+      .showSaveButton(false)
+      .showCancelButton(false);
+}
+```
+
+`_navigatorAPI` e construido no `init()` do controller, entao a API ja esta disponivel em `sk-init-dynaform` e `sk-on-dynaform-loaded`. Os `sk-show-*` do template sao bindings `=?` sobre `navigatorOptions`, logo a troca vale a qualquer momento — nao precisa ser no load.
+
+#### `getNavigatorAPI()` nao e `navigatorApi`
+
+Dois objetos diferentes, nomes quase iguais:
+
+| Expressao | O que e | Serve para |
+|---|---|---|
+| `dynaform.getNavigatorAPI()` | wrapper sobre `navigatorOptions` | visibilidade/disable dos botoes |
+| `dynaform.navigatorApi` | o proprio `SkNavigatorController` (saida do `sk-api`) | `getDataset`, `setDataGridMode`, `setSaveHandler`, `setAddHandler`, `setEditHandler` — ver [navigator.md](navigator.md) |
+
+Nenhum dos dois expoe `showCrud`: `show-crud` e atributo do `sk-navigator` standalone e nao entra em `navigatorOptions`.
+
+#### Armadilhas
+
+1. **O dynaform monta dois `sk-navigator`** — um no `sk-fixed-bar` (barra fixa ao rolar) e um na toolbar principal. A barra fixa **so** recebe `showNavigation`, `showCopyButton`, `showAddButton` e `showEditButton`. `showRemoveButton`, `showRefreshButton`, `showCancelButton` e `showSaveButton` **nao chegam nela** — o botao segue visivel na barra fixa depois de sumir da principal.
+
+2. **A maioria dos `sk-show-*` do template e `AND` com `isActiveOnToolBarManager('useNav*Button')`**, que le `dynaformHelperData.toolBarManager` vindo da classe Helper do backend (`sk-helper-class-name`). Sem `toolBarManager`, retorna `true`. Com ele, o backend pode manter um botao escondido mesmo com a option em `true` — `getNavigatorAPI()` so consegue esconder, nunca forcar a aparicao.
+
+   Cobertos pelo AND: `showNavigation` (`useNavNavigationButtons`), `showCopyButton`, `showRemoveButton`, `showRefreshButton`, `showCancelButton`, `showSaveButton`. **Fora do AND:** `showAddButton` e `showEditButton` — esses dois obedecem so a option.
+
+   `showAddButton(false)` tambem derruba o botao novo da pagina inicial: `showBtnAddRecord()` retorna `navigatorOptions.showAddButton` (depois de checar `useNavigator` e `useNavAddButton`).
+
+3. **`ng-if="isActiveOnToolBarManager('useNavigator')"`** remove a barra inteira. Nesse caso `dynaform.navigatorApi` fica `undefined` e `setNavigatorSaveHandler`/`setNavigatorAddHandler` estouram `TypeError`.
 
 ### Obter referencia ao controller
 
@@ -312,15 +378,35 @@ No modo `sk-only-custom`, so os campos declarados no HTML aparecem no form.
 
 ### `IDynaformInterceptor`
 
-Definido em idynaform.interceptor.js:
+Definido em idynaform.interceptor.js. A interface declara sete metodos, mas **so quatro sao invocados** pelo `dynaform.controller.js`:
 
-- `interceptFieldMetadata(fieldMD, dataset, dynaform)` — ajustar metadados de campo.
-- `interceptDataset(dynaform, dataset)` — apos o dataset ser criado.
-- `interceptPersonalizedFilter(pf, dataset)` — ajustar filtro personalizado.
-- `interceptNavigator(navigator, dynaform)` — ajustar barra de navegacao.
-- `interceptDynaform(dynaform)` — ajustar o dynaform.
-- `acceptField(fieldMD, dynaform, dataset)` — `true` para aceitar o campo no form.
-- `acceptTab(tabId, dynaform, dataset, isCustomBlock)` — `true` para aceitar a aba.
+| Metodo | Chamado? | Assinatura real no call site |
+|---|---|---|
+| `interceptFieldMetadata` | sim | `(fieldProperty, dataset, dynaform)` — recebe o `fieldProp` do form, nao o metadado cru |
+| `interceptDataset` | sim | `(dynaform, datasetController)` — apos criar o dataset, antes de `_whenDatasetReady` |
+| `acceptField` | sim | `(fieldMD, dynaform, dataset)` → `boolean` |
+| `acceptTab` | sim | `(tabId, dynaform, dataset, isCustomBlock)` → `boolean` |
+| `interceptPersonalizedFilter` | **nunca** | codigo morto |
+| `interceptNavigator` | **nunca** | codigo morto |
+| `interceptDynaform` | **nunca** | codigo morto |
+
+Os tres ultimos existem apenas no prototype com corpo vazio; nao ha nenhuma chamada a eles em todo o `sankhya-js`. Implementar `interceptNavigator` para mexer na barra CRUD **nao tem efeito** — use `getNavigatorAPI()` (secao 2.1). Continuam obrigatorios na declaracao do objeto por causa do `isImplementorOf` (abaixo).
+
+**`dynaformInterceptor` faz sombra em `formInterceptor` no `acceptField`.** O call site e `else if`:
+
+```javascript
+if ($scope.dynaformInterceptor) {
+    var visible = $scope.dynaformInterceptor.acceptField(fieldMD, self, $scope.dataset);
+} else if ($scope.formInterceptor) {
+    var visible = $scope.formInterceptor.acceptField(fieldMD, $scope.dataset);
+}
+```
+
+Passando `sk-dynaform-interceptor` **e** `sk-form-interceptor` no mesmo dynaform, o `acceptField` do form nunca roda. Os outros metodos do `IFormInterceptor` (`interceptBuildField`, etc.) continuam funcionando.
+
+**Campo recusado antes de chegar ao interceptor:** o `acceptField` so e consultado quando `!foreignKeysByName.hasOwnProperty(fieldMD.name)`. Campo de chave estrangeira ja entra com `accept = false` sem passar pelo interceptor.
+
+**`sk-hierarchy` embrulha seu `interceptFieldMetadata`.** Com hierarquia ativa, o dynaform substitui a funcao por um wrapper que chama a sua e depois `hierarchyDynaformInterceptField`. Se voce nao declarou `interceptFieldMetadata`, o wrapper chama `undefined()` — mais um motivo para declarar todos os metodos.
 
 ### `IFormInterceptor`
 
@@ -337,6 +423,26 @@ Validacao de implementacao via `ObjectUtils.isImplementorOf($scope.formIntercept
 ### `IDatagridInterceptor` e `IFilterPanelInterceptor`
 
 Ver [datagrid.md](datagrid.md) para detalhes do IDatagridInterceptor. Ambos seguem o mesmo padrao: objeto com metodos especificos, validado por `ObjectUtils.isImplementorOf`.
+
+### `isImplementorOf` exige **todos** os metodos
+
+`ObjectUtils.isImplementorOf(obj, Interface)` nao e checagem frouxa — **lanca**:
+
+```javascript
+throw new Error(objName + ' não é uma implementação de ' + implementor.name);
+```
+
+Regras exatas: passa direto se `obj.__proto__ === Interface.prototype`; senao exige `obj.hasOwnProperty(metodo)` para **cada** metodo do prototype da interface. Herdar por prototype chain nao conta. Implementar so os metodos que interessam derruba a tela no init do componente.
+
+Duas saidas — declarar tudo no objeto (inclusive os metodos mortos, com corpo vazio), ou copiar o prototype:
+
+```javascript
+// controller da tela
+ObjectUtils.implements(self, IDynaformInterceptor);   // copia os 7 metodos como own property
+self.acceptField = function (fieldMD, dynaform, dataset) { ... };  // sobrescreve o que interessa
+```
+
+Vale para todo slot de interface do framework — `IDynaformInterceptor`, `IFormInterceptor`, `IDatagridInterceptor`, `IFilterPanelInterceptor`, `IGridPrinterInterceptor`, `CriteriaProvider`, `FieldBinder`, `IDataSetObserver`, `RecordValidator`. Ver [gotchas.md](gotchas.md).
 
 ---
 
@@ -438,6 +544,9 @@ O linker faz `masterDynaformElem.find('dynaform-' + StringUtils.toDashCase(entit
 - [ ] `sk-suppress-screen-config` bloqueando config que deveria carregar?
 - [ ] Listeners de dataset registrados diretamente no dataset (`addRefreshedListener`) estao sendo desregistrados em `$destroy`?
 - [ ] `parentDynaform` mudando dinamicamente sem chamar `loadMetadata` explicitamente?
-- [ ] Interceptor implementando **todos** os metodos da interface (ou pelo menos os que pretende usar)?
+- [ ] Interceptor implementando **todos** os metodos da interface? Faltar um lanca `não é uma implementação de` no init — nao existe implementacao parcial.
+- [ ] Tentando mexer na barra CRUD por `interceptNavigator` (codigo morto) em vez de `getNavigatorAPI()`?
+- [ ] Botao escondido por `getNavigatorAPI()` ainda aparecendo? Conferir a barra fixa (`sk-fixed-bar`), que nao recebe remove/refresh/cancel/save.
+- [ ] `sk-dynaform-interceptor` e `sk-form-interceptor` juntos, com o `acceptField` do form sendo ignorado?
 - [ ] Campo invisivel sumiu do dataset? Considerar `sk-disable-remove-invisible-fields`.
 - [ ] `setFieldProperty` usado em vez de mutacao direta do field?
