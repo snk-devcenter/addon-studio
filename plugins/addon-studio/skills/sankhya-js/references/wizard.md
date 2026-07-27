@@ -154,7 +154,7 @@ goTo(step)
 
 ## Gotchas
 
-1. **`current-step` e titulo, nao indice**. O `$watch` em `currentStep` procura `ArrayUtils.findWhere(getEnabledSteps(), {title: $scope.currentStep})`. Passar numero vira uma busca por titulo numerico — so funciona se o step nao tem `sk-title` e o `title = wizard.getNextStepNumber()` ja fez cast para string coincidente.
+1. **`current-step` nao navega — o lookup esta quebrado**. O `$watch` em `currentStep` procura `ArrayUtils.findWhere(getEnabledSteps(), {title: $scope.currentStep})`, e o `findWhere` do framework tem um `for (var whereKey in whereKey)` que itera sobre a propria variavel: **sempre devolve `undefined`** (ver [utils.md](utils.md), gotcha 3). Nem por titulo nem por indice o atributo leva a lugar nenhum. Para navegar por codigo, use a api do wizard (`SkWizardHandler.wizard('nome').goTo(...)`).
 
 2. **`edit-mode=true` marca TODOS os steps como `completed`**. Watcher em `[editMode, steps.length]` itera `getEnabledSteps()` setando `completed=true` a cada adicao de step. Util em edicao de registro ja salvo, mas pula validacoes — usar com cuidado.
 
