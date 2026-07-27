@@ -10,6 +10,11 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Adicionado
+
+- Skill `sankhya-js` documenta `PopUpParameter` — popup de formulário sem `.tpl.html`/`.controller.js` nem registro no `launcher/<Tela>.body`: os builders por tipo de campo, `openPopUp` para campos vindos do backend, o `.show().result` (a instância não é thenable) e a tabela de decisão contra `MessageUtils`, `SanPopup.open` e `sk-form`.
+- Skill `sankhya-js`: armadilhas do `PopUpParameter` — campo obrigatório vazio lança exceção em vez de rejeitar a promise, `showBtnDesconsiderar` resolve com valores sentinela (`-9999`, `'01/01/1800'`, `'>:-:<'`) que não devem chegar ao backend, o bind do Enter nunca é desfeito e `.options({...})` substitui o objeto inteiro de opções.
+
 ## [2.18.2] - 2026-07-27
 
 ### Adicionado
