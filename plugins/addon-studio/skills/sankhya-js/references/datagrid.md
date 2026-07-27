@@ -320,6 +320,58 @@ sk-config-name="GrdCfgCpl:{{ctrl.resourceID}}"   <!-- prefixo para grade secunda
 
 ---
 
+## Componentes de apoio da grade
+
+Nao vem dentro do `sk-datagrid` — voce coloca no toolbar/rodape da tela e liga no mesmo dataset (ou no controller do grid).
+
+### `sk-rows-counter` — contador de linhas
+
+components/rowscounter/rowscounter.directive.js.
+
+```html
+<sk-rows-counter sk-dataset="ctrl.dataset" sk-on-click="ctrl.abrirDetalhe()"></sk-rows-counter>
+```
+
+| Atributo | Tipo | Uso |
+|---|---|---|
+| `sk-dataset` | `=?` | dataset observado |
+| `sk-on-click` | `&?` | clique no contador |
+| `lines-limit` | `<` | acima de `0`, pinta o contador em alerta e mostra o icone de triangulo |
+
+Escuta `BACKGROUND_LOAD_START`/`BACKGROUND_LOAD_END` do dataset: durante a paginacao em background exibe um pop com link **cancelar**, que chama `dataset.cancelPagination()`. A contagem vem de `$watchCollection('dataset.getRecords()')` — e o que ja foi carregado, nao o total da consulta.
+
+### `sk-grid-config` — colunas visiveis
+
+components/gridconfig/gridconfig.directive.js.
+
+```html
+<sk-grid-config sk-config-name="<PRX>MinhaGrade"
+                sk-available-columns-standard="CODIGO, DESCRICAO, DTALTER">
+</sk-grid-config>
+```
+
+| Atributo | Tipo | Uso |
+|---|---|---|
+| `sk-config-name` | `@` | id da configuracao persistida — observado, pode trocar em runtime |
+| `sk-available-columns-standard` | `@?` | lista separada por virgula das colunas oferecidas por padrao |
+| `sk-selected-columns-grid` | `&?` | devolve as colunas escolhidas ao abrir |
+| `sk-tooltip-placement` | `@?` | posicao do tooltip |
+| `uigrid` | attr | monta a instancia no modo do backend uigrid |
+
+O botao so aparece se o usuario tiver a autorizacao `ACCESS_CONTROL_CONFIG_GRID` (`SkApplication.instance().hasAuthorization`); antes de a autorizacao carregar, o default e liberar. No `$destroy` a instancia faz `unregistry()`.
+
+### `GridStatistics` — soma e media das colunas numericas
+
+components/gridstatistics/gridstatistics.service.js. Service, nao diretiva:
+
+```javascript
+GridStatistics.openGridStatistics(ctrl.datagrid);   // controller do grid, nao o dataset
+```
+
+Abre um `SanPopup` com uma linha por coluna **visivel** de `dataType` `'I'` ou `'F'`, trazendo `COLUNA`, `SOMA`, `MEDIA`, `OCORRENCIAS`, `MAIOR`, `MENOR`. Com a grade vazia, mostra o alerta `DataGrid.gradeVazia` e nao abre.
+
+---
+
 ## Gotchas
 
 ### 1. `addGridReadyListener` nao retorna deregister
@@ -353,6 +405,14 @@ O `<script>` dentro de `sk-cell-renderer`/`sk-editor-renderer` e executado com `
 ### 8. Handlers de dataset sao setados automaticamente
 
 Nao sobrescrever `grid.refreshed`, `grid.dataSaved`, etc. — esses slots sao usados pelo proprio controller para reagir a eventos do dataset.
+
+### 9. A media do `GridStatistics` divide pelo total de linhas
+
+No calculo, `occurrences++` esta fora do `if (!isNaN(fieldValue))`: linha com valor nulo, vazio ou nao numerico nao entra na soma mas entra no divisor. Em coluna com muitos vazios a media sai menor do que a media dos valores preenchidos — e `OCORRENCIAS` e a contagem de linhas, nao de valores.
+
+### 10. Estatistica e contador enxergam so o que ja foi carregado
+
+`GridStatistics` usa `datagrid.getDataset().getRecordsAsObject()` e `sk-rows-counter` observa `dataset.getRecords()`. Com paginacao ligada (o default), os dois refletem as paginas ja trazidas — nao o total da consulta. Total real vem do backend.
 
 ---
 
