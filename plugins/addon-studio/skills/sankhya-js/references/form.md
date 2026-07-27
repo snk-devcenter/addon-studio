@@ -473,6 +473,12 @@ Vale para todo slot de interface do framework — `IDynaformInterceptor`, `IForm
 - Ou via `sk-filter-panel-interceptor`.
 - Acessar instancia: `getFilterPanelInstance()`.
 
+### Com `PopUpParameter` (form dentro de popup)
+
+- `PopUpParameter` e um `sk-form` num popup: os objetos passados aos builders sao os mesmos **field metadata** desta secao (`type`, `presentationType`, `size`, `fieldProp`, `groupName`, `visible`).
+- Serve para pedir campos avulsos sem template/controller proprios; nao substitui `sk-form`/`sk-dynaform` ligado a dataset.
+- Ver [popup-parameter.md](popup-parameter.md).
+
 ---
 
 ## 6. Gotchas

@@ -1,6 +1,6 @@
 ---
 name: sankhya-js
-description: Telas HTML5 do addon (módulo `<addon>-vc`, `src/main/webapp/html5/<Tela>/`) escritas em AngularJS 1.x sobre o framework proprietário `sankhya-js` (módulo `snk`) — `sk-application`, `sk-dynaform`, `sk-dataset`, `sk-datagrid`, `sk-form`, `sk-wizard`, `sk-navigator`, `sk-pesquisa-input`, `SanPopup`, `MessageUtils`, `ServiceProxy`, `MetadataProvider`, `SkComponentRegistry`, `SkWorkspace`. Use ao criar, alterar, revisar ou depurar tela do addon, ao gerar tela com `gradle gerarTela`, ao consumir um `@Controller ...SP` do próprio addon a partir da tela, ao montar dynaform sobre `<instance>` do dicionário de dados, ao registrar a tela no menu via `<ui url="/$ctx/<Tela>.xhtml5">`, ou ao tocar em `.js`/`.html`/`.css` sob `webapp/html5/`. NÃO usar para o frontend novo de Design System (`snk-application` Stencil/web components em `frontend/<App>`, `gradle compileDS`), React ou Flex.
+description: Telas HTML5 do addon (módulo `<addon>-vc`, `src/main/webapp/html5/<Tela>/`) escritas em AngularJS 1.x sobre o framework proprietário `sankhya-js` (módulo `snk`) — `sk-application`, `sk-dynaform`, `sk-dataset`, `sk-datagrid`, `sk-form`, `sk-wizard`, `sk-navigator`, `sk-pesquisa-input`, `SanPopup`, `PopUpParameter`, `MessageUtils`, `ServiceProxy`, `MetadataProvider`, `SkComponentRegistry`, `SkWorkspace`. Use ao criar, alterar, revisar ou depurar tela do addon, ao gerar tela com `gradle gerarTela`, ao consumir um `@Controller ...SP` do próprio addon a partir da tela, ao montar dynaform sobre `<instance>` do dicionário de dados, ao registrar a tela no menu via `<ui url="/$ctx/<Tela>.xhtml5">`, ou ao tocar em `.js`/`.html`/`.css` sob `webapp/html5/`. NÃO usar para o frontend novo de Design System (`snk-application` Stencil/web components em `frontend/<App>`, `gradle compileDS`), React ou Flex.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 — telas HTML5 do módulo `<addon>-vc` (AngularJS 1.x + framework `sankhya-js`). Arquivos do `webapp` em UTF-8.
 ---
@@ -119,6 +119,20 @@ SanPopup.open({
 
 O `.controller.js` do popup precisa ser carregado por `launcher/<Tela>.body`, senão o Angular acusa controller desconhecido. `MessageUtils`, temas de botão e o contrato de `$popupInstance`: [references/messages-popup.md](references/messages-popup.md).
 
+**Popup que só pede campos não precisa de template nem controller** — use `PopUpParameter`, que monta um `sk-form` a partir dos parâmetros:
+
+```javascript
+PopUpParameter.builder()
+  .title('Reabertura de OS')
+  .columns(2)
+  .buildDateParameter('DTREABERTURA', 'Data de reabertura', true, new Date())
+  .buildSearchInputParameter('CODUSU', 'Responsável', true, 'Usuario', 'NOMEUSU')
+  .show().result                              // .show() devolve a instância; a promise é .result
+  .then(function (result) { /* result.DTREABERTURA, result.CODUSU */ });
+```
+
+Builders disponíveis, opções, sentinelas do botão "Desconsiderar não informados" e armadilhas: [references/popup-parameter.md](references/popup-parameter.md).
+
 ## Padrão canônico 4 — Compartilhar instância entre controllers
 
 ```javascript
@@ -164,6 +178,7 @@ Cache por `entidade + locale`. Serve tanto para entidade nativa quanto para a do
 - [references/filter-panel.md](references/filter-panel.md) — `sk-filter-panel` + `sk-filter-panel-btn`
 - [references/pesquisa.md](references/pesquisa.md) — `sk-pesquisa-input` + `SkPesquisaService`
 - [references/messages-popup.md](references/messages-popup.md) — `MessageUtils` + `SanPopup`
+- [references/popup-parameter.md](references/popup-parameter.md) — `PopUpParameter`: popup de campos sem template proprio
 - [references/wizard.md](references/wizard.md) — `sk-wizard` + `sk-step`
 - [references/tabs.md](references/tabs.md) — `sk-tab` + `sk-tab-item`
 - [references/sidenav.md](references/sidenav.md) — `sk-sidenav` e variantes

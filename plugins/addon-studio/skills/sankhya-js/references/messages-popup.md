@@ -5,6 +5,8 @@ Dois servicos complementares para dialogos modais:
 - **`MessageUtils`** — dialogos de alerta/erro/info/confirmacao prontos.
 - **`SanPopup`** — servico de baixo nivel para popups custom com template/controller proprios. `MessageUtils` e construido em cima de `SanPopup`.
 
+Existe um terceiro, tambem construido sobre `SanPopup`: **`PopUpParameter`**, que monta um popup de formulario a partir de uma lista de campos, sem template nem controller proprios. Antes de escrever `.tpl.html` + `.controller.js` para um popup que so pede campos, ver [popup-parameter.md](popup-parameter.md).
+
 Fontes:
 - core/util/message/messageutil.service.js (969 linhas)
 - components/popup/popup.service.js (386 linhas)
