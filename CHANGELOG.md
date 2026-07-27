@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [2.19.0] - 2026-07-27
+
 ### Adicionado
 
 - Skill `sankhya-js` ganha `references/ui-components.md`: catálogo dos componentes genéricos que faltavam — overlay e feedback (`WaitWindow`, `SnackbarService`/`sk-snackbar`, `sk-popover`, `sk-help-tip`, `TooltipBuilder`, `sk-dropdown`), layout (`sk-scroll-container`, `sk-accordion`, `sk-divider`, `sk-loading-panel`, `sk-work-box`), listas (`sk-list`, `sk-entity-card`, `sk-btn-novo`) e comportamento (`sk-draggable`, `sk-resizable`, `sk-sortable`).
@@ -238,7 +240,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v2.18.2...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v2.19.0...HEAD
+[2.19.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.18.2...v2.19.0
 [2.18.2]: https://github.com/snk-devcenter/addon-studio/compare/v2.18.1...v2.18.2
 [2.18.1]: https://github.com/snk-devcenter/addon-studio/compare/v2.18.0...v2.18.1
 [2.18.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.17.0...v2.18.0
