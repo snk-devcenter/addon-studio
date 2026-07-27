@@ -12,12 +12,18 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ### Adicionado
 
+- Skill `sankhya-js` ganha `references/utils.md`: assinaturas dos utilitários do módulo `snk.core.util` que a tela injeta direto — `StringUtils`, `NumberUtils`, `DateUtils` + `DateUtilsConstants`, `ArrayUtils`, `ObjectUtils`, `SkConstants` (`KEY_CODE`, eventos, operadores SQL), `Base64`, `UrlUtils`, `SqlUtils`, `SessionFileUpload`, `ClipboardUtils`, `UidGenerator` e `AngularUtil`. Antes eram menções de passagem sem contrato, então o agente reescrevia null-check, formatação de data e cláusula `IN` na mão.
+- Skill `sankhya-js`: 10 armadilhas dos utilitários — `StringUtils.toBoolean` só aceita `'true'`/`'s'`, `ArrayUtils.findWhere` sempre devolve `undefined` (itera a própria variável no `for...in`), `ObjectUtils.clone` é raso e devolve string para `Date`, `Base64.encode(x)` não aplica UTF-8 (a segunda definição sobrescreve a primeira), `AngularUtil.timeout` não dispara digest, `SqlUtils.buildINClause` devolve a cláusula sem o primeiro campo e `DateUtils.getToday()` zera a hora.
 - Skill `sankhya-js` documenta os ~30 inputs da família `FieldBinder`, não só os 5 anteriores: índice de qual componente usar por tipo de dado e uma seção por input com os atributos próprios — `sk-text-area`, `sk-masked-input`, `sk-url-input`, `sk-rich-text`, `sk-code-editor`, `sk-number-input`, `sk-numeric-stepper`, `sk-rate-input`, `sk-date-input`, `sk-time-input`, `sk-date-period-input`, `sk-datepicker`, `sk-multi-combo`, `sk-radio-input`, `sk-checkbox-list`, `sk-select-distinct-input`, `sk-typeahead-input`, `sk-cgc-cpf-input`, `sk-cep-input`, `sk-phone-input`, `sk-file-input`, `sk-file-input-multi`, `sk-image-input`, `sk-color-picker` e `sk-search-input`.
 - Skill `sankhya-js`: `sk-file-input` grava no campo a chave de sessão `$file.session.key{<fileKey>}` — o binário é resolvido no backend, e `sk-name-as-value` troca isso pelo nome do arquivo.
 - Skill `sankhya-js`: 11 armadilhas novas dos inputs — `sk-focus-out` é `&` em uns componentes e `=` em outros, `sk-radio-input` chama um `onFocusOut` que não existe no scope (`TypeError` no blur) e foca o `<label>`, `sk-align` é inerte no `sk-date-input` (chave duplicada no template), `sk-rate-input` não tem `sk-enabled`, `sk-multi-combo`/`sk-checkbox-list` mutam os arrays recebidos, `sk-precision` default `0` não formata decimais, `NumberUtils.stringToNumber('1.234')` devolve `1.234` e `sk-search-input` sinaliza o filtro limpo por `sk-cancel-search`, não por `sk-change`.
-
 - Skill `sankhya-js` documenta `PopUpParameter` — popup de formulário sem `.tpl.html`/`.controller.js` nem registro no `launcher/<Tela>.body`: os builders por tipo de campo, `openPopUp` para campos vindos do backend, o `.show().result` (a instância não é thenable) e a tabela de decisão contra `MessageUtils`, `SanPopup.open` e `sk-form`.
 - Skill `sankhya-js`: armadilhas do `PopUpParameter` — campo obrigatório vazio lança exceção em vez de rejeitar a promise, `showBtnDesconsiderar` resolve com valores sentinela (`-9999`, `'01/01/1800'`, `'>:-:<'`) que não devem chegar ao backend, o bind do Enter nunca é desfeito e `.options({...})` substitui o objeto inteiro de opções.
+
+### Corrigido
+
+- Skill `sankhya-js`: o exemplo de "use o util do framework" em `code-quality.md` chamava `DateUtil.format(d, 'dd/MM/yyyy')` — serviço inexistente e formato inválido em moment (`dd` é dia da semana, `yyyy` não é token). Agora é `DateUtils.formatDate(d, DateUtilsConstants.DEFAULT_DATE_FORMAT)`.
+- Skill `sankhya-js`: o gotcha de `current-step` do `sk-wizard` dizia que a busca por título "só funciona" em certo caso — o `ArrayUtils.findWhere` por trás nunca acha nada, então o atributo não navega em cenário nenhum; a saída é `SkWizardHandler.wizard('nome').goTo(...)`.
 
 ## [2.18.2] - 2026-07-27
 
