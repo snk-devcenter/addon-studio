@@ -33,7 +33,7 @@ Controller que monta payload, chama servico, trata erro **e** manipula DOM e can
 
 ### DRY - procure o utilitario antes de reescrever
 
-Antes de escrever validacao, formatacao ou conversao na mao, procure o equivalente nos utilitarios do framework (modulo `snk.core.util`: string, date, number, array, object, dom, encode — ex.: `DateUtil`, `ObjectUtils`). Reescrever `formataData`, `padLeft`, `trim`, escape de HTML, etc., duplica codigo que o framework ja testou e mantem.
+Antes de escrever validacao, formatacao ou conversao na mao, procure o equivalente nos utilitarios do framework (modulo `snk.core.util`: `StringUtils`, `DateUtils`, `NumberUtils`, `ArrayUtils`, `ObjectUtils`, `Base64`, ...). Reescrever `formataData`, `padLeft`, `trim`, escape de HTML, etc., duplica codigo que o framework ja testou e mantem. Assinaturas e armadilhas: [utils.md](utils.md).
 
 ```javascript
 // Ruim: reimplementar formatacao de data
@@ -41,8 +41,8 @@ var dia = ('0' + d.getDate()).slice(-2);
 var mes = ('0' + (d.getMonth() + 1)).slice(-2);
 var txt = dia + '/' + mes + '/' + d.getFullYear();
 
-// Bom: usar o util do framework (ver api-cheatsheet.md)
-var txt = DateUtil.format(d, 'dd/MM/yyyy');
+// Bom: usar o util do framework (ver utils.md)
+var txt = DateUtils.formatDate(d, DateUtilsConstants.DEFAULT_DATE_FORMAT);
 ```
 
 ### Escopo de variavel

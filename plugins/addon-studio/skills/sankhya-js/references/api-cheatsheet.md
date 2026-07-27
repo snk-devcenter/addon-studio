@@ -165,6 +165,37 @@ Tambem ha o provider `i18n` injetavel como funcao: `i18n('chave', valores)`.
 
 Values array: posicoes viram `p0`, `p1`, `p2`... no mapa.
 
+### No template: dois filtros e duas diretivas
+
+| Forma | Origem | Quando usar |
+|---|---|---|
+| `{{'Minha.chave' \| i18n}}` | filtro do framework, encapsula o provider `i18n` | texto interpolado |
+| `{{'Minha.chave' \| translate}}` | filtro do `angular-translate` (dependencia) | equivalente; e o que o proprio framework usa nos templates internos |
+| `<span sk-i18n>Minha.chave</span>` | i18n.directive.js | conteudo **e** atributos traduziveis do mesmo elemento |
+| `<span sk-translate="Minha.chave"></span>` | i18n.directive.js | conteudo, atributo especifico ou chave vinda de expressao |
+
+`sk-i18n` resolve a chave nesta ordem: valor do proprio atributo → texto do elemento (se nao tiver filhos). Alem do conteudo, traduz automaticamente `tooltip`, `title`, `placeholder` e `sk-placeholder`, e qualquer outro atributo cujo valor comece com `@i18n:`:
+
+```html
+<sk-icon sk-i18n tooltip="Geral.lblCopiar"></sk-icon>
+<input sk-i18n placeholder="Cadastro.lblNome" aria-label="@i18n:Cadastro.lblNome">
+<span sk-i18n sk-i18n-values="{p0: ctrl.total}">Relatorio.lblTotalRegistros</span>
+```
+
+`sk-translate` cobre os casos que o `sk-i18n` nao alcanca:
+
+| Atributo | Efeito |
+|---|---|
+| `sk-translate="chave"` | chave literal; sem valor, usa o `innerHTML` do elemento |
+| `sk-translate-exp="expressao"` | chave vinda do scope, com `$watch` — troca de idioma/chave em runtime |
+| `sk-translate-attr="nomeDoAtributo"` | escreve a traducao **naquele** atributo em vez do conteudo |
+| `sk-translate-values="{...}"` | valores interpolados, observados com `$watch` deep |
+| `sk-remove-end-colon` | remove o `:` final da traducao (rotulo de campo reaproveitado) |
+
+Ambas re-traduzem no evento `$translateLoadingEnd` (troca de idioma ou bundle carregado depois da tela).
+
+Chave inexistente **nao lanca**: `$translate` devolve a propria chave, entao o sintoma e a tela mostrando `Modulo.lblAlgumaCoisa`. Sem nenhuma chave resolvivel, o `sk-translate` lanca `'Não foi definida uma chave de tradução'` no link.
+
 ---
 
 ## `SkWorkspace` — integracao com a shell do produto
