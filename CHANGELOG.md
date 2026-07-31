@@ -10,6 +10,27 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Adicionado
+
+- Hook `SessionStart` injeta as regras sempre-ativas (Java 8, ISO-8859-1, JAPE, Guice) em projeto que ainda não rodou `/addon-studio:init` — sem isso, skill focada dispara mas o código sai fora da regra. Silencioso fora de projeto Addon Studio.
+- Esteira `tools/skill-trigger-audit`: mede se cada skill dispara sem âncora no projeto, com 3 cenários por skill (óbvio, indireto, negativo) e histórico de runs comparáveis.
+
+### Alterado
+
+- 20 skills ganham gatilho em linguagem de dev, não só nome de símbolo: `test` (regressão, travar comportamento antes de refatorar), `job` ("de madrugada", "sem intervenção", lote), `dependency-injection` (texto do erro de binding, costura entre camadas), `value` ("liga-desliga", "sem redeploy"), `database` (`ALTER TABLE`, índice, seed), `macros` (`NVL`, `SYSDATE`, `TRUNC`), `encoding` (acento embaralhado, caractere inválido), `data-dictionary` ("virar tela de cadastro", campo obrigatório, menu), `action-button` (marcar registros na grade e clicar), `before-load-listener` (empresa do usuário logado, sem depender de quem chama), `build` (servidor local com versão antiga), entre outras.
+- Pares que competiam agora se excluem por nome na própria `description`: `listener` ↔ `business-rule`, `mapstruct` ↔ `type-adapter`, `data-dictionary` ↔ `sankhya-js`, `sankhya-utils` ↔ `sankhya-js`, `action-button` ↔ `job`/`sankhya-js`, `repository` ↔ `controller`, `controller` ↔ `retrofit`.
+- `controller` assume a pergunta "como invoco esse endpoint" (URL `serviceName`/SP, Postman, curl), que antes não tinha dono.
+- `data-dictionary` e `sankhya-js` abrem com o critério de decisão em vez do inventário de tags/componentes, e cada uma declara um sinal observável: tela sem pasta em `webapp/html5/` é do dicionário; tela que chama endpoint do addon é HTML5. `data-dictionary` é o dono default de label/texto de tela quando o dev não cita o caminho.
+- `addon-studio` responde de entrada que o esqueleto do projeto vem do tooling Sankhya — nenhuma skill cria `build.gradle` do zero — e oferece `/addon-studio:init` em projeto sem `docs/ADDON.md`.
+- `listener`, `controller`, `database` e `data-dictionary` passam a declarar cada um o seu recorte de "campo obrigatório": campo da tabela em qualquer origem de gravação, payload do endpoint, `NOT NULL` da coluna e obrigatório na tela.
+- `ADDON.md` do `init` enxuga de 29 para 20 linhas: sai a seção de roteamento (as `description` roteiam sozinhas) e a tabela de delegação a sub-agents (duplicava a `description` deles); ficam só as regras sempre-ativas, que nenhuma `description` consegue carregar.
+- `MUST BE USED` dos sub-agents deixa de capturar pedido de artefato único: `troubleshooter` sai de erro com causa conhecida, `test-writer` de teste de um arquivo, `entity-architect` e `dbscript-builder` param de disputar o mesmo pedido, `controller-designer` devolve `@ControllerAdvice` isolado para a skill.
+
+### Corrigido
+
+- `init` deixa de atrair "cria o projeto do zero" e de colidir com o `/init` embutido do Claude Code; `build` idem para esqueleto de projeto.
+- `entity` avisa que renomear/adicionar coluna em entidade publicada arrasta `dbscripts/` e `datadictionary/`.
+
 ## [2.19.0] - 2026-07-27
 
 ### Adicionado

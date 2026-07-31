@@ -12,14 +12,17 @@ Marketplace Claude Code (`snk-devcenter`) + o plugin `addon-studio` (skills e su
 .
 ├── CHANGELOG.md                        # histórico de mudanças (alimentado por PR)
 ├── .claude-plugin/marketplace.json     # catálogo do marketplace  [versão]
+├── tools/skill-trigger-audit/          # esteira de auditoria de disparo das skills
 └── plugins/addon-studio/
     ├── .claude-plugin/plugin.json      # manifest do plugin       [versão]
-    ├── hooks/                          # hook PostToolUse de encoding
+    ├── hooks/                          # PostToolUse de encoding + SessionStart de regras
     ├── agents/                         # sub-agents
     └── skills/<nome>/SKILL.md          # 1 diretório por skill
 ```
 
 Não há build nem suíte de testes: o entregável é markdown + JSON. Validação = ler o diff e conferir os manifests (`jq . <arquivo>`).
+
+Mexeu em `description` de skill ou de sub-agent? Rode a esteira de disparo antes do PR — `tools/skill-trigger-audit/README.md`. Ela mede se a skill dispara sem âncora no projeto e guarda o histórico em `runs/`; description nova sem cenário na esteira passa a ser dívida.
 
 ## Versionamento — regra principal
 
