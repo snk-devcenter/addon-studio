@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [2.20.0] - 2026-07-31
+
 ### Adicionado
 
 - Hook `SessionStart` injeta as regras sempre-ativas (Java 8, ISO-8859-1, JAPE, Guice) em projeto que ainda não rodou `/addon-studio:init` — sem isso, skill focada dispara mas o código sai fora da regra. Silencioso fora de projeto Addon Studio.
@@ -261,7 +263,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v2.19.0...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v2.20.0...HEAD
+[2.20.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.19.0...v2.20.0
 [2.19.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.18.2...v2.19.0
 [2.18.2]: https://github.com/snk-devcenter/addon-studio/compare/v2.18.1...v2.18.2
 [2.18.1]: https://github.com/snk-devcenter/addon-studio/compare/v2.18.0...v2.18.1
