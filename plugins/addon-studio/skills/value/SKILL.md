@@ -1,6 +1,6 @@
 ---
 name: value
-description: Configura, revisa e debuga injeção `@Value` Sankhya (`ValueType`, `Provider<T>` lazy/eager, `SANKHYA_PARAM`, `group`), declaração de parâmetro em `META-INF/parameter.xml` e feature flag togglável via `MGECoreParameter`. Use ao injetar, alterar, revisar ou auditar valores de configuração em componentes Guice, criar/editar parâmetro Sankhya (`parameter.xml`, key, cacheable), implementar feature flag, diagnosticar valor não injetado/null/desatualizado, ou ao tocar em código com `@Value`/`ValueType`/`SANKHYA_PARAM`/`MGECoreParameter`.
+description: Configura, revisa e debuga injeção `@Value` Sankhya (`ValueType`, `Provider<T>` lazy/eager, `SANKHYA_PARAM`, `group`), declaração de parâmetro em `META-INF/parameter.xml` e feature flag toggável via `MGECoreParameter`. Use ao injetar, alterar, revisar ou auditar valores de configuração em componentes Guice, ao criar/editar parâmetro Sankhya (`parameter.xml`, key, cacheable), ao implementar feature flag, quando o pedido é "liga-desliga", "o cliente muda sem redeploy" ou "configurável por cliente", ao diagnosticar valor não injetado/null/desatualizado, ou ao tocar em código com `@Value`/`ValueType`/`SANKHYA_PARAM`/`MGECoreParameter`. NÃO usar para carga inicial de dados em tabela (seed) — isso é `database`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

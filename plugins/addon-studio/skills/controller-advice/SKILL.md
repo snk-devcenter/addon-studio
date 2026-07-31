@@ -1,6 +1,6 @@
 ---
 name: controller-advice
-description: Cria, revisa e padroniza handlers globais de exceção Sankhya com `@ControllerAdvice` + `@ExceptionHandler` — rollback automático, DTO de erro, mapeamento de status HTTP. Use ao criar, alterar, revisar, auditar ou consolidar tratamento de exceções globais em projetos Sankhya Addon Studio, ou ao tocar em código com `@ControllerAdvice`/`@ExceptionHandler`.
+description: Cria, revisa e padroniza handlers globais de exceção Sankhya com `@ControllerAdvice` + `@ExceptionHandler` — rollback automático, DTO de erro, mapeamento de status HTTP, inclusive para violação de `@Valid` vinda do controller. Declarar a constraint no DTO é `controller`; aqui mora a resposta HTTP da violação e de qualquer exceção do addon. Use ao criar, alterar, revisar, auditar ou consolidar tratamento de exceções globais em projetos Sankhya Addon Studio, quando exceção do addon volta stacktrace cru para o cliente ou cada endpoint trata erro do seu jeito, ou ao tocar em código com `@ControllerAdvice`/`@ExceptionHandler`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

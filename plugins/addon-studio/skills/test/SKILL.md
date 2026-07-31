@@ -1,6 +1,6 @@
 ---
 name: test
-description: Escreve, revisa e amplia testes JUnit 5 + Mockito 4.11 para Sankhya Addon Studio — mock de `JapeRepository` via `@Mock`, mock estático de `JapeSession`/`SessionFile` (mockito-inline), fixtures, controllers, services, repositories, mappers. Use ao criar, alterar, revisar ou ampliar cobertura de testes em `src/test/java/`, ao diagnosticar testes flaky/falhando, ou ao tocar em código com `@Test`/`@Mock`/`@InjectMocks`.
+description: Escreve, revisa e amplia testes JUnit 5 + Mockito 4.11 para Sankhya Addon Studio — mock de `JapeRepository` via `@Mock`, mock estático de `JapeSession`/`SessionFile` (mockito-inline), fixtures, controllers, services, repositories, mappers. Use ao criar, alterar, revisar ou ampliar cobertura de testes em `src/test/java/`, ao querer garantir que um comportamento não quebre numa mudança futura (regressão), ao travar o comportamento atual antes de refatorar, ao diagnosticar teste flaky, teste falhando ou `NullPointerException`/stub faltando em mock, ou ao tocar em código com `@Test`/`@Mock`/`@InjectMocks`. NÃO usar para teste manual ou exploratório (Postman, curl, chamar o endpoint no navegador) — isso não é `src/test/java/`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

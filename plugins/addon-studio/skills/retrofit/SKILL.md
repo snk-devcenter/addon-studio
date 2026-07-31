@@ -1,6 +1,6 @@
 ---
 name: retrofit
-description: Configura, revisa e debuga integração HTTP externa em Sankhya Addon Studio usando Retrofit + Moshi + OkHttp — declara dependências `moduleLib` no `build.gradle`, escreve interface client (`@GET`/`@POST`/`@Body`/`@Path`/`@Query`/`@Headers`), faz wiring Guice via `@Provides @Singleton` em `@CustomModule`, cria interceptors OkHttp (autenticação, logging, headers). Use ao integrar API REST/JSON externa, consumir endpoint de terceiro, adicionar lib Retrofit/Moshi/OkHttp, montar HTTP client, criar interceptor, ou diagnosticar `NoClassDefFoundError` runtime de classe Retrofit/OkHttp.
+description: Configura, revisa e debuga integração HTTP de saída em Sankhya Addon Studio — o addon como cliente de uma API de terceiro — usando Retrofit + Moshi + OkHttp — declara dependências `moduleLib` no `build.gradle`, escreve interface client (`@GET`/`@POST`/`@Body`/`@Path`/`@Query`/`@Headers`), faz wiring Guice via `@Provides @Singleton` em `@CustomModule`, cria interceptors OkHttp (autenticação, logging, headers). Use ao integrar API REST/JSON externa, ao consumir (não expor — expor endpoint do addon é `controller`), consumir endpoint de terceiro, adicionar lib Retrofit/Moshi/OkHttp, montar HTTP client, criar interceptor, ou diagnosticar `NoClassDefFoundError` runtime de classe Retrofit/OkHttp.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

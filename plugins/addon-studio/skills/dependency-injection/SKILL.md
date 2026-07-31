@@ -1,6 +1,6 @@
 ---
 name: dependency-injection
-description: Configura, revisa e debuga DI Guice em Sankhya Addon Studio — `@Inject` de `com.google.inject`, `@Component`, `@CustomModule`, `Provider<T>`, `Multibinder`, `@Singleton`, escopos. Use ao montar wiring, criar/alterar módulos Guice, revisar/auditar dependências, diagnosticar `ConfigurationException`/`CreationException`/binding ausente, ou ao tocar em código com `@Inject`/`@CustomModule`/`AbstractModule`.
+description: Configura, revisa e debuga DI Guice em Sankhya Addon Studio — `@Inject` de `com.google.inject`, `@Component`, `@CustomModule`, `Provider<T>`, `Multibinder`, `@Singleton`, escopos. Use ao montar wiring, criar/alterar módulos Guice, ao injetar repository/service em controller, job ou listener (costura entre camadas), ao revisar/auditar dependências, quando o addon sobe e reclama que não conseguiu criar/instanciar um componente, que falta implementação ligada ou que não achou construtor (`ConfigurationException`, `CreationException`, `No implementation bound`, `Could not find a suitable constructor`), ou ao tocar em código com `@Inject`/`@CustomModule`/`AbstractModule`. NÃO usar quando o valor a injetar é parâmetro de configuração do Sankhya — isso é `@Value`, skill `value`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

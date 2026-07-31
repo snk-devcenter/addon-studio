@@ -1,6 +1,6 @@
 ---
 name: dbscript-builder
-description: Gera, revisa e padroniza dbscripts de migration Sankhya (`dbscripts/V<NNN>-*.xml`) com DDL dual MSSQL/Oracle e macros SQL portáveis a partir de uma entidade `@JapeEntity` ou de um XML de dicionário de dados existente. **Use proativamente** ao pedir migration nova, alteração de tabela (ALTER), script de dados de configuração, ao revisar/auditar dbscripts existentes, ou ao padronizar mapeamento de tipos Oracle/MSSQL. **MUST BE USED** ao criar migration nova ou ao gerar dbscript a partir de entidade/dicionário — ajuste pontual em script existente pode ser feito inline com a skill `database`.
+description: Gera, revisa e padroniza dbscripts de migration Sankhya (`dbscripts/V<NNN>-*.xml`) com DDL dual MSSQL/Oracle e macros SQL portáveis a partir de uma entidade `@JapeEntity` ou de um XML de dicionário de dados existente. **Use proativamente** ao pedir migration nova, alteração de tabela (ALTER), script de dados de configuração, ao revisar/auditar dbscripts existentes, ou ao padronizar mapeamento de tipos Oracle/MSSQL. **MUST BE USED** ao criar migration nova ou ao gerar dbscript a partir de entidade/dicionário — coluna nova numa entidade já publicada (ALTER) é aqui; ajuste pontual em script existente pode ser feito inline com a skill `database`. Se o pedido inclui também a entidade Java e o XML do dicionário, use `entity-architect` em vez deste.
 tools: Read, Write, Edit, Glob, Grep
 model: haiku
 color: yellow
