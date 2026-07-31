@@ -1,6 +1,6 @@
 ---
 name: init
-description: Setup inicial do projeto Sankhya Addon Studio para colaboração com o agente. Copia o template `ADDON.md` (instruções do plugin) para `docs/ADDON.md` no projeto e garante que o `CLAUDE.md` da raiz importe esse arquivo via `@docs/ADDON.md`. Use quando o dev pedir "setup do projeto", "configurar CLAUDE.md", "instalar instruções do addon-studio", "atualizar ADDON.md", ou rodar `/addon-studio:init`. Operação idempotente — pode ser re-executada para receber atualizações do `ADDON.md` em novas versões do plugin.
+description: Setup do projeto Sankhya Addon Studio para colaboração com o agente. Copia o template `ADDON.md` (instruções do plugin) para `docs/ADDON.md` no projeto e garante que o `CLAUDE.md` da raiz importe esse arquivo via `@docs/ADDON.md`. Use quando o dev pedir "setup do projeto", "configurar CLAUDE.md", "instalar instruções do addon-studio", "atualizar ADDON.md", "preparar esse projeto recém-clonado", ou rodar `/addon-studio:init`. Operação idempotente — pode ser re-executada para receber atualizações do `ADDON.md` em novas versões do plugin. Não é o `/init` embutido do Claude Code (que documenta um codebase qualquer) e não cria projeto nem `build.gradle` do zero: só instala as instruções do agente num projeto que já existe.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

@@ -1,6 +1,6 @@
 ---
 name: troubleshooter
-description: Diagnostica e resolve erros comuns em projetos Sankhya Addon Studio — encoding ISO-8859-1, falhas de Guice DI, JPA/JAPE misturada, violações de Java 8, build fail, deploy quebrado, exceções obscuras do framework. **Use proativamente** quando o usuário relatar erro, build falhando ou comportamento inesperado. **MUST BE USED** sempre que aparecer stacktrace, `BUILD FAILED`, `ConfigurationException`, `CreationException`, ou qualquer erro relacionado ao framework Sankhya — não tentar resolver inline no agente principal.
+description: Diagnostica e resolve erros comuns em projetos Sankhya Addon Studio — encoding ISO-8859-1, falhas de Guice DI, JPA/JAPE misturada, violações de Java 8, build fail, deploy quebrado, exceções obscuras do framework. **Use proativamente** quando o usuário relatar erro, build falhando ou comportamento inesperado. **MUST BE USED** quando há erro a diagnosticar e a causa ainda não está evidente — stacktrace sem causa óbvia, `BUILD FAILED`, `ConfigurationException`, `CreationException`, deploy quebrado. NÃO usar quando a causa já é conhecida e o fix é de um arquivo (charset → skill `encoding`, binding Guice → skill `dependency-injection`, deploy antigo/stale no servidor local → skill `build`, teste falhando ou NPE em mock → skill `test`), nem para desenhar tratamento de erro (`@ControllerAdvice`) — isso é design, não diagnóstico.
 tools: Read, Edit, Write, Grep, Glob, Bash(./gradlew *), Bash(iconv *), Bash(python3 *)
 model: sonnet
 color: red

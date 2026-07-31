@@ -1,6 +1,6 @@
 ---
 name: entity-architect
-description: Modela e refatora entidade Sankhya end-to-end — XML do dicionário de dados + dbscript de migration + classe `@JapeEntity` Java. **Use proativamente** ao criar tabela/entidade nova, ao implementar feature/MVP/cadastro/módulo de uma spec, ao receber spec de produto, ao modelar feature CRUD, ao planejar estrutura de dados, ao refatorar modelo existente, ou ao alinhar/auditar consistência entre os 3 artefatos (XML dicionário, dbscript, entidade Java) em projetos Sankhya Addon Studio. **MUST BE USED** ao criar tabela/entidade nova ou ao alinhar os 3 artefatos — edição pontual em entidade existente pode ser feita inline com a skill `entity`.
+description: Modela e refatora entidade Sankhya end-to-end — XML do dicionário de dados + dbscript de migration + classe `@JapeEntity` Java. **Use proativamente** ao criar tabela/entidade nova, ao implementar feature/MVP/cadastro/módulo de uma spec, ao receber spec de produto, ao modelar feature CRUD, ao planejar estrutura de dados, ao refatorar modelo existente, ou ao alinhar/auditar consistência entre os 3 artefatos (XML dicionário, dbscript, entidade Java) em projetos Sankhya Addon Studio. Se o dev pediu só um dos três artefatos, NÃO use este agent: só o dbscript → `dbscript-builder`; só o XML do dicionário → skill `data-dictionary`; só a classe Java, ou edição pontual em entidade existente → skill `entity`. **MUST BE USED** quando os três artefatos nascem ou mudam juntos.
 tools: Read, Write, Edit, Glob, Grep
 model: sonnet
 color: blue

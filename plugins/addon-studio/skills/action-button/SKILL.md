@@ -1,6 +1,6 @@
 ---
 name: action-button
-description: Cria, revisa e refatora botões de ação Sankhya com `@ActionButton` (`AcaoRotinaJava` + `@Form` + `ContextoAcao`) — incluindo validação, fluxo de tela e mensagens. Use ao criar, alterar, revisar, auditar ou padronizar classes `AcaoRotinaJava`, ao implementar `doAction`, ao trabalhar com arquivos `*Action.java`, ou ao tocar em código com a anotação `@ActionButton`.
+description: Cria, revisa e refatora botões de ação Sankhya com `@ActionButton` (`AcaoRotinaJava` + `@Form` + `ContextoAcao`) — incluindo validação, fluxo de tela e mensagens. Use ao criar, alterar, revisar, auditar ou padronizar classes `AcaoRotinaJava`, quando o usuário marca registros na grade de uma tela nativa do Sankhya (Pedidos, Notas, cadastros) e clica num botão para executar algo, ao validar a seleção e devolver mensagem ao usuário, ao implementar `doAction`, ao trabalhar com arquivos `*Action.java`, ou ao tocar em código com a anotação `@ActionButton`. NÃO usar para botão em tela HTML5 do próprio addon (`sk-*`, `webapp/html5/`) — isso é `sankhya-js`; nem para rotina que roda sozinha ou agendada — isso é `@Job`, skill `job`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---

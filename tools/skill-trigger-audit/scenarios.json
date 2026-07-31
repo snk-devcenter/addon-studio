@@ -1,0 +1,131 @@
+{
+  "_doc": "Cenarios da esteira de auditoria de disparo. 3 por skill: obvio (cita o simbolo), indireto (dev-speak de negocio, sem termo do SDK), negativo (mensagem vizinha que NAO deve disparar essa skill). Texto sem acento de proposito: o agente le como o dev digita. Alterar um cenario invalida a comparacao com runs anteriores -- crie um cenario novo em vez de editar.",
+  "order": [
+    "entity", "repository", "controller", "controller-advice", "data-dictionary", "database",
+    "macros", "job", "action-button", "listener", "before-load-listener", "business-rule",
+    "mapstruct", "type-adapter", "dependency-injection", "value", "encoding", "build",
+    "test", "retrofit", "sankhya-utils", "sankhya-js", "addon-studio", "init"
+  ],
+  "scenarios": {
+    "entity": [
+      "cria a entidade @JapeEntity da tabela AD_VSTVIS, com PK VISTORIAID e os campos de placa, data e KM",
+      "preciso guardar no banco os dados da vistoria do veiculo: placa, data, km rodado e o laudo. monta a classe java disso",
+      "a classe da entidade AD_VSTVIS ta quebrando o build com erro de caractere invalido nos comentarios"
+    ],
+    "repository": [
+      "cria a interface de repository da entidade VstVistoria estendendo JapeRepository, com busca por status",
+      "preciso listar as vistorias de um parceiro paginado, 20 por pagina, filtrando por periodo de data",
+      "essa consulta usa NVL e vai quebrar no cliente que roda SQL Server, como deixo portavel entre os dois bancos?"
+    ],
+    "controller": [
+      "cria um @Controller REST expondo o CRUD de vistoria",
+      "o app mobile precisa consumir a lista de vistorias e mandar uma nova, monta isso pra mim",
+      "toda exception que estoura no meu addon volta stacktrace cru pro app, quero um JSON de erro padronizado com o status HTTP certo em todos os endpoints"
+    ],
+    "controller-advice": [
+      "cria um @ControllerAdvice com @ExceptionHandler pras excecoes do addon",
+      "quero centralizar num lugar so o tratamento de erro de todos os meus endpoints, hoje cada um trata do seu jeito e o rollback nao acontece",
+      "preciso validar o payload que chega no endpoint antes de processar"
+    ],
+    "data-dictionary": [
+      "monta o XML do dicionario de dados da tabela AD_VSTVIS em datadictionary/",
+      "quero que essa tabela apareca como tela de cadastro dentro do Sankhya, com campo de busca de parceiro e o menu pro usuario achar",
+      "preciso de um indice unico na coluna PLACA dessa tabela"
+    ],
+    "database": [
+      "cria o dbscript de migration pra criar a tabela AD_VSTVIS",
+      "adicionei um campo novo na entidade, o que mais preciso fazer pro banco do cliente pegar essa coluna quando atualizar o addon?",
+      "como escrevo a query de listagem com filtro no repository?"
+    ],
+    "macros": [
+      "quais macros do MacroTranslator eu posso usar nessa query?",
+      "esse SQL usa TRUNC(SYSDATE) e NVL, mas metade dos clientes roda SQL Server. como escrevo uma vez e funciona nos dois?",
+      "preciso rodar um script que popula os dados de configuracao inicial do modulo"
+    ],
+    "job": [
+      "cria um @Job que roda todo dia as 2 da manha",
+      "preciso de uma rotina que roda de madrugada sozinha consolidando os lancamentos do dia anterior",
+      "preciso disparar esse processamento quando o usuario clicar num botao na tela de pedidos"
+    ],
+    "action-button": [
+      "cria um botao de acao AcaoRotinaJava na tela de pedidos",
+      "o usuario vai marcar as linhas na tela do Sankhya e clicar em Aprovar; precisa validar cada uma e mostrar mensagem do que deu errado",
+      "quero um botao na tela HTML5 do addon que chame meu endpoint e mostre um popup de confirmacao"
+    ],
+    "listener": [
+      "cria um @Listener estendendo PersistenceEventAdapter pro insert de AD_VSTVIS",
+      "sempre que alguem mudar o status do pedido eu preciso gravar quem mudou e quando, automatico",
+      "quero que a listagem de vistorias so traga as da empresa do usuario logado, sem depender de quem chama"
+    ],
+    "before-load-listener": [
+      "implementa um FinderListener com @BeforeLoadListener na entidade VstVistoria",
+      "quero garantir que qualquer consulta nessa entidade ja venha filtrada pelo codigo da empresa do usuario, sem ter que repetir o filtro em todo lugar que consulta",
+      "preciso bloquear a exclusao de vistoria que ja foi faturada"
+    ],
+    "business-rule": [
+      "cria uma regra de negocio com @BusinessRule implementando Regra pro barramento",
+      "preciso impedir o faturamento do pedido quando o cliente estourou o limite de credito, e permitir liberacao pelo supervisor",
+      "preciso validar que o campo PLACA da minha tabela AD_VSTVIS nao vem vazio no insert"
+    ],
+    "mapstruct": [
+      "cria o mapper MapStruct entre VistoriaRequest e a entidade VstVistoria",
+      "tenho o DTO de request e a entidade, quero converter um no outro sem escrever get/set na mao",
+      "quero controlar como o tipo Timestamp sai no JSON em todos os endpoints do addon"
+    ],
+    "type-adapter": [
+      "cria um @GlobalTypeAdapter pra Timestamp",
+      "o BigDecimal ta voltando no JSON num formato que o app nao entende; quero definir num lugar so como esse tipo serializa e desserializa em todo o addon",
+      "preciso converter o DTO de request pra entidade antes de salvar"
+    ],
+    "dependency-injection": [
+      "configura o modulo Guice do addon com os bindings dos meus services",
+      "subiu o addon e deu pau dizendo que nao achou como criar o meu VistoriaService, no deploy",
+      "quero ler um parametro configuravel do Sankhya dentro do meu service"
+    ],
+    "value": [
+      "injeta o parametro do Sankhya no service com @Value",
+      "quero um liga-desliga dessa feature que o cliente consiga mudar sem eu precisar fazer redeploy",
+      "quero injetar meu repository dentro do controller"
+    ],
+    "encoding": [
+      "converte os arquivos que eu acabei de criar pra ISO-8859-1",
+      "as mensagens com acento estao aparecendo como PedidoNAoEncontrado no log do Wildfly, tudo trocado",
+      "quero traduzir as labels da tela pra ingles"
+    ],
+    "build": [
+      "roda o clean deployAddon",
+      "subi as alteracoes mas o servidor local continua respondendo com a versao antiga do addon",
+      "o teste unitario do service ta falhando com NullPointerException no mock"
+    ],
+    "test": [
+      "escreve os testes JUnit do VistoriaController",
+      "quero garantir que essa regra de calculo de valor nao quebre quando eu mexer nela daqui a dois meses",
+      "quero testar o endpoint manualmente pelo Postman, qual a URL?"
+    ],
+    "retrofit": [
+      "configura o Retrofit + Moshi pra consumir a API do parceiro",
+      "preciso chamar um webservice REST de terceiro (consulta de CEP) de dentro do addon, com token no header",
+      "preciso expor um endpoint REST do addon pro app consumir"
+    ],
+    "sankhya-utils": [
+      "que utilitario do com.sankhya.util eu uso pra validar CNPJ?",
+      "preciso arredondar esse valor pra 2 casas, tratar quando vier null e formatar como moeda pra mostrar",
+      "preciso validar o request do endpoint com @Valid antes de processar"
+    ],
+    "sankhya-js": [
+      "cria a tela HTML5 do addon usando sk-dynaform e sk-dataset",
+      "preciso de uma tela dentro do Sankhya onde o usuario preenche um formulario de vistoria e envia pro meu endpoint",
+      "quero criar a tela no frontend novo de Design System, com snk-application e os web components Stencil"
+    ],
+    "addon-studio": [
+      "vou comecar uma feature nova nesse addon, quais as regras e convencoes que eu tenho que seguir aqui?",
+      "recebi essa spec do produto: cadastro de vistoria de veiculo com tela de listagem no app mobile. implementa end-to-end",
+      "so ajusta o nome desse campo na entidade de KMRODADO pra KMATUAL"
+    ],
+    "init": [
+      "configura o CLAUDE.md desse projeto pro addon-studio",
+      "acabei de clonar esse projeto de addon, prepara ele pra eu trabalhar com voce aqui",
+      "cria o build.gradle do addon do zero"
+    ]
+  }
+}

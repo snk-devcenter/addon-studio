@@ -1,6 +1,6 @@
 ---
 name: business-rule
-description: Cria, revisa e refatora regras de negócio Sankhya com `@BusinessRule` (interface `Regra` + `ContextoRegra`) para barramento de eventos, liberação de limite e regras transacionais. Use ao criar, alterar, revisar, auditar ou padronizar regras de negócio, ao implementar `beforeInsert`/`beforeUpdate`/`beforeDelete`/`afterInsert`/`afterUpdate`/`afterDelete`, ao trabalhar com arquivos `*Regra.java`, ou ao tocar em código com `@BusinessRule`.
+description: Cria, revisa e refatora regras de negócio Sankhya com `@BusinessRule` (interface `Regra` + `ContextoRegra`) para barramento de eventos do módulo comercial, liberação de limite e regras transacionais. Use ao criar, alterar, revisar, auditar ou padronizar regras de negócio do comercial (nota, pedido, fatura, limite de crédito), ao implementar `beforeInsert`/`beforeUpdate`/`beforeDelete`/`afterInsert`/`afterUpdate`/`afterDelete` de `Regra`, ao trabalhar com arquivos `*Regra.java`, ou ao tocar em código com `@BusinessRule`. NÃO usar para evento de persistência de entidade JAPE genérica, inclusive tabela `AD_` do próprio addon (validar/preencher campo no insert, auditoria de alteração, bloquear exclusão) — isso é `@Listener`/`PersistenceEventAdapter`, skill `listener`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
