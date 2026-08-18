@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Corrigido
+
+- Releases incluem instaladores `sh` e PowerShell com `--claude`/`--codex` para configurar o provider inteiro sem copiar TOMLs à mão nem alterar o projeto; customização local só é substituída com `--force`/`-Force`.
+
 ## [2.21.0] - 2026-08-18
 
 ### Adicionado

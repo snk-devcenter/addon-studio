@@ -9,6 +9,38 @@ As skills são a **fonte de verdade da API do SDK**: assinaturas validadas contr
 
 ## Instalação
 
+### Um comando para CLI
+
+Os instaladores da release atualizam o marketplace, instalam o plugin e configuram os agents no escopo pessoal — nunca no projeto. Escolha o provider:
+
+Linux/macOS — Claude Code:
+
+```sh
+curl -fsSL https://github.com/snk-devcenter/addon-studio/releases/latest/download/addon-studio-install.sh | sh -s -- --claude
+```
+
+Linux/macOS — Codex CLI:
+
+```sh
+curl -fsSL https://github.com/snk-devcenter/addon-studio/releases/latest/download/addon-studio-install.sh | sh -s -- --codex
+```
+
+Windows PowerShell — Claude Code:
+
+```powershell
+& ([scriptblock]::Create((Invoke-RestMethod -Uri 'https://github.com/snk-devcenter/addon-studio/releases/latest/download/addon-studio-install.ps1'))) -Claude
+```
+
+Windows PowerShell — Codex CLI:
+
+```powershell
+& ([scriptblock]::Create((Invoke-RestMethod -Uri 'https://github.com/snk-devcenter/addon-studio/releases/latest/download/addon-studio-install.ps1'))) -Codex
+```
+
+No Codex, os seis TOMLs ficam em `~/.codex/agents` (ou `CODEX_HOME`) e são baixados do artefato da mesma release. Se você já customizou um agent com o mesmo nome, ele é preservado; acrescente `--force` no Unix ou `-Force` no PowerShell para substituir. Abra uma nova sessão ao terminar.
+
+### Pelo Claude Code
+
 Dentro do Claude Code, adicione o marketplace:
 
 ```
@@ -94,16 +126,7 @@ No Claude Code, especialistas com workflow ativo, tools restritas e modelo próp
 
 #### Codex CLI
 
-O Codex CLI 0.147.0 descobre agents em `~/.codex/agents/`, mas o manifest de plugin não tem campo `agents`; por isso a instalação do plugin não copia estes arquivos automaticamente. Depois de instalar `addon-studio@snk-devcenter`, copie os TOMLs distribuídos pelo plugin:
-
-```bash
-addon_studio_plugin="$(codex plugin list | awk '$1 == "addon-studio@snk-devcenter" { print $NF }')"
-test -n "$addon_studio_plugin"
-install -d "$HOME/.codex/agents"
-cp -i "$addon_studio_plugin"/agents/codex/*.toml "$HOME/.codex/agents/"
-```
-
-Abra uma nova sessão após copiar. O `-i` evita sobrescrever uma customização local sem confirmação; repita a cópia para atualizar os agents junto do plugin.
+Use o instalador com `--codex`/`-Codex` da seção [Instalação](#instalação). Ele instala os TOMLs no escopo pessoal, nunca no projeto. No Claude Code, os seis agents já são carregados pelo plugin e não exigem instalador.
 
 Os agents Terra usam `xhigh`; o `dbscript-builder` usa `gpt-5.6-luna` com `high`.
 

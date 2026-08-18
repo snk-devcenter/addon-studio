@@ -12,6 +12,7 @@ Marketplace Claude Code (`snk-devcenter`) + o plugin `addon-studio` (skills e su
 .
 ├── CHANGELOG.md                        # histórico de mudanças (alimentado por PR)
 ├── .claude-plugin/marketplace.json     # catálogo do marketplace  [versão]
+├── scripts/                            # instaladores e artefatos de release
 ├── tools/skill-trigger-audit/          # esteira de auditoria de disparo das skills
 └── plugins/addon-studio/
     ├── .claude-plugin/plugin.json      # manifest do plugin       [versão]
@@ -20,7 +21,7 @@ Marketplace Claude Code (`snk-devcenter`) + o plugin `addon-studio` (skills e su
     └── skills/<nome>/SKILL.md          # 1 diretório por skill
 ```
 
-Não há build nem suíte de testes: o entregável é markdown + JSON. Validação = ler o diff e conferir os manifests (`jq . <arquivo>`).
+Não há build do plugin: o entregável é markdown + JSON. O único empacotamento é `scripts/build-release-artifacts.sh`, que gera os instaladores e pacotes anexados à GitHub Release. Validação = ler o diff, conferir os manifests (`jq . <arquivo>`) e, se tocar nos instaladores, rodar `sh scripts/test-release-artifacts.sh`.
 
 Mexeu em `description` de skill ou de sub-agent? Rode a esteira de disparo antes do PR — `tools/skill-trigger-audit/README.md`. Ela mede se a skill dispara sem âncora no projeto e guarda o histórico em `runs/`; description nova sem cenário na esteira passa a ser dívida.
 
@@ -67,7 +68,7 @@ Passos, em `main` atualizada:
 4. `CHANGELOG.md`: renomear `## [Não publicado]` para `## [X.Y.Z] - AAAA-MM-DD` (data do corte), criar um `## [Não publicado]` vazio acima e atualizar os links de comparação no rodapé.
 5. Commit único: `chore(release): vX.Y.Z`.
 6. Tag anotada `vX.Y.Z` no commit de release; push do commit e da tag.
-7. `gh release create vX.Y.Z --target <SHA de 40 chars> --title "vX.Y.Z - <resumo>" --notes "<seção do changelog>"`.
+7. Rode `sh scripts/test-release-artifacts.sh` e `sh scripts/build-release-artifacts.sh`; depois `gh release create vX.Y.Z --target <SHA de 40 chars> --title "vX.Y.Z - <resumo>" --notes "<seção do changelog>" dist/*` para anexar os instaladores e pacotes de agents.
 
 Checagem final: `plugin.json`, `marketplace.json` e o topo do `CHANGELOG.md` apontam para a mesma versão, e a tag existe.
 
