@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Alterado
+
+- README reorganizado com instalação, primeiros passos, uso e atualização separados para Claude Code e Codex CLI, além do catálogo de skills agrupado por domínio.
+
 ### Corrigido
 
 - Releases incluem instaladores `sh` e PowerShell com `--claude`/`--codex` para configurar o provider inteiro sem copiar TOMLs à mão nem alterar o projeto; customização local só é substituída com `--force`/`-Force`.
