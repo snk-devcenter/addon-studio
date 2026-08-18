@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Adicionado
+
+- Permite instalar manualmente no Codex CLI os seis especialistas, com roteamento e permissões equivalentes documentados.
+
 ## [2.20.0] - 2026-07-31
 
 ### Adicionado
