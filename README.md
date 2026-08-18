@@ -1,227 +1,281 @@
-# Addon Studio Plugin
+# Addon Studio
 
 [![release](https://img.shields.io/github/v/release/snk-devcenter/addon-studio?label=release&color=blue)](https://github.com/snk-devcenter/addon-studio/releases/latest)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-Plugin para **Claude Code e Codex CLI** com **24 skills focadas + 6 sub-agents** que orientam implementação em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo DevCenter Squad.
+Plugin para desenvolver addons **Sankhya Addon Studio 2.0** com **Claude Code** ou **Codex CLI**.
 
-As skills são a **fonte de verdade da API do SDK**: assinaturas validadas contra os jars reais (`studio-annotations`, `sdk-sankhya`). Seguir as skills gera código que compila e deploya — sem o agente precisar inspecionar jars.
+São 24 skills e 6 agents especializados em WildFly/EJB, Java 8 e SDK JAPE. As instruções foram validadas contra os jars reais do SDK (`studio-annotations` e `sdk-sankhya`) para evitar APIs inventadas, JPA no lugar de JAPE, SQL incompatível ou código fora do padrão da plataforma.
+
+## Navegação
+
+- [Instalação](#instalação)
+- [Primeiros passos](#primeiros-passos)
+- [Como usar](#como-usar)
+- [Skills](#skills)
+- [Agents](#agents)
+- [Regras do Addon Studio](#regras-do-addon-studio)
+- [Atualização](#atualização)
+- [Contribuição](#contribuição)
 
 ## Instalação
 
-### Um comando para CLI
+Os instaladores configuram o marketplace, instalam ou atualizam o plugin e deixam os agents disponíveis no escopo do usuário. Eles não instalam agents dentro do projeto.
 
-Os instaladores da release atualizam o marketplace, instalam o plugin e configuram os agents no escopo pessoal — nunca no projeto. Escolha o provider:
+Pré-requisito: tenha o `claude` ou o `codex` instalado e disponível no `PATH`.
 
-Linux/macOS — Claude Code:
+### Claude Code
+
+#### Linux e macOS
 
 ```sh
 curl -fsSL https://github.com/snk-devcenter/addon-studio/releases/latest/download/addon-studio-install.sh | sh -s -- --claude
 ```
 
-Linux/macOS — Codex CLI:
-
-```sh
-curl -fsSL https://github.com/snk-devcenter/addon-studio/releases/latest/download/addon-studio-install.sh | sh -s -- --codex
-```
-
-Windows PowerShell — Claude Code:
+#### Windows PowerShell
 
 ```powershell
 & ([scriptblock]::Create((Invoke-RestMethod -Uri 'https://github.com/snk-devcenter/addon-studio/releases/latest/download/addon-studio-install.ps1'))) -Claude
 ```
 
-Windows PowerShell — Codex CLI:
+O instalador registra o marketplace `snk-devcenter` e instala `addon-studio@snk-devcenter` no escopo do usuário. Skills, agents e hooks são carregados pelo próprio plugin.
+
+<details>
+<summary>Instalação manual pelo Claude Code</summary>
+
+```text
+/plugin marketplace add snk-devcenter/addon-studio
+/plugin install addon-studio@snk-devcenter
+```
+
+</details>
+
+### Codex CLI
+
+#### Linux e macOS
+
+```sh
+curl -fsSL https://github.com/snk-devcenter/addon-studio/releases/latest/download/addon-studio-install.sh | sh -s -- --codex
+```
+
+#### Windows PowerShell
 
 ```powershell
 & ([scriptblock]::Create((Invoke-RestMethod -Uri 'https://github.com/snk-devcenter/addon-studio/releases/latest/download/addon-studio-install.ps1'))) -Codex
 ```
 
-No Codex, os seis TOMLs ficam em `~/.codex/agents` (ou `CODEX_HOME`) e são baixados do artefato da mesma release. Se você já customizou um agent com o mesmo nome, ele é preservado; acrescente `--force` no Unix ou `-Force` no PowerShell para substituir. Abra uma nova sessão ao terminar.
+O instalador registra o marketplace, instala `addon-studio@snk-devcenter` e copia os seis agents para o escopo pessoal do Codex:
 
-### Pelo Claude Code
+- Linux e macOS: `~/.codex/agents/`
+- Windows: `$HOME\.codex\agents\`
+- Com `CODEX_HOME`: `$CODEX_HOME/agents/`
 
-Dentro do Claude Code, adicione o marketplace:
+Agents já personalizados são preservados. Use `--force` no Linux/macOS ou `-Force` no PowerShell somente quando quiser substituí-los pela versão da release.
 
-```
-/plugin marketplace add snk-devcenter/addon-studio
-```
+## Primeiros passos
 
-Depois instale o plugin:
+Abra uma nova sessão da CLI depois da instalação.
 
-```
-/plugin install addon-studio@snk-devcenter
-```
+### Claude Code
 
-## Setup do projeto (obrigatório, 1 comando)
+Na raiz de um projeto Addon Studio existente, execute:
 
-Na raiz do projeto Sankhya, rode:
-
-```
+```text
 /addon-studio:init
 ```
 
-A skill `init`:
+O comando valida o `build.gradle`, copia as regras permanentes para `docs/ADDON.md` e garante o import `@docs/ADDON.md` no `CLAUDE.md`. A operação é idempotente e preserva as customizações do projeto.
 
-1. Confere que o projeto é Addon Studio (procura `br.com.sankhya.addonstudio` no `build.gradle`/`build.gradle.kts`).
-2. Copia o `ADDON.md` do plugin para `docs/ADDON.md` no projeto.
-3. Insere a linha `@docs/ADDON.md` no `CLAUDE.md` da raiz (cria o arquivo se não existir; idempotente — não duplica nem mexe nas suas customizações).
+Depois, trabalhe normalmente:
 
-Resultado:
-
-```
-projeto/
-├── docs/
-│   └── ADDON.md        # gerado pelo plugin — não editar
-├── CLAUDE.md           # seu — contém `@docs/ADDON.md` + customizações do projeto
-├── build.gradle
-└── ...
+```text
+Crie a entidade, o dbscript e o dicionário para a tabela TDCXYZCAB.
 ```
 
-**Por que precisa?** Skill discovery é semântica — o agente só carrega uma skill quando o prompt casa com a `description` dela. Num prompt genérico ("implementa essa spec"), o agente pode pular as regras universais (Java 8 strict, ISO-8859-1, JAPE não JPA). O `ADDON.md` importado no `CLAUDE.md` garante que essas regras estejam **sempre** no contexto.
+### Codex CLI
+
+As skills ficam disponíveis automaticamente após a instalação. Você pode descrevê-las em linguagem natural ou invocá-las pelo nome com `$`:
+
+```text
+$addon-studio:entity crie a entidade da tabela TDCXYZCAB
+```
+
+Para usar um especialista, peça pelo nome:
+
+```text
+Use o entity-architect para modelar o CRUD completo desta tabela.
+```
+
+Os agents permanecem no diretório pessoal do Codex; nenhum TOML é copiado para o projeto.
 
 ## Como usar
 
-### Auto-trigger (fluxo normal)
+### Linguagem natural
 
-Trabalhe normalmente — as skills disparam sozinhas quando o assunto casa:
+As skills são selecionadas pelo contexto do pedido. Exemplos:
 
-| Você pede | Skill que dispara |
-|-----------|-------------------|
-| "cria a entidade da tabela TDCXYZCAB" | `entity` (+ `data-dictionary`, `database` se for trio completo) |
-| "preciso de um endpoint que recebe esse payload" | `controller` (+ `mapstruct`, `controller-advice`) |
-| "consome essa API externa" | `retrofit` |
-| "agenda esse processamento pra rodar de noite" | `job` |
-| "preenche esse campo automático quando gravar o registro" | `listener` |
-| "esse parâmetro não atualiza sem restart" | `value` |
-| "erro Guice/BindingAlreadySet no deploy" | `dependency-injection` |
-| "escreve testes pra esse service" | `test` |
-| "tem util do Sankhya pra isso?" / null-check repetido no diff | `sankhya-utils` |
-| "cria a tela HTML5 desse cadastro" / "botão novo na tela do addon" | `sankhya-js` |
+| Pedido | Skills principais |
+|---|---|
+| “Crie entidade, migration e tela cadastral para esta tabela” | `entity`, `database`, `data-dictionary` |
+| “Exponha este cadastro por REST com DTO e validação” | `controller`, `mapstruct`, `controller-advice` |
+| “Consuma esta API externa com autenticação” | `retrofit`, `dependency-injection` |
+| “Execute este processamento toda madrugada” | `job` |
+| “Preencha este campo quando o registro for salvo” | `listener` |
+| “Crie uma tela HTML5 que chama o endpoint do addon” | `sankhya-js` |
+| “Escreva testes para este service” | `test` |
+| “Diagnostique este erro de deploy ou Guice” | `build`, `dependency-injection` |
 
 ### Invocação explícita
 
-Qualquer skill pode ser chamada direto como slash command:
+No Claude Code, use `/`:
 
-```
-/addon-studio:entity
-/addon-studio:repository
+```text
 /addon-studio:controller
-/addon-studio:value
-...
+/addon-studio:repository
+/addon-studio:test
 ```
 
-### Sub-agents
+No Codex CLI, use `$`:
 
-No Claude Code, especialistas com workflow ativo, tools restritas e modelo próprio executam decisão + ação (diferente de skills, que são conhecimento). Aparecem em `/agents` e são auto-invocados conforme contexto, ou explicitamente ("usa o addon-reviewer nesse diff"):
+```text
+$addon-studio:controller
+$addon-studio:repository
+$addon-studio:test
+```
 
-| Agent | Modelo | Escopo |
-|-------|:------:|--------|
-| `addon-reviewer` | sonnet | Review pré-commit: encoding, Java 8, Lombok, Guice DI, `@JapeEntity`, anti-patterns. Saída em Blockers/Warnings/Suggestions. |
-| `entity-architect` | sonnet | Modela trio CRUD end-to-end: XML dicionário + dbscript migration + entidade `@JapeEntity`. |
-| `controller-designer` | sonnet | Desenha endpoint REST: `@Controller` + DTOs + MapStruct Mapper + (se aplicável) `@ControllerAdvice`. |
-| `test-writer` | sonnet | Escreve JUnit 5 + Mockito 4.11 com quirks de `JapeRepository`. Roda `./gradlew test` pra validar. |
-| `troubleshooter` | sonnet | Diagnostica erros: encoding, Guice DI, JPA misturada com JAPE, Java 8 violations, build/deploy. |
-| `dbscript-builder` | haiku | Gera dbscripts `V<NNN>-*.xml` dual MSSQL/Oracle. |
+## Skills
 
-#### Codex CLI
+### Fundamentos e projeto
 
-Use o instalador com `--codex`/`-Codex` da seção [Instalação](#instalação). Ele instala os TOMLs no escopo pessoal, nunca no projeto. No Claude Code, os seis agents já são carregados pelo plugin e não exigem instalador.
+| Skill | Responsabilidade |
+|---|---|
+| `addon-studio` | Regras universais, fluxo de feature e convenções do SDK JAPE |
+| `init` | Prepara `docs/ADDON.md` e `CLAUDE.md` para uso com Claude Code |
+| `build` | Build e deploy local com Gradle |
+| `encoding` | Auditoria e conversão de fontes para ISO-8859-1 |
 
-Os agents Terra usam `xhigh`; o `dbscript-builder` usa `gpt-5.6-luna` com `high`.
+### Dados e persistência
 
-No Codex, peça o agent pelo nome; a `description` ajuda a escolha, mas não impõe auto-delegação. Roteamento: `entity-architect` para os três artefatos CRUD juntos; `dbscript-builder` para migration isolada; `controller-designer` para endpoint junto de DTOs/mapper; `test-writer` para suíte nova ou cobertura de vários arquivos; `troubleshooter` para causa-raiz ainda incerta; `addon-reviewer` antes de commit. Para mudança pontual, use a skill correspondente.
+| Skill | Responsabilidade |
+|---|---|
+| `entity` | Entidades `@JapeEntity`, chaves e relacionamentos |
+| `repository` | `JapeRepository`, critérios, queries nativas e paginação |
+| `database` | Dbscripts versionados para Oracle e SQL Server |
+| `data-dictionary` | Telas cadastrais geradas pelo dicionário de dados |
+| `macros` | SQL portável com `MacroTranslator` |
 
-O allowlist Claude de comandos não tem equivalente: `addon-reviewer` é `read-only`; os demais são `workspace-write`. Assim, `Bash(git diff *)`, `Bash(./gradlew *)`, `Bash(iconv *)` e `Bash(python3 *)` não são restringidos individualmente no Codex.
+### Backend e integrações
 
-### Hook de encoding
+| Skill | Responsabilidade |
+|---|---|
+| `controller` | Endpoints REST, DTOs, validação e transações |
+| `controller-advice` | Tratamento global de exceções e respostas HTTP |
+| `mapstruct` | Conversão entre DTOs e entidades |
+| `dependency-injection` | Wiring Guice, módulos, providers e escopos |
+| `retrofit` | Clientes HTTP com Retrofit, Moshi e OkHttp |
+| `type-adapter` | Serialização JSON global de tipos |
+| `value` | Parâmetros Sankhya, `@Value` e feature flags |
+| `sankhya-utils` | Utilitários nativos de `com.sankhya.util` |
 
-O plugin instala um hook PostToolUse que converte `.java`/`.xml`/`.kt`/`.properties` para **ISO-8859-1** após cada edição. Quando o acento já foi destruído na leitura (byte vira `U+FFFD`), o hook **aborta em vez de converter** e avisa o agente — nesse caso o trecho acentuado precisa ser restaurado (`git checkout -- <arquivo>`) e a edição reaplicada.
+### Eventos e automação
 
-## Cobertura (24 skills)
+| Skill | Responsabilidade |
+|---|---|
+| `action-button` | Botões de ação com `AcaoRotinaJava` |
+| `business-rule` | Regras do barramento comercial |
+| `listener` | Eventos CRUD de persistência |
+| `before-load-listener` | Filtros transversais antes de consultas JAPE |
+| `job` | Processamentos agendados com CRON |
 
-| Skill | Escopo |
-|-------|--------|
-| `addon-studio` | Overview, regras universais (Java 8 strict, Lombok, ISO-8859-1), naming `<PRX><MOD3><CTX>`, fluxo CRUD |
-| `init` | Setup do projeto: `docs/ADDON.md` + `@import` no `CLAUDE.md`. Re-rodar = upgrade idempotente |
-| `entity` | `@JapeEntity` (Lombok, PK simples/composta, relacionamentos) |
-| `data-dictionary` | XML dicionário de dados (`datadictionary/<TABELA>.xml`) |
-| `database` | `dbscripts/V<NNN>-*.xml` dual MSSQL/Oracle |
-| `repository` | `@Repository`, `@Criteria`, `@NativeQuery`, `@Modifying` |
-| `retrofit` | Retrofit + Moshi + OkHttp (deps `moduleLib`, interface client, wiring Guice, interceptors) |
-| `controller` | `@Controller(serviceName SP)`, DTO + `@Valid`, `@Transactional` |
-| `controller-advice` | `@ControllerAdvice` + `@ExceptionHandler`, rollback automático |
-| `dependency-injection` | Guice (`@Component`, `@CustomModule`, `Multibinder`, `@Singleton`, `Provider<T>`) |
-| `mapstruct` | `componentModel=jakarta`, `injectionStrategy=CONSTRUCTOR`, padrão create/merge |
-| `test` | JUnit 5 + Mockito 4.11 (quirks `JapeRepository`, mock estático `JapeSession`/`SessionFile`) |
-| `action-button` | `@ActionButton` (`AcaoRotinaJava`, `@Form`, `ContextoAcao`) |
-| `business-rule` | `@BusinessRule` (`Regra`, `ContextoRegra`, barramento) |
-| `listener` | `@Listener` (`PersistenceEventAdapter`, eventos CRUD before/after insert/update/delete) |
-| `before-load-listener` | `@BeforeLoadListener` (`FinderListener`, filtro transversal no Finder) |
-| `job` | `@Job` (`IJob`, `onSchedule`, CRON, migração XML) |
-| `type-adapter` | `@GlobalTypeAdapter` (`TypeAdapter`, `JsonSerializer`/`JsonDeserializer`) |
-| `value` | `@Value` / `ValueType`, `parameter.xml`, feature flag toggável (`MGECoreParameter`) |
-| `macros` | MacroTranslator SQL (`dbDate`, `nullValue`, `ignorecase`, etc.) |
-| `sankhya-utils` | Utilitários `com.sankhya.util` (`StringUtils`, `BigDecimalUtil`, `TimeUtils`, `XMLUtils`, `SQLUtils`, `ResourceLock`) |
-| `encoding` | ISO-8859-1 obrigatório em `.java`/`.xml`/`.kt`/`.properties` |
-| `build` | `gradle deployAddon` |
-| `sankhya-js` | Telas HTML5 do módulo `-vc` (AngularJS 1.x): `gerarTela`, `sk-application`/`sk-dynaform`/`sk-datagrid`, `ServiceProxy`, registro no menu |
+### Frontend e qualidade
+
+| Skill | Responsabilidade |
+|---|---|
+| `sankhya-js` | Telas HTML5 em AngularJS sobre `sankhya-js` |
+| `test` | Testes JUnit 5 e Mockito para addons |
+
+## Agents
+
+Os seis agents cobrem tarefas maiores que atravessam várias skills.
+
+| Agent | Quando usar |
+|---|---|
+| `addon-reviewer` | Revisão pré-commit de compatibilidade, encoding e padrões do plugin |
+| `entity-architect` | Modelagem conjunta de entidade, dbscript e dicionário |
+| `controller-designer` | Endpoint completo com DTOs, mapper e tratamento de erros |
+| `test-writer` | Suíte de testes ou cobertura de vários arquivos |
+| `troubleshooter` | Diagnóstico de causa-raiz ainda incerta |
+| `dbscript-builder` | Migration isolada para Oracle e SQL Server |
+
+No Claude Code, os agents fazem parte do plugin e aparecem em `/agents`. No Codex, o instalador usa os TOMLs da mesma release e os coloca em `~/.codex/agents/`; peça a delegação explicitamente pelo nome.
+
+## Regras do Addon Studio
+
+O plugin mantém estas restrições em todas as implementações:
+
+- Java 8 estrito.
+- JAPE SDK em vez de JPA genérico.
+- Lombok, Guice e MapStruct conforme os padrões do Addon Studio.
+- Fontes Java, XML, Kotlin e properties em ISO-8859-1.
+- Dbscripts compatíveis com Oracle e SQL Server.
+- Nomenclatura parametrizada pelo prefixo e módulo do projeto.
+- Arquitetura de pacotes e camadas definida pelo projeto, não pelo plugin.
+
+### Convenção de nomenclatura
+
+O plugin detecta o padrão existente. Quando não houver referência suficiente, pergunta o prefixo (`<PRX>`) e o código do módulo (`<MOD3>`) antes de gerar artefatos.
+
+| Artefato | Padrão | Exemplo |
+|---|---|---|
+| Tabela do addon | `<PRX><MOD3><CTX>` | `TDCXYZCAB` |
+| Nome da entidade JAPE | `<Prx><Mod><Ctx>` | `TdcXyzCabecalho` |
+| Coluna em tabela nativa | `<MOD3>_NOMECAMPO` | `XYZ_STATUS` |
+
+### Proteção de encoding
+
+O hook de pós-edição converte `.java`, `.xml`, `.kt` e `.properties` para ISO-8859-1. Se o conteúdo já tiver sido corrompido na leitura, o hook interrompe a conversão e pede a restauração do trecho para evitar perda silenciosa.
 
 ## Atualização
 
-```
+Execute novamente o instalador do seu provider e sistema operacional. Ele atualiza o marketplace, o plugin e, no Codex, os agents pessoais.
+
+No Claude Code, também é possível atualizar manualmente:
+
+```text
 /plugin update addon-studio@snk-devcenter
 ```
 
-Depois re-rode `/addon-studio:init` no projeto: a skill sobrescreve o `docs/ADDON.md` com a versão nova **sem tocar** no seu `CLAUDE.md`.
+Após atualizar no Claude Code, execute `/addon-studio:init` em cada projeto que precise receber a versão nova de `docs/ADDON.md`.
 
-## Customizações do projeto
+No Codex, customizações locais dos TOMLs continuam preservadas. Use `--force` ou `-Force` apenas para substituí-las.
 
-Regras específicas (override de convenção, padrão de pacotes, arquitetura) vão no `CLAUDE.md` da raiz — **fora** do `docs/ADDON.md`, que é regenerado a cada update. O plugin nunca reescreve o `CLAUDE.md`; só insere o `@docs/ADDON.md` se ausente.
+## Estrutura do repositório
 
-## Convenção de nomenclatura (parametrizada por projeto)
-
-Padrão parametrizado por `<PRX>` (prefixo) + `<MOD3>` (módulo). A skill detecta o padrão existente no projeto; se ausente, **pergunta ao dev** antes de gerar artefatos.
-
-| Artefato                              | Padrão                            | Exemplo (PRX=TDC, MOD3=XYZ)  |
-|:--------------------------------------|:----------------------------------|:-----------------------------|
-| Tabela do addon                       | `<PRX><MOD3><CTX>` UPPER          | `TDCXYZCAB`                  |
-| `@JapeEntity(entity = "...")`         | `<Prx><Mod><Ctx>` Pascal          | `TdcXyzCabecalho`            |
-| Coluna custom em tabela nativa        | `<MOD3>_NOMECAMPO` UPPER          | `XYZ_STATUS`                 |
-
-## Sem opinião arquitetural
-
-Skills cobrem **regras do SDK e do framework**. Organização de pacotes, camadas e padrões de design (Clean Arch, Hexagonal, MVC, DDD) são decisões do dev/projeto.
-
-## Estrutura do repo
-
-```
+```text
 .
-├── CHANGELOG.md                        # histórico de mudanças
-├── CLAUDE.md                           # regras de contribuição e corte de release
-├── .claude-plugin/marketplace.json     # catálogo do marketplace
-└── plugins/
-    └── addon-studio/
-        ├── .claude-plugin/plugin.json  # manifest do plugin
-        ├── hooks/                      # hooks.json + to-iso88591.sh (PostToolUse de encoding)
-        ├── agents/                     # 6 sub-agents Claude Code + TOMLs Codex em codex/
-        └── skills/                     # 24 skills (1 dir por skill, SKILL.md cada)
-            └── addon-studio/assets/ADDON.md   # template injetado no projeto consumidor
+├── .claude-plugin/marketplace.json
+├── plugins/addon-studio/
+│   ├── .claude-plugin/plugin.json
+│   ├── agents/
+│   │   ├── *.md               # agents do Claude Code
+│   │   └── codex/*.toml       # agents do Codex
+│   ├── hooks/
+│   └── skills/                # compartilhadas pelos dois providers
+└── scripts/                   # instalação e artefatos de release
 ```
 
-> **Layout multi-plugin:** o repo serve como marketplace + plugin; plugin futuro ganha pasta própria em `plugins/<nome>/`.
+O repositório funciona como marketplace e como fonte do plugin para os dois providers. Novos plugins podem ser adicionados em `plugins/<nome>/`.
 
-## Contribuindo
+## Contribuição
 
-Regras de contribuição, política de versionamento e checklist de corte de release estão no [CLAUDE.md](CLAUDE.md). O essencial:
+As regras de contribuição e release estão em [CLAUDE.md](CLAUDE.md). Em resumo:
 
-- Branch a partir de `main` (`feat/<slug>`, `fix/<slug>`, `docs/<slug>`), commit em Conventional Commits.
-- Toda PR alimenta a seção `[Não publicado]` do [CHANGELOG.md](CHANGELOG.md).
-- **PR não altera versão** — o bump acontece só no corte da release.
+- Crie a branch a partir de `main` usando `feat/`, `fix/` ou `docs/`.
+- Use Conventional Commits.
+- Registre a mudança em `[Não publicado]` no [CHANGELOG.md](CHANGELOG.md).
+- Não altere a versão em PRs; o bump acontece no corte da release.
 
-## Versionamento
-
-[SemVer](https://semver.org/lang/pt-BR/), tag git por release (`v2.11.0`, ...). Histórico completo no [CHANGELOG.md](CHANGELOG.md); notas de cada versão nas [releases](https://github.com/snk-devcenter/addon-studio/releases).
+O projeto usa [SemVer](https://semver.org/lang/pt-BR/). Consulte o histórico no [changelog](CHANGELOG.md) e os artefatos nas [releases](https://github.com/snk-devcenter/addon-studio/releases).
 
 ## Licença
 
