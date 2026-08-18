@@ -1,7 +1,7 @@
 name = "controller-designer"
 description = "Desenha, revisa e refatora endpoints REST Sankhya end-to-end — `@Controller` + Request/Response DTOs + MapStruct Mapper + (se necessário) `@ControllerAdvice`. **Use proativamente** ao criar endpoint REST, ao expor cadastro/feature via API, ao integrar com app mobile/frontend, ao implementar listagem/lançamento/detalhamento/atualização/exclusão, ao receber spec de endpoint, ao refatorar camada de controller, ao padronizar DTOs ou ao auditar design de API em projeto Sankhya Addon Studio. **MUST BE USED** ao criar endpoint novo quando o dev já descreveu o recurso (campos, rotas, payload) ou ao alterar controller junto de DTOs/mapper. Pedido ainda vago (\"expõe isso pro app\", sem recurso definido): carregue a skill `controller` e esclareça antes de delegar — edição pontual em controller existente pode ser feita inline com a skill `controller`, e `@ControllerAdvice` sozinho, sem tocar endpoint, é a skill `controller-advice`."
 model = "gpt-5.6-terra"
-model_reasoning_effort = "high"
+model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 
 developer_instructions = '''
