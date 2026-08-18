@@ -3,7 +3,7 @@
 [![release](https://img.shields.io/github/v/release/snk-devcenter/addon-studio?label=release&color=blue)](https://github.com/snk-devcenter/addon-studio/releases/latest)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-Plugin para **Claude Code** com **24 skills focadas + 6 sub-agents** que orientam implementação em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo DevCenter Squad.
+Plugin para **Claude Code e Codex CLI** com **24 skills focadas + 6 sub-agents** que orientam implementação em projetos **Sankhya Addon Studio 2.0** (Wildfly/EJB + SDK Java JAPE). Mantido pelo DevCenter Squad.
 
 As skills são a **fonte de verdade da API do SDK**: assinaturas validadas contra os jars reais (`studio-annotations`, `sdk-sankhya`). Seguir as skills gera código que compila e deploya — sem o agente precisar inspecionar jars.
 
@@ -81,7 +81,7 @@ Qualquer skill pode ser chamada direto como slash command:
 
 ### Sub-agents
 
-Especialistas com workflow ativo, tools restritas e modelo próprio — executam decisão + ação (diferente de skills, que são conhecimento). Aparecem em `/agents` e são auto-invocados conforme contexto, ou explicitamente ("usa o addon-reviewer nesse diff"):
+No Claude Code, especialistas com workflow ativo, tools restritas e modelo próprio executam decisão + ação (diferente de skills, que são conhecimento). Aparecem em `/agents` e são auto-invocados conforme contexto, ou explicitamente ("usa o addon-reviewer nesse diff"):
 
 | Agent | Modelo | Escopo |
 |-------|:------:|--------|
@@ -91,6 +91,25 @@ Especialistas com workflow ativo, tools restritas e modelo próprio — executam
 | `test-writer` | sonnet | Escreve JUnit 5 + Mockito 4.11 com quirks de `JapeRepository`. Roda `./gradlew test` pra validar. |
 | `troubleshooter` | sonnet | Diagnostica erros: encoding, Guice DI, JPA misturada com JAPE, Java 8 violations, build/deploy. |
 | `dbscript-builder` | haiku | Gera dbscripts `V<NNN>-*.xml` dual MSSQL/Oracle. |
+
+#### Codex CLI
+
+O Codex CLI 0.147.0 descobre agents em `~/.codex/agents/`, mas o manifest de plugin não tem campo `agents`; por isso a instalação do plugin não copia estes arquivos automaticamente. Depois de instalar `addon-studio@snk-devcenter`, copie os TOMLs distribuídos pelo plugin:
+
+```bash
+addon_studio_plugin="$(codex plugin list | awk '$1 == "addon-studio@snk-devcenter" { print $NF }')"
+test -n "$addon_studio_plugin"
+install -d "$HOME/.codex/agents"
+cp -i "$addon_studio_plugin"/agents/codex/*.toml "$HOME/.codex/agents/"
+```
+
+Abra uma nova sessão após copiar. O `-i` evita sobrescrever uma customização local sem confirmação; repita a cópia para atualizar os agents junto do plugin.
+
+Os TOMLs usam, provisoriamente, `gpt-5.6-terra` para os agents Sonnet e `gpt-5.4` para o `dbscript-builder`; os esforços são `high` para design/diagnóstico e `medium` para execução/review. Esta escolha ainda precisa de confirmação do mantenedor.
+
+No Codex, peça o agent pelo nome; a `description` ajuda a escolha, mas não impõe auto-delegação. Roteamento: `entity-architect` para os três artefatos CRUD juntos; `dbscript-builder` para migration isolada; `controller-designer` para endpoint junto de DTOs/mapper; `test-writer` para suíte nova ou cobertura de vários arquivos; `troubleshooter` para causa-raiz ainda incerta; `addon-reviewer` antes de commit. Para mudança pontual, use a skill correspondente.
+
+O allowlist Claude de comandos não tem equivalente: `addon-reviewer` é `read-only`; os demais são `workspace-write`. Assim, `Bash(git diff *)`, `Bash(./gradlew *)`, `Bash(iconv *)` e `Bash(python3 *)` não são restringidos individualmente no Codex.
 
 ### Hook de encoding
 
@@ -162,7 +181,7 @@ Skills cobrem **regras do SDK e do framework**. Organização de pacotes, camada
     └── addon-studio/
         ├── .claude-plugin/plugin.json  # manifest do plugin
         ├── hooks/                      # hooks.json + to-iso88591.sh (PostToolUse de encoding)
-        ├── agents/                     # 6 sub-agents
+        ├── agents/                     # 6 sub-agents Claude Code + TOMLs Codex em codex/
         └── skills/                     # 24 skills (1 dir por skill, SKILL.md cada)
             └── addon-studio/assets/ADDON.md   # template injetado no projeto consumidor
 ```
