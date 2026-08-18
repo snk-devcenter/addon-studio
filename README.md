@@ -105,7 +105,7 @@ cp -i "$addon_studio_plugin"/agents/codex/*.toml "$HOME/.codex/agents/"
 
 Abra uma nova sessão após copiar. O `-i` evita sobrescrever uma customização local sem confirmação; repita a cópia para atualizar os agents junto do plugin.
 
-Os TOMLs usam, provisoriamente, `gpt-5.6-terra` para os agents Sonnet e `gpt-5.4` para o `dbscript-builder`; os esforços são `high` para design/diagnóstico e `medium` para execução/review. Esta escolha ainda precisa de confirmação do mantenedor.
+O `dbscript-builder` usa `gpt-5.6-luna`; para os agents Sonnet, a proposta é `gpt-5.6-terra`. Os esforços são `high` para design/diagnóstico e `medium` para execução/review. A escolha dos modelos Sonnet ainda precisa de confirmação do mantenedor.
 
 No Codex, peça o agent pelo nome; a `description` ajuda a escolha, mas não impõe auto-delegação. Roteamento: `entity-architect` para os três artefatos CRUD juntos; `dbscript-builder` para migration isolada; `controller-designer` para endpoint junto de DTOs/mapper; `test-writer` para suíte nova ou cobertura de vários arquivos; `troubleshooter` para causa-raiz ainda incerta; `addon-reviewer` antes de commit. Para mudança pontual, use a skill correspondente.
 
