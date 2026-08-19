@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [2.21.1] - 2026-08-19
+
 ### Alterado
 
 - README reorganizado com instalação, primeiros passos, uso e atualização separados para Claude Code e Codex CLI, além do catálogo de skills agrupado por domínio.
@@ -278,7 +280,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v2.21.0...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v2.21.1...HEAD
+[2.21.1]: https://github.com/snk-devcenter/addon-studio/compare/v2.21.0...v2.21.1
 [2.21.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.20.0...v2.21.0
 [2.20.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.19.0...v2.20.0
 [2.19.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.18.2...v2.19.0
