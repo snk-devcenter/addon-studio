@@ -44,23 +44,17 @@ Overwrite é **esperado** — re-rodar a skill upgrade o arquivo pra versão mai
 
 Claude Code suporta sintaxe de import de arquivo via `@<path>` no `CLAUDE.md`. Garanta que o `CLAUDE.md` da raiz contenha a linha `@docs/ADDON.md`.
 
-**Caso A — `CLAUDE.md` não existe:** crie com o seguinte template mínimo:
+**Caso A — `CLAUDE.md` não existe:** crie o arquivo com uma linha só, o import:
 
 ````markdown
-# CLAUDE.md
-
 @docs/ADDON.md
-
-## Customizações deste projeto
-
-> Regras específicas do projeto que sobrescrevem as skills do plugin (ex.: convenção de pacotes, padrão de nomenclatura customizada, restrições de design adicionais).
-
-- _Sem customizações declaradas._
 ````
+
+Nada além disso — sem título, sem seção de customizações, sem placeholder. Regra específica do projeto entra depois, quando o dev pedir; seção vazia com placeholder vira convite pro agente preencher e duplicar o que já está documentado em outro lugar do repo.
 
 **Caso B — `CLAUDE.md` já existe e já contém `@docs/ADDON.md`:** não faça nada (idempotente).
 
-**Caso C — `CLAUDE.md` já existe mas não contém `@docs/ADDON.md`:** insira a linha `@docs/ADDON.md` no topo (após o título `#`, se houver), preservando o resto do conteúdo intacto. Avise o dev em uma linha que o import foi adicionado.
+**Caso C — `CLAUDE.md` já existe mas não contém `@docs/ADDON.md`:** insira a linha `@docs/ADDON.md` no topo (após o título `#`, se houver), preservando o resto do conteúdo intacto. Só a linha do import — não acrescente seção nenhuma. Avise o dev em uma linha que o import foi adicionado.
 
 ### 4. Confirmar para o dev
 
@@ -68,13 +62,15 @@ Reporte em 2-3 linhas:
 
 - `docs/ADDON.md` copiado (ou atualizado).
 - `CLAUDE.md` criado / import adicionado / já estava OK.
-- Próximo passo opcional: dev adiciona regras específicas do projeto na seção "Customizações" do `CLAUDE.md`.
+
+Não sugira conteúdo pro `CLAUDE.md` nem ofereça preencher regras do projeto — o dev escreve isso quando precisar.
 
 ## Idempotência — checklist
 
 - [ ] `docs/ADDON.md` é overwrite seguro (conteúdo todo gerado pelo plugin).
 - [ ] `@docs/ADDON.md` no `CLAUDE.md` só é inserido se ausente — nunca duplica.
-- [ ] Não toca em customizações que o dev escreveu no `CLAUDE.md`.
+- [ ] Não toca no conteúdo que o dev escreveu no `CLAUDE.md`.
+- [ ] Não escreve regra de projeto no `CLAUDE.md` — a skill só garante o import.
 
 ## O que NÃO fazer
 

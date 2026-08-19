@@ -16,6 +16,7 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ### Corrigido
 
+- Skill `init` cria o `CLAUDE.md` só com o import `@docs/ADDON.md`, sem seção de customizações com placeholder — a seção vazia induzia o agente a preencher regras já documentadas no projeto.
 - Releases incluem instaladores `sh` e PowerShell com `--claude`/`--codex` para configurar o provider inteiro sem copiar TOMLs à mão nem alterar o projeto; customização local só é substituída com `--force`/`-Force`.
 
 ## [2.21.0] - 2026-08-18
