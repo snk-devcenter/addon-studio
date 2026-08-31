@@ -192,6 +192,7 @@ $addon-studio:test
 | Skill | Responsabilidade |
 |---|---|
 | `sankhya-js` | Telas HTML5 em AngularJS sobre `sankhya-js` |
+| `jsp` | Telas `.jsp` do add-on com a taglib `sankhyaUtil` |
 | `test` | Testes JUnit 5 e Mockito para addons |
 
 ## Agents

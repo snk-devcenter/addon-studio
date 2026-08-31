@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Adicionado
+
+- Skill `jsp` cobre telas `.jsp` do add-on de ponta a ponta: instalação da taglib `sankhyaUtil` (TLD, `QueryTag`, `HTMLGadgetSetupTag`), registro no menu, carga de dados por `<snk:query>` ou `executeQuery`, navegação com `openApp`/`openLevel` e templates prontos para copiar — incluindo o que muda ao portar um gadget do Dashboard nativo.
+
 ## [2.21.1] - 2026-08-19
 
 ### Alterado
