@@ -1,0 +1,48 @@
+{
+  "skill_name": "jsp",
+  "evals": [
+    {
+      "id": 0,
+      "name": "instalar-suporte-do-zero",
+      "prompt": "to com um addon aqui (contexto se chama frotasop) e preciso por uma tela de acompanhamento de frota: um painel com mapa dos veiculos, uns indicadores em cima e uma lista embaixo. E tela so de leitura, o layout e o que importa. O addon nao tem nenhum .jsp ainda, so telas html5. O que eu preciso criar pra isso funcionar, e como faco a tela aparecer no menu?",
+      "expected_output": "Lista os arquivos de instalacao (TLD + as 4 taglibs no :vc + as duas dependencias compileOnly), o .jsp em webapp/jsp/<Pasta>/, e a entrada <ui url=\"/$ctx/jsp/...\"> no dicionario. Alerta que a tela precisa ser aberta pelo menu.",
+      "files": [],
+      "assertions": [
+        "Lista a TLD (sankhyaUtil.tld) em webapp/WEB-INF/tld/ como arquivo a criar",
+        "Lista as taglibs Java (QueryTag, HTMLGadgetSetupTag, ResultImpl, Period) no modulo :vc",
+        "Cita as dependencias compileOnly (libs e mge-modelcore) que o :vc precisa",
+        "Mostra a entrada <ui url=\"/$ctx/jsp/...\"> no XML do dicionario para o menu",
+        "Avisa que a tela precisa ser aberta pelo menu (workspace) e nao pela URL direta",
+        "Nao inventa servlet proprio nem endpoint novo para carregar dados"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "gadget-portado-quebrado",
+      "prompt": "portei um .jsp que rodava como gadget do Dashboard pro nosso addon, pra parar de depender daquele esquema de zip + insert nas tabelas de dashboard. A tela abre e a tabela de cima renderiza, mas quando ele vai carregar os dados aparece um alert escrito 'Metodo nao disponivel aqui' e nos botoes de abrir a viagem da 'contextPage is not defined'. Como resolvo isso mantendo o .jsp sem alteracao?",
+      "expected_output": "Identifica que executeQuery e openApp perderam o contextPage do dashboard, e que a correcao e na tag <snk:load/>: executeQuery passa a chamar o servico nativo ExecQuerySP e openApp passa pelo workspace (openAppActivity), preservando a assinatura para nao mexer no .jsp.",
+      "files": [],
+      "assertions": [
+        "Identifica que a causa e a ausencia do contextPage, que so existe dentro do dashboard",
+        "Localiza a correcao na tag <snk:load/> / HTMLGadgetSetupTag, nao no .jsp",
+        "Aponta o servico nativo ExecQuerySP como executor da query, sem criar servlet",
+        "Diz que openApp passa a usar o workspace (openAppActivity) preservando o pkObject",
+        "Preserva a assinatura das funcoes para nao exigir alteracao no .jsp"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "carga-e-paginacao",
+      "prompt": "minha tela .jsp mostra 1003 linhas de uma query que no banco retorna 88 mil. o dash ta mostrando 1% do custo e ninguem percebeu por meses. como eu trago tudo?",
+      "expected_output": "Explica o teto de linhas do servico, o padrao de paginacao por blocos do tamanho do teto, e o alerta de que o tamanho do bloco no JS precisa casar com o teto do servidor senao a carga para na primeira pagina.",
+      "files": [],
+      "assertions": [
+        "Explica que o teto de linhas vem do servico (ExecQuerySP), nao do .jsp",
+        "Propoe paginacao por blocos com OFFSET/FETCH e laco ate a pagina vir incompleta",
+        "Alerta que o tamanho do bloco no JS tem de casar com o teto do servidor",
+        "Menciona maxRows=-1 ou o parametro MAXROWEXECQUERY como o que define o teto",
+        "Nao sugere simplesmente aumentar o limite sem tratar a paginacao"
+      ]
+    }
+  ]
+}

@@ -1,10 +1,31 @@
 {
   "_doc": "Cenarios da esteira de auditoria de disparo. 3 por skill: obvio (cita o simbolo), indireto (dev-speak de negocio, sem termo do SDK), negativo (mensagem vizinha que NAO deve disparar essa skill). Texto sem acento de proposito: o agente le como o dev digita. Alterar um cenario invalida a comparacao com runs anteriores -- crie um cenario novo em vez de editar.",
   "order": [
-    "entity", "repository", "controller", "controller-advice", "data-dictionary", "database",
-    "macros", "job", "action-button", "listener", "before-load-listener", "business-rule",
-    "mapstruct", "type-adapter", "dependency-injection", "value", "encoding", "build",
-    "test", "retrofit", "sankhya-utils", "sankhya-js", "addon-studio", "init"
+    "entity",
+    "repository",
+    "controller",
+    "controller-advice",
+    "data-dictionary",
+    "database",
+    "macros",
+    "job",
+    "action-button",
+    "listener",
+    "before-load-listener",
+    "business-rule",
+    "mapstruct",
+    "type-adapter",
+    "dependency-injection",
+    "value",
+    "encoding",
+    "build",
+    "test",
+    "retrofit",
+    "sankhya-utils",
+    "sankhya-js",
+    "addon-studio",
+    "init",
+    "jsp"
   ],
   "scenarios": {
     "entity": [
@@ -126,6 +147,11 @@
       "configura o CLAUDE.md desse projeto pro addon-studio",
       "acabei de clonar esse projeto de addon, prepara ele pra eu trabalhar com voce aqui",
       "cria o build.gradle do addon do zero"
+    ],
+    "jsp": [
+      "preciso por uma tela .jsp no addon usando a taglib snk:query, o que falta no projeto?",
+      "quero uma torre de controle com mapa e uns paineis, tela so de leitura, o layout e o produto e eu monto o html na mao",
+      "quero criar a tela HTML5 do addon com sk-dynaform ligada numa instancia do dicionario"
     ]
   }
 }

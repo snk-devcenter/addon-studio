@@ -53,7 +53,13 @@ public class HTMLGadgetSetupTag extends BodyTagSupport {
 		html.append("var qd = { query: { '$': query }, config: { name: 'maxRows', value: '-1' } };");
 		html.append("if (params && params.length) {");
 		html.append("var ps = [];");
-		html.append("for (var i = 0; i < params.length; i++) { ps.push({ type: (typeof params[i] === 'number' ? 'N' : 'S'), value: String(params[i]) }); }");
+		// o contrato do gadget e {type, value} por item; escalar e tolerado por conveniencia.
+		// Sem o primeiro ramo, um param no formato do contrato virava "[object Object]".
+		html.append("for (var i = 0; i < params.length; i++) {");
+		html.append("var it = params[i];");
+		html.append("if (it !== null && typeof it === 'object' && 'value' in it) { ps.push({ type: it.type || 'S', value: String(it.value) }); }");
+		html.append("else { ps.push({ type: (typeof it === 'number' ? 'N' : 'S'), value: String(it) }); }");
+		html.append("}");
 		html.append("qd.param = ps;");
 		html.append("}");
 		html.append("var url = '/mge/service.sbr?serviceName=ExecQuerySP.execQuery&outputType=json'");

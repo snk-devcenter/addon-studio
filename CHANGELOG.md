@@ -13,6 +13,11 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 ### Adicionado
 
 - Skill `jsp` cobre telas `.jsp` do add-on de ponta a ponta: instalação da taglib `sankhyaUtil` (TLD, `QueryTag`, `HTMLGadgetSetupTag`), registro no menu, carga de dados por `<snk:query>` ou `executeQuery`, navegação com `openApp`/`openLevel` e templates prontos para copiar — incluindo o que muda ao portar um gadget do Dashboard nativo.
+- Esteira de auditoria de disparo cobre catálogo com número ímpar de skills: com 25, três skills ficavam sem um dos três eixos e a fórmula de lotes as deixava de fora do teste.
+
+### Alterado
+
+- Skill `sankhya-js` declara que painel/dashboard denso de leitura e tela `.jsp` pertencem à skill `jsp`, desambiguando o roteamento entre as duas.
 
 ## [2.21.1] - 2026-08-19
 
