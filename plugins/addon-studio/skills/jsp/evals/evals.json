@@ -43,6 +43,24 @@
         "Menciona maxRows=-1 ou o parametro MAXROWEXECQUERY como o que define o teto",
         "Nao sugere simplesmente aumentar o limite sem tratar a paginacao"
       ]
+    },
+    {
+      "id": 3,
+      "name": "ilha-angular-no-jsp",
+      "prompt": "tenho um .jsp grandao de acompanhamento de carga que ja roda em producao com snk:query. agora pediram um botao que abre uma janela pra escolher a transportadora e depois chama um servico. queria usar o popup bonito do Sankhya mesmo, igual das telas nativas, sem reescrever a tela toda em html5. da pra por angular so nesse pedaco?",
+      "expected_output": "Confirma que da (ilha Angular no .jsp, sem Html5Launcher), e entrega o que a ilha exige: os 8 scripts em caminho absoluto /mge/ com snk.js por ultimo e ui-grid obrigatorio, as 5 globais antes do snk.js, bootstrap.min.css antes do snk.min.css, o fecho de modulos sem depender de snk, e bootstrap manual com gate de i18n. Diz que se a tela fosse nova o caminho seria .xhtml5.",
+      "files": [],
+      "assertions": [
+        "Confirma que da para subir Angular + snk.js dentro do .jsp sem passar pelo Html5Launcher",
+        "Lista os scripts em caminho absoluto /mge/..., com snk.js por ultimo",
+        "Exige ui-grid.modified.js mesmo sem grid na tela, e explica que a falta quebra em tempo de parse",
+        "Declara as globais workspace, VSS, locale, i18nAll e i18nFramework ANTES do snk.js",
+        "Carrega bootstrap.min.css antes do snk.min.css e explica que sem ele o popup nao aparece",
+        "Usa o fecho de modulos snk.core.* / snk.components.* / snk.i18n em vez do modulo guarda-chuva snk",
+        "Faz bootstrap manual (angular.bootstrap(document, ...)) depois de buscar _Framework.json, nao ng-app",
+        "Sobrescreve $scope.$success para devolver valor do SanPopup, porque o botao Ok chama $success() sem argumento",
+        "Diz que tela NOVA com stack Angular completo deveria ser .xhtml5, nao .jsp"
+      ]
     }
   ]
 }

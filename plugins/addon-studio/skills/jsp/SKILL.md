@@ -1,6 +1,6 @@
 ---
 name: jsp
-description: Painel operacional, dashboard denso, mapa ou tela de leitura com layout próprio — servidos como `.jsp` pelo próprio add-on, com a taglib `sankhyaUtil` (`<snk:query>` para SQL no render, `<snk:load/>` para a API JavaScript de tela). É também o caminho para portar gadget do Dashboard nativo, que rodava por zip + insert nas tabelas de dashboard. Use ao criar, revisar ou depurar arquivo em `webapp/jsp/`; ao instalar o suporte a `.jsp` num add-on que ainda não tem (TLD, taglibs, dependências do `:vc`); ao registrar a tela no menu do dicionário com `<ui url="/$ctx/jsp/...">`; ao consumir SQL de dentro de um `.jsp` por `<snk:query>` ou `executeQuery`; ao navegar entre telas com `openApp`/`openLevel`; ao migrar gadget do `Dashboard.xhtml5` para tela standalone; ou quando a tela abre mas o JavaScript não roda, aparece "Método não disponível aqui", `contextPage is not defined`, ou o código JS surge como texto na página. NÃO usar para tela AngularJS/`sk-*` em `webapp/html5/` que consome endpoint do add-on — isso é `sankhya-js`; nem para tela que o Sankhya monta a partir da tabela sem HTML próprio — isso é `data-dictionary`.
+description: Painel operacional, dashboard denso, mapa ou tela de leitura em que **você escreve o HTML na mão** e o servidor renderiza — servidos como `.jsp` pelo próprio add-on, com a taglib `sankhyaUtil` (`<snk:query>` para SQL no render, `<snk:load/>` para a API JavaScript de tela). Use ao criar, revisar ou depurar arquivo em `webapp/jsp/`; ao instalar o suporte a `.jsp` num add-on que ainda não tem (TLD, taglibs, dependências do `:vc`); ao registrar a tela no menu do dicionário com `<ui url="/$ctx/jsp/...">`; ao consumir SQL de dentro de um `.jsp` por `<snk:query>` ou `executeQuery`; ao navegar entre telas com `openApp`/`openLevel`; ao portar para o add-on gadget do `Dashboard.xhtml5` nativo, que rodava por zip + insert nas tabelas de dashboard; ao subir uma ilha AngularJS dentro de um `.jsp` já existente — carregar `angular` + `snk.js` sem o `Html5Launcher` para usar `ServiceProxy`, `MessageUtils`, `SanPopup` ou `SkWorkspace`, ou abrir popup nativo do framework, numa página que continua server-side; ou quando a tela `.jsp` abre mas o JavaScript não roda — "Método não disponível aqui", `contextPage is not defined`, `[$injector:nomod] ui.grid`, `workspace`/`VSS is not defined`, ou o código JS surge como texto na página. NÃO usar para tela AngularJS/`sk-*` em `webapp/html5/` que consome endpoint do add-on — isso é `sankhya-js`, que é também o destino da tela nova que já ia carregar o stack Angular completo (`.xhtml5` pelo `Html5Launcher`); nem para tela que o Sankhya monta a partir da tabela sem HTML próprio — isso é `data-dictionary`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -8,9 +8,10 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 # Tela `.jsp` — Addon Studio 2.0
 
 Um `.jsp` é servido pelo contexto web do próprio add-on (módulo `:vc`) e renderiza HTML no
-servidor. Diferente da tela `sankhya-js`, não há AngularJS, dataset nem componente `sk-*`:
-o que existe é HTML, JavaScript solto e uma taglib que dá acesso a SQL e à API de navegação
-do Sankhya.
+servidor. Diferente da tela `sankhya-js`, o default não tem AngularJS, dataset nem componente
+`sk-*`: o que existe é HTML, JavaScript solto e uma taglib que dá acesso a SQL e à API de
+navegação do Sankhya. Quando isso não basta, dá para subir uma **ilha Angular** com o
+`snk.js` da plataforma dentro da própria página (§5) — sem virar tela `sankhya-js`.
 
 Vale quando o layout é o produto — painel operacional, mapa, gráfico denso, tela de leitura
 com muitas visões — ou quando se está trazendo para o add-on um gadget que rodava no
@@ -136,7 +137,130 @@ aqui quem lê é o `.jsp` que você escreveu.
 
 ---
 
-## 5. Armadilhas
+## 5. Ilha Angular no `.jsp` — quando o HTML solto não basta
+
+Um `.jsp` pode subir Angular e o `snk.js` da plataforma dentro dele, **sem passar pelo
+`Html5Launcher`**. Isso destrava `ServiceProxy`, `MessageUtils`, `SanPopup` e `SkWorkspace`
+— a mesma API das telas `sankhya-js` — numa página que continua sendo `.jsp`, com a taglib
+e o `<snk:query>` funcionando ao lado.
+
+**Quando isso se paga.** Quando o `.jsp` **já existe** e é grande demais para reescrever, ou
+quando você quer só uma **ilha**: um popup nativo, uma chamada de serviço com loading e erro
+tratados, um trecho reativo dentro de uma tela que continua server-side. **Tela nova não
+entra aqui**: se ela vai carregar o stack Angular inteiro de qualquer jeito, ela devia ser
+`.xhtml5` — o `Html5Launcher` já faz isso, é o caminho suportado, e não deixa 8 `<script>`
+de caminho absoluto sob sua manutenção. Tier A se paga por **não reescrever**, não por ser
+mais leve.
+
+### Os 8 scripts, nesta ordem
+
+O template nativo carrega ~35. O fecho mínimo são estes 8, e nenhum é decorativo — tirar
+qualquer um quebra em **tempo de parse** do `snk.js`, com sintoma que não aponta para a causa.
+
+| # | Script | Por que está aqui |
+|:--|:-------|:------------------|
+| 1 | `/mge/js/sf/sf.js` | `snk.js` chama `ftxt('pcsf')` em **tempo de parse** |
+| 2 | `/mge/js/util/jquery-1.9.1.min.js` | `snk.js` roda `+function($){...}` em **tempo de parse** |
+| 3 | `/mge/js/util/Base64.js` | global usada pelo `ServiceProxy` no caminho de erro |
+| 4 | `/mge/scripts/vendors/angular/angular.js` | o framework |
+| 5 | `/mge/scripts/vendors/moment/moment.min.js` | bloco `.config()` **eager** de `snk.core.util` |
+| 6 | `/mge/scripts/vendors/numeral/numeral.min.js` | bloco `.config()` **eager** de `snk.core.util` |
+| 7 | `/mge/scripts/vendors/translate/angular-translate.js` | `$translate`, injetado pelo `SanPopup` via `snk.i18n` |
+| 8 | `/mge/scripts/vendors/ui-grid/ui-grid.modified.js` | **obrigatório mesmo sem grid nenhum** — ver abaixo |
+
+E só então `/mge/scripts/snk.js`.
+
+**Caminhos absolutos `/mge/...`.** Relativo resolve dentro do contexto do add-on e dá 404.
+
+**`ui-grid` sem grid não é engano.** O `snk.js` tem um IIFE de topo de arquivo que faz
+`angular.module('ui.grid')` na forma **getter**. Sem o vendor carregado antes, isso lança
+`[$injector:nomod]` em tempo de parse, e tudo o que vem depois no bundle nunca registra —
+medido, **204 de 1039 providers**. O erro visível mente: o dev vê
+`Unknown provider: i18nProvider <- i18n <- MessageUtils <- ServiceProxy`, porque `snk.i18n`
+é concatenado depois do ponto do estouro, e ninguém suspeita de grid lendo isso.
+(`ui-grid.min.css` só é preciso se a tela for renderizar um grid de verdade.)
+
+### As 5 globais que o `Html5Launcher` injeta
+
+Um `.jsp` não tem nenhuma delas. **Declare antes do `<script src=".../snk.js">`**, não depois:
+
+| Global | Quem lê | Quando estoura |
+|:-------|:--------|:---------------|
+| `workspace` | `SkWorkspace` (**construtor**) | ao injetar o serviço, mesmo sem navegar |
+| `VSS` | `ServiceProxy.callService` | em **toda** chamada ao backend |
+| `locale` | `SkI18nService` | no `setLang` |
+| `i18nAll` | `SkI18nServiceLoader` | 1º `setLang`, dentro de `.run()` → `[$injector:modulerr]` |
+| `i18nFramework` | `SkI18nServiceLoader` | idem |
+
+O `SkI18nServiceLoader` **não recebe os bundles por injeção** — ele faz `angular.forEach`
+lendo o escopo global. Popular a global antes do `angular.bootstrap` basta; não há `addBundle`
+a fazer no `.run()`.
+
+`workspace` resolve de `window.top`/`window.parent`, e pode ficar `undefined` — é o que
+acontece abrindo o `.jsp` pela URL, fora do menu (§4). Declarar mesmo assim é o que impede o
+`ReferenceError`; o que falta aí é o workspace em volta, não a global.
+
+### CSS, nesta ordem
+
+```html
+<link rel="stylesheet" href="/mge/assets/vendors/bootstrap.min.css"/>
+<link rel="stylesheet" href="/mge/assets/css/snk.min.css"/>
+<link rel="stylesheet" href="tela.css"/>
+```
+
+**`bootstrap.min.css` não é opcional se a tela usa popup.** `.modal` e `.modal-backdrop`
+tiram dele todo o posicionamento (`position:fixed`, `top/right/bottom/left`, `z-index`); o
+`snk.min.css` só traz *override*. Sem bootstrap o popup renderiza em fluxo normal no fim do
+`<body>`: existe no DOM, fecha no ESC, e não aparece na tela.
+
+A contrapartida é real e vale dizer ao dono da tela: os dois são **baseline global** e
+reestilizam a página inteira. O CSS da tela vem por último para que as regras dela vençam.
+
+### Dependências do módulo
+
+Fecho exato para `ServiceProxy` + `MessageUtils` + `SanPopup` + `SkWorkspace`:
+
+```js
+angular.module('<App>', [
+  'snk.core.util',          // ServiceProxy, MessageUtils, Criteria, StringUtils, ObjectUtils
+  'snk.core.workspace',     // SkWorkspace
+  'snk.core.application',   // SkApplication (o SkWorkspace injeta)
+  'snk.core.tour',          // SkTourService (o SanPopupStack injeta)
+  'snk.components.popup',   // SanPopup
+  'snk.components.button',  // ButtonThemes (o MessageUtils injeta)
+  'snk.i18n'                // $translate + i18n
+]);
+```
+
+`pascalprecht.translate` é o único módulo de vendor angular que esse fecho exige, e chega
+por `snk.i18n`. **Não dependa do módulo guarda-chuva `snk`**: ele puxa datagrid e o bloco
+inteiro de vendors — exatamente o que esta tela não carrega.
+
+### Bootstrap manual, com gate de i18n
+
+Nada de `ng-app`. Busque `/mge/assets/i18n/<locale>/_Framework.json` (40 KB, as 14 chaves
+`Geral.*` que o `MessageUtils` usa nos labels) e **só então** chame `angular.bootstrap`, com
+um `.run()` que faz `SkI18nService.setLang(locale)`. Sem o gate, o popup abre com a chave
+crua no lugar do label.
+
+Três coisas que custam deploy se forem ignoradas:
+
+- **`angular.bootstrap(document, ...)`**, não numa `div` — o `SanPopup` pendura o popup no
+  `<body>`, fora da app.
+- **`try/catch` em volta do `bootstrap`.** Dentro de uma cadeia de promises o erro morre
+  como *unhandled rejection*: a tela fica muda, só com os `{{ }}` crus e o console limpo.
+  Escreva o erro na página.
+- **Não reaproveite o `launcher.js`.** Ele monta a URL do bundle da tela em caminho
+  **relativo**, o que dá 404 fora da raiz do contexto. Os bundles do framework, ao
+  contrário, são absolutos — dá para buscar direto.
+
+Template pronto: [`templates/TelaAngular.jsp`](templates/TelaAngular.jsp). A API destravada,
+o contrato de cada serviço e a tabela sintoma → causa:
+[`references/angular-no-jsp.md`](references/angular-no-jsp.md).
+
+---
+
+## 6. Armadilhas
 
 **Custom tag dentro de comentário JavaScript é executada.** O JSP não conhece comentário JS.
 Uma tag escrita em `// ...` ou `/* ... */` roda na tradução, e se ela emitir
@@ -161,21 +285,26 @@ dashboard. Sem ele, precisam de destino novo — a página, uma URL — ou viram
 
 ---
 
-## 6. Anti-patterns
+## 7. Anti-patterns
 
 | Anti-pattern | Correção |
 |:-------------|:---------|
-| Tag `<snk:...>` dentro de comentário ou string JavaScript | Escrever o nome sem os sinais (§5) |
+| Tag `<snk:...>` dentro de comentário ou string JavaScript | Escrever o nome sem os sinais (§6) |
 | `<snk:load/>` depois dos scripts que usam a API | A tag vai no `<head>`, antes de tudo |
 | Serializar o `pkObject` do `openApp` | Passar o objeto inteiro — o destino o lê em `loadByPK` |
 | Servlet próprio para rodar o SQL do `executeQuery` | O serviço nativo já faz isso (`references/gadget-api.md`) |
 | Registrar toda view da pasta no menu | Só o entrypoint; o resto é `openLevel` |
 | `<tag-class>` da TLD divergente do `package` real | Mesma FQN nos dois |
 | Cadastro CRUD como `.jsp` | `data-dictionary` ou `sankhya-js` |
+| Tela nova nascendo `.jsp` só para carregar o stack Angular (§5) | Tela nova com stack completo é `.xhtml5` — `sankhya-js` |
+| `ng-app` na ilha Angular | Bootstrap manual, depois do gate de i18n (§5) |
+| Depender do módulo `snk` na ilha Angular | Só o fecho de 7 módulos (§5) — `snk` puxa datagrid e todos os vendors |
+| Carregar só os vendors "que a tela usa" | Os 8 são o mínimo; `ui-grid` é exigido sem grid (§5) |
+| `<script src="scripts/snk.js">` (relativo) | Absoluto `/mge/...` — relativo resolve no contexto do add-on e dá 404 |
 
 ---
 
-## 7. Checklist: nova tela `.jsp`
+## 8. Checklist: nova tela `.jsp`
 
 1. [ ] TLD em `webapp/WEB-INF/tld/` e as 4 classes no `:vc`, com `<tag-class>` batendo no `package`.
 2. [ ] `compileOnly` de `libs` e `mge-modelcore` no `vc/build.gradle`.
@@ -187,18 +316,29 @@ dashboard. Sem ele, precisam de destino novo — a página, uma URL — ou viram
 8. [ ] Só ASCII em arte de comentário.
 9. [ ] Abrir **pelo menu**, não pela URL — é o que dá workspace ao `openApp`.
 
+Se a tela tiver ilha Angular (§5), some a estes:
+
+10. [ ] Os 8 `<script>` na ordem, em caminho absoluto `/mge/...`, e `snk.js` por último.
+11. [ ] `ui-grid.modified.js` presente, mesmo sem grid na tela.
+12. [ ] As 5 globais (`workspace`, `VSS`, `locale`, `i18nAll`, `i18nFramework`) declaradas **antes** do `snk.js`.
+13. [ ] CSS: `bootstrap.min.css` → `snk.min.css` → CSS da tela.
+14. [ ] Fecho de 7 módulos, sem depender de `snk`.
+15. [ ] `_Framework.json` buscado antes do `angular.bootstrap(document, ...)`, com `try/catch` que escreve o erro na página.
+
 ---
 
 ## Referências
 
 - [`references/gadget-api.md`](references/gadget-api.md) — as cinco funções em detalhe, o serviço que executa a query, formato da resposta e teto de linhas
 - [`references/querytag.md`](references/querytag.md) — `<snk:query>`: atributos, `Result`, parâmetros nomeados, datasource
-- [`templates/`](templates/) — TLD, as 4 taglibs e um `.jsp` funcional, prontos para copiar
+- [`references/angular-no-jsp.md`](references/angular-no-jsp.md) — `ServiceProxy`, `MessageUtils`, `SanPopup`, `SkWorkspace` na ilha Angular, e a tabela sintoma → causa
+- [`templates/`](templates/) — TLD, as 4 taglibs, um `.jsp` funcional e o [`TelaAngular.jsp`](templates/TelaAngular.jsp) da ilha, prontos para copiar
 
 ## Skills relacionadas
 
 - `data-dictionary` — registro no menu, `<folder>`, pasta nativa
-- `sankhya-js` — tela HTML5 do add-on (AngularJS, `sk-*`), a alternativa quando o caso é CRUD
+- `sankhya-js` — tela HTML5 do add-on (AngularJS, `sk-*`), a alternativa quando o caso é CRUD ou quando a tela nova já ia carregar o stack completo; é lá que mora o contrato de `ServiceProxy`, `MessageUtils` e `SanPopup`
+- `controller` — o `@Controller(serviceName = "<Nome>SP")` que a ilha Angular chama por `ServiceProxy` com o prefixo `<addon>@`
 - `database` — objetos de banco que a tela consulta
 - `build` — deploy do add-on e do contexto web
 - `encoding` — ISO-8859-1 nos `.java`/`.xml` das taglibs
