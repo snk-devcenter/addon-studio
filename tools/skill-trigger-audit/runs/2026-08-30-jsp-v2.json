@@ -1,0 +1,477 @@
+{
+ "B10C1": {
+  "conf": 85,
+  "skills": [
+   "repository"
+  ]
+ },
+ "B10C2": {
+  "conf": 90,
+  "skills": [
+   "test"
+  ]
+ },
+ "B10C3": {
+  "conf": 88,
+  "skills": [
+   "before-load-listener"
+  ]
+ },
+ "B10C4": {
+  "conf": 75,
+  "skills": [
+   "controller"
+  ]
+ },
+ "B10C5": {
+  "conf": 97,
+  "skills": [
+   "retrofit"
+  ]
+ },
+ "B10C6": {
+  "conf": 70,
+  "skills": [
+   "listener"
+  ]
+ },
+ "B11C1": {
+  "conf": 92,
+  "skills": [
+   "controller-advice"
+  ]
+ },
+ "B11C2": {
+  "conf": 96,
+  "skills": [
+   "sankhya-utils"
+  ]
+ },
+ "B11C3": {
+  "conf": 88,
+  "skills": [
+   "listener"
+  ]
+ },
+ "B11C4": {
+  "conf": 94,
+  "skills": [
+   "data-dictionary"
+  ]
+ },
+ "B11C5": {
+  "conf": 97,
+  "skills": [
+   "sankhya-js"
+  ]
+ },
+ "B11C6": {
+  "conf": 93,
+  "skills": [
+   "type-adapter"
+  ]
+ },
+ "B12C1": {
+  "conf": 88,
+  "skills": [
+   "database",
+   "entity"
+  ]
+ },
+ "B12C2": {
+  "conf": 92,
+  "skills": [
+   "addon-studio"
+  ]
+ },
+ "B12C3": {
+  "conf": 84,
+  "skills": [
+   "mapstruct"
+  ]
+ },
+ "B12C4": {
+  "conf": 94,
+  "skills": [
+   "macros"
+  ]
+ },
+ "B12C5": {
+  "conf": 96,
+  "skills": [
+   "init"
+  ]
+ },
+ "B12C6": {
+  "conf": 87,
+  "skills": [
+   "value"
+  ]
+ },
+ "B13C1": {
+  "conf": 92,
+  "skills": [
+   "job"
+  ]
+ },
+ "B13C2": {
+  "conf": 96,
+  "skills": [
+   "jsp"
+  ]
+ },
+ "B13C3": {
+  "conf": 88,
+  "skills": [
+   "dependency-injection"
+  ]
+ },
+ "B13C4": {
+  "conf": 90,
+  "skills": [
+   "action-button"
+  ]
+ },
+ "B13C5": {
+  "conf": 90,
+  "skills": [
+   "entity"
+  ]
+ },
+ "B13C6": {
+  "conf": 55,
+  "skills": [
+   "data-dictionary",
+   "sankhya-js"
+  ]
+ },
+ "B1C1": {
+  "conf": 88,
+  "skills": [
+   "action-button"
+  ]
+ },
+ "B1C2": {
+  "conf": 92,
+  "skills": [
+   "entity"
+  ]
+ },
+ "B1C3": {
+  "conf": 55,
+  "skills": [
+   "data-dictionary",
+   "sankhya-js"
+  ]
+ },
+ "B1C4": {
+  "conf": 82,
+  "skills": [
+   "listener"
+  ]
+ },
+ "B1C5": {
+  "conf": 95,
+  "skills": [
+   "repository"
+  ]
+ },
+ "B1C6": {
+  "conf": 87,
+  "skills": [
+   "test"
+  ]
+ },
+ "B2C1": {
+  "conf": 92,
+  "skills": [
+   "before-load-listener",
+   "repository"
+  ]
+ },
+ "B2C2": {
+  "conf": 88,
+  "skills": [
+   "controller",
+   "mapstruct"
+  ]
+ },
+ "B2C3": {
+  "conf": 80,
+  "skills": [
+   "controller"
+  ]
+ },
+ "B2C4": {
+  "conf": 90,
+  "skills": [
+   "business-rule",
+   "action-button"
+  ]
+ },
+ "B2C5": {
+  "conf": 97,
+  "skills": [
+   "controller-advice"
+  ]
+ },
+ "B2C6": {
+  "conf": 85,
+  "skills": [
+   "controller"
+  ]
+ },
+ "B3C1": {
+  "conf": 92,
+  "skills": [
+   "mapstruct"
+  ]
+ },
+ "B3C2": {
+  "conf": 97,
+  "skills": [
+   "data-dictionary"
+  ]
+ },
+ "B3C3": {
+  "conf": 85,
+  "skills": [
+   "controller"
+  ]
+ },
+ "B3C4": {
+  "conf": 95,
+  "skills": [
+   "type-adapter"
+  ]
+ },
+ "B3C5": {
+  "conf": 88,
+  "skills": [
+   "database"
+  ]
+ },
+ "B3C6": {
+  "conf": 90,
+  "skills": []
+ },
+ "B4C1": {
+  "conf": 78,
+  "skills": [
+   "dependency-injection"
+  ]
+ },
+ "B4C2": {
+  "conf": 96,
+  "skills": [
+   "macros"
+  ]
+ },
+ "B4C3": {
+  "conf": 88,
+  "skills": [
+   "entity"
+  ]
+ },
+ "B4C4": {
+  "conf": 94,
+  "skills": [
+   "value"
+  ]
+ },
+ "B4C5": {
+  "conf": 97,
+  "skills": [
+   "job"
+  ]
+ },
+ "B4C6": {
+  "conf": 55,
+  "skills": []
+ },
+ "B5C1": {
+  "conf": 96,
+  "skills": [
+   "encoding"
+  ]
+ },
+ "B5C2": {
+  "conf": 97,
+  "skills": [
+   "action-button"
+  ]
+ },
+ "B5C3": {
+  "conf": 92,
+  "skills": [
+   "sankhya-js",
+   "data-dictionary"
+  ]
+ },
+ "B5C4": {
+  "conf": 93,
+  "skills": [
+   "build"
+  ]
+ },
+ "B5C5": {
+  "conf": 98,
+  "skills": [
+   "listener"
+  ]
+ },
+ "B5C6": {
+  "conf": 95,
+  "skills": [
+   "encoding"
+  ]
+ },
+ "B6C1": {
+  "conf": 80,
+  "skills": [
+   "test"
+  ]
+ },
+ "B6C2": {
+  "conf": 97,
+  "skills": [
+   "before-load-listener"
+  ]
+ },
+ "B6C3": {
+  "conf": 95,
+  "skills": [
+   "macros"
+  ]
+ },
+ "B6C4": {
+  "conf": 93,
+  "skills": [
+   "retrofit"
+  ]
+ },
+ "B6C5": {
+  "conf": 96,
+  "skills": [
+   "business-rule"
+  ]
+ },
+ "B6C6": {
+  "conf": 90,
+  "skills": [
+   "controller-advice"
+  ]
+ },
+ "B7C1": {
+  "conf": 70,
+  "skills": [
+   "sankhya-utils"
+  ]
+ },
+ "B7C2": {
+  "conf": 97,
+  "skills": [
+   "mapstruct"
+  ]
+ },
+ "B7C3": {
+  "conf": 85,
+  "skills": [
+   "controller",
+   "controller-advice"
+  ]
+ },
+ "B7C4": {
+  "conf": 78,
+  "skills": [
+   "sankhya-js",
+   "data-dictionary"
+  ]
+ },
+ "B7C5": {
+  "conf": 98,
+  "skills": [
+   "type-adapter"
+  ]
+ },
+ "B7C6": {
+  "conf": 90,
+  "skills": [
+   "database"
+  ]
+ },
+ "B8C1": {
+  "conf": 80,
+  "skills": [
+   "addon-studio"
+  ]
+ },
+ "B8C2": {
+  "conf": 95,
+  "skills": [
+   "dependency-injection"
+  ]
+ },
+ "B8C3": {
+  "conf": 93,
+  "skills": [
+   "repository"
+  ]
+ },
+ "B8C4": {
+  "conf": 90,
+  "skills": [
+   "init"
+  ]
+ },
+ "B8C5": {
+  "conf": 96,
+  "skills": [
+   "value"
+  ]
+ },
+ "B8C6": {
+  "conf": 82,
+  "skills": [
+   "database"
+  ]
+ },
+ "B9C1": {
+  "conf": 82,
+  "skills": [
+   "jsp",
+   "sankhya-js"
+  ]
+ },
+ "B9C2": {
+  "conf": 95,
+  "skills": [
+   "encoding"
+  ]
+ },
+ "B9C3": {
+  "conf": 88,
+  "skills": [
+   "action-button"
+  ]
+ },
+ "B9C4": {
+  "conf": 80,
+  "skills": [
+   "entity",
+   "database"
+  ]
+ },
+ "B9C5": {
+  "conf": 60,
+  "skills": [
+   "build"
+  ]
+ },
+ "B9C6": {
+  "conf": 93,
+  "skills": [
+   "sankhya-js"
+  ]
+ }
+}

@@ -124,7 +124,7 @@ def cmd_build():
 
     n = len(order)
     key, prompts = {}, []
-    for k in range(n // 2):
+    for k in range((n + 1) // 2):
         itens = [(order[(2 * k + off) % n], eixo) for off, eixo in OFFSETS]
         itens = [itens[i] for i in SHUFFLE]
         linhas = [
@@ -140,7 +140,7 @@ def cmd_build():
 
     write(os.path.join(OUT, "key.json"), json.dumps(key, indent=1, ensure_ascii=False))
     write(os.path.join(OUT, "prompt.md"), "\n\n---\n\n".join(prompts))
-    print("out/: %d skills, %d lotes, %d cenarios" % (len(skills), n // 2, len(key)))
+    print("out/: %d skills, %d lotes, %d cenarios" % (len(skills), (n + 1) // 2, len(key)))
     print("proximo passo: 1 subagente por lote, prompts prontos em out/prompt.md")
 
 

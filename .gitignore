@@ -6,3 +6,4 @@
 node_modules/
 *.original.md
 dist/
+*-workspace/
