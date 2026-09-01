@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [2.22.0] - 2026-09-01
+
 ### Adicionado
 
 - Skill `jsp` cobre telas `.jsp` do add-on de ponta a ponta: instalação da taglib `sankhyaUtil` (TLD, `QueryTag`, `HTMLGadgetSetupTag`), registro no menu, carga de dados por `<snk:query>` ou `executeQuery`, navegação com `openApp`/`openLevel` e templates prontos para copiar — incluindo o que muda ao portar um gadget do Dashboard nativo.
@@ -289,7 +291,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v2.21.1...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v2.22.0...HEAD
+[2.22.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.21.1...v2.22.0
 [2.21.1]: https://github.com/snk-devcenter/addon-studio/compare/v2.21.0...v2.21.1
 [2.21.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.20.0...v2.21.0
 [2.20.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.19.0...v2.20.0
