@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Adicionado
+
+- Skill `jsp` cobre ilha AngularJS dentro de um `.jsp`: subir `angular` + `snk.js` sem o `Html5Launcher` para usar `ServiceProxy`, `MessageUtils`, `SanPopup` e `SkWorkspace` numa tela server-side — com os 8 scripts na ordem, as 5 globais que o launcher injetava, a ordem de CSS, o fecho de módulos, o bootstrap manual com gate de i18n, template pronto e a tabela sintoma → causa dos erros que apontam para o lugar errado.
+
 ## [2.22.0] - 2026-09-01
 
 ### Adicionado
