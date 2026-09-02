@@ -16,6 +16,7 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ### Alterado
 
+- Descriptions desambiguam pedidos indiretos que empatavam entre duas skills: formulário que envia para endpoint do addon (`sankhya-js`, não `data-dictionary`/`jsp`), erro de deploy que nomeia o componente que o Guice não criou (`dependency-injection`, não `troubleshooter`), "listar/paginar X" sem rota (`repository`, não `controller`) e arredondar/formatar sem citar tela (`sankhya-utils`, não `sankhya-js`).
 - Sub-agent `entity-architect` lista a cadeia completa da feature nos próximos passos: repository, service, controller, testes, tela (`<dynamicForm>` ou HTML5) e build.
 - Template `ADDON.md` passa a morar em `skills/init/assets/` — `/addon-studio:init` e o hook `SessionStart` leem de lá; nada muda para o projeto consumidor.
 
