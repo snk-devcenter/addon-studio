@@ -14,6 +14,16 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Skill `jsp` cobre ilha AngularJS dentro de um `.jsp`: subir `angular` + `snk.js` sem o `Html5Launcher` para usar `ServiceProxy`, `MessageUtils`, `SanPopup` e `SkWorkspace` numa tela server-side — com os 8 scripts na ordem, as 5 globais que o launcher injetava, a ordem de CSS, o fecho de módulos, o bootstrap manual com gate de i18n, template pronto e a tabela sintoma → causa dos erros que apontam para o lugar errado.
 
+### Alterado
+
+- Descriptions desambiguam pedidos indiretos que empatavam entre duas skills: formulário que envia para endpoint do addon (`sankhya-js`, não `data-dictionary`/`jsp`), erro de deploy que nomeia o componente que o Guice não criou (`dependency-injection`, não `troubleshooter`), "listar/paginar X" sem rota (`repository`, não `controller`) e arredondar/formatar sem citar tela (`sankhya-utils`, não `sankhya-js`).
+- Sub-agent `entity-architect` lista a cadeia completa da feature nos próximos passos: repository, service, controller, testes, tela (`<dynamicForm>` ou HTML5) e build.
+- Template `ADDON.md` passa a morar em `skills/init/assets/` — `/addon-studio:init` e o hook `SessionStart` leem de lá; nada muda para o projeto consumidor.
+
+### Removido
+
+- Skill `addon-studio` removida: tudo que ela carregava já vive no `docs/ADDON.md` (regras universais, always-on), nas skills focadas (`entity`, `database`, `data-dictionary` para naming e tipos) e no sub-agent `entity-architect` (feature end-to-end). Invocar `/addon-studio:addon-studio` deixa de existir; as demais skills e agents não citam mais a skill para regras universais — os sub-agents apontam para o `docs/ADDON.md` do projeto (ou o template do plugin, quando `init` não rodou).
+
 ## [2.22.0] - 2026-09-01
 
 ### Adicionado

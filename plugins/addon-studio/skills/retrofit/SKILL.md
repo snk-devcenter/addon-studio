@@ -399,7 +399,7 @@ Estes patterns são comuns mas opcionais. Skill não detalha — implemente conf
 | `IllegalArgumentException: Illegal URL` no `Retrofit.Builder` | Base URL sem barra final | Adicionar `/` no fim: `"https://api.x.com/"` |
 | `EOFException` em response com `204 No Content` | Tentou desserializar corpo vazio | Use `Call<Void>` ou cheque `response.body() == null` |
 | `MalformedJsonException` ao deserializar | DTO não bate com JSON | Adicionar `@Json(name = "...")` em campos com nome diferente |
-| `@Inject` de `javax.inject` no interceptor | Pacote errado | `com.google.inject.Inject` (ver skill `addon-studio`) |
+| `@Inject` de `javax.inject` no interceptor | Pacote errado | `com.google.inject.Inject` |
 | Token expirou mid-request | Auth interceptor sem refresh | Implementar `okhttp3.Authenticator` separado para 401, ou refresh proativo |
 | Timeouts disparam sob carga | Defaults OkHttp são baixos | Configurar `connectTimeout`/`readTimeout`/`writeTimeout` no `OkHttpClient.Builder` |
 | `Method not annotated with HTTP method type` | Falta `@GET`/`@POST`/etc. | Adicionar verbo HTTP no método da interface |
@@ -425,7 +425,6 @@ Estes patterns são comuns mas opcionais. Skill não detalha — implemente conf
 
 - `dependency-injection` — `@CustomModule`, `@Provides`, `@Singleton`, `Provider<T>`, `Multibinder`
 - `value` — injetar base URL e timeouts via `@Value`
-- `addon-studio` — regras universais (Java 8, `@Inject` de `com.google.inject`)
 - `test` — testar gateway com `MockWebServer` (OkHttp)
 - `controller-advice` — mapear `IntegrationApiException`/`IntegrationNetworkException` para HTTP errors do addon
 - `build` — comandos Gradle (`gradle deployAddon`)

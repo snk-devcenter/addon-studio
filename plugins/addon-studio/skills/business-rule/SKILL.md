@@ -10,7 +10,6 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 `@BusinessRule` implementa logica automatica disparada por eventos do ciclo de vida comercial — principalmente **confirmacao e faturamento** de documentos (Pedidos, Notas de Venda). Disponivel a partir do Addon Studio 2.0.
 
 > **Referencias complementares:**
-> - `addon-studio` — Stack + restricoes Java 8
 > - `dependency-injection` — Injecao de dependencia (Guice)
 
 ---

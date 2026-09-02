@@ -312,4 +312,3 @@ public class MeuJob extends IJob {
 - `repository` — jobs tipicamente operam sobre dados via repository
 - `value` — configuração agendamento via `@Value`/`SANKHYA_PARAM`
 - `database` — migration XML do registro do job
-- `addon-studio` — regras universais Java 8 + Lombok

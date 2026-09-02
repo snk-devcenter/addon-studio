@@ -1,6 +1,6 @@
 ---
 name: dependency-injection
-description: Configura, revisa e debuga DI Guice em Sankhya Addon Studio — `@Inject` de `com.google.inject`, `@Component`, `@CustomModule`, `Provider<T>`, `Multibinder`, `@Singleton`, escopos. Use ao montar wiring, criar/alterar módulos Guice, ao injetar repository/service em controller, job ou listener (costura entre camadas), ao revisar/auditar dependências, quando o addon sobe e reclama que não conseguiu criar/instanciar um componente, que falta implementação ligada ou que não achou construtor (`ConfigurationException`, `CreationException`, `No implementation bound`, `Could not find a suitable constructor`), ou ao tocar em código com `@Inject`/`@CustomModule`/`AbstractModule`. NÃO usar quando o valor a injetar é parâmetro de configuração do Sankhya — isso é `@Value`, skill `value`.
+description: Configura, revisa e debuga DI Guice em Sankhya Addon Studio — `@Inject` de `com.google.inject`, `@Component`, `@CustomModule`, `Provider<T>`, `Multibinder`, `@Singleton`, escopos. Use ao montar wiring, criar/alterar módulos Guice, ao injetar repository/service em controller, job ou listener (costura entre camadas), ao revisar/auditar dependências, quando o addon sobe (deploy) e reclama que não conseguiu criar/instanciar um componente, que "não achou como criar" o seu service, que falta implementação ligada ou que não achou construtor (`ConfigurationException`, `CreationException`, `No implementation bound`, `Could not find a suitable constructor`), ou ao tocar em código com `@Inject`/`@CustomModule`/`AbstractModule`. Erro de deploy que nomeia o componente que o Guice não conseguiu criar já é diagnóstico pronto: o dono é esta skill, não o sub-agent `troubleshooter`. NÃO usar quando o valor a injetar é parâmetro de configuração do Sankhya — isso é `@Value`, skill `value`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -428,7 +428,6 @@ Pontos de injeção que pedem o tipo concreto continuam funcionando sem alteraç
 
 ## Skills relacionadas
 
-- `addon-studio` — regras universais sobre @Inject (com.google.inject) e proibição de `new`
 - `controller` — controllers gerenciados automaticamente pelo framework — NÃO anotar @Component
 - `controller-advice` — advice gerenciado automaticamente pelo framework — NÃO anotar @Component
 - `mapstruct` — mappers são registrados no container Guice

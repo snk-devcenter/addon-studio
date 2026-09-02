@@ -64,4 +64,4 @@ não faz. Logo mede **discriminação** (olhando o catálogo, escolhe certo?), n
 (para pra olhar?). Saliência não cabe em `description`: depende de instrução always-on —
 `docs/ADDON.md` via `/addon-studio:init`, ou o hook `SessionStart` do plugin como piso.
 
-Corolário: `O`/`I` em 100% não autoriza remover o `ADDON.md`. Ver `assets/ADDON.md`.
+Corolário: `O`/`I` em 100% não autoriza remover o `ADDON.md`. Ver `skills/init/assets/ADDON.md`.

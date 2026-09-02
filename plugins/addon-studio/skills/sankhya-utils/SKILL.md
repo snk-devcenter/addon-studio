@@ -1,6 +1,6 @@
 ---
 name: sankhya-utils
-description: Classes utilitárias do backend Java que a plataforma Sankhya já expõe no classpath do addon (`com.sankhya.util`) — `StringUtils`, `BigDecimalUtil`, `TimeUtils`, `XMLUtils`, `JsonUtils`, `JdbcUtils`, `SQLUtils`, `CollectionUtils`, `MapUtils`, `ExceptionNavigator`, `ResourceLock`, `SessionFile`, `UIDGenerator`, validadores de CPF/CNPJ/e-mail/PIS. Use quando o cálculo, a conversão ou a formatação acontece no Java do addon (backend, não na tela) e antes de escrever à mão null-check, checagem de string/coleção vazia, conversão de tipo, arredondamento de `BigDecimal`, aritmética de data/`Timestamp`, formatação de moeda/CPF/CNPJ/CEP, fechamento de `ResultSet`, cláusula `IN` dinâmica, lock de recurso, arquivo temporário de sessão ou parser XML/JSON; ao revisar código com null-check repetido; ou ao tocar em código que importa `com.sankhya.util`. NÃO usar para os utilitários homônimos da tela HTML5 (`StringUtils`/`DateUtils`/`NumberUtils` do framework `sankhya-js`) — esses são `sankhya-js`.
+description: Classes utilitárias do backend Java que a plataforma Sankhya já expõe no classpath do addon (`com.sankhya.util`) — `StringUtils`, `BigDecimalUtil`, `TimeUtils`, `XMLUtils`, `JsonUtils`, `JdbcUtils`, `SQLUtils`, `CollectionUtils`, `MapUtils`, `ExceptionNavigator`, `ResourceLock`, `SessionFile`, `UIDGenerator`, validadores de CPF/CNPJ/e-mail/PIS. Use quando o cálculo, a conversão ou a formatação acontece no Java do addon (backend, não na tela) — pedido genérico de Java como "arredondar para N casas", "tratar quando vier null" ou "formatar como moeda", sem citar tela/`.js`/HTML, é aqui, e a resposta certa nunca é `setScale`/`String.format`/`NumberFormat`/`SimpleDateFormat` à mão: a plataforma já expõe o utilitário — e antes de escrever à mão null-check, checagem de string/coleção vazia, conversão de tipo, arredondamento de `BigDecimal`, aritmética de data/`Timestamp`, formatação de moeda/CPF/CNPJ/CEP, fechamento de `ResultSet`, cláusula `IN` dinâmica, lock de recurso, arquivo temporário de sessão ou parser XML/JSON; ao revisar código com null-check repetido; ou ao tocar em código que importa `com.sankhya.util`. NÃO usar para os utilitários homônimos da tela HTML5 (`StringUtils`/`DateUtils`/`NumberUtils` do framework `sankhya-js`) — esses são `sankhya-js`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -353,7 +353,6 @@ TimeUtils.dataAddDay(dtBase, 30)
 
 ## Skills relacionadas
 
-- `addon-studio` — regras universais (Java 8 strict, Lombok, ISO-8859-1, logging)
 - `controller` / `mapstruct` — validação e conversão em endpoint REST (substituem `if` manual e parser cru)
 - `repository` — `@Criteria`/`@NativeQuery`; `SQLUtils` complementa na montagem de `IN` dinâmica
 - `macros` — equivalentes das utilidades de data/texto/null **dentro** do SQL

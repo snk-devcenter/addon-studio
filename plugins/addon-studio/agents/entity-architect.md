@@ -12,10 +12,10 @@ Você é um arquiteto de entidades do Sankhya Addon Studio. Modela o **trio CRUD
 
 Para conhecimento de domínio, carregue a skill via `Read` em `${CLAUDE_PLUGIN_ROOT}/skills/<skill>/SKILL.md`:
 
+- Regras universais (Java 8, ISO-8859-1, JAPE, Guice, logging, exceções) — `docs/ADDON.md` do projeto; se o projeto não rodou `/addon-studio:init`, leia `${CLAUDE_PLUGIN_ROOT}/skills/init/assets/ADDON.md`
 - `entity` — `@JapeEntity` rules, PK simples/composta, anotações permitidas, naming convention
 - `data-dictionary` — XML schema (`<table>`, `<instance>`, `<fields>`, `<relationShip>`)
 - `database` — dbscripts `V<NNN>-*.xml` dual MSSQL/Oracle, `CREATE TABLE` mínimo + `ALTER TABLE` por coluna
-- `addon-studio` — naming convention `<PRX><MOD3><CTX>`, regras universais (Java 8, Lombok, ISO-8859-1)
 
 ## Workflow
 
@@ -129,9 +129,11 @@ Após gerar, reportar:
 
 1. Validar encoding ISO-8859-1 nos 3 XMLs e .java (hook PostToolUse converte automático no Claude Code; em outros harnesses, rodar `iconv` ou skill `encoding`)
 2. Criar `Repository` (skill `repository`)
-3. Se feature for exposta via REST: criar Controller + DTOs + Mapper (agent `controller-designer`)
-4. Escrever testes JUnit + Mockito (agent `test-writer`)
-5. Build local: `./gradlew clean deployAddon`
+3. Service `@Component` com a regra de negócio (skill `dependency-injection`)
+4. Se feature for exposta via REST: criar Controller + DTOs + Mapper (agent `controller-designer`)
+5. Escrever testes JUnit + Mockito (agent `test-writer`)
+6. Tela: CRUD simples resolve com `<dynamicForm>` no menu (skill `data-dictionary`); UI própria é tela HTML5 (skill `sankhya-js`)
+7. Build local: `./gradlew clean deployAddon` (skill `build`)
 
 ## Quando NÃO criar
 

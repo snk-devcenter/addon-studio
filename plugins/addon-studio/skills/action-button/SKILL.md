@@ -10,7 +10,6 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 `@ActionButton` associa uma classe Java ao menu "Acoes" de telas nativas do Sankhya Om. Disponivel a partir do Addon Studio 2.0.
 
 > **Referencias complementares:**
-> - `addon-studio` — Stack + restricoes Java 8
 > - `dependency-injection` — Injecao de dependencia (Guice)
 
 ---

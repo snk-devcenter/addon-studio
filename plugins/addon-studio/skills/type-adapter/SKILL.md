@@ -224,4 +224,3 @@ Ja registrados automaticamente. Nao recriar sem necessidade — apenas sobrescre
 - `entity` — tipos suportados em @JapeEntity
 - `controller` — DTOs e serialização JSON nos endpoints; endpoint REST que serializa/desserializa via adapter
 - `dependency-injection` — wiring Guice dos services injetados no adapter
-- `addon-studio` — regras universais do projeto

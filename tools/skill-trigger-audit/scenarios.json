@@ -23,7 +23,6 @@
     "retrofit",
     "sankhya-utils",
     "sankhya-js",
-    "addon-studio",
     "init",
     "jsp"
   ],
@@ -137,11 +136,6 @@
       "cria a tela HTML5 do addon usando sk-dynaform e sk-dataset",
       "preciso de uma tela dentro do Sankhya onde o usuario preenche um formulario de vistoria e envia pro meu endpoint",
       "quero criar a tela no frontend novo de Design System, com snk-application e os web components Stencil"
-    ],
-    "addon-studio": [
-      "vou comecar uma feature nova nesse addon, quais as regras e convencoes que eu tenho que seguir aqui?",
-      "recebi essa spec do produto: cadastro de vistoria de veiculo com tela de listagem no app mobile. implementa end-to-end",
-      "so ajusta o nome desse campo na entidade de KMRODADO pra KMATUAL"
     ],
     "init": [
       "configura o CLAUDE.md desse projeto pro addon-studio",

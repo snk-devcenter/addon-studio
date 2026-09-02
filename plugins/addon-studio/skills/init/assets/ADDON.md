@@ -4,7 +4,7 @@
 
 Projeto **Sankhya Addon Studio 2.0** — plugin Gradle `br.com.sankhya.addonstudio` aplicado no `build.gradle`/`build.gradle.kts`.
 
-Antes de gerar ou alterar código, case o domínio do artefato com a skill do plugin cujos gatilhos batem — cada skill declara os seus na própria `description`, inclusive quando **não** deve ser usada. Planejamento end-to-end, regras universais e naming `<PRX><MOD3><CTX>`: skill `addon-studio`. Delegação a sub-agent: os `description` deles dizem quando entram.
+Antes de gerar ou alterar código, case o domínio do artefato com a skill do plugin cujos gatilhos batem — cada skill declara os seus na própria `description`, inclusive quando **não** deve ser usada. Delegação a sub-agent: os `description` deles dizem quando entram.
 
 ## Regras universais (sempre ativas)
 

@@ -1,6 +1,6 @@
 ---
 name: controller
-description: Cria, revisa e refatora endpoints REST Sankhya com `@Controller` — `serviceName`, SP, `@Transactional`, DTOs, `@Valid`, mapeamento HTTP (GET/POST/PUT/DELETE), códigos de status. Use ao criar, alterar, revisar, auditar ou padronizar controllers REST, ao expor cadastro/feature via REST, ao integrar com app mobile/frontend, ao implementar listagem/lançamento/detalhamento/atualização/exclusão, ao receber spec de endpoint/API, ao declarar validação de entrada no DTO (`@Valid`, `@NotNull`, `@NotBlank`, `@Size` moram aqui; a resposta de erro da violação é `controller-advice`; injetar o repository/service no controller é `dependency-injection`), ao descobrir como chamar o endpoint de fora (URL a partir do `serviceName`/SP, chamada por Postman ou curl), ao trabalhar com arquivos `*Controller.java`, ou ao tocar em código com `@Controller`/`@GetMapping`/`@PostMapping`/`@RequestMapping`. NÃO usar para consumir API REST de terceiro — expor é aqui, consumir é `retrofit`.
+description: Cria, revisa e refatora endpoints REST Sankhya com `@Controller` — `serviceName`, SP, `@Transactional`, DTOs, `@Valid`, mapeamento HTTP (GET/POST/PUT/DELETE), códigos de status. Use ao criar, alterar, revisar, auditar ou padronizar controllers REST, ao expor cadastro/feature via REST, ao integrar com app mobile/frontend, ao implementar listagem/lançamento/detalhamento/atualização/exclusão expostos por endpoint (pedido que só diz "listar/filtrar/paginar X" sem citar rota, REST ou app é a query, skill `repository`), ao receber spec de endpoint/API, ao declarar validação de entrada no DTO (`@Valid`, `@NotNull`, `@NotBlank`, `@Size` moram aqui; a resposta de erro da violação é `controller-advice`; injetar o repository/service no controller é `dependency-injection`), ao descobrir como chamar o endpoint de fora (URL a partir do `serviceName`/SP, chamada por Postman ou curl), ao trabalhar com arquivos `*Controller.java`, ou ao tocar em código com `@Controller`/`@GetMapping`/`@PostMapping`/`@RequestMapping`. NÃO usar para consumir API REST de terceiro — expor é aqui, consumir é `retrofit`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -10,7 +10,6 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 `@Controller` marca classes = pontos entrada API interna add-on. Cada metodo publico auto-exposto como endpoint servico. Controllers **orquestram** fluxo requisicao — **nunca** contem logica negocio.
 
 > **Referencias complementares:**
-> - `addon-studio` — overview, regras universais, naming convention, fluxo CRUD
 > - `dependency-injection` — Injecao de dependencia (Guice)
 > - `mapstruct` — Mapeamento de objetos (MapStruct)
 > - `controller-advice` — Tratamento global de excecoes
@@ -475,5 +474,4 @@ Exemplos completos — controller simples (CRUD) e controller completo (múltipl
 - `dependency-injection` — wiring Guice do controller (injeção de serviços)
 - `mapstruct` — controller usa mapper MapStruct para DTO ↔ entidade `@JapeEntity`
 - `repository` — service delega persistência ao repository (controller nunca acessa repository direto)
-- `addon-studio` — regras universais (Java 8, Lombok, ISO-8859-1, exceções tipadas)
 - `test` — JUnit + Mockito do controller
