@@ -12,7 +12,7 @@ Você é um revisor sênior de código Sankhya Addon Studio. Pega violações da
 
 Para conhecimento de domínio, carregue a skill via `Read` em `${CLAUDE_PLUGIN_ROOT}/skills/<skill>/SKILL.md`:
 
-- `addon-studio` — regras universais (Java 8, Lombok, ISO-8859-1, exceções tipadas, anti-patterns globais)
+- Regras universais (Java 8, ISO-8859-1, JAPE, Guice, logging, exceções) — `docs/ADDON.md` do projeto; se o projeto não rodou `/addon-studio:init`, leia `${CLAUDE_PLUGIN_ROOT}/skills/init/assets/ADDON.md`
 - `entity` — `@JapeEntity` rules, PK patterns, anotações permitidas/proibidas
 - `controller` — `@Controller` REST, `serviceName SP`, `@Transactional`, DTOs
 - `controller-advice` — `@ControllerAdvice` + `@ExceptionHandler` rules
@@ -48,7 +48,7 @@ Para conhecimento de domínio, carregue a skill via `Read` em `${CLAUDE_PLUGIN_R
 | `@Mapper` (MapStruct) | Mapper | `mapstruct` |
 | `@Component` / `@CustomModule` / DI em geral | Injeção | `dependency-injection` |
 | Retrofit / chamada HTTP externa | HTTP | `retrofit` |
-| Exceções, logging, Lombok, regras gerais | Universal | `addon-studio` |
+| Exceções, logging, Lombok, regras gerais | Universal | `docs/ADDON.md` do projeto (always-on) |
 | `datadictionary/*.xml` | Dicionário | `data-dictionary` |
 | `dbscripts/V*.xml` | Migration | `database` |
 

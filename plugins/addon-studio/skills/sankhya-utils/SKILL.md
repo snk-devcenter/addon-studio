@@ -353,7 +353,6 @@ TimeUtils.dataAddDay(dtBase, 30)
 
 ## Skills relacionadas
 
-- `addon-studio` — regras universais (Java 8 strict, Lombok, ISO-8859-1, logging)
 - `controller` / `mapstruct` — validação e conversão em endpoint REST (substituem `if` manual e parser cru)
 - `repository` — `@Criteria`/`@NativeQuery`; `SQLUtils` complementa na montagem de `IN` dinâmica
 - `macros` — equivalentes das utilidades de data/texto/null **dentro** do SQL

@@ -27,15 +27,15 @@ grep -l "br.com.sankhya.addonstudio" build.gradle build.gradle.kts 2>/dev/null
 
 ### 1. Localizar o `ADDON.md` canônico
 
-O template fica no diretório `assets/` da skill `addon-studio` (convenção Agent Skills). Use a variável de ambiente `${CLAUDE_PLUGIN_ROOT}` (disponível para skills de plugin — aponta para a raiz do plugin instalado):
+O template fica no diretório `assets/` desta skill (convenção Agent Skills). Use a variável de ambiente `${CLAUDE_PLUGIN_ROOT}` (disponível para skills de plugin — aponta para a raiz do plugin instalado):
 
-- `${CLAUDE_PLUGIN_ROOT}/skills/addon-studio/assets/ADDON.md`
+- `${CLAUDE_PLUGIN_ROOT}/skills/init/assets/ADDON.md`
 
 ### 2. Copiar `ADDON.md` para `docs/` no projeto
 
 ```bash
 mkdir -p docs
-cp "${CLAUDE_PLUGIN_ROOT}/skills/addon-studio/assets/ADDON.md" ./docs/ADDON.md
+cp "${CLAUDE_PLUGIN_ROOT}/skills/init/assets/ADDON.md" ./docs/ADDON.md
 ```
 
 Overwrite é **esperado** — re-rodar a skill upgrade o arquivo pra versão mais nova. Dev nunca edita `docs/ADDON.md` à mão (override do projeto vai no `CLAUDE.md`, não aqui).
@@ -79,5 +79,4 @@ Não sugira conteúdo pro `CLAUDE.md` nem ofereça preencher regras do projeto �
 
 ## Skills relacionadas
 
-- `addon-studio` — overview que o `ADDON.md` instrui o agente a carregar
 - `encoding` — `ADDON.md` deve ficar em UTF-8 (é arquivo de instrução, não código Sankhya); ignore a regra ISO-8859-1 para este arquivo específico

@@ -149,7 +149,6 @@ $addon-studio:test
 
 | Skill | Responsabilidade |
 |---|---|
-| `addon-studio` | Regras universais, fluxo de feature e convenções do SDK JAPE |
 | `init` | Prepara `docs/ADDON.md` e `CLAUDE.md` para uso com Claude Code |
 | `build` | Build e deploy local com Gradle |
 | `encoding` | Auditoria e conversão de fontes para ISO-8859-1 |
@@ -248,7 +247,7 @@ No Claude Code, também é possível atualizar manualmente:
 
 Após atualizar no Claude Code, execute `/addon-studio:init` em cada projeto que precise receber a versão nova de `docs/ADDON.md`.
 
-No Codex, customizações locais dos TOMLs continuam preservadas. Use `--force` ou `-Force` apenas para substituí-las.
+No Codex, rode `/addon-studio:init` em cada projeto: sem `docs/ADDON.md` as regras universais do plugin não entram no contexto (o hook `SessionStart` que faz esse piso é do Claude Code). Customizações locais dos TOMLs continuam preservadas. Use `--force` ou `-Force` apenas para substituí-las.
 
 ## Estrutura do repositório
 

@@ -10,7 +10,6 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 `@Controller` marca classes = pontos entrada API interna add-on. Cada metodo publico auto-exposto como endpoint servico. Controllers **orquestram** fluxo requisicao — **nunca** contem logica negocio.
 
 > **Referencias complementares:**
-> - `addon-studio` — overview, regras universais, naming convention, fluxo CRUD
 > - `dependency-injection` — Injecao de dependencia (Guice)
 > - `mapstruct` — Mapeamento de objetos (MapStruct)
 > - `controller-advice` — Tratamento global de excecoes
@@ -475,5 +474,4 @@ Exemplos completos — controller simples (CRUD) e controller completo (múltipl
 - `dependency-injection` — wiring Guice do controller (injeção de serviços)
 - `mapstruct` — controller usa mapper MapStruct para DTO ↔ entidade `@JapeEntity`
 - `repository` — service delega persistência ao repository (controller nunca acessa repository direto)
-- `addon-studio` — regras universais (Java 8, Lombok, ISO-8859-1, exceções tipadas)
 - `test` — JUnit + Mockito do controller

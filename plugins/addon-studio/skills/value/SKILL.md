@@ -229,4 +229,3 @@ Restricoes do XSD (`parameters.xsd`) que derrubam o build/deploy:
 ## Skills relacionadas
 
 - `dependency-injection` — wiring Guice que injeta os `@Value`; `@Value` só funciona em `@Component` (e demais estereótipos) gerenciados pelo Guice
-- `addon-studio` — regras universais do projeto

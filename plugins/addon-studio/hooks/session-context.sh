@@ -2,15 +2,15 @@
 # SessionStart: injeta as regras sempre-ativas do plugin em projeto Sankhya Addon Studio.
 #
 # Piso para projeto que nunca rodou `/addon-studio:init`: sem isso, as regras universais
-# (Java 8 estrito, ISO-8859-1, JAPE, Guice) so entram no contexto se a skill `addon-studio`
-# for invocada -- e ela se autoexclui em tarefa de topico isolado. Resultado medido pela
-# esteira em tools/skill-trigger-audit: a skill focada dispara, mas o codigo sai fora da regra.
+# (Java 8 estrito, ISO-8859-1, JAPE, Guice) nao entram no contexto por caminho nenhum.
+# Resultado medido pela esteira em tools/skill-trigger-audit: a skill focada dispara, mas
+# o codigo sai fora da regra.
 #
 # Fonte unica: o mesmo ADDON.md que o `init` copia. Nada e duplicado aqui.
 # Rode `sh session-context.sh --selftest` para verificar.
 set -u
 
-ADDON_MD="${CLAUDE_PLUGIN_ROOT:-$(dirname "$0")/..}/skills/addon-studio/assets/ADDON.md"
+ADDON_MD="${CLAUDE_PLUGIN_ROOT:-$(dirname "$0")/..}/skills/init/assets/ADDON.md"
 
 # cwd vem no payload JSON do hook (stdin). Sem python3 nao ha como serializar a saida
 # com seguranca -- fica silencioso em vez de emitir JSON quebrado.

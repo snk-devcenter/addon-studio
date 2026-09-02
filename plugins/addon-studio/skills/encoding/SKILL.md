@@ -230,5 +230,4 @@ Alternativa segura (portavel, sem depender de encoding): escapes Unicode.
 
 ## Skills relacionadas
 
-- `addon-studio` — regra universal: ISO-8859-1 obrigatório em `.java`/`.xml`/`.kt`/`.properties`
 - `build` — build falha silenciosamente se encoding estiver errado; garantir Latin-1 antes do empacotamento

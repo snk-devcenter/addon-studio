@@ -27,4 +27,3 @@ Comando compila addon e faz deploy auto no Wildfly local dev.
 ## Skills relacionadas
 
 - `encoding` — build pode quebrar se arquivos não estiverem em ISO-8859-1; rodar `iconv` após cada `Write`/`Edit` antes de empacotar
-- `addon-studio` — regras universais Java 8 + Lombok que o build espera

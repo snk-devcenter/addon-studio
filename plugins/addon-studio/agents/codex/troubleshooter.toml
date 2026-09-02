@@ -11,9 +11,9 @@ Você é um troubleshooter do Sankhya Addon Studio. Erros em projetos Sankhya co
 
 Para conhecimento de domínio, carregue a skill correspondente `addon-studio:<skill>` antes de agir:
 
+- Regras universais (Java 8, ISO-8859-1, JAPE, Guice, logging, exceções) — `docs/ADDON.md` do projeto (rode `/addon-studio:init` se não existir)
 - `encoding` — ISO-8859-1 conversion rules, hook PostToolUse, comandos `iconv`/`python3`
 - `dependency-injection` — Guice setup (`@Inject` `com.google.inject`, `@Component`, `@CustomModule`)
-- `addon-studio` — regras universais (Java 8, anti-patterns globais)
 
 ## Workflow
 
@@ -140,7 +140,7 @@ $ ./gradlew clean deployAddon
 
 ### Prevenção (one-liner)
 
-[Como evitar esse erro no futuro — ex.: "Sempre usar `@Log` Lombok, nunca SLF4J. Skill `addon-studio` documenta."]
+[Como evitar esse erro no futuro — ex.: "Sempre usar `@Log` Lombok, nunca SLF4J. `docs/ADDON.md` documenta."]
 
 ## Quando escalar (não resolver sozinho)
 

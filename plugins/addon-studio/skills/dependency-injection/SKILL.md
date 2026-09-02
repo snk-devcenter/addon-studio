@@ -428,7 +428,6 @@ Pontos de injeção que pedem o tipo concreto continuam funcionando sem alteraç
 
 ## Skills relacionadas
 
-- `addon-studio` — regras universais sobre @Inject (com.google.inject) e proibição de `new`
 - `controller` — controllers gerenciados automaticamente pelo framework — NÃO anotar @Component
 - `controller-advice` — advice gerenciado automaticamente pelo framework — NÃO anotar @Component
 - `mapstruct` — mappers são registrados no container Guice

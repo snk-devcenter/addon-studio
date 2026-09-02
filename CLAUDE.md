@@ -2,7 +2,7 @@
 
 Instruções para agentes trabalhando **neste repositório** (o plugin em si).
 
-> Estas regras valem para o desenvolvimento do plugin. Elas **não** são as regras de projetos Sankhya Addon Studio consumidores — essas vivem em `plugins/addon-studio/skills/addon-studio/assets/ADDON.md`.
+> Estas regras valem para o desenvolvimento do plugin. Elas **não** são as regras de projetos Sankhya Addon Studio consumidores — essas vivem em `plugins/addon-studio/skills/init/assets/ADDON.md`.
 
 ## O que é este repo
 
