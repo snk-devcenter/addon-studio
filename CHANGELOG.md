@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.0.0] - 2026-09-01
+
 ### Adicionado
 
 - Skill `jsp` cobre ilha AngularJS dentro de um `.jsp`: subir `angular` + `snk.js` sem o `Html5Launcher` para usar `ServiceProxy`, `MessageUtils`, `SanPopup` e `SkWorkspace` numa tela server-side — com os 8 scripts na ordem, as 5 globais que o launcher injetava, a ordem de CSS, o fecho de módulos, o bootstrap manual com gate de i18n, template pronto e a tabela sintoma → causa dos erros que apontam para o lugar errado.
@@ -305,7 +307,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v2.22.0...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.22.0...v3.0.0
 [2.22.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.21.1...v2.22.0
 [2.21.1]: https://github.com/snk-devcenter/addon-studio/compare/v2.21.0...v2.21.1
 [2.21.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.20.0...v2.21.0

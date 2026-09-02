@@ -5,7 +5,7 @@
 
 Plugin para desenvolver addons **Sankhya Addon Studio 2.0** com **Claude Code** ou **Codex CLI**.
 
-São 25 skills e 6 agents especializados em WildFly/EJB, Java 8 e SDK JAPE. As instruções foram validadas contra os jars reais do SDK (`studio-annotations` e `sdk-sankhya`) para evitar APIs inventadas, JPA no lugar de JAPE, SQL incompatível ou código fora do padrão da plataforma.
+São 24 skills e 6 agents especializados em WildFly/EJB, Java 8 e SDK JAPE. As instruções foram validadas contra os jars reais do SDK (`studio-annotations` e `sdk-sankhya`) para evitar APIs inventadas, JPA no lugar de JAPE, SQL incompatível ou código fora do padrão da plataforma.
 
 ## Navegação
 
