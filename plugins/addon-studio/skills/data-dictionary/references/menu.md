@@ -2,6 +2,8 @@
 
 Define ponto de entrada na barra de navegação principal do Sankhya Om. Container hierárquico para `<folder>`, `<dynamicForm>`, `<dynamicTreeView>`, `<ui>`, `<dashboard>`, `<pastaNativa>`.
 
+> **Regra que derruba deploy:** todo `<ui>` e todo `<folder>` — e todo `<dynamicForm>`/`<dynamicTreeView>`/`<dashboard>` — leva `resourceId` explícito de no máximo 50 caracteres. O XSD deixa o atributo opcional; trate como obrigatório. Sem ele o `NOME` gravado em `TRDCON` recebe o prefixo do contexto do add-on, estoura os 50 caracteres da coluna e **o módulo inteiro não carrega**. Ver [`resourceId` e o teto de 50](#resourceid--obrigatório-na-prática-teto-de-50-em-trdconnome).
+
 ## Quando usar
 
 - Add-on tem funcionalidade suficiente para justificar entrada **dedicada** na nav bar (módulo completo: Cadastros, Movimentos, Relatórios)
@@ -21,16 +23,19 @@ Define ponto de entrada na barra de navegação principal do Sankhya Om. Contain
     <menu id="TDC_MENU_XYZ"
           description="Modulo XYZ"
           icon="/$ctx/assets/xyz_icone.png">
-        <folder id="TDC_FLD_CADASTROS" description="Cadastros">
+        <folder id="TDC_FLD_CADASTROS" resourceId="TDC_FLD_CADASTROS" description="Cadastros">
             <!-- Atendimento e Departamento sao <table> regulares -->
             <dynamicForm id="TDC_FORM_ATD"
+                         resourceId="TDC_FORM_ATD"
                          instance="TdcXyzAtendimento"
                          description="Atendimentos"/>
             <dynamicForm id="TDC_FORM_DEP"
+                         resourceId="TDC_FORM_DEP"
                          instance="TdcXyzDepartamento"
                          description="Departamentos"/>
             <!-- Centro de Custo eh <treeTable> hierarquica - usar dynamicTreeView -->
             <dynamicTreeView id="TDC_TREE_CCU"
+                             resourceId="TDC_TREE_CCU"
                              instance="TdcXyzCentroCusto"
                              description="Centro de Custo"/>
         </folder>
@@ -64,13 +69,13 @@ Define ponto de entrada na barra de navegação principal do Sankhya Om. Contain
 ## `<folder>` — submenu recursivo
 
 ```xml
-<folder id="TDC_FLD_CADASTROS" description="Cadastros">
-    <folder id="TDC_FLD_CAD_BASICOS" description="Cadastros Basicos">
-        <dynamicForm id="TDC_FORM_CCU" instance="TdcXyzCentroCusto" description="Centro de Custo"/>
-        <dynamicForm id="TDC_FORM_DEP" instance="TdcXyzDepartamento" description="Departamento"/>
+<folder id="TDC_FLD_CADASTROS" resourceId="TDC_FLD_CADASTROS" description="Cadastros">
+    <folder id="TDC_FLD_CAD_BASICOS" resourceId="TDC_FLD_CAD_BASICOS" description="Cadastros Basicos">
+        <dynamicForm id="TDC_FORM_CCU" resourceId="TDC_FORM_CCU" instance="TdcXyzCentroCusto" description="Centro de Custo"/>
+        <dynamicForm id="TDC_FORM_DEP" resourceId="TDC_FORM_DEP" instance="TdcXyzDepartamento" description="Departamento"/>
     </folder>
-    <folder id="TDC_FLD_CAD_AVANCADOS" description="Cadastros Avancados">
-        <dynamicForm id="TDC_FORM_CFG" instance="TdcXyzConfiguracao" description="Configuracoes"/>
+    <folder id="TDC_FLD_CAD_AVANCADOS" resourceId="TDC_FLD_CAD_AVANCADOS" description="Cadastros Avancados">
+        <dynamicForm id="TDC_FORM_CFG" resourceId="TDC_FORM_CFG" instance="TdcXyzConfiguracao" description="Configuracoes"/>
     </folder>
 </folder>
 ```
@@ -79,7 +84,7 @@ Define ponto de entrada na barra de navegação principal do Sankhya Om. Contain
 |----------|:-----------:|-----------|
 | `id` | Sim | Pattern `[a-zA-Z0-9_.-]+`, único no plugin |
 | `description` | Sim | Label do submenu |
-| `resourceId` | Não | Recurso para controle de permissão |
+| `resourceId` | Opcional no XSD, **obrigatório na prática** | Recurso para controle de permissão. Máx. 50 caracteres. Sem ele o `NOME` em `TRDCON` vira `<domain>.<id>` e pode estourar a coluna — ver [teto de 50](#resourceid--obrigatório-na-prática-teto-de-50-em-trdconnome) |
 | `license` | Não | Licença |
 
 ## `<ui>` — tela custom (xhtml5)
@@ -87,8 +92,9 @@ Define ponto de entrada na barra de navegação principal do Sankhya Om. Contain
 Usa quando UI não pode ser gerada declarativamente (gráficos, layouts custom, fluxos não-CRUD):
 
 ```xml
-<folder id="TDC_FLD_RELATORIOS" description="Relatorios">
+<folder id="TDC_FLD_RELATORIOS" resourceId="TDC_FLD_RELATORIOS" description="Relatorios">
     <ui id="TDC_UI_RPT_XYZ"
+        resourceId="TDC_UI_RPT_XYZ"
         url="/$ctx/addon/xyz/relatorio_custom.xhtml5"
         description="Relatorio XYZ Customizado">
         <acesso description="Visualizar" acronym="VIS" sequence="1"/>
@@ -102,17 +108,102 @@ Usa quando UI não pode ser gerada declarativamente (gráficos, layouts custom, 
 | `id` | Sim | Identificador único |
 | `url` | Sim | Path do XHTML5 (formato `/$ctx/addon/...xhtml5`) |
 | `description` | Sim | Label |
-| `resourceId` | Não | Recurso de permissão |
+| `resourceId` | Opcional no XSD, **obrigatório na prática** | Recurso de permissão. Máx. 50 caracteres. Sem ele o `NOME` em `TRDCON` vira `<domain>.<id>` e pode estourar a coluna — ver [teto de 50](#resourceid--obrigatório-na-prática-teto-de-50-em-trdconnome) |
 | `license` | Não | Licença |
 
 Filhos: `<acesso>` (0..N), `<properties>` (controlproperties).
+
+## `resourceId` — obrigatório na prática (teto de 50 em `TRDCON.NOME`)
+
+O XSD marca `resourceId` como opcional em `<ui>`, `<folder>`, `<dynamicForm>`, `<dynamicTreeView>` e
+`<dashboard>`. Na prática ele é obrigatório: **sem `resourceId`, um único item de menu com `id` longo
+impede o add-on inteiro de carregar.**
+
+### O que o import grava
+
+Cada nó de menu vira um controle na `TRDCON`:
+
+```sql
+INSERT INTO TRDCON (NUCONTROLE, NOME, DESCRCONTROLE, TIPOCONTROLE, TIPOFILHOS, CONTROLE, DOMAIN)
+```
+
+O valor de `NOME` sai de uma de duas formas:
+
+| Nó no XML | `NOME` gravado |
+|-----------|----------------|
+| **com** `resourceId` | o `resourceId`, puro |
+| **sem** `resourceId` | `<domain>.<id>` — `domain` é o nome do contexto do add-on |
+
+O prefixo é aplicado mesmo existindo coluna `DOMAIN` própria no insert. Não conte com ela: quem sofre o
+limite é o `NOME`.
+
+### O teto: `VARCHAR2(50)`
+
+`TRDCON.NOME` é `VARCHAR2(50)` na plataforma. Medido num banco de produção — todo domínio do produto
+cabe, com zero de folga em vários deles:
+
+| `DOMAIN` | controles de menu | maior `NOME` |
+|----------|------------------:|-------------:|
+| `mge` | 1115 | 50 |
+| `mgepes` | 167 | 50 |
+| `mgeliv` | 107 | 50 |
+| `mgecontab` | 82 | 50 |
+| `mgeprod` | 68 | 50 |
+| `mgewms` | 63 | 49 |
+
+Seis add-ons de terceiros no mesmo banco: todos ≤ 49. O único a passar de 50 foi um add-on com 129
+controles — e ele quebrou.
+
+### O orçamento do `id` quando falta `resourceId`
+
+```
+len(id) <= 50 - len(domain) - 1
+```
+
+| Contexto do add-on | `len(domain)` | Orçamento do `id` |
+|--------------------|--------------:|------------------:|
+| 6 caracteres | 6 | 43 |
+| 12 caracteres | 12 | 37 |
+| 20 caracteres | 20 | 29 |
+
+Com contexto de 12 caracteres o orçamento é **37, não 50**. Um `id` de 47 caracteres — perfeitamente
+válido isolado, dentro do pattern e abaixo de 50 — vira `NOME` de 60 e estoura.
+
+### Modo de falha: o módulo não carrega
+
+Não é degradação parcial nem item de menu faltando. Um caractere a mais em **um** nó e o add-on inteiro
+fica fora:
+
+```
+ORA-12899: valor muito grande para a coluna "SANKHYA"."TRDCON"."NOME" (real: 60, máximo: 50)
+  -> DataDictionaryInsertException
+  -> ModuleBootLoaderException
+  -> [SANMODULE] Erro ao inicializar módulo. O módulo não será carregado.
+```
+
+### Por que build e deploy local não pegam
+
+- O `metadados.xsd` não declara `maxLength` em `idType` nem em `textType`. `id` e `resourceId` de
+  qualquer tamanho validam, e o build passa.
+- **Base de desenvolvimento pode ter a coluna com 60**, não 50. Um `deployAddon` local com `NOME` de
+  exatamente 60 passa raspando, margem zero, e o mesmo pacote quebra no ambiente do cliente.
+  **Ambiente local não é teste válido para esse limite** — o que vale é contar os caracteres de cada
+  `resourceId` no XML.
+
+### O fix é dar `resourceId`, não encurtar o `id`
+
+Com `resourceId` o `NOME` é o `resourceId` puro, sem prefixo de domínio, e o orçamento volta a ser os 50
+inteiros. Encurtar o `id` trata o sintoma, deixa o `NOME` dependente do tamanho do contexto e quebra a
+convenção observada em produção: **119 de 129 nós usam `id` igual ao `resourceId`**. Repetir o valor nos
+dois atributos deixa o `NOME` gravado previsível a partir do XML — é o padrão usado nos exemplos deste
+arquivo.
 
 ## `<acesso>` — controle de permissão
 
 Define níveis de acesso (roles/perfis) para a tela. Cada `<acesso>` vira uma permissão específica que admin pode atribuir a perfis de usuário:
 
 ```xml
-<ui id="TDC_UI_PEDIDOS" url="..." description="Pedidos">
+<ui id="TDC_UI_PEDIDOS" resourceId="TDC_UI_PEDIDOS" url="..." description="Pedidos">
     <acesso description="Visualizar" acronym="VIS" sequence="1"/>
     <acesso description="Editar" acronym="EDI" sequence="2"/>
     <acesso description="Cancelar" acronym="CAN" sequence="3"/>
@@ -133,8 +224,9 @@ Acesso não declarado = permissão liberada para todos. Acesso declarado = admin
 Aponta para arquivo de dashboard em `/dashboards/`:
 
 ```xml
-<folder id="TDC_FLD_DASHBOARDS" description="Dashboards">
+<folder id="TDC_FLD_DASHBOARDS" resourceId="TDC_FLD_DASHBOARDS" description="Dashboards">
     <dashboard id="TDC_DSH_VENDAS"
+               resourceId="TDC_DSH_VENDAS"
                file="/dashboards/vendas.json"
                description="Dashboard de Vendas"/>
 </folder>
@@ -145,6 +237,7 @@ Aponta para arquivo de dashboard em `/dashboards/`:
 | `id` | Sim | Identificador único |
 | `file` | Sim | Path do arquivo de definição (em `/dashboards/`) |
 | `description` | Sim | Label |
+| `resourceId` | Opcional no XSD, **obrigatório na prática** | Máx. 50 caracteres — ver [teto de 50](#resourceid--obrigatório-na-prática-teto-de-50-em-trdconnome) |
 | `license` | Não | Licença |
 
 ## `<pastaNativa>` — encaixe em pasta nativa Sankhya
@@ -165,6 +258,7 @@ Exemplo:
     <nativeFolder>
         <pastaNativa name="CONFIGURACOES_CADASTROS" resourceId="tdc_xyz_cad">
             <dynamicForm id="TDC_FORM_CCU"
+                         resourceId="TDC_FORM_CCU"
                          instance="TdcXyzCentroCusto"
                          description="Centro de Custo (Add-on XYZ)"/>
         </pastaNativa>
@@ -187,7 +281,7 @@ Filho `<properties>` em `<ui>`/`<dynamicForm>`/`<dynamicTreeView>` aceita 3 sub-
 Exemplo `paramMenuAtivo` — habilita o form só se parâmetro Sankhya `XYZ_FEAT_ATD = 'S'`:
 
 ```xml
-<dynamicForm id="TDC_FORM_ATD" instance="TdcXyzAtendimento" description="Atendimentos">
+<dynamicForm id="TDC_FORM_ATD" resourceId="TDC_FORM_ATD" instance="TdcXyzAtendimento" description="Atendimentos">
     <properties>
         <paramMenuAtivo>SELECT 1 FROM TSIPAR WHERE CHAVE = 'XYZ_FEAT_ATD' AND VALOR = 'S'</paramMenuAtivo>
     </properties>
@@ -205,19 +299,22 @@ Item somente aparece no menu se a query retornar pelo menos 1 row no banco.
           description="Modulo XYZ"
           icon="/$ctx/assets/xyz_icone.png">
 
-        <folder id="TDC_FLD_CADASTROS" description="Cadastros">
+        <folder id="TDC_FLD_CADASTROS" resourceId="TDC_FLD_CADASTROS" description="Cadastros">
             <!-- Departamento eh <table> regular -->
             <dynamicForm id="TDC_FORM_DEP"
+                         resourceId="TDC_FORM_DEP"
                          instance="TdcXyzDepartamento"
                          description="Departamento"/>
             <!-- Centro de Custo eh <treeTable> - usar dynamicTreeView -->
             <dynamicTreeView id="TDC_TREE_CCU"
+                             resourceId="TDC_TREE_CCU"
                              instance="TdcXyzCentroCusto"
                              description="Centro de Custo"/>
         </folder>
 
-        <folder id="TDC_FLD_MOVIMENTOS" description="Movimentos">
+        <folder id="TDC_FLD_MOVIMENTOS" resourceId="TDC_FLD_MOVIMENTOS" description="Movimentos">
             <dynamicForm id="TDC_FORM_ATD"
+                         resourceId="TDC_FORM_ATD"
                          instance="TdcXyzAtendimento"
                          description="Atendimentos">
                 <properties>
@@ -226,8 +323,9 @@ Item somente aparece no menu se a query retornar pelo menos 1 row no banco.
             </dynamicForm>
         </folder>
 
-        <folder id="TDC_FLD_CONSULTAS" description="Consultas">
+        <folder id="TDC_FLD_CONSULTAS" resourceId="TDC_FLD_CONSULTAS" description="Consultas">
             <ui id="TDC_UI_REL_PROD"
+                resourceId="TDC_UI_REL_PROD"
                 url="/$ctx/addon/xyz/relatorio_produtividade.xhtml5"
                 description="Relatorio de Produtividade">
                 <acesso description="Visualizar" acronym="VIS" sequence="1"/>
@@ -235,8 +333,9 @@ Item somente aparece no menu se a query retornar pelo menos 1 row no banco.
             </ui>
         </folder>
 
-        <folder id="TDC_FLD_DASHBOARDS" description="Dashboards">
+        <folder id="TDC_FLD_DASHBOARDS" resourceId="TDC_FLD_DASHBOARDS" description="Dashboards">
             <dashboard id="TDC_DSH_VENDAS"
+                       resourceId="TDC_DSH_VENDAS"
                        file="/dashboards/xyz_vendas.json"
                        description="Vendas"/>
         </folder>
@@ -256,6 +355,9 @@ Item somente aparece no menu se a query retornar pelo menos 1 row no banco.
 
 ## Anti-patterns
 
+- [ ] **Nó de menu sem `resourceId`** — o `NOME` gravado em `TRDCON` passa a ser `<domain>.<id>`, o orçamento do `id` cai para `50 - len(domain) - 1` e um `id` longo derruba o carregamento do módulo inteiro. Ver [teto de 50](#resourceid--obrigatório-na-prática-teto-de-50-em-trdconnome).
+- [ ] **`resourceId` com mais de 50 caracteres** — mesma `ORA-12899`, mesmo módulo fora do ar.
+- [ ] **Validar o limite só no `deployAddon` local** — base de desenvolvimento pode ter `TRDCON.NOME` com 60. Contar caracteres no XML é o único teste que vale.
 - [ ] **Aninhar `<menu>` dentro de `<menu>`** — `<menu>` é só raiz da nav bar. Use `<folder>` para hierarquia.
 - [ ] Usar prefixo `AD_` em `id` — reservado para Sankhya core. Usar `<PRX>_` do projeto.
 - [ ] IDs duplicados (mesmo `id` em `<folder>`/`<ui>`/etc.) — causa falha de renderização
@@ -269,6 +371,7 @@ Item somente aparece no menu se a query retornar pelo menos 1 row no banco.
 ## Boas práticas
 
 - ID segue padrão `<PRX>_MENU_<MOD3>` para `<menu>`, `<PRX>_FLD_<CTX>` para `<folder>`, `<PRX>_FORM_<CTX>` para `<dynamicForm>`, `<PRX>_UI_<CTX>` para `<ui>`
+- `resourceId` explícito em **todo** nó de menu, com o mesmo valor do `id` e no máximo 50 caracteres — é a convenção de produção e a única forma de o `NOME` em `TRDCON` não depender do tamanho do contexto do add-on
 - `description` clara, em português, voltada ao usuário final
 - Estrutura típica: `<menu>` → folders por categoria (Cadastros / Movimentos / Consultas / Dashboards) → forms/uis específicos
 - Arquivo XML separado: `datadictionary/<PRX><MOD3>_MENU.xml` só com `<menu>`

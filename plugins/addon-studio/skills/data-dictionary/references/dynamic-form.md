@@ -24,6 +24,7 @@ Componente UI declarativo que **gera tela de cadastro CRUD completa** sem escrev
 <metadados>
     <menu id="TDC_MENU_XYZ" description="Modulo XYZ" icon="https://.../icon.png">
         <dynamicForm id="TDC_FORM_CCU"
+                     resourceId="TDC_FORM_CCU"
                      instance="TdcXyzCentroCusto"
                      description="Cadastro de Centro de Custo"/>
     </menu>
@@ -37,7 +38,7 @@ Componente UI declarativo que **gera tela de cadastro CRUD completa** sem escrev
 | `id` | Sim | Identificador único. Pattern `[a-zA-Z0-9_.-]+`. Use prefixo do projeto (`<PRX>_FORM_<CTX>`) | `TDC_FORM_CCU` |
 | `instance` | Sim | Nome da `<instance>` declarada no `<table>`. **Deve bater exatamente** | `TdcXyzCentroCusto` |
 | `description` | Sim | Label do menu visível ao usuário | `Cadastro de Centro de Custo` |
-| `resourceId` | Não | Recurso para controle de permissão (resourceId) | — |
+| `resourceId` | Opcional no XSD, **obrigatório na prática** | Recurso para controle de permissão. Mesmo valor do `id`, máx. 50 caracteres — sem ele o `NOME` gravado em `TRDCON` recebe o prefixo do contexto do add-on e pode derrubar o carregamento do módulo. Ver [`menu.md`](menu.md#resourceid--obrigatório-na-prática-teto-de-50-em-trdconnome) | `TDC_FORM_CCU` |
 | `license` | Não | Identificador de licença | — |
 
 ## Como o `instance` conecta tudo
@@ -63,6 +64,7 @@ Componente UI declarativo que **gera tela de cadastro CRUD completa** sem escrev
 <metadados>
     <menu id="TDC_MENU_XYZ" description="Modulo XYZ" icon="...">
         <dynamicForm id="TDC_FORM_ATD"
+                     resourceId="TDC_FORM_ATD"
                      instance="TdcXyzAtendimento"   <!-- ← bate com instance acima -->
                      description="Atendimentos"/>
     </menu>
@@ -131,6 +133,7 @@ Framework monta a tela a partir de:
 <metadados>
     <menu id="TDC_MENU_ATD" description="Atendimentos" icon="...">
         <dynamicForm id="TDC_FORM_ATD"
+                     resourceId="TDC_FORM_ATD"
                      instance="TdcXyzAtendimento"
                      description="Cadastro de Atendimentos"/>
     </menu>
@@ -150,7 +153,7 @@ Resultado: tela com 4 campos, `CODUSU` lookup pra Usuario com default = usuário
 | `<paramMenuAtivo>` | SQL que retorna 1+ row para liberar acesso à tela |
 
 ```xml
-<dynamicForm id="TDC_FORM_ATD" instance="TdcXyzAtendimento" description="Atendimentos">
+<dynamicForm id="TDC_FORM_ATD" resourceId="TDC_FORM_ATD" instance="TdcXyzAtendimento" description="Atendimentos">
     <properties>
         <paramMenuAtivo>SELECT 1 FROM TSIPAR WHERE CHAVE = 'XYZ_FEAT_ATD' AND VALOR = 'S'</paramMenuAtivo>
     </properties>
@@ -170,6 +173,7 @@ Resultado: tela com 4 campos, `CODUSU` lookup pra Usuario com default = usuário
 
 ## Anti-patterns
 
+- [ ] Omitir `resourceId` — o `NOME` em `TRDCON` passa a ser `<domain>.<id>` e pode estourar o `VARCHAR2(50)`, impedindo o módulo de carregar. Ver [`menu.md`](menu.md#resourceid--obrigatório-na-prática-teto-de-50-em-trdconnome)
 - [ ] Usar prefixo genérico `AD_` no `id` — usar `<PRX>_` do projeto
 - [ ] `instance` apontando para nome que não existe na tabela — deploy falha
 - [ ] **Usar `<dynamicForm>` apontando para `<instance>` de `<treeTable>`** — perde tree-view, renderiza grade plana. Use `<dynamicTreeView>` para `<treeTable>`.

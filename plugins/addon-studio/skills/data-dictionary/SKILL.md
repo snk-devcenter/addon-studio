@@ -49,7 +49,7 @@ Entidade Java (`@JapeEntity`) = classe dominio **limpa** — so `@Column(name = 
 | `<treeTable />`   | Tabela **hierarquica** (pai/filho) — cadastros tipo centro de custo, categorias de produto, organogramas. Framework gera UI tree + campos `CODIGOPAI`/`ANALITICO`/`GRAU`. Detalhes em [`references/tree-table.md`](references/tree-table.md). |
 | `<nativeTable />` | Extensao tabela **nativa** Sankhya Om (adiciona campos/instancia). |
 | `<nativeFolder />`| Container para `<pastaNativa>` — encaixe em pasta nativa Sankhya (Configuracoes / Cadastros / Consulta / Rotina / Relatorio). Detalhes em [`references/menu.md`](references/menu.md). |
-| `<menu />`        | Estrutura de menu/navegacao do add-on. Container para `<folder>`, `<dynamicForm>`, `<dynamicTreeView>`, `<ui>`, `<dashboard>`. Detalhes em [`references/menu.md`](references/menu.md). |
+| `<menu />`        | Estrutura de menu/navegacao do add-on. Container para `<folder>`, `<dynamicForm>`, `<dynamicTreeView>`, `<ui>`, `<dashboard>`. **Todo no de menu leva `resourceId` explicito de no maximo 50 caracteres** — sem isso o deploy pode derrubar o add-on inteiro. Detalhes em [`references/menu.md`](references/menu.md). |
 | `<dynamicForm />` | Tela CRUD declarativa (sem JS/HTML) gerada a partir de uma `<instance>` da tabela. Vai dentro de `<menu>`/`<folder>`. Detalhes em [`references/dynamic-form.md`](references/dynamic-form.md). |
 | `<filters />`     | Filtros de busca em telas geradas por `<dynamicForm>`/`<dynamicTreeView>`. Filho de `<table>`/`<treeTable>`. Detalhes em [`references/filters.md`](references/filters.md). |
 
@@ -620,6 +620,7 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 
 | Erro                                              | Correcao                                                         |
 |:--------------------------------------------------|:-----------------------------------------------------------------|
+| No de menu (`<ui>`, `<folder>`, `<dynamicForm>`, `<dynamicTreeView>`, `<dashboard>`) sem `resourceId` | Declarar `resourceId` explicito, igual ao `id` e com no maximo 50 caracteres. Sem ele o import grava `TRDCON.NOME` = `<domain>.<id>` numa coluna `VARCHAR2(50)`: estourar da `ORA-12899` -> `ModuleBootLoaderException` e **o modulo inteiro nao carrega**. Base local pode ter a coluna com 60 e mascarar. Detalhes em [`references/menu.md`](references/menu.md). |
 | Usar `uiTabName` no XML                           | Sempre `UITabName` (Pascal Case, UI maiusculo).               |
 | Usar `precision` no XML                           | Sempre `nuCasasDecimais`.                                        |
 | Usar `required="true"` no XML                     | Sempre `required="S"` ou `required="N"`.                         |

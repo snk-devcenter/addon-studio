@@ -10,6 +10,14 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Adicionado
+
+- Skill `data-dictionary` documenta o teto de `TRDCON.NOME` (`VARCHAR2(50)`) que faz um item de menu sem `resourceId` derrubar o carregamento do add-on inteiro: as duas formas do `NOME` gravado (`resourceId` puro vs. `<domain>.<id>`), o orçamento do `id` quando falta o atributo, a cadeia `ORA-12899` → `DataDictionaryInsertException` → `ModuleBootLoaderException`, e o aviso de que base de desenvolvimento com a coluna em 60 mascara a falha no `deployAddon` local. Skill `jsp` aponta para a regra ao registrar a tela no menu.
+
+### Alterado
+
+- Exemplos de menu das skills `data-dictionary` e `jsp` passam a declarar `resourceId` em todo nó (`<ui>`, `<folder>`, `<dynamicForm>`, `<dynamicTreeView>`, `<dashboard>`), com o mesmo valor do `id` — o atributo é opcional no XSD e obrigatório na prática.
+
 ## [3.0.0] - 2026-09-01
 
 ### Adicionado
