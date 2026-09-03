@@ -68,6 +68,11 @@ No XML do dicionário, dentro de `<menu>` ou de um `<folder>`:
 `$ctx` é o contexto web do add-on — o `rootProject.name` do `settings.gradle`. Estrutura de
 menu, pastas e encaixe em pasta nativa: skill `data-dictionary`.
 
+O `resourceId` acima não é opcional: sem ele o import grava `TRDCON.NOME` como
+`<contexto>.<id>` num `VARCHAR2(50)` e um `id` longo derruba o carregamento do add-on inteiro
+— regra, orçamento de caracteres e modo de falha em `data-dictionary`,
+[`references/menu.md`](../data-dictionary/references/menu.md).
+
 Quando a pasta tem várias views (§4, `openLevel`), **só o entrypoint entra no menu**. As
 demais são alcançadas por navegação; registrá-las duplicaria portas de entrada para o que é
 um fluxo só.

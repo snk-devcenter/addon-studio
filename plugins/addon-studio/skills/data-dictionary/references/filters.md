@@ -203,7 +203,7 @@ Filtros declarados em `<table>` aparecem **automaticamente** na tela gerada por 
 Para **filtros fixos** (não-editáveis, sempre aplicados), usar `<filterExpression>` em `<properties>` do `<dynamicForm>`:
 
 ```xml
-<dynamicForm id="TDC_FORM_ATD_ABERTOS" instance="TdcXyzAtendimento"
+<dynamicForm id="TDC_FORM_ATD_ABERTOS" resourceId="TDC_FORM_ATD_ABERTOS" instance="TdcXyzAtendimento"
              description="Atendimentos Abertos">
     <properties>
         <filterExpression>STATUS = 'ABERTO'</filterExpression>
