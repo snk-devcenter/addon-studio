@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.0.1] - 2026-09-03
+
 ### Adicionado
 
 - Skill `data-dictionary` documenta o teto de `TRDCON.NOME` (`VARCHAR2(50)`) que faz um item de menu sem `resourceId` derrubar o carregamento do add-on inteiro: as duas formas do `NOME` gravado (`resourceId` puro vs. `<domain>.<id>`), o orçamento do `id` quando falta o atributo, a cadeia `ORA-12899` → `DataDictionaryInsertException` → `ModuleBootLoaderException`, e o aviso de que base de desenvolvimento com a coluna em 60 mascara a falha no `deployAddon` local. Skill `jsp` aponta para a regra ao registrar a tela no menu.
@@ -315,7 +317,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.0...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.1...HEAD
+[3.0.1]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.22.0...v3.0.0
 [2.22.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.21.1...v2.22.0
 [2.21.1]: https://github.com/snk-devcenter/addon-studio/compare/v2.21.0...v2.21.1
