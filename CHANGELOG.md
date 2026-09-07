@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Corrigido
+
+- Skill `repository` documenta os imports de paginação (`Page`/`Pageable` em `...pagination`, `PageRequest`/`Sort`/`Direction` em `...pagination.impl`) e registra que `Page<T>` não expõe total — paginação é por cursor (`hasNext`/`isLast`), rodapé com contagem exige `COUNT` próprio. Erros comuns passam a cobrir `Pageable.of(...)` e `getTotalElements()`.
+
 ## [3.0.1] - 2026-09-03
 
 ### Adicionado
