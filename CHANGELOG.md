@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.0.2] - 2026-09-07
+
 ### Corrigido
 
 - Skill `repository` documenta os imports de paginação (`Page`/`Pageable` em `...pagination`, `PageRequest`/`Sort`/`Direction` em `...pagination.impl`) e registra que `Page<T>` não expõe total — paginação é por cursor (`hasNext`/`isLast`), rodapé com contagem exige `COUNT` próprio. Erros comuns passam a cobrir `Pageable.of(...)` e `getTotalElements()`.
@@ -321,7 +323,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.1...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.2...HEAD
+[3.0.2]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.22.0...v3.0.0
 [2.22.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.21.1...v2.22.0
