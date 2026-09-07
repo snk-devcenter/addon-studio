@@ -188,6 +188,16 @@ public void limparLogsAntigos(java.sql.Date data) throws Exception {
 
 Paginação suportada **apenas** com `@Criteria`. `@NativeQuery` não suporta.
 
+Imports — contratos em `...pagination`, construtores em `...pagination.impl`:
+
+```java
+import br.com.sankhya.sdk.data.pagination.Page;
+import br.com.sankhya.sdk.data.pagination.Pageable;
+import br.com.sankhya.sdk.data.pagination.impl.PageRequest;
+import br.com.sankhya.sdk.data.pagination.impl.Sort;
+import br.com.sankhya.sdk.data.pagination.impl.Direction;
+```
+
 ```java
 
 @Criteria(clause = "this.ATIVO = :ativo")
@@ -200,6 +210,10 @@ Page<Veiculo> findByAtivoPaginado(Boolean ativo, Pageable pageable);
 PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("PLACA", Direction.DESC));
 Page<Veiculo> pagina = repository.findByAtivoPaginado(true, pageRequest);
 ```
+
+`Pageable` é interface e não tem factory estática — quem constrói é `PageRequest.of(int page, int size)` ou `PageRequest.of(int page, int size, Sort... sort)`. `Sort.by(campo)` / `Sort.by(campo, Direction.ASC|DESC)`.
+
+**`Page<T>` não expõe total.** O contrato é `getContent()`, `getNumber()`, `getSize()`, `getSort()`, `isLast()`, `hasNext()` — não existe `getTotalElements()` nem `getTotalPages()` como no Spring Data. É paginação por cursor: dá pra oferecer "próxima página", não "página 3 de 47". Rodapé de grade com contagem exige um `COUNT` próprio via `@NativeQuery`.
 
 ---
 
@@ -452,6 +466,7 @@ List<Veiculo> findByPlacaStartingWith(String prefix);
 
 - **Query Methods por nome** (estilo Spring Data JPA) **não suportados**
 - **Paginação** só com `@Criteria`, não com `@NativeQuery`
+- **`Page<T>` sem total** — paginação por cursor (`hasNext`/`isLast`); contagem exige `COUNT` separado
 - **Limite padrão registros**: 500 por sessão (use paginação pra contornar)
 - **`@Delete` descontinuada** — use `@Modifying` + `@NativeQuery` para exclusões
 
@@ -566,6 +581,8 @@ public class PedidoService {
 | `findByPK(...).orElseThrow(...)` ou `.map(...)`  | `findByPK` retorna `T` (nullable), não `Optional<T>` — usar null-check manual |
 | Esquecer `throws Exception` em método que usa repositório | Todo método que chama `save`, `findByPK`, `findAll` ou `delete` deve declarar `throws Exception` |
 | Import errado de `@NativeQuery`                  | Usar `br.com.sankhya.studio.persistence.NativeQuery`, não `br.com.sankhya.sdk.data.repository.NativeQuery` |
+| `Pageable.of(0, 50)`                             | `Pageable` é interface sem factory — usar `PageRequest.of(...)` de `...pagination.impl` |
+| `page.getTotalElements()` / `getTotalPages()`    | `Page<T>` não tem total — usar `hasNext()`/`isLast()`, ou `COUNT` próprio via `@NativeQuery` |
 
 
 ## Skills relacionadas
