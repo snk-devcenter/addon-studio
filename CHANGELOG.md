@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.1.3] - 2026-09-08
+
 ### Adicionado
 
 - Skill `sankhya-js` documenta `CrudUtils.find`: assinatura completa (`entityName` = instância do dicionário, `fields` como array ou lista separada por vírgula, `criterio` só de igualdade, `findOne`, `literalCriteria`, `orderBy`, `options`), o retorno já desembrulhado do `$` e o fato de todo valor voltar como String — inclusive de campo numérico. Sem isso, a saída para ler dois campos de uma entidade na tela era criar `@Controller` + DTOs + mapper, e a herança de valor acabava no `save`, com campo obrigatório em branco até gravar; virou o anti-pattern 15 da skill.
@@ -347,7 +349,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.2...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.3...HEAD
+[3.1.3]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.2...v3.1.3
 [3.1.2]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.1...v3.1.2
 [3.1.1]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.2...v3.1.0
