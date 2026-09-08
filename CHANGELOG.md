@@ -10,6 +10,11 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Adicionado
+
+- Skill `callback` documenta `@Callback`/`ICustomCallBack`: o mapa de `CallbackEvent` por tela (`PROCESS_CONFIRMATION` = Central de Vendas, `CONFIRMATION` = Portal de Vendas), as chaves e tipos do `Map` de cada evento — incluindo `bregras` minúsculo na confirmação contra `bRegras` no `INSERTION` —, o padrão classe base + uma subclasse por evento para valer nas duas telas, o `AFTER` que dispara também quando a confirmação falhou (`error`), a ausência de `AFTER` em `PROCESS_BILLING` e o retorno descartado de `call`.
+- Skill `business-rule` passa a apontar `callback` pelo nome nos quatro pontos em que já recomendava `@Callback`.
+
 ## [3.0.2] - 2026-09-07
 
 ### Corrigido
