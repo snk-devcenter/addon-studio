@@ -221,7 +221,7 @@ self.saveHandler = function(request) {
   }).then(function(data) {
     // Retornar array de linhas faz o dataset atualizar com os
     // valores devolvidos (captura alteracoes feitas pelo backend).
-    return data.responseBody.linhas;
+    return data.responseBody.body.linhas;
   });
 };
 ```

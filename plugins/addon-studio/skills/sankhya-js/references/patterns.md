@@ -16,7 +16,7 @@ angular.module('<Tela>App')
       ServiceProxy.callService('<addon>@OrdemServicoSP.listarFinanceiros', {
         codParc: { $: $scope.codParc }
       }).then(function(data) {
-        $scope.dados = data.responseBody;
+        $scope.dados = data.responseBody.body;
       }).catch(function(err) {
         // Popup de erro ja e exibido por default, a nao ser que
         // config.errorHandler / config.ignorePopUpErrorMsgs sejam setados
@@ -28,7 +28,7 @@ angular.module('<Tela>App')
 **Observacoes:**
 - `serviceName` sempre com prefixo: `<addon>@` para servico do proprio addon, `mge@`/`mgecom@`/`mgefin@` para servico nativo. Sem prefixo vai para `mge`.
 - Campos primitivos no `params` usam notacao `{ $: valor }` (herdada do transform XML/JSON do backend).
-- Resposta e desserializada; usualmente em `data.responseBody`.
+- Retorno do `@Controller` fica em `data.responseBody.body` — o `body` e o nivel que o framework acrescenta. Servico nativo nao tem esse nivel: e `data.responseBody.<no>` (ex.: `responseBody.queryExecResult`).
 
 ---
 

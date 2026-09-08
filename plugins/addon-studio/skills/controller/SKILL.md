@@ -292,14 +292,32 @@ curl --location 'http://localhost:8080/mge/service.sbr?serviceName=MobileLoginSP
   "pendingPrinting": "false",
   "transactionId": "CB0F625A72C214CF8449F0B18E1FA81A",
   "responseBody": {
-    "numeroPedido": 987654,
-    "valorTotal": 551.00,
-    "status": "PENDENTE"
+    "body": {
+      "numeroPedido": 987654,
+      "valorTotal": 551.00,
+      "status": "PENDENTE"
+    }
   }
 }
 ```
 
-**Erro (`status != "1"`):**
+> DTO retornado fica em `responseBody.body` — um nivel **abaixo** de `responseBody`. Consumo na tela: `response.responseBody.body` (skill `sankhya-js`). Ler `responseBody.<campo>` direto devolve `undefined` sem erro.
+
+**Erro tratado por `@ControllerAdvice` (`status = "0"`):**
+
+```json
+{
+  "serviceName": "PedidoControllerSP.criarPedido",
+  "status": "0",
+  "responseBody": {
+    "error": {
+      "mensagem": "O campo descricao e obrigatorio"
+    }
+  }
+}
+```
+
+**Erro sem handler (`status != "1"`):**
 
 ```json
 {
@@ -318,7 +336,7 @@ curl --location 'http://localhost:8080/mge/service.sbr?serviceName=MobileLoginSP
 | `"3"` | Timeout |
 | `"4"` | Cancelado por concorrencia |
 
-> Erro: `responseBody` nao incluido. Mensagem fica em `statusMessage`.
+> Excecao com handler `@ControllerAdvice`: retorno do handler vai em `responseBody.error`. Sem handler: `responseBody` nao incluido e a mensagem fica em `statusMessage`.
 
 ---
 
@@ -343,7 +361,7 @@ public void cancelar(@Valid CancelarPedidoRequest request) {
 }
 ```
 
-Framework serializa automaticamente o objeto retornado em `responseBody` da response.
+Framework serializa automaticamente o objeto retornado em `responseBody.body` da response.
 
 ---
 

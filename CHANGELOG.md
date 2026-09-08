@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Corrigido
+
+- Skills `controller` e `sankhya-js`: o envelope de resposta do `@Controller` estava documentado com um nível a menos. O DTO retornado fica em `responseBody.body` — o processador gera `jsonResponse.add("body", gson.toJsonTree(response))` —, e quem seguia a `controller` lia `responseBody.<campo>` e recebia `undefined` sem erro. Corrigidos o exemplo de JSON, os exemplos de consumo e os templates de `ServiceProxy`/dataset; o erro tratado por `@ControllerAdvice` passa a ser documentado em `responseBody.error` com `status "0"`, distinto do erro sem handler, que só traz `statusMessage`.
+
 ## [3.1.1] - 2026-09-07
 
 ### Corrigido
