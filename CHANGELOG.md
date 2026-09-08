@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.1.1] - 2026-09-07
+
 ### Corrigido
 
 - Skill `callback`: a seção 7 ensinava classe abstrata + uma subclasse por evento — padrão que nem compila, porque o build valida `ICustomCallBack` nos supertipos diretos da classe anotada. Agora são duas classes independentes, cada uma `implements ICustomCallBack`, com a lógica comum no service injetado; os exemplos deixam de carregar domínio de vertical.
@@ -335,7 +337,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.0...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.1...HEAD
+[3.1.1]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.2...v3.1.0
 [3.0.2]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.0...v3.0.1
