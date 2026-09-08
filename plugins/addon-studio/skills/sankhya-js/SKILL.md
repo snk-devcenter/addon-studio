@@ -162,7 +162,7 @@ Cache por `entidade + locale`. Serve tanto para entidade nativa quanto para a do
 
 - [references/addon-screen.md](references/addon-screen.md) — anatomia da tela no addon, `gerarTela`, launcher `.body`/`.include`, registro no menu, deploy, checklist
 - [references/api-cheatsheet.md](references/api-cheatsheet.md) — `ServiceProxy`, `FluidBuilder`, `MetadataProvider`, `SkComponentRegistry`, `SkI18nService`, `SkWorkspace`, `$SkInjectorProvider`
-- [references/utils.md](references/utils.md) — utilitários do `snk.core.util` prontos para injetar: `StringUtils`, `NumberUtils`, `DateUtils`/`DateUtilsConstants`, `ArrayUtils`, `ObjectUtils`, `SkConstants`, `Base64`, `UrlUtils`, `SqlUtils`, `SessionFileUpload`, `ClipboardUtils`, `AngularUtil`
+- [references/utils.md](references/utils.md) — utilitários do `snk.core.util` prontos para injetar: `StringUtils`, `NumberUtils`, `DateUtils`/`DateUtilsConstants`, `ArrayUtils`, `ObjectUtils`, `SkConstants`, `Base64`, `UrlUtils`, `SqlUtils`, `CrudUtils` (ler entidade sem endpoint novo), `SessionFileUpload`, `ClipboardUtils`, `AngularUtil`
 - [references/patterns.md](references/patterns.md) — padrões canônicos + tabela de decisão
 - [references/anti-patterns.md](references/anti-patterns.md) — práticas a evitar, útil em triagem de bug
 - [references/gotchas.md](references/gotchas.md) — armadilhas de API

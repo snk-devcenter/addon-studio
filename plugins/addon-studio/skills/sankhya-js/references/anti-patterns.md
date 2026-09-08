@@ -363,6 +363,36 @@ SkWorkspace.openAppActivity(id, pk);
 
 ---
 
+## 15. `@Controller` novo para ler campo de entidade que a tela ja pode consultar
+
+### Padrao ruim
+
+Controller + DTO de request + DTO de response + mapper + metodo de service, so para devolver dois campos de uma tabela do dicionario:
+
+```javascript
+ServiceProxy.callService('<addon>@ProdutoSP.buscarNcm', {codProd: codProd})
+    .then(function (r) { self.dataset.setFieldValue('NCM', r.responseBody.body.ncm); });
+```
+
+### Por que quebra
+
+Nao quebra em runtime — cobra em manutencao e em UX. Sao quatro artefatos Java e um deploy para cada campo novo que a tela precisar ler. E como a leitura vive no backend, a heranca de valor acaba caindo no `save`: o campo obrigatorio fica em branco na tela ate a pessoa gravar.
+
+### Forma correta
+
+[`CrudUtils.find`](utils.md#crudutils) — a sessao ja pode ler a entidade:
+
+```javascript
+CrudUtils.find('Produto', ['NCM', 'DESCRPROD'], {CODPROD: codProd}, true)
+    .then(function (produto) {
+        self.dataset.setFieldValue('NCM', produto.NCM);
+    });
+```
+
+Endpoint proprio continua sendo o certo quando ha **regra** no meio: calculo, validacao, gravacao, ou dado que a sessao da tela nao pode ver. Leitura simples de entidade, nao.
+
+---
+
 ## Checklist rapido para triagem
 
 Em bugs de tela AngularJS/sankhya-js, investigue primeiro:
@@ -375,5 +405,6 @@ Em bugs de tela AngularJS/sankhya-js, investigue primeiro:
 - [ ] Popup duplicado de erro?
 - [ ] Handle duplicado no `SkComponentRegistry`?
 - [ ] `callback` + `.then` no mesmo `callService`?
+- [ ] Leitura de entidade resolvida com endpoint proprio em vez de `CrudUtils.find`?
 
-Esses oito itens cobrem a maioria das classes de bugs recorrentes em telas antigas.
+Esses nove itens cobrem a maioria das classes de bugs recorrentes em telas antigas.

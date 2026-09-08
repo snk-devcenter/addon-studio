@@ -268,6 +268,7 @@ Sem o commons, a alternativa e duplicar o codigo por tela — nao registre nada 
 | Abortar request em voo | guardar a promise e chamar `.abort()` |
 | Obter estrutura de entidade | `MetadataProvider.getEntityMetadata` |
 | Obter entidade + FKs | `MetadataProvider.getEntityAndRelationsMetadata` |
+| Ler campo de registro de outra entidade | `CrudUtils.find` — nao crie `@Controller` para leitura simples (ver `utils.md`) |
 | Compartilhar instancia entre controllers | `SkComponentRegistry.register`/`.get` |
 | Criar widget UI | directive em `angular.module('<Tela>App')` + `<script>` no `.body` |
 | Traduzir texto estatico | `SkI18nService.instant` ou filter `\| translate` |

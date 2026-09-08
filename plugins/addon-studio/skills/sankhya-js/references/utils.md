@@ -24,6 +24,7 @@ Arquivos: core/util/<pasta>/<nome>.service.js.
 | `ClipboardUtils` | copiar texto |
 | `UrlUtils` | query params, PK da URL, base da aplicacao |
 | `SqlUtils` | clausula `IN` sem estourar limite do banco |
+| `CrudUtils` | ler registro de entidade do dicionario na tela, sem endpoint novo |
 | `SessionFileUpload` | upload para a sessao (par do `sk-file-input`) |
 | `UidGenerator` | id unico para elemento/DOM |
 | `AngularUtil` | debounce, timeout, compile, watch de uma vez |
@@ -223,6 +224,43 @@ core/util/sql/sqlutil.service.js. Montagem de fragmento SQL — o SQL de negocio
 | `loadFromQuery(columnsName, tableName, whereOrderGroup, fullLine)` | monta e executa um `SELECT`; devolve promise |
 | `checkifExistWordInQuery(query, word)` / `getParamsFromQuery(query, word)` / `getDefaultNamedParamsObject(arrayParams)` | inspecao de query com parametros nomeados |
 
+## CrudUtils
+
+core/util/crud/crudutil.service.js. Le registro de qualquer entidade do dicionario direto da tela, por cima do servico `mge@crud.find`. **Antes de criar um `@Controller` para devolver dois campos de uma tabela, veja se e isso que voce precisa** — leitura simples de entidade nao pede endpoint novo (ver [anti-patterns.md](anti-patterns.md), item 15).
+
+`find(entityName, fields, criterio, findOne, literalCriteria, orderBy, options)` — devolve promise.
+
+| Parametro | Tipo | Nota |
+|---|---|---|
+| `entityName` | String | nome da **instancia** do dicionario (`'Produto'`), nao o da tabela |
+| `fields` | Array ou String | `['NCM','DESCRPROD']` ou `'NCM,DESCRPROD'` (split por virgula); qualquer outra coisa → `throw` |
+| `criterio` | Object | `{CODPROD: 123}` vira `{nome: 'CODPROD', valor: 123}` — **so igualdade**; para `>`, `LIKE` ou `IN` use `literalCriteria` |
+| `findOne` | Boolean | `true` resolve o objeto (`undefined` sem resultado); omitido ou `false` resolve array (`[]` sem resultado) |
+| `literalCriteria` | String | expressao literal, ex. `"ATIVO = 'S'"` |
+| `orderBy` | String | ex. `'DESCRPROD'` |
+| `options` | Object | `{referenceFetch: '<CAMPO>', includePresentations: true}` |
+
+```javascript
+angular.module('<Tela>App')
+  .controller('<Tela>Controller', ['CrudUtils', function (CrudUtils) {
+    var self = this;
+
+    self.herdarDoProduto = function (codProd) {
+      return CrudUtils.find('Produto', ['NCM', 'QTDMIN'], {CODPROD: codProd}, true)
+        .then(function (produto) {
+          if (!produto) { return; }
+          self.dataset.setFieldValue('NCM', produto.NCM);
+          self.dataset.setFieldValue('QTDMIN', Number(produto.QTDMIN));
+        });
+    };
+  }]);
+```
+
+- **Todo valor volta como String**, inclusive de campo numerico e de data — o servico so desembrulha o `{$: valor}`, nao converte (ver gotcha 11).
+- Campo cujo valor nao vem embrulhado em `$` e **descartado** do objeto de retorno.
+- `findOne: true` com mais de um registro casando nao e erro: resolve o primeiro.
+- Falha do servico rejeita a promise — trate no segundo callback do `.then` (ver [anti-patterns.md](anti-patterns.md), itens 10 e 11).
+
 ## SessionFileUpload
 
 core/util/sessionfileupload/sessionfileupload.service.js. E o motor do [`sk-file-input`](inputs.md#sk-file-input).
@@ -282,3 +320,5 @@ core/util/angular/angularutil.service.js. Os mais uteis numa tela de addon:
 9. **`DateUtils.getToday()` zera a hora**. Sem argumento, `doClearTime` vira `true`. Para carimbar hora corrente, `getToday(false)`. Consequencia: `diffWithToday` compara contra meia-noite de hoje.
 
 10. **Os formatos sao do moment, nao do Angular**. `DateUtils.formatDate(d, 'dd/MM/yyyy')` nao devolve `01/01/2026` — em moment, `dd` e dia da semana abreviado e `yyyy` nao e token de ano. Use `DateUtilsConstants.DEFAULT_DATE_FORMAT` (`'DD/MM/YYYY'`) ou o token correto.
+
+11. **`CrudUtils.find` devolve todo campo como String**. `produto.QTDMIN` vem `'10'`, nao `10`; jogar isso em `setFieldValue` de campo `INTEIRO`/`DECIMAL` grava texto. Converta com `Number(...)` — o servico so tira o `$` do envelope do `crud.find`.
