@@ -10,6 +10,11 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Corrigido
+
+- Skill `callback`: a seção 7 ensinava classe abstrata + uma subclasse por evento — padrão que nem compila, porque o build valida `ICustomCallBack` nos supertipos diretos da classe anotada. Agora são duas classes independentes, cada uma `implements ICustomCallBack`, com a lógica comum no service injetado; os exemplos deixam de carregar domínio de vertical.
+- Roteamento: a `description` do `callback` passa a ceder ao `business-rule` liberação, bloqueio e aprovação por limite de crédito, inclusive quando o dev fala em impedir o faturamento do pedido — o faturamento do `callback` é só o gancho `PROCESS_BILLING` do lote do portal. Na esteira de disparo, a confiança do eixo indireto do `business-rule` volta de 78 para 90 e a do `listener` de 78 para 85.
+
 ## [3.1.0] - 2026-09-07
 
 ### Adicionado

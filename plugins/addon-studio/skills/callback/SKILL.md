@@ -1,6 +1,6 @@
 ---
 name: callback
-description: Cria, revisa e refatora callbacks de documento Sankhya com `@Callback` (`ICustomCallBack` + `CallbackWhen` + `CallbackEvent`) — hooks que a plataforma dispara na inclusão/alteração do cabeçalho da nota, na confirmação pela Central de Vendas, na confirmação pelo Portal de Vendas e no faturamento em lote do portal. Use ao criar, alterar, revisar, auditar ou padronizar lógica que roda antes ou depois de confirmar documento comercial (pedido, nota de venda e também **nota de entrada/compra**), ao gerar ou emitir documento auxiliar antes da confirmação, ao abortar a confirmação com exceção, ao reagir ao resultado da confirmação inclusive quando ela falhou, ao interceptar inclusão/alteração de cabeçalho vinda dos portais ou de integração, ao interceptar o faturamento em lote no portal, ao trabalhar com classes `*Callback.java`, ou ao tocar em código com `@Callback`/`ICustomCallBack`. É também a skill de quem precisa descobrir **qual** `CallbackEvent` corresponde à tela: Central e Portal disparam eventos diferentes, e o par `when`/`event` errado compila, sobe e nunca dispara. NÃO usar quando a regra é do barramento comercial de nota de saída pela interface `Regra` + `ContextoRegra` (liberação de limite de crédito) — isso é `@BusinessRule`, skill `business-rule`. NÃO usar para evento CRUD de entidade JAPE (`PersistenceEventAdapter`) — isso é `@Listener`, skill `listener`; inclusão de documento pelos portais **não** passa por CRUD JAPE. NÃO usar para rotina disparada por clique do usuário na grade (`AcaoRotinaJava`) — isso é `action-button`.
+description: Cria, revisa e refatora callbacks de documento Sankhya com `@Callback` (`ICustomCallBack` + `CallbackWhen` + `CallbackEvent`) — hooks que a plataforma dispara na inclusão/alteração do cabeçalho da nota, na confirmação pela Central de Vendas, na confirmação pelo Portal de Vendas e no faturamento em lote do portal. Use ao criar, alterar, revisar, auditar ou padronizar lógica que roda antes ou depois de confirmar documento comercial (pedido, nota de venda e também **nota de entrada/compra**), ao gerar ou emitir documento auxiliar antes da confirmação, ao abortar a confirmação com exceção, ao reagir ao resultado da confirmação inclusive quando ela falhou, ao interceptar inclusão/alteração de cabeçalho vinda dos portais ou de integração, ao interceptar o faturamento em lote no portal, ao trabalhar com classes `*Callback.java`, ou ao tocar em código com `@Callback`/`ICustomCallBack`. É também a skill de quem precisa descobrir **qual** `CallbackEvent` corresponde à tela: Central e Portal disparam eventos diferentes, e o par `when`/`event` errado compila, sobe e nunca dispara. NÃO usar quando a regra é do barramento comercial de nota de saída pela interface `Regra` + `ContextoRegra` — liberação, bloqueio ou aprovação por limite de crédito é `@BusinessRule`, skill `business-rule`, inclusive quando o dev fala em impedir o **faturamento do pedido**: aqui o faturamento é só o gancho `PROCESS_BILLING` do lote do portal, nunca a regra que barra o documento por limite. NÃO usar para evento CRUD de entidade JAPE (`PersistenceEventAdapter`) — isso é `@Listener`, skill `listener`; inclusão de documento pelos portais **não** passa por CRUD JAPE. NÃO usar para rotina disparada por clique do usuário na grade (`AcaoRotinaJava`) — isso é `action-button`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -11,7 +11,7 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 
 Diferente de `@BusinessRule`, vale para **qualquer** documento comercial, incluindo **Notas de Entrada (compras)**.
 
-> ⚠️ **A pegadinha central: Central e Portal são eventos diferentes.** `PROCESS_CONFIRMATION` é a confirmação da Central de Vendas; `CONFIRMATION` é a confirmação do Portal de Vendas. Uma classe carrega **um** par `when`/`event` — `@Callback` não é repetível. Para valer nas duas telas: classe base compartilhada + uma subclasse por evento (seção 7).
+> ⚠️ **A pegadinha central: Central e Portal são eventos diferentes.** `PROCESS_CONFIRMATION` é a confirmação da Central de Vendas; `CONFIRMATION` é a confirmação do Portal de Vendas. Uma classe carrega **um** par `when`/`event` — `@Callback` não é repetível. Para valer nas duas telas: uma classe por evento, com a lógica comum no service injetado (seção 7).
 
 > **Referências complementares:**
 > - `business-rule` — barramento comercial de nota de saída
@@ -51,15 +51,15 @@ import java.util.Map;
 @Callback(
     when = CallbackWhen.BEFORE,
     event = CallbackEvent.PROCESS_CONFIRMATION,
-    description = "Emite o laudo antes da confirmacao na Central de Vendas"
+    description = "Valida o documento antes da confirmacao na Central de Vendas"
 )
-public class EmissaoLaudoCentralCallback implements ICustomCallBack {
+public class ConfirmacaoCentralCallback implements ICustomCallBack {
 
-    private final LaudoService laudoService;
+    private final ValidacaoDocumentoService validacaoService;
 
     @Inject
-    public EmissaoLaudoCentralCallback(LaudoService laudoService) {
-        this.laudoService = laudoService;
+    public ConfirmacaoCentralCallback(ValidacaoDocumentoService validacaoService) {
+        this.validacaoService = validacaoService;
     }
 
     @Override
@@ -67,8 +67,8 @@ public class EmissaoLaudoCentralCallback implements ICustomCallBack {
         BigDecimal nuNota = (BigDecimal) data.get("nunota");
         IBarramentoRegra bRegras = (IBarramentoRegra) data.get("bregras");
 
-        laudoService.emitir(nuNota);
-        bRegras.addMensagem("Laudo emitido automaticamente.");
+        validacaoService.validar(nuNota);
+        bRegras.addMensagem("Documento conferido automaticamente.");
 
         return null;
     }
@@ -149,64 +149,34 @@ import br.com.sankhya.modelcore.comercial.proxyconnect.IBarramentoRegra;
 
 ---
 
-## 7. Central **e** Portal: classe base + uma subclasse por evento
+## 7. Central **e** Portal: uma classe por evento
 
-Uma classe = um par `when`/`event`. Para a mesma lógica valer nas duas telas, a lógica fica na base e cada subclasse carrega uma anotação:
-
-```java
-// Base — sem @Callback, nao e registrada
-public abstract class ConfirmacaoDocumentoCallback implements ICustomCallBack {
-
-    private final LaudoService laudoService;
-
-    protected ConfirmacaoDocumentoCallback(LaudoService laudoService) {
-        this.laudoService = laudoService;
-    }
-
-    @Override
-    public Object call(String id, Map<String, Object> data) {
-        BigDecimal nuNota = (BigDecimal) data.get("nunota");
-        IBarramentoRegra bRegras = (IBarramentoRegra) data.get("bregras");
-
-        laudoService.emitir(nuNota);
-        bRegras.addMensagem("Laudo emitido automaticamente.");
-
-        return null;
-    }
-}
-```
-
-```java
-@Callback(
-    when = CallbackWhen.BEFORE,
-    event = CallbackEvent.PROCESS_CONFIRMATION,
-    description = "Emite o laudo antes da confirmacao na Central de Vendas"
-)
-public class ConfirmacaoCentralCallback extends ConfirmacaoDocumentoCallback {
-
-    @Inject
-    public ConfirmacaoCentralCallback(LaudoService laudoService) {
-        super(laudoService);
-    }
-}
-```
+`@Callback` não é repetível: uma classe carrega **um** par `when`/`event`. Para a mesma lógica valer nas duas telas, são duas classes independentes, cada uma `implements ICustomCallBack`, mudando só o `event`:
 
 ```java
 @Callback(
     when = CallbackWhen.BEFORE,
     event = CallbackEvent.CONFIRMATION,
-    description = "Emite o laudo antes da confirmacao no Portal de Vendas"
+    description = "Valida o documento antes da confirmacao no Portal de Vendas"
 )
-public class ConfirmacaoPortalCallback extends ConfirmacaoDocumentoCallback {
+public class ConfirmacaoPortalCallback implements ICustomCallBack {
+
+    private final ValidacaoDocumentoService validacaoService;
 
     @Inject
-    public ConfirmacaoPortalCallback(LaudoService laudoService) {
-        super(laudoService);
+    public ConfirmacaoPortalCallback(ValidacaoDocumentoService validacaoService) {
+        this.validacaoService = validacaoService;
+    }
+
+    @Override
+    public Object call(String id, Map<String, Object> data) {
+        validacaoService.validar((BigDecimal) data.get("nunota"));
+        return null;
     }
 }
 ```
 
-O `@Inject` precisa estar no construtor da **subclasse concreta** — é ela que o Guice instancia.
+A lógica comum mora no **service injetado**, não numa superclasse: as duas classes recebem o mesmo `@Component` e o `call` só delega.
 
 ---
 
@@ -238,7 +208,7 @@ public Object call(String id, Map<String, Object> data) {
 
 - A anotação **basta**: o build gera o registro e o deploy publica o callback no evento. Nada de `parameter.xml`, XML manual ou parâmetro editado à mão.
 - A classe do callback **não precisa de binding** no módulo Guice — o SDK a descobre pela anotação. Registre os **services injetados** nela. Ver `dependency-injection`.
-- `implements ICustomCallBack` é validado no build: sem isso, falha com `Classe <X> deve implementar 'br.com.sankhya.modelcore.custommodule.ICustomCallBack'`.
+- `implements ICustomCallBack` é validado no build na **classe anotada**: sem a declaração ali, falha com `Classe <X> deve implementar 'br.com.sankhya.modelcore.custommodule.ICustomCallBack'`.
 - Callback registrado que não dispara, com o par `when`/`event` correto: o ambiente pode não ter a personalização autorizada — verificar com o administrador antes de caçar bug no código.
 
 ---
@@ -249,6 +219,7 @@ public Object call(String id, Map<String, Object> data) {
 |:--------------------------------------------------------|:-----------------------------------------------------------------------------|
 | Registrar só um dos eventos de confirmação              | Central e Portal são eventos distintos — uma subclasse para cada (seção 7)  |
 | Duas anotações `@Callback` na mesma classe              | Não é repetível: uma classe = um par `when`/`event`                          |
+| Superclasse abstrata para compartilhar lógica entre callbacks | Lógica comum no service injetado; cada classe anotada `implements ICustomCallBack` |
 | `@Callback(when = AFTER, event = PROCESS_BILLING)`      | Só existe `BEFORE` — o build quebra                                          |
 | Ler `data.get("bRegras")` num evento de confirmação     | A chave é `bregras` minúscula nesses eventos                                 |
 | `AFTER` assumindo que a operação deu certo              | Checar `data.get("error")` antes de qualquer efeito                          |
