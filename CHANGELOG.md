@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.1.2] - 2026-09-08
+
 ### Corrigido
 
 - Skills `controller` e `sankhya-js`: o envelope de resposta do `@Controller` estava documentado com um nível a menos. O DTO retornado fica em `responseBody.body` — o processador gera `jsonResponse.add("body", gson.toJsonTree(response))` —, e quem seguia a `controller` lia `responseBody.<campo>` e recebia `undefined` sem erro. Corrigidos o exemplo de JSON, os exemplos de consumo e os templates de `ServiceProxy`/dataset; o erro tratado por `@ControllerAdvice` passa a ser documentado em `responseBody.error` com `status "0"`, distinto do erro sem handler, que só traz `statusMessage`.
@@ -341,7 +343,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.1...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.2...HEAD
+[3.1.2]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.1...v3.1.2
 [3.1.1]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.2...v3.1.0
 [3.0.2]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.1...v3.0.2
