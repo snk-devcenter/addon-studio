@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Adicionado
+
+- Skill `sankhya-js` documenta `CrudUtils.find`: assinatura completa (`entityName` = instância do dicionário, `fields` como array ou lista separada por vírgula, `criterio` só de igualdade, `findOne`, `literalCriteria`, `orderBy`, `options`), o retorno já desembrulhado do `$` e o fato de todo valor voltar como String — inclusive de campo numérico. Sem isso, a saída para ler dois campos de uma entidade na tela era criar `@Controller` + DTOs + mapper, e a herança de valor acabava no `save`, com campo obrigatório em branco até gravar; virou o anti-pattern 15 da skill.
+
 ## [3.1.2] - 2026-09-08
 
 ### Corrigido
