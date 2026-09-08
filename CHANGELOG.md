@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Corrigido
+
+- Skill `callback`: a seção 7 ensinava classe abstrata + uma subclasse por evento — padrão que nem compila, porque o build valida `ICustomCallBack` nos supertipos diretos da classe anotada. Agora são duas classes independentes, cada uma `implements ICustomCallBack`, com a lógica comum no service injetado; os exemplos deixam de carregar domínio de vertical.
+
 ## [3.1.0] - 2026-09-07
 
 ### Adicionado
