@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.1.0] - 2026-09-07
+
 ### Adicionado
 
 - Skill `callback` documenta `@Callback`/`ICustomCallBack`: o mapa de `CallbackEvent` por tela (`PROCESS_CONFIRMATION` = Central de Vendas, `CONFIRMATION` = Portal de Vendas), as chaves e tipos do `Map` de cada evento — incluindo `bregras` minúsculo na confirmação contra `bRegras` no `INSERTION` —, o padrão classe base + uma subclasse por evento para valer nas duas telas, o `AFTER` que dispara também quando a confirmação falhou (`error`), a ausência de `AFTER` em `PROCESS_BILLING` e o retorno descartado de `call`.
@@ -328,7 +330,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.2...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.2...v3.1.0
 [3.0.2]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/snk-devcenter/addon-studio/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/snk-devcenter/addon-studio/compare/v2.22.0...v3.0.0
