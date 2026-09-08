@@ -16,7 +16,9 @@ angular
                     '<addon>@MeuServicoSP.listar',
                     { codParc: { $: codParc } }
                 ).then(function (data) {
-                    $scope.financeiros = data.responseBody;
+                    // Retorno do @Controller vem em responseBody.body — sem o
+                    // nivel body, todo campo lido volta undefined.
+                    $scope.financeiros = data.responseBody.body;
                 });
 
                 // Popup de erro ja e exibido por default pelo ServiceProxy.

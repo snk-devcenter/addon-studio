@@ -37,9 +37,7 @@ angular
                 return ServiceProxy.callService('<addon>@MinhaConsultaSP.listar', {
                     filtro: { $: request.filter }
                 }).then(function (data) {
-                    // Retornar o objeto inteiro tambem funciona — dataset
-                    // extrai automaticamente de responseBody quando presente.
-                    return data.responseBody.linhas;
+                    return data.responseBody.body.linhas;
                 });
             };
 
@@ -52,7 +50,7 @@ angular
                 return ServiceProxy.callService('<addon>@MinhaConsultaSP.persistir', {
                     registro: request.record
                 }).then(function (data) {
-                    return data.responseBody.linhas;
+                    return data.responseBody.body.linhas;
                 });
             };
 

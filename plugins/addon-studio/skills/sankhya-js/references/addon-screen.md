@@ -171,7 +171,7 @@ A tela só aparece no produto depois de entrar no XML de menu do dicionário de 
 ```javascript
 ServiceProxy.callService('<addon>@<Nome>SP.<metodo>', payload)
     .then(function (response) {
-        var body = response.responseBody;
+        var body = response.responseBody.body;
     });
 ```
 
@@ -183,7 +183,7 @@ ServiceProxy.callService('<addon>@<Nome>SP.<metodo>', payload)
 
 Sem o prefixo `<addon>@`, o framework assume `mge` e a chamada vai para o serviço nativo — erro de "serviço não encontrado" ou, pior, um serviço homônimo do produto. Serviços nativos são chamados com o prefixo do módulo deles (`mge@`, `mgecom@`, `mgefin@`).
 
-O payload é o JSON que o controller recebe; a resposta útil fica em `response.responseBody`.
+O payload é o JSON que o controller recebe; o DTO de retorno fica em `response.responseBody.body` — o `body` é o nível que o framework acrescenta ao serializar o retorno do método. Ler `responseBody.<campo>` direto devolve `undefined` sem erro.
 
 ---
 

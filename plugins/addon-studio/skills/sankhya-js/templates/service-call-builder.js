@@ -24,7 +24,7 @@ angular
                     .call();
 
                 return _promisePendente.then(function (data) {
-                    return data.responseBody;
+                    return data.responseBody.body;
                 });
             };
 
