@@ -13,6 +13,7 @@
     "listener",
     "before-load-listener",
     "business-rule",
+    "callback",
     "mapstruct",
     "type-adapter",
     "dependency-injection",
@@ -86,6 +87,11 @@
       "cria uma regra de negocio com @BusinessRule implementando Regra pro barramento",
       "preciso impedir o faturamento do pedido quando o cliente estourou o limite de credito, e permitir liberacao pelo supervisor",
       "preciso validar que o campo PLACA da minha tabela AD_VSTVIS nao vem vazio no insert"
+    ],
+    "callback": [
+      "cria um @Callback com ICustomCallBack pra rodar antes da confirmacao na central de vendas",
+      "antes de confirmar a nota de compra eu preciso emitir o laudo e barrar a confirmacao se der erro",
+      "quero um botao na tela de pedidos pro usuario marcar as notas e confirmar em lote"
     ],
     "mapstruct": [
       "cria o mapper MapStruct entre VistoriaRequest e a entidade VstVistoria",

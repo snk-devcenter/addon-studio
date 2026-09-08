@@ -12,14 +12,15 @@ mostra o efeito. Comparação entre runs só é válida se `scenarios.json` não
 python3 tools/skill-trigger-audit/audit.py build
 ```
 
-Gera `out/` (não versionado): `catalog.md` (contexto simulado + as 24 descriptions + os
-sub-agents), `batch-1..12.md`, `key.json` (gabarito) e `prompt.md`.
+Gera `out/` (não versionado): `catalog.md` (contexto simulado + todas as descriptions + os
+sub-agents), um `batch-N.md` por lote, `key.json` (gabarito) e `prompt.md`. A própria saída do
+`build` diz quantas skills e quantos lotes saíram.
 
-Depois, **um subagente por lote** — 12 no total, `general-purpose`, mesmo modelo da sessão.
+Depois, **um subagente por lote**, `general-purpose`, mesmo modelo da sessão.
 Os prompts prontos estão em `out/prompt.md`, um por lote. Cada agente é cego: lê só o
 catálogo e o próprio lote, e nunca sabe qual skill está sob teste.
 
-Colete as 12 tabelas num `results.json`:
+Colete as tabelas num `results.json`:
 
 ```json
 {"B1C1": {"skills": ["action-button", "business-rule"], "conf": 70},
@@ -46,8 +47,8 @@ Guarde cada `results.json` em `runs/AAAA-MM-DD-<rotulo>.json` — é o históric
 | `I` indireto | dev-speak de negócio, nenhum termo do SDK | skill é a 1ª escolha |
 | `N` negativo | mensagem vizinha que deve cair noutra skill | a skill **não** é a 1ª escolha |
 
-Os 12 lotes embaralham os eixos (`SHUFFLE`/`OFFSETS` em `audit.py`) para o agente não inferir
-o padrão do lote, e distribuem as 24 skills de forma que nenhum lote repita skill.
+Os lotes embaralham os eixos (`SHUFFLE`/`OFFSETS` em `audit.py`) para o agente não inferir
+o padrão do lote, e distribuem as skills de forma que nenhum lote repita skill.
 
 ## Critério de aceite
 

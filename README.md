@@ -182,6 +182,7 @@ $addon-studio:test
 |---|---|
 | `action-button` | Botões de ação com `AcaoRotinaJava` |
 | `business-rule` | Regras do barramento comercial |
+| `callback` | Hooks de confirmação e faturamento de documento |
 | `listener` | Eventos CRUD de persistência |
 | `before-load-listener` | Filtros transversais antes de consultas JAPE |
 | `job` | Processamentos agendados com CRON |

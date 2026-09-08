@@ -1,6 +1,6 @@
 ---
 name: business-rule
-description: Cria, revisa e refatora regras de negócio Sankhya com `@BusinessRule` (interface `Regra` + `ContextoRegra`) para barramento de eventos do módulo comercial, liberação de limite e regras transacionais. Use ao criar, alterar, revisar, auditar ou padronizar regras de negócio do comercial (nota, pedido, fatura, limite de crédito), ao implementar `beforeInsert`/`beforeUpdate`/`beforeDelete`/`afterInsert`/`afterUpdate`/`afterDelete` de `Regra`, ao trabalhar com arquivos `*Regra.java`, ou ao tocar em código com `@BusinessRule`. NÃO usar para evento de persistência de entidade JAPE genérica, inclusive tabela `AD_` do próprio addon (validar/preencher campo no insert, auditoria de alteração, bloquear exclusão) — isso é `@Listener`/`PersistenceEventAdapter`, skill `listener`.
+description: Cria, revisa e refatora regras de negócio Sankhya com `@BusinessRule` (interface `Regra` + `ContextoRegra`) para barramento de eventos do módulo comercial, liberação de limite e regras transacionais. Use ao criar, alterar, revisar, auditar ou padronizar regras de negócio do comercial (nota, pedido, fatura, limite de crédito), ao implementar `beforeInsert`/`beforeUpdate`/`beforeDelete`/`afterInsert`/`afterUpdate`/`afterDelete` de `Regra`, ao trabalhar com arquivos `*Regra.java`, ou ao tocar em código com `@BusinessRule`. NÃO usar quando o documento é Nota de Entrada (compra) ou quando o gancho é o ponto de confirmação em si, na Central ou no Portal de Vendas — isso é `@Callback`/`ICustomCallBack`, skill `callback`. NÃO usar para evento de persistência de entidade JAPE genérica, inclusive tabela `AD_` do próprio addon (validar/preencher campo no insert, auditoria de alteração, bloquear exclusão) — isso é `@Listener`/`PersistenceEventAdapter`, skill `listener`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -19,12 +19,12 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 | Hook              | Escopo                                                        | Quando usar                                                                                      |
 |:------------------|:--------------------------------------------------------------|:-------------------------------------------------------------------------------------------------|
 | `@BusinessRule`   | Notas de Saida e Mov. Interna (Vendas, Remessas, etc.)        | Logica que interage com barramento de regras (`ContextoRegra`): liberacoes de limite, validacoes complexas na confirmacao/faturamento. |
-| `@Callback`       | Todos documentos comerciais, incluindo Notas de Entrada       | Eventos de negocio onde `@BusinessRule` nao atua (ex: notas de compra) ou quando barramento nao e necessario. |
+| `@Callback`       | Todos documentos comerciais, incluindo Notas de Entrada       | Eventos de negocio onde `@BusinessRule` nao atua (ex: notas de compra) ou quando barramento nao e necessario. Skill `callback`. |
 | `@Listener`       | Operacoes CRUD (insert/update/delete) em qualquer entidade    | Validacoes e modificacoes de campo disparadas ao salvar/excluir. Preferir para CRUD simples.     |
 
 **Regra rapida:**
 - Liberacao de limite em nota de venda? `@BusinessRule`.
-- Validar nota de compra na confirmacao? `@Callback`.
+- Validar nota de compra na confirmacao? `@Callback` — skill `callback`.
 - Logica ao salvar/excluir qualquer registro? `@Listener`.
 
 ---
@@ -296,13 +296,13 @@ public class IntegracaoExternaRegra implements Regra {
 | Logica de negocio no metodo da interface        | Mover para Service (`@Component`)                           |
 | Usar `afterInsert` para validacao               | Validar em `beforeInsert` — apos salvar e tarde demais      |
 | `new` em dependencias gerenciadas               | Injetar via construtor com `@Inject`                        |
-| Usar para Notas de Entrada (compras)            | Usar `@Callback`                                            |
+| Usar para Notas de Entrada (compras)            | Usar `@Callback` — skill `callback`                         |
 
 ---
 
 ## 10. Checklist: Novo `@BusinessRule`
 
-1. [ ] Confirmar que o caso de uso e especifico de nota de saida/mov. interna — senao usar `@Callback` ou `@Listener`.
+1. [ ] Confirmar que o caso de uso e especifico de nota de saida/mov. interna — senao usar `@Callback` (skill `callback`) ou `@Listener`.
 2. [ ] Criar classe implementando `Regra` (nomear `<Feature>Regra`).
 3. [ ] Anotar com `@BusinessRule(description = "...")`.
 4. [ ] Injetar dependencias via construtor com `@Inject` (Guice).
@@ -316,6 +316,7 @@ public class IntegracaoExternaRegra implements Regra {
 
 ## Skills relacionadas
 
+- `callback` — o outro gancho de confirmacao: Notas de Entrada e a confirmacao em si (Central/Portal)
 - `action-button` — botão dispara fluxo que pode invocar regra
 - `controller` — controller pode invocar regra via barramento
 - `entity` — entidade alvo do evento
