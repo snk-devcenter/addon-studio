@@ -176,19 +176,21 @@ private boolean flagAtiva() {
     description="Descricao exibida nas Preferencias"/>
 ```
 
-Restricoes do XSD (`parameters.xsd`) que derrubam o build/deploy:
+Restricoes do XSD (`parameters.xsd`) que derrubam o build/deploy — menos `description`, que falha depois (ver abaixo):
 
 | Atributo | Restricao |
 |:---------|:----------|
 | `key` | 3–15 chars, `[a-zA-Z_]+` — **sem digitos** |
 | `name` | `[a-zA-Z.]+` (pontuado, comeca com o modulo) |
-| `description` | 3–50 chars |
+| `description` | 3–50 chars — limite de `TSIPAR.DESCRICAO` (`VARCHAR2(50)`) |
 | `type` | `integer` / `string` / `boolean` / `date` / `list` / `number` |
 | `cacheable` | `false` para valor que muda em runtime (flags) |
 | `module` | letra do modulo (ex.: `B` = Configuracao) |
 | `list-content` | opcoes separadas por `\n` quando `type="list"` |
 
 > `cacheable="false"` e pre-requisito do pattern de flag togglavel da secao 6.
+
+**`description` com mais de 50 chars nao quebra na instalacao.** Ate alguem mexer no valor, o parametro vive so dentro do addon e nao chega na `TSIPAR`. A gravacao acontece quando o usuario altera o parametro nas Preferencias do ERP — ai o insert estoura no limite da `DESCRICAO` (`VARCHAR2(50)`) e a criacao falha, longe do deploy e na mao do usuario final. Contar os 50 chars e obrigacao de quem escreve o `parameter.xml`.
 
 ---
 
@@ -212,6 +214,7 @@ Restricoes do XSD (`parameters.xsd`) que derrubam o build/deploy:
 | Eager em valor opcional/custoso                    | Usar `Provider<T>` (Lazy)                         |
 | `Provider<T>` como feature flag togglavel          | Congela no primeiro `.get()` — ler `MGECoreParameter` a cada uso + `cacheable="false"` (secao 6) |
 | `SANKHYA_PARAM` sem declarar no `parameter.xml`    | Declarar em `META-INF/parameter.xml` (secao 7)    |
+| `description` acima de 50 chars no `parameter.xml` | Encurtar — instala, mas quebra ao salvar nas Preferencias (`TSIPAR.DESCRICAO`, secao 7) |
 
 ---
 
@@ -220,7 +223,7 @@ Restricoes do XSD (`parameters.xsd`) que derrubam o build/deploy:
 1. [ ] Classe anotada com estereotipo Guice (`@Component`, `@Controller`, etc.).
 2. [ ] Escolher fonte correta: `ENV_VAR`, `SYSTEM_PROPERTY` ou `SANKHYA_PARAM`.
 3. [ ] Usar `param` para `SANKHYA_PARAM` (com `group` se necessario); `value` para as demais.
-4. [ ] `SANKHYA_PARAM`: parametro declarado no `META-INF/parameter.xml` (secao 7).
+4. [ ] `SANKHYA_PARAM`: parametro declarado no `META-INF/parameter.xml` (secao 7), com `description` de no maximo 50 chars.
 5. [ ] Definir `defaultValue` com valor significativo — nunca string vazia em config critica.
 6. [ ] Decidir Eager vs Lazy: `Provider<T>` se o valor for opcional/custoso — lembrando que congela apos o primeiro `.get()`.
 7. [ ] Flag que precisa mudar sem restart? **Nao** usar `@Value` — pattern da secao 6.
