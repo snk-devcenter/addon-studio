@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Alterado
+
+- Skill `value`: o limite de 50 caracteres do `description` no `parameter.xml` passa a dizer de onde vem (`TSIPAR.DESCRICAO`, `VARCHAR2(50)`) e quando estoura — a instalação passa, porque o parâmetro só vive dentro do addon até alguém alterá-lo nas Preferências do ERP; é a gravação na `TSIPAR` que falha, na mão do usuário final.
+
 ## [3.1.3] - 2026-09-08
 
 ### Adicionado
