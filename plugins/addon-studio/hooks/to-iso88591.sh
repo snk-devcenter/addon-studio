@@ -14,6 +14,21 @@ set -u
 
 FFFD=$(printf '\357\277\275')
 
+# Arquivo de projeto Addon Studio? Algum build.gradle acima dele aplica o plugin
+# Gradle -- o modulo -vc nao aplica, a raiz sim, por isso a subida ate "/".
+# Sem isso o hook converte .java de qualquer projeto na maquina para ISO-8859-1.
+# sh nao tem variavel local: nomes proprios para nao pisar no chamador.
+is_addon_project() {
+    _dir=$(dirname "$1")
+    while [ "$_dir" != "/" ] && [ "$_dir" != "." ]; do
+        for _build in "$_dir/build.gradle" "$_dir/build.gradle.kts"; do
+            [ -f "$_build" ] && grep -q 'br\.com\.sankhya\.addonstudio' "$_build" 2> /dev/null && return 0
+        done
+        _dir=$(dirname "$_dir")
+    done
+    return 1
+}
+
 # Uma conversão de um arquivo. Retorna 2 quando detecta perda de acento.
 convert_file() {
     file=$1
@@ -24,6 +39,8 @@ convert_file() {
         *.java | *.xml | *.kt | *.properties) ;;
         *) return 0 ;;
     esac
+
+    is_addon_project "$file" || return 0
 
     # 1. Perda de dado já ocorrida: nada a converter, o byte original não existe mais.
     #    exit 2 em PostToolUse devolve o stderr para o agente.
@@ -72,6 +89,8 @@ selftest() {
     dir=$(mktemp -d) || exit 1
     fails=0
 
+    echo "plugins { id 'br.com.sankhya.addonstudio' }" > "$dir/build.gradle"
+
     hex() { LC_ALL=C od -An -tx1 "$1" | tr -d ' \n'; }
 
     check() {
@@ -103,6 +122,21 @@ selftest() {
     printf 'ol\303\241\n' > "$dir/D.md"
     convert_file "$dir/D.md"
     check "extensao ignorada" '6f6cc3a10a' "$(hex "$dir/D.md")"
+
+    # Projeto de outro stack (fora da raiz addon) -> intocado, mesmo com acento
+    outro=$(mktemp -d) || exit 1
+    echo "plugins { id 'java' }" > "$outro/build.gradle"
+    printf 'ol\303\241\n' > "$outro/E.java"
+    convert_file "$outro/E.java"
+    check "projeto nao-addon intocado" '6f6cc3a10a' "$(hex "$outro/E.java")"
+    rm -rf "$outro"
+
+    # Submodulo sem o plugin, mas sob raiz que aplica -> convertido
+    mkdir -p "$dir/addon-vc"
+    echo "plugins { id 'java' }" > "$dir/addon-vc/build.gradle"
+    printf 'ol\303\241\n' > "$dir/addon-vc/F.java"
+    convert_file "$dir/addon-vc/F.java"
+    check "submodulo -vc convertido" '6f6ce10a' "$(hex "$dir/addon-vc/F.java")"
 
     # Nenhum .tmp adjacente deixado para trás
     check "sem .tmp residual" '' "$(ls "$dir" | grep '\.tmp$' || true)"
