@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.1.4] - 2026-09-23
+
 ### Alterado
 
 - Skill `value`: o limite de 50 caracteres do `description` no `parameter.xml` passa a dizer de onde vem (`TSIPAR.DESCRICAO`, `VARCHAR2(50)`) e quando estoura — a instalação passa, porque o parâmetro só vive dentro do addon até alguém alterá-lo nas Preferências do ERP; é a gravação na `TSIPAR` que falha, na mão do usuário final.
@@ -353,7 +355,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.3...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.4...HEAD
+[3.1.4]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.3...v3.1.4
 [3.1.3]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.2...v3.1.3
 [3.1.2]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.1...v3.1.2
 [3.1.1]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.0...v3.1.1
