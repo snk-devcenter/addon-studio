@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Corrigido
+
+- Hook de encoding: com o plugin instalado, ele convertia para ISO-8859-1 qualquer `.java`/`.xml`/`.kt`/`.properties` editado na máquina, inclusive de projetos que não são Addon Studio. Agora só converte arquivo sob uma raiz cujo `build.gradle`/`build.gradle.kts` aplica o plugin `br.com.sankhya.addonstudio` — a subida na árvore mantém o módulo `-vc`, que não aplica o plugin, coberto pela raiz.
+
 ## [3.1.4] - 2026-09-23
 
 ### Alterado
