@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.1.5] - 2026-09-23
+
 ### Corrigido
 
 - Hook de encoding: com o plugin instalado, ele convertia para ISO-8859-1 qualquer `.java`/`.xml`/`.kt`/`.properties` editado na máquina, inclusive de projetos que não são Addon Studio. Agora só converte arquivo sob uma raiz cujo `build.gradle`/`build.gradle.kts` aplica o plugin `br.com.sankhya.addonstudio` — a subida na árvore mantém o módulo `-vc`, que não aplica o plugin, coberto pela raiz.
@@ -359,7 +361,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.4...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.5...HEAD
+[3.1.5]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.4...v3.1.5
 [3.1.4]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.3...v3.1.4
 [3.1.3]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.2...v3.1.3
 [3.1.2]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.1...v3.1.2
