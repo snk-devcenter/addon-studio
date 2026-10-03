@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.2.0] - 2026-10-03
+
 ### Adicionado
 
 - Skill `merge-on-root`: campo novo em entidade nativa (Parceiro, Produto, Nota...) ou do addon via tabela de extensão com a mesma PK, fundida na tela e no registro da raiz por `@OneToOne` com `@ref-param[merge-on-root=true]` — dbscript, XML do dicionário (extensão e relação na raiz) e entidades Java no padrão do plugin, sem autoDD.
@@ -386,7 +388,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.5...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.2.0...HEAD
+[3.2.0]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.5...v3.2.0
 [3.1.5]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.4...v3.1.5
 [3.1.4]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.3...v3.1.4
 [3.1.3]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.2...v3.1.3
