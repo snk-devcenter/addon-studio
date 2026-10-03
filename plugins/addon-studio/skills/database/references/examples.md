@@ -181,38 +181,6 @@
 </scripts>
 ```
 
-## V003-ALTER_TABLE_TGFCAB.xml — Tabela nativa (somente colunas customizadas)
-
-```xml
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<scripts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="../.gradle/scripts.xsd">
-
-    <sql nomeTabela="TGFCAB" ordem="1" executar="SE_NAO_EXISTIR"
-         tipoObjeto="COLUMN" nomeObjeto="XYZ_CODRECEITA"
-         descricao="Adicionar campo XYZ_CODRECEITA na tabela TGFCAB">
-        <mssql>
-            ALTER TABLE TGFCAB ADD XYZ_CODRECEITA VARCHAR(100)
-        </mssql>
-        <oracle>
-            ALTER TABLE TGFCAB ADD (XYZ_CODRECEITA VARCHAR2(100))
-        </oracle>
-    </sql>
-
-    <sql nomeTabela="TGFCAB" ordem="2" executar="SE_NAO_EXISTIR"
-         tipoObjeto="COLUMN" nomeObjeto="XYZ_STATUS"
-         descricao="Adicionar campo XYZ_STATUS na tabela TGFCAB">
-        <mssql>
-            ALTER TABLE TGFCAB ADD XYZ_STATUS VARCHAR(50)
-        </mssql>
-        <oracle>
-            ALTER TABLE TGFCAB ADD (XYZ_STATUS VARCHAR2(50))
-        </oracle>
-    </sql>
-
-</scripts>
-```
-
 ## V005-INSERT_DATA_PRXXYZCTL.xml — Dados iniciais
 
 PK derivada de `MAX+1` (o dicionário é dono da sequência) e idempotência pela **chave de negócio** (`ROTINA`), não pela PK:

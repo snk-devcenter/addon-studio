@@ -17,7 +17,7 @@ Entidade Java (@JapeEntity) -> XML do Dicionario -> Limpar entidade Java
 | `isNativeTable` | `isNativeInstance` | Tag raiz        | Tag de instancia      |
 |:----------------|:-------------------|:----------------|:----------------------|
 | omitido         | omitido            | `<table>`       | `<instance>`          |
-| `true`          | omitido            | `<nativeTable>` | `<instance>`          |
+| `true`          | omitido            | `<nativeTable>` | `<instance>` — legado: instancia nova sobre tabela nativa nao se cria mais (skill `merge-on-root`) |
 | `true`          | `true`             | `<nativeTable>` | `<nativeInstance>`    |
 
 Atributo `name` da tag raiz vem de `@JapeEntity(table = "...")`. Atributo `name` da tag de instancia vem de `@JapeEntity(entity = "...")`.

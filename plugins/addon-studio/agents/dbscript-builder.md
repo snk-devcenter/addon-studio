@@ -154,22 +154,9 @@ Ações:
 </sql>
 ```
 
-#### 4.3 Tabela nativa — somente ALTER, coluna prefixada `<MOD3>_`
+#### 4.3 Tabela nativa — sem script
 
-```xml
-<sql nomeTabela="TGFCAB" ordem="1" executar="SE_NAO_EXISTIR"
-     tipoObjeto="COLUMN" nomeObjeto="XYZ_STATUS"
-     descricao="Adicionar campo custom XYZ_STATUS em TGFCAB">
-    <mssql>
-        ALTER TABLE TGFCAB ADD XYZ_STATUS VARCHAR(1)
-    </mssql>
-    <oracle>
-        ALTER TABLE TGFCAB ADD (XYZ_STATUS VARCHAR2(1))
-    </oracle>
-</sql>
-```
-
-Coluna custom em tabela nativa: prefixo `<MOD3>_` UPPER (ex.: `XYZ_STATUS`, `FIN_TAXA`).
+Tabela nativa (`TGFCAB`, `TGFPAR`...) não recebe DDL do addon — nem CREATE, nem coluna nova. Campo novo em entidade nativa vai para uma tabela de extensão com a mesma PK (script de tabela nova, 4.1/4.2), fundida via merge-on-root: `Read ${CLAUDE_PLUGIN_ROOT}/skills/merge-on-root/SKILL.md`.
 
 ### 5. Tipos por banco
 
@@ -184,8 +171,7 @@ Macros SQL Sankhya (`dbDate`, `nullValue`, etc.) funcionam em `<expression>` do 
 - [ ] Omitir uma das tags `<oracle>` ou `<mssql>` — **sempre** dual
 - [ ] Ponto-e-vírgula `;` no final do SQL (parser quebra)
 - [ ] CREATE TABLE com todas as colunas (forma "fat") — usar ALTER incremental
-- [ ] CREATE TABLE para tabela nativa — só ALTER
-- [ ] ALTER em coluna nativa de tabela nativa — proibido
+- [ ] CREATE TABLE ou ALTER TABLE em tabela nativa — campo novo vai para tabela de extensão (merge-on-root)
 - [ ] Modificar estrutura de colunas nativas do Sankhya core
 - [ ] Usar prefixo genérico `AD_` em tabela nova — usar convenção `<PRX><MOD3>` do projeto
 - [ ] `ordem` duplicada dentro do mesmo arquivo

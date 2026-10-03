@@ -108,43 +108,24 @@ Log, registro, historico e auditoria seguem o default `"A"` — a PK e sequencia
 
 > **Não confundir com `<treeTable>`:** os nomes `CODORIG`/`CODPROD`/`NURELACAO` aqui são exemplos arbitrários de PK composta entre tabelas distintas. Em `<treeTable>` a coluna que aponta pro pai **chama-se sempre `CODIGOPAI`** (nome fixo do framework, não pode ser renomeado). Ver `tree-table.md`.
 
-### nativeTable + nativeInstance (entidade nativa Sankhya estendida)
+### nativeTable + nativeInstance (relacao de merge-on-root)
+
+Tabela de extensao do addon fundida na instancia nativa — sem `<fields>` na `<nativeTable>`. Fluxo completo (dbscript, `<table>` da extensao, Java) na skill `merge-on-root`.
 
 ```xml
-<nativeTable name="TGFTOP">
+<nativeTable name="TGFPRO">
     <instances>
-        <nativeInstance name="TipoOperacao">
+        <nativeInstance name="Produto">
             <relationShip>
-                <relation entityName="PrxXyzVinculoTop" insert="N" update="N" relation="OneToOne" removeCascade="N">
+                <relation entityName="PrxXyzComplementoProduto" relation="OneToOne" insert="S" update="S">
+                    <expression><![CDATA[@ref-param[merge-on-root=true]]]></expression>
                     <fields>
-                        <field localName="CODTIPOPER" targetName="CODTIPOPER"/>
+                        <field localName="CODPROD" targetName="CODPROD"/>
                     </fields>
                 </relation>
             </relationShip>
         </nativeInstance>
     </instances>
-    <fields>
-        <field name="XYZ_CAMPOCUSTOM" dataType="CHECKBOX" UITabName="XyzAddon" allowSearch="N" visibleOnSearch="N">
-            <description>Campo Customizado</description>
-        </field>
-    </fields>
-</nativeTable>
-```
-
-### nativeTable + instance nova (addon cria instancia logica sobre tabela nativa)
-
-```xml
-<nativeTable name="TGFDFAGR">
-    <instances>
-        <instance name="PrxXyzDefensivos">
-            <description>Defensivos Agricolas</description>
-        </instance>
-    </instances>
-    <fields>
-        <field name="NUMRECEITAGRO" dataType="TEXTO" size="50" UITabName="__main" allowSearch="S" visibleOnSearch="S">
-            <description>Num. Receituario</description>
-        </field>
-    </fields>
 </nativeTable>
 ```
 

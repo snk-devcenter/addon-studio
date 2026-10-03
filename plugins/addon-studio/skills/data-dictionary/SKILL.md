@@ -1,6 +1,6 @@
 ---
 name: data-dictionary
-description: Tela de cadastro que o **próprio Sankhya monta a partir da tabela**, declarada no XML do dicionário (`datadictionary/<TABELA>.xml`) — sem escrever JS nem HTML. Sinal prático: se a tela não tem pasta própria em `webapp/html5/`, ela é gerada daqui, e label, campo obrigatório, filtro e item de menu dela moram neste XML. Use ao criar, alterar, revisar, auditar ou padronizar arquivos em `datadictionary/`; quando o pedido é "quero que essa tabela vire uma tela de cadastro", "campo obrigatório / lista de opções / busca de parceiro na tela" ou "quero a tabela no menu"; ao ajustar ou traduzir label de campo, de menu ou qualquer texto/rótulo dessa tela — é o dono default quando o dev diz "label/texto da tela" sem citar `webapp/html5/`; ao receber spec de tabela/entidade hierárquica; ao definir metadados/UI de uma tabela; ao mapear tipos; ou ao tocar em XML com tag raiz `<metadados>`. Cobre `<table>`, `<treeTable>`, `<nativeTable>`, `<instance>`, `<fields>`, `<filters>`, `<menu>`, `<dynamicForm>`, `<dynamicTreeView>`, `dataType` (TEXTO/INTEIRO/DECIMAL/DATA/DATA_HORA/HORA/CHECKBOX/LISTA/PESQUISA), `<expression>`, `calculated`, lookups e relacionamentos. NÃO usar para índice, constraint ou `NOT NULL` no banco — isso é `database`. NÃO usar para tela própria do addon em `webapp/html5/`, nem quando a tela precisa enviar dados para um endpoint/serviço do addon ou ter lógica própria (formulário que chama seu `@Controller`) — isso é `sankhya-js`.
+description: Tela de cadastro que o **próprio Sankhya monta a partir da tabela**, declarada no XML do dicionário (`datadictionary/<TABELA>.xml`) — sem escrever JS nem HTML. Sinal prático: se a tela não tem pasta própria em `webapp/html5/`, ela é gerada daqui, e label, campo obrigatório, filtro e item de menu dela moram neste XML. Use ao criar, alterar, revisar, auditar ou padronizar arquivos em `datadictionary/`; quando o pedido é "quero que essa tabela vire uma tela de cadastro", "campo obrigatório / lista de opções / busca de parceiro na tela" ou "quero a tabela no menu"; ao ajustar ou traduzir label de campo, de menu ou qualquer texto/rótulo dessa tela — é o dono default quando o dev diz "label/texto da tela" sem citar `webapp/html5/`; ao receber spec de tabela/entidade hierárquica; ao definir metadados/UI de uma tabela; ao mapear tipos; ou ao tocar em XML com tag raiz `<metadados>`. Cobre `<table>`, `<treeTable>`, `<nativeTable>`, `<instance>`, `<fields>`, `<filters>`, `<menu>`, `<dynamicForm>`, `<dynamicTreeView>`, `dataType` (TEXTO/INTEIRO/DECIMAL/DATA/DATA_HORA/HORA/CHECKBOX/LISTA/PESQUISA), `<expression>`, `calculated`, lookups e relacionamentos. NÃO usar para índice, constraint ou `NOT NULL` no banco — isso é `database`. NÃO usar para campo novo em tabela nativa (`<field>` em `<nativeTable>`) — isso é `merge-on-root`. NÃO usar para tela própria do addon em `webapp/html5/`, nem quando a tela precisa enviar dados para um endpoint/serviço do addon ou ter lógica própria (formulário que chama seu `@Controller`) — isso é `sankhya-js`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -47,7 +47,7 @@ Entidade Java (`@JapeEntity`) = classe dominio **limpa** — so `@Column(name = 
 |:------------------|:-------------------------------------------------------------------------|
 | `<table />`       | Tabela **nova** criada pelo add-on.                                      |
 | `<treeTable />`   | Tabela **hierarquica** (pai/filho) — cadastros tipo centro de custo, categorias de produto, organogramas. Framework gera UI tree + campos `CODIGOPAI`/`ANALITICO`/`GRAU`. Detalhes em [`references/tree-table.md`](references/tree-table.md). |
-| `<nativeTable />` | Extensao tabela **nativa** Sankhya Om (adiciona campos/instancia). |
+| `<nativeTable />` | Tabela **nativa** Sankhya Om: so para declarar `<nativeInstance>` com `<relationShip>` (ex.: relacao de merge-on-root). **Nao** adiciona campo nem instancia nova — campo novo em entidade nativa e skill `merge-on-root`. Ver 1.10. |
 | `<nativeFolder />`| Encaixe em pasta nativa Sankhya: atributo `name` (`CONFIGURACOES_CADASTROS`/`_CONSULTA`/`_ROTINA`/`_RELATORIO`), filhos iguais aos de `<folder>`. Detalhes em [`references/menu.md`](references/menu.md). |
 | `<menu />`        | Estrutura de menu/navegacao do add-on. Container para `<folder>`, `<dynamicForm>`, `<dynamicTreeView>`, `<ui>`, `<dashboard>`. **Todo no de menu leva `resourceId` explicito de no maximo 50 caracteres** — sem isso o deploy pode derrubar o add-on inteiro. Detalhes em [`references/menu.md`](references/menu.md). |
 | `<dynamicForm />` | Tela CRUD declarativa (sem JS/HTML) gerada a partir de uma `<instance>` da tabela. Vai dentro de `<menu>`/`<folder>`. Detalhes em [`references/dynamic-form.md`](references/dynamic-form.md). |
@@ -94,7 +94,7 @@ Entidade Java (`@JapeEntity`) = classe dominio **limpa** — so `@Column(name = 
 |:----------------------------------------------------------------------------|:-------------------------------------------------------------------|
 | PK composta so de FKs (tabela de ligacao/vinculo)                           | Nao existe coluna pra sequenciar — o valor sai das FKs             |
 | PK e codigo de negocio informado pelo usuario ou por sistema externo         | O valor tem significado fora do addon; framework nao pode inventar |
-| PK espelha chave de registro nativo Sankhya (1:1 com `NUNOTA`, `CODPARC`, ...) | O valor ja existe no registro nativo                              |
+| PK espelha chave de registro nativo Sankhya (1:1 com `NUNOTA`, `CODPARC`, ... — tabela de extensao do `merge-on-root`) | O valor ja existe no registro nativo                              |
 
 > **Por que `"M"` fora desses casos esta errado:** joga a geracao da PK pra aplicacao (`MAX+1` — corrida sob concorrencia) e quebra a gravacao pela tela do dicionario, que conta com a sequencia do framework. **Sintoma tipico:** usuario clica em "novo" na tela gerada, grava, e estoura `ORA-01400: cannot insert NULL into (<TABELA>.<PK>)` — a tela nao preenche PK que o framework nao gera. Tabela de log/config/apoio com PK manual e defeito, nao escolha de design.
 >
@@ -156,7 +156,7 @@ Define entidade (instancia JAPE) da tabela. Existem duas tags possiveis dentro d
 
 | Tag                    | Quando usar                                                                                  |
 |:-----------------------|:---------------------------------------------------------------------------------------------|
-| `<instance>`           | Instancia **nova**, criada pelo addon. Permitida em `<table>` e em `<nativeTable>`.          |
+| `<instance>`           | Instancia **nova**, criada pelo addon, sobre tabela do addon (`<table>`/`<treeTable>`). Nao crie instancia nova sobre tabela nativa (ver 1.10). |
 | `<nativeInstance>`     | Instancia **nativa do Sankhya** (ex.: `CabecalhoNota`, `Parceiro`, `Produto`). **Somente** dentro de `<nativeTable>`. |
 
 ```xml
@@ -187,23 +187,7 @@ Define entidade (instancia JAPE) da tabela. Existem duas tags possiveis dentro d
 | `resourceId`     | Nao         | Identificador do recurso da instancia no Sankhya. Formato `br.com.sankhya.<projeto>.<idtela>`. |
 | `parentInstance` | Nao         | `resourceId` da instancia **nativa** da qual esta deriva. Declara a instancia como alias/derivada da nativa. |
 
-**`parentInstance` — alias de instancia nativa.** Use quando o addon cria uma instancia propria sobre uma tabela nativa mas quer herdar o vinculo com a instancia nativa correspondente (telas, permissoes, comportamento). O valor e o `resourceId` da nativa, **nao** o `name`:
-
-```xml
-<nativeTable name="<TABELA_NATIVA>">
-    <instances>
-        <instance name="<Prx><Mod><Ctx>"
-                  resourceId="br.com.sankhya.<projeto>.<idtela>"
-                  parentInstance="<resourceId da instancia nativa alvo>">
-            <description>...</description>
-        </instance>
-    </instances>
-</nativeTable>
-```
-
-> O `resourceId` da instancia nativa alvo **nao** e adivinhavel — confira no dicionario do ambiente (`TDDINS`) ou no metadata nativo. Nunca invente o valor a partir do nome da instancia.
-
-> Sem `parentInstance`, a instancia nasce solta — perde o vinculo com a nativa. Omitir o atributo na geracao **dropa a informacao silenciosamente** (o XSD nao exige).
+`parentInstance` existe no XSD para instancia propria do addon sobre tabela nativa — caminho que nao se usa mais: estender entidade nativa e skill `merge-on-root`.
 
 > **Por que `<nativeInstance>` ao inves de `<instance>`:** ambas as tags geram a mesma entidade no runtime, mas `<nativeInstance>` sinaliza para o builder que a instancia **ja existe** no Sankhya nativo e **nao** deve ser regravada no `metadata.xml` final. Se uma instancia nativa for declarada como `<instance>`, o deploy do addon re-mapeia o owner da instancia para o addon e quebra regras de negocio, validacoes e telas nativas que dependem dela. Pareie sempre com `isNativeInstance = true` no `@JapeEntity` correspondente (ver `entity` secao 1.2).
 
@@ -215,7 +199,6 @@ Padrao parametrizado por `<PRX>` (prefixo) + `<MOD3>` (modulo). Ver `database` s
 |:----------------------------------------|:----------------------------------------|:-----------------------------|
 | `<table name="...">`                    | `<PRX><MOD3><CTX>` (UPPER)              | `PRXXYZCAB`                  |
 | `<instance name="...">` (em `<table>`)  | `<Prx><Mod><Ctx>` (PascalCase)          | `PrxXyzCabecalho`            |
-| `<instance name="...">` (em `<nativeTable>`, instancia nova) | `<Prx><Mod><Ctx>` (PascalCase) | `PrxXyzDefensivos`     |
 | `<nativeInstance name="...">` (em `<nativeTable>`) | Nome **exato** da instancia nativa Sankhya | `CabecalhoNota`, `Parceiro`, `ItemNota` |
 
 Componentes do prefixo addon:
@@ -450,60 +433,37 @@ Campos que referenciam outra entidade: `dataType="PESQUISA"` + `targetInstance`,
 
 ---
 
-## 1.10 Extensao de Tabela Nativa (`<nativeTable>`)
+## 1.10 Tabela Nativa (`<nativeTable>`)
 
-Estende tabelas Sankhya Om. **Sem** `<primaryKey>` nem `sequenceType`.
+`<nativeTable>` so declara relacao em instancia nativa: `<nativeInstance>` com `<relationShip>`. **Sem** `<primaryKey>`, `sequenceType`, `<fields>` ou `<instance>` nova.
 
-- Declare **todos campos usados pela entidade** (nativos + custom).
-- Prefixo exclusivo add-on (ex: `XYZ_`) nos custom pra evitar conflito.
+- **Campo novo em entidade nativa nao vai aqui.** O `<fields>` de `<nativeTable>` cria coluna na tabela nativa e o `metadados.xsd` o marca como deprecated. O caminho e uma tabela de extensao com merge-on-root — skill `merge-on-root`.
+- **Instancia nova do addon sobre tabela nativa** tambem nao se usa mais: a informacao nova vai para a tabela de extensao, com instancia propria em `<table>`.
 
-Dentro de `<nativeTable>` ha **dois cenarios** para a tag de instancia, conforme a entidade alvo seja nativa ou nova (ver tabela completa em 1.6):
-
-### Cenario A — Instancia **nativa** Sankhya: `<nativeInstance>`
-
-Use quando a entidade ja existe no Sankhya nativo (`CabecalhoNota`, `Parceiro`, `ItemNota`, `TipoOperacao`, `Produto`, etc.). Combine sempre com `isNativeTable = true` **e** `isNativeInstance = true` no `@JapeEntity`.
+Uso tipico — relacao de merge-on-root na instancia nativa:
 
 ```xml
-<nativeTable name="TGFTOP">
+<nativeTable name="TGFPAR">
     <instances>
-        <nativeInstance name="TipoOperacao">
+        <nativeInstance name="Parceiro">
             <relationShip>
-                <relation entityName="PrxXyzVinculo" insert="N" update="N" relation="OneToOne" removeCascade="N">
+                <relation entityName="PrxXyzIntegracaoParceiro" relation="OneToOne" insert="S" update="S">
+                    <expression><![CDATA[@ref-param[merge-on-root=true]]]></expression>
                     <fields>
-                        <field localName="CODTIPOPER" targetName="CODTIPOPER"/>
+                        <field localName="CODPARC" targetName="CODPARC"/>
                     </fields>
                 </relation>
             </relationShip>
         </nativeInstance>
     </instances>
-    <fields>
-        <field name="XYZ_HABILITADO" dataType="CHECKBOX" UITabName="XyzAddon" allowSearch="N" visibleOnSearch="N">
-            <description>Habilitado</description>
-        </field>
-    </fields>
 </nativeTable>
 ```
 
-> `<nativeInstance>` aceita apenas `<relationShip>` opcional — sem `<description>`, sem campos adicionais. Os campos vao no `<fields>` da `<nativeTable>`.
+Combine com `isNativeTable = true` **e** `isNativeInstance = true` no `@JapeEntity` da raiz, se ela tiver entidade Java (skill `entity`, secao 1.2).
 
-### Cenario B — Instancia **nova** do addon em tabela nativa: `<instance>`
+> `<nativeInstance>` aceita apenas `<relationShip>` opcional — sem `<description>`, sem campos.
 
-Use quando o addon cria uma instancia logica nova sobre uma tabela nativa (ex.: `PrxXyzDefensivos` sobre `TGFDFAGR`). Combine com `isNativeTable = true` no `@JapeEntity`, **sem** `isNativeInstance`.
-
-```xml
-<nativeTable name="TGFDFAGR">
-    <instances>
-        <instance name="PrxXyzDefensivos">
-            <description>Defensivos Agricolas</description>
-        </instance>
-    </instances>
-    <fields>
-        <field name="NUMRECEITAGRO" dataType="TEXTO" size="50" UITabName="__main" allowSearch="S" visibleOnSearch="S">
-            <description>Num. Receituario</description>
-        </field>
-    </fields>
-</nativeTable>
-```
+> Projeto que ja tem `<field>` em `<nativeTable>`: nao acrescente outros. Campo novo vai para a tabela de extensao.
 
 ---
 
@@ -560,7 +520,7 @@ Campos pra entidades com correspondencia em sistemas externos. Inclui ID origem 
 
 ## 1.12 Exemplos Completos
 
-Exemplos completos de XML — tabela com sequência AUTO/MANUAL, PK simples e composta, `nativeTable + nativeInstance`, `nativeTable + instance` (addon cria instância lógica em tabela nativa), e exemplo XML→Java integrado — em [`references/examples.md`](references/examples.md).
+Exemplos completos de XML — tabela com sequência AUTO/MANUAL, PK simples e composta, `nativeTable + nativeInstance` (relacao de merge-on-root), e exemplo XML→Java integrado — em [`references/examples.md`](references/examples.md).
 
 ---
 
@@ -579,7 +539,7 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 ## 4.1 Checklist: Criando XML do zero (solicitacao do usuario)
 
 1. [ ] Criar `<NOME_TABELA>.xml` em `datadictionary/`.
-2. [ ] `<table>` pra novas ou `<nativeTable>` pra nativas. Em `<nativeTable>`, escolher `<instance>` (instancia nova do addon) ou `<nativeInstance>` (instancia nativa Sankhya — nome reusa entidade do ERP).
+2. [ ] `<table>` pra tabela do addon. `<nativeTable>` so para relacao em `<nativeInstance>` (nome reusa entidade do ERP) — campo novo em tabela nativa e `merge-on-root`.
 3. [ ] `sequenceType="A"` + `sequenceField="<coluna PK>"` (default — inclui config/log/historico). `"M"` so nas excecoes da secao 1.4.
 4. [ ] Declarar `<description>` da `<table>` (vai pra `TDDTAB.DESCRTAB`, NOT NULL).
 5. [ ] Declarar `<primaryKey>` com campos PK.
@@ -637,6 +597,8 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 | Usar `@Expression` ou `@GeneratedValue` no Java  | Remover — vao pra `<expression>` e `sequenceType` no XML.       |
 | `@JoinColumn` com `name` e `referencedColumnName` invertidos | `name` = campo local (na tabela com `@JoinColumn`). `referencedColumnName` = campo na referenciada. Ver [`references/xml-to-java.md`](references/xml-to-java.md), seção "FK que referencia campo nao-PK". |
 | Usar `<instance>` para instancia nativa Sankhya em `<nativeTable>` | Usar `<nativeInstance>`. `<instance>` faz o builder regravar a entrada no `metadata.xml`; durante o deploy a instancia e re-mapeada para o owner do addon e quebra regras/validacoes nativas. |
+| `<field>` dentro de `<nativeTable><fields>` | Campo vai para tabela de extensao com merge-on-root (skill `merge-on-root`) — o XSD marca esse `<fields>` como deprecated. |
+| `<instance>` nova do addon dentro de `<nativeTable>` | Tabela de extensao com instancia propria em `<table>` + merge-on-root. |
 | Esquecer `<nativeInstance>` quando o `entity` Java reusa nome nativo (`CabecalhoNota`, `Parceiro`, `Produto`, etc.) | Trocar `<instance>` por `<nativeInstance>` no XML e adicionar `isNativeInstance = true` no `@JapeEntity`. |
 
 
@@ -644,4 +606,5 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 
 - `entity` — classe Java `@JapeEntity` que mapeia a tabela definida neste XML
 - `database` — dbscript que materializa a tabela no banco
+- `merge-on-root` — campo novo em entidade nativa (ou do addon) via tabela de extensao 1:1
 - `macros` — macros do MacroTranslator para SQL portável Oracle/MSSQL no campo `<expression>`

@@ -10,8 +10,13 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Adicionado
+
+- Skill `merge-on-root`: campo novo em entidade nativa (Parceiro, Produto, Nota...) ou do addon via tabela de extensão com a mesma PK, fundida na tela e no registro da raiz por `@OneToOne` com `@ref-param[merge-on-root=true]` — dbscript, XML do dicionário (extensão e relação na raiz) e entidades Java no padrão do plugin, sem autoDD.
+
 ### Alterado
 
+- Skills `data-dictionary`, `database` e `entity`, sub-agents `dbscript-builder` e `entity-architect` e o `README.md` deixam de ensinar coluna nova em tabela nativa (`ALTER TABLE` em `TGF*`, `<field>` em `<nativeTable>`, marcado como deprecated no `metadados.xsd`) e instância nova do addon sobre tabela nativa; o caminho passa a ser `merge-on-root`.
 - Sub-agent `dbscript-builder` roda em `sonnet` em vez de `haiku` — o plugin usa só Opus e Sonnet.
 - `@Controller` nunca acessa repository: o dado passa por um service `@Component`. A regra entra no `ADDON.md` (sempre ativa) e nas skills `controller`, `dependency-injection` e `repository`.
 - Skill `controller` cataloga `@Service` como erro comum: é legado, endpoint é `@Controller` e service de negócio é `@Component`.

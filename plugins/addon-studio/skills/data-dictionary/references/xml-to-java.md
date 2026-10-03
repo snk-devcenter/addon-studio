@@ -13,7 +13,7 @@ XML do Dicionario -> Entidade Java (@JapeEntity) limpa
 | Tag raiz XML    | Tag instancia XML    | `@JapeEntity` resultante                                                                                  |
 |:----------------|:---------------------|:-----------------------------------------------------------------------------------------------------------|
 | `<table>`       | `<instance>`         | `@JapeEntity(entity = "<instance.name>", table = "<table.name>")`                                          |
-| `<nativeTable>` | `<instance>`         | `@JapeEntity(entity = "<instance.name>", table = "<nativeTable.name>", isNativeTable = true)`              |
+| `<nativeTable>` | `<instance>`         | `@JapeEntity(entity = "<instance.name>", table = "<nativeTable.name>", isNativeTable = true)` — legado: nao criar novo (skill `merge-on-root`) |
 | `<nativeTable>` | `<nativeInstance>`   | `@JapeEntity(entity = "<nativeInstance.name>", table = "<nativeTable.name>", isNativeTable = true, isNativeInstance = true)` |
 
 ---
