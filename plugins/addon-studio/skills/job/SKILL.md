@@ -312,7 +312,7 @@ public class MeuJob extends IJob {
 
 ## 7. Boas Praticas
 
-- **Logica em Services**: `onSchedule()` orquestra — delega para `@Component`.
+- **Classe enxuta (boa pratica)**: `onSchedule()` orquestra e delega para outra classe injetada (ex.: service `@Component`) — a organizacao em camadas e do projeto.
 - **Tratamento de erros**: sempre `try/catch` no `onSchedule()` — falha sem captura pode impedir execucoes futuras.
 - **Logging**: `@Log` Lombok + `java.util.logging`. Nunca `System.out`.
 - **Transacao adequada**: escrita → `@Transactional` no metodo do service; lote item a item → metodo por item com `REQUIRES_NEW`; somente leitura → consulta tambem sob `@Transactional` (sessao JAPE).
@@ -333,7 +333,6 @@ public class MeuJob extends IJob {
 | CRON com prefixo `&` (ex.: `"&0 0 2 * * ?"`)            | CRON e SEM `&`; `&` so para intervalo em ms               |
 | `getScheduleConfigHook()` retornando `String` p/ freq   | `getScheduleConfig()` retorna a freq (`Hook` e `void`/obsoleto) |
 | `TransactionType.X`                                     | `EJBTransactionType.X`                                    |
-| Logica de negocio no `onSchedule()`                     | Mover para Service (`@Component`)                         |
 | `System.out.println` para logging                       | `@Log` Lombok + `java.util.logging`                       |
 | `new` em dependencias gerenciadas                       | Injetar via construtor com `@Inject`                      |
 | `@Transactional` no `onSchedule()` com `try/catch` que so loga | Commita a escrita parcial — `@Transactional` no metodo do service |

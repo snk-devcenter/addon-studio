@@ -201,6 +201,7 @@ public Object call(String id, Map<String, Object> data) {
 
 - **Ordem não é garantida.** Vários callbacks podem estar registrados no mesmo evento (outros add-ons, configuração do ambiente). Nunca faça um depender do outro nem do que outro gravou.
 - **Velocidade.** Roda dentro da transação da confirmação: milissegundos. Chamada externa (HTTP, e-mail, fila) sempre assíncrona.
+- **Classe enxuta (boa prática).** O `call` filtra o evento e delega a regra para outra classe injetada (ex.: service `@Component`) — a organização em camadas é do projeto.
 - **`@Transactional` no service chamado daqui: confira o `TxType`.** O callback já roda dentro da sessão e da transação da operação. `@Transactional` bare (`REQUIRED`, o default) entra nessa transação — caso seguro. `REQUIRES_NEW` suspende a transação da operação e commita por conta própria: se a operação for revertida depois, o que ele gravou fica. `NOT_SUPPORTED` roda fora dela e não participa do commit/rollback. Nada falha na hora — o bug só aparece quando a operação dá erro depois da chamada.
 
 ---
@@ -226,7 +227,6 @@ public Object call(String id, Map<String, Object> data) {
 | `AFTER` assumindo que a operação deu certo              | Checar `data.get("error")` antes de qualquer efeito                          |
 | Exceção para dar um aviso ao usuário                    | `bRegras.addMensagem(...)`; exceção é para abortar                           |
 | Chamada síncrona a API/Web Service                      | `CompletableFuture`, `ExecutorService` ou JMS                                |
-| Lógica de negócio dentro do `call`                      | Delegar para Service (`@Component`)                                          |
 | `new` em dependência gerenciada                         | Injetar via construtor com `@Inject`                                         |
 | Usar `INSERTION` para reagir a CRUD de tabela           | Usar `@Listener`                                                             |
 

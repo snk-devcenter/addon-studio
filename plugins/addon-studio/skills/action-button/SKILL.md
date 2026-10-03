@@ -235,7 +235,7 @@ public class ExportarDadosAction implements AcaoRotinaJava {
 
 ## 7. Boas Praticas
 
-- **Logica em Services**: `doAction()` orquestra — nao implementa regra de negocio. Delegue para `@Component`.
+- **Classe enxuta (boa pratica)**: `doAction()` orquestra e delega a regra para outra classe injetada (ex.: service `@Component`) — a organizacao em camadas e do projeto.
 - **`resourceId` sempre que possivel**: Evita poluir menu "Acoes" de outras telas que usam a mesma entidade.
 - **Feedback obrigatorio**: Sempre chame `contexto.setMensagemRetorno()`. Usuario sem retorno pensa que nada ocorreu.
 - **`accessControlled`**: Default e `false`. Defina `true` quando a visibilidade do botao deve respeitar as permissoes de acesso do usuario a tela.
@@ -252,7 +252,6 @@ public class ExportarDadosAction implements AcaoRotinaJava {
 | Em `AUTOMATIC`, chamar metodo de service `REQUIRES_NEW`/`NOT_SUPPORTED` sem querer | Gravacao escapa do rollback da acao — usar metodo `REQUIRED` (bare) ou isolar de proposito |
 | `type = FieldType.CHECKBOX` | Nao existe — usar `FieldType.BOOLEAN` |
 | `refreshType = RefreshTypeEnum.ALL` / `ITEM` | Usar `ALL_ITEMS` / `NONE_ITEM` (valores reais) |
-| Logica de negocio no `doAction()` | Mover para Service (`@Component`) |
 | Nao chamar `setMensagemRetorno()` | Sempre fornecer feedback ao usuario |
 | Usar para logica automatica (salvar/excluir) | Usar `@Listener` |
 | `description` generica ("Processar", "Executar") | Descricao clara e contextualizada |
