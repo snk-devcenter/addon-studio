@@ -1,6 +1,6 @@
 ---
 name: database
-description: Cria, audita e padroniza dbscripts Sankhya (`dbscripts/V<NNN>-*.xml`) com migrations dual MSSQL/Oracle. Cobre convenções de nomenclatura, mapeamento de tipos (`NUMBER`/`NUMERIC`/`INT`/`FLOAT`/`DECIMAL`/`VARCHAR`/`VARCHAR2`/`CHAR`/`DATE`/`DATETIME`/`TIMESTAMP`), estrutura `<sql>`/`<mssql>`/`<oracle>` e atributos `executar`/`tipoObjeto`/`nomeObjeto`. Use ao adicionar, alterar, revisar, padronizar ou auditar arquivos em `dbscripts/`, ao adicionar coluna, tabela, índice ou constraint (`ALTER TABLE`, `CREATE INDEX`, `NOT NULL`, PK/FK), ao popular dados de configuração ou parametrização inicial do módulo (seed/carga de linhas), quando o dev pergunta o que falta para o banco do cliente pegar um campo novo na atualização do addon, ao mapear tipos entre Oracle e MSSQL (função SQL portável — `NVL`, `SYSDATE`, `TRUNC` — é `macros`), ou ao tocar em SQL com tags `<mssql>`/`<oracle>`. `NOT NULL` na coluna é aqui; exigir valor preenchido (string vazia, regra de preenchimento) é `listener`.
+description: Cria, audita e padroniza dbscripts Sankhya (`dbscripts/V<NNN>-*.xml`) com migrations dual MSSQL/Oracle. Cobre convenções de nomenclatura, mapeamento de tipos (`NUMBER`/`NUMERIC`/`INT`/`FLOAT`/`DECIMAL`/`VARCHAR`/`VARCHAR2`/`CHAR`/`DATE`/`DATETIME`/`TIMESTAMP`), estrutura `<sql>`/`<mssql>`/`<oracle>` e atributos `executar`/`tipoObjeto`/`nomeObjeto`. Use ao adicionar, alterar, revisar, padronizar ou auditar arquivos em `dbscripts/`, ao adicionar coluna, tabela, índice ou constraint (`ALTER TABLE`, `CREATE INDEX`, `NOT NULL`, PK/FK), ao popular dados de configuração ou parametrização inicial do módulo (seed/carga de linhas), quando o dev pergunta o que falta para o banco do cliente pegar um campo novo na atualização do addon, ao mapear tipos entre Oracle e MSSQL (função SQL portável — `NVL`, `SYSDATE`, `TRUNC` — é `macros`), ou ao tocar em SQL com tags `<mssql>`/`<oracle>`. `NOT NULL` na coluna é aqui; exigir valor preenchido (string vazia, regra de preenchimento) é `listener`. NÃO usar para coluna nova em tabela nativa (`ALTER TABLE` em `TGF*`/`TSI*`) — isso é `merge-on-root`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -19,7 +19,7 @@ Cada arquivo migração = XML versionamento sequencial estilo **Flyway**:
 dbscripts/
 |-- V001-CREATE_TABLE_PRXXYZCAD.xml
 |-- V002-CREATE_TABLE_PRXXYZFAT.xml
-|-- V003-ALTER_TABLE_TGFCAB.xml
+|-- V003-CREATE_TABLE_PRXXYZIPA.xml
 |-- V004-ALTER_TABLE_PRXXYZCAD.xml
 |-- V005-INSERT_DATA_PRXXYZCTL.xml
 |-- V<NNN>-<OPERACAO>_<TABELA>.xml
@@ -35,7 +35,7 @@ dbscripts/
 |:-------------|:--------------------------------------------------------------------|:---------------------------------------------|
 | `V<NNN>`     | Versão sequencial **3 dígitos** (zero-padded), nunca reutilizar     | `V001`, `V002`, `V003`                       |
 | `<OPERACAO>` | Operação principal script                                           | `CREATE_TABLE`, `ALTER_TABLE`, `INSERT_DATA` |
-| `<TABELA>`   | Nome tabela afetada                                                 | `PRXXYZCAD`, `TGFCAB`                        |
+| `<TABELA>`   | Nome tabela afetada                                                 | `PRXXYZCAD`, `PRXXYZIPA`                        |
 
 ---
 
@@ -165,9 +165,8 @@ Abreviacoes padrao ecossistema Sankhya:
 | `PERC`       | Percentual                          | `PERCMRR`                               |
 | `DESCR`      | Descricao (texto livre)             | `DESCRERRO`, `DESCRPRODUTO`             |
 | `NU`         | Numero unico movimentos/documentos  | `NUNOTA`, `NUIMP`, `NUPED`              |
-| `<MOD>_`     | Coluna customizada em tabela nativa | `XYZ_CODRECEITA`, `XYZ_STATUS`          |
 
-> **Colunas customizadas em tabelas nativas Sankhya** (ex: `TGFCAB`) usam prefixo do **modulo** do addon + `_` (ex: `<MOD>_NOMECAMPO`) para evitar conflito com core Sankhya e com outros addons. Nunca usar prefixo generico tipo `AD_`.
+> **Tabela nativa Sankhya (ex: `TGFCAB`, `TGFPAR`) nao recebe coluna do addon.** Campo novo em entidade nativa vai para uma tabela de extensao do addon (mesma PK) com merge-on-root — skill `merge-on-root`.
 
 > **Chaves primarias sequenciais:** nao usar prefixo `ID`. Para **cadastros**, usar `COD` (ex: `CODCAD`, `CODCFG`); para **movimentos/documentos**, usar `NU` (ex: `NUNOTA`, `NUIMP`).
 
@@ -216,7 +215,7 @@ Abreviacoes padrao ecossistema Sankhya:
 
 ## Padrões de Script por Operação
 
-Padrões completos de DDL — `CREATE TABLE` mínimo (somente PK + constraint), `ALTER TABLE` para adicionar/modificar colunas (uma por `<sql>`), CHECK constraints para `LISTA`/`CHECKBOX`, tabelas nativas (`nativeTable`), relação dicionário ↔ scripts e `INSERT` para dados de configuração — em [`references/script-patterns.md`](references/script-patterns.md).
+Padrões completos de DDL — `CREATE TABLE` mínimo (somente PK + constraint), `ALTER TABLE` para adicionar/modificar colunas (uma por `<sql>`), CHECK constraints para `LISTA`/`CHECKBOX`, relação dicionário ↔ scripts e `INSERT` para dados de configuração — em [`references/script-patterns.md`](references/script-patterns.md).
 
 ---
 
@@ -249,7 +248,7 @@ Campo `LISTA` (valores das `<option>`) e campo `CHECKBOX` (`'S'`/`'N'`) geram **
 </sql>
 ```
 
-Padrões completos — `LISTA`, tabela nativa, evolução das opções (DROP + recreate) — em [`references/script-patterns.md`](references/script-patterns.md).
+Padrões completos — `LISTA`, evolução das opções (DROP + recreate) — em [`references/script-patterns.md`](references/script-patterns.md).
 
 ### Mapeamento Banco -> Tipo do Dicionário (inverso)
 
@@ -333,38 +332,35 @@ CONSTRAINT PK_PRXXYZCAD PRIMARY KEY (CODCAD)
 ### 4. CREATE TABLE para tabela nativa
 
 ```xml
-<!-- ERRADO | tabela nativa não deve ter CREATE TABLE -->
+<!-- ERRADO | tabela nativa já existe — o addon não cria nem recria -->
 <oracle>
     CREATE TABLE TGFCAB (...)
 </oracle>
-
-    <!-- CORRETO | apenas ALTER TABLE para colunas customizadas do addon -->
-<oracle>
-ALTER TABLE TGFCAB ADD (XYZ_CODRECEITA VARCHAR2(100))
-</oracle>
 ```
 
-### 5. ALTER TABLE para coluna nativa em tabela nativa
+### 5. Coluna nova em tabela nativa
 
 ```xml
-<!-- ERRADO | CODPARC já existe na TGFCAB, é coluna nativa -->
+<!-- ERRADO | tabela nativa não recebe coluna do addon -->
 <oracle>
-    ALTER TABLE TGFCAB ADD (CODPARC NUMBER(10))
+    ALTER TABLE TGFCAB ADD (XYZ_CODRECEITA VARCHAR2(100))
 </oracle>
 
-    <!-- CORRETO | somente colunas customizadas com prefixo do addon -->
+    <!-- CORRETO | coluna na tabela de extensão (mesma PK da nativa), fundida via merge-on-root -->
 <oracle>
-ALTER TABLE TGFCAB ADD (XYZ_CODRECEITA VARCHAR2(100))
+ALTER TABLE PRXXYZCCA ADD (CODRECEITA VARCHAR2(100))
 </oracle>
 ```
+
+Tabela nativa tem volume e carga altíssimos (migração em horário de pico derruba o SankhyaOM do cliente), a coluna pode sumir numa atualização da plataforma e a alteração invalida o suporte. Fluxo da extensão na skill `merge-on-root`.
 
 ### 6. Modificar estrutura de colunas nativas do Sankhya
 
-**NUNCA** alterar tabelas ERP core. Pode **adicionar** colunas com prefixo addon, mas **nunca** modificar/remover colunas existentes.
+**NUNCA** alterar tabelas ERP core — nem adicionar, nem modificar, nem remover coluna (ver item 4).
 
 ### 7. Usar prefixo genérico `AD_`
 
-Usar sempre prefixo específico addon (ex: `XYZ_`), nunca `AD_` — causa conflitos com outros add-ons.
+Usar sempre o prefixo do projeto (`<PRX>`) nas tabelas do addon, nunca `AD_` — causa conflitos com outros add-ons.
 
 ### 8. Duplicar `ordem` dentro do mesmo arquivo
 
@@ -417,7 +413,7 @@ script_tabela.xml
 <!-- CORRETO -->
 V001-CREATE_TABLE_PRXXYZCAD.xml
 V002-CREATE_TABLE_PRXXYZFAT.xml
-V003-ALTER_TABLE_TGFCAB.xml
+V003-CREATE_TABLE_PRXXYZIPA.xml
 ```
 
 ---
@@ -434,7 +430,7 @@ V003-ALTER_TABLE_TGFCAB.xml
 8. **Ordem de criação** — tabelas referenciadas criadas antes das que referenciam
 9. **CREATE TABLE mínimo** — **só** colunas PK + constraint PK
 10. **Colunas via ALTER TABLE** — cada coluna não-PK adicionada individualmente via `ALTER TABLE ADD`
-11. **Tabelas nativas sem CREATE** — `<nativeTable>` no dicionário = só ALTER TABLE para colunas customizadas (prefixo addon)
+11. **Tabela nativa sem DDL** — nem CREATE nem ALTER. Campo novo em entidade nativa = tabela de extensão + merge-on-root (skill `merge-on-root`)
 12. **Campos auditoria** — `DHALTER DATE`, `DHCREATE DATE` e `CODUSU NUMBER(10)` **opcionais**. Perguntar usuário se deseja incluir
 13. **Sem ponto-e-vírgula** — não colocar `;` no final SQL
 14. **`ordem` única** — cada `<sql>` no mesmo arquivo com `ordem` distinta
@@ -449,7 +445,7 @@ V003-ALTER_TABLE_TGFCAB.xml
 
 ## Exemplos Completos
 
-Exemplos completos de XMLs — `V001-CREATE_TABLE_PRXXYZCAD.xml` (PK simples), `V002-CREATE_TABLE_PRXXYZFAT.xml` (PK composta), `V003-ALTER_TABLE_TGFCAB.xml` (tabela nativa) e `V005-INSERT_DATA_PRXXYZCTL.xml` (dados iniciais com PK derivada) — em [`references/examples.md`](references/examples.md).
+Exemplos completos de XMLs — `V001-CREATE_TABLE_PRXXYZCAD.xml` (PK simples), `V002-CREATE_TABLE_PRXXYZFAT.xml` (PK composta) e `V005-INSERT_DATA_PRXXYZCTL.xml` (dados iniciais com PK derivada) — em [`references/examples.md`](references/examples.md).
 
 ---
 
@@ -474,16 +470,7 @@ Exemplos completos de XMLs — `V001-CREATE_TABLE_PRXXYZCAD.xml` (PK simples), `
 
 ### Tabela nativa (`<nativeTable>` no dicionário)
 
-- [ ] Verificar último `V<NNN>-*.xml` existente para definir `N+1` (3 dígitos, zero-padded)
-- [ ] Nomear arquivo `V<NNN>-ALTER_TABLE_<TABELA>.xml`
-- [ ] **NÃO** criar CREATE TABLE
-- [ ] ALTER TABLE ADD **só** para colunas com prefixo addon (ex: `XYZ_`)
-- [ ] CHECK constraint para campos `LISTA`/`CHECKBOX` — **só** nas colunas do addon, nunca em coluna nativa
-- [ ] Incluir **ambas** tags `<mssql>` e `<oracle>` em cada `<sql>`
-- [ ] Ignorar colunas nativas (sem prefixo addon) — já existem no banco
-- [ ] `ordem` única e sequencial no arquivo
-- [ ] **Não colocar ponto-e-vírgula** no final SQL
-- [ ] Incluir atributo `descricao` para documentação script
+- [ ] **Nenhum script** na tabela nativa. Campo novo → tabela de extensão (checklist de tabela nova acima + skill `merge-on-root`).
 
 ### Adição de coluna em tabela existente (evolução)
 

@@ -1,6 +1,6 @@
 ---
 name: entity
-description: Cria, revisa e refatora entidades Java `@JapeEntity` Sankhya — Lombok (`@Data`/`@NoArgsConstructor`/`@AllArgsConstructor`), PK simples/composta com `@Embeddable`, `@Column`, `@Id`, `@JoinColumn`, `@OneToMany`/`@OneToOne`/`@ManyToOne`, `@Relationship`, naming `<PRX><MOD3><CTX>`, mapeamento de tipos (`Integer`/`BigDecimal`/`String`/`Boolean`/`Date`/`Timestamp`). Use ao criar, alterar, revisar, auditar ou padronizar entidades, ao modelar a classe de dados de uma spec/tabela, quando o dev diz que precisa "guardar isso no banco" e o entregável é a classe Java, ao ajustar campo pontualmente (renomear, trocar tipo), ou ao tocar em código com `@JapeEntity`. NÃO usar para erro de charset/acento em arquivo de entidade — isso é `encoding`. Renomear ou adicionar coluna em entidade já publicada arrasta `dbscripts/` (ALTER, skill `database`) e `datadictionary/` (skill `data-dictionary`) — avise o dev e trate os três.
+description: Cria, revisa e refatora entidades Java `@JapeEntity` Sankhya — Lombok (`@Data`/`@NoArgsConstructor`/`@AllArgsConstructor`), PK simples/composta com `@Embeddable`, `@Column`, `@Id`, `@JoinColumn`, `@OneToMany`/`@OneToOne`/`@ManyToOne`, `@Relationship`, naming `<PRX><MOD3><CTX>`, mapeamento de tipos (`Integer`/`BigDecimal`/`String`/`Boolean`/`Date`/`Timestamp`). Use ao criar, alterar, revisar, auditar ou padronizar entidades, ao modelar a classe de dados de uma spec/tabela, quando o dev diz que precisa "guardar isso no banco" e o entregável é a classe Java, ao ajustar campo pontualmente (renomear, trocar tipo), ou ao tocar em código com `@JapeEntity`. NÃO usar para erro de charset/acento em arquivo de entidade — isso é `encoding`. NÃO usar para campo novo em entidade nativa (Parceiro, Produto, Nota...) — isso é `merge-on-root`. Renomear ou adicionar coluna em entidade já publicada arrasta `dbscripts/` (ALTER, skill `database`) e `datadictionary/` (skill `data-dictionary`) — avise o dev e trate os três.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -55,12 +55,11 @@ Exemplo coerente (`<PRX>`=`PRX`, `<MOD3>`=`XYZ`):
 
 ### 1.2 Tabelas e Instâncias Nativas Sankhya (`isNativeTable` / `isNativeInstance`)
 
-`@JapeEntity` aceita dois flags para sinalizar quando a tabela e/ou a instância já existem no Sankhya nativo. **Os dois flags são independentes** e cobrem 3 cenários:
+`@JapeEntity` aceita dois flags para sinalizar quando a tabela e/ou a instância já existem no Sankhya nativo. Entidade nova do addon usa tabela do addon; mapear tabela nativa é para ler/gravar a instância nativa existente:
 
 | Cenário                               | `isNativeTable` | `isNativeInstance` | Tag XML correspondente                  |
 |:--------------------------------------|:----------------|:-------------------|:----------------------------------------|
 | Tabela addon + Instância addon        | omitir          | omitir             | `<table>` + `<instance>`                |
-| Tabela nativa + Instância **nova** do addon | `true`    | omitir             | `<nativeTable>` + `<instance>`          |
 | Tabela nativa + Instância nativa      | `true`          | `true`             | `<nativeTable>` + `<nativeInstance>`    |
 
 > **Por que isso importa:** sem `isNativeTable`, o KSP rejeita a compilação com erro de entidade duplicada ao detectar que a tabela já existe. Sem `isNativeInstance` em uma instância nativa, a instância é regravada no `metadata.xml` gerado e, durante o deploy do addon, o dicionário a re-mapeia para o owner do addon — quebrando todas as regras, validações e telas nativas que dependem dessa instância.
@@ -68,16 +67,14 @@ Exemplo coerente (`<PRX>`=`PRX`, `<MOD3>`=`XYZ`):
 Tabelas nativas mais comuns: `TGFCAB`, `TGFFIN`, `TGFORD`, `TGFVEI`, `TGFEMP`, `TGFPAR`, `TGFPRO`, `TGFITE`.
 Instâncias nativas mais comuns associadas: `CabecalhoNota` (TGFCAB), `ItemNota` (TGFITE), `Parceiro` (TGFPAR), `Produto` (TGFPRO), `TipoOperacao` (TGFTOP), `Financeiro` (TGFFIN).
 
+> **Campo novo em entidade nativa não entra na entidade nativa.** Nada de `@Column` para coluna que não existe na tabela nativa, nem instância nova do addon sobre tabela nativa (`isNativeTable` sem `isNativeInstance`): o dado vai para uma tabela de extensão com merge-on-root — skill `merge-on-root`.
+
 ```java
 // 1) Tabela e instância do addon — sem flags
 @JapeEntity(entity = "PrxXyzCabecalho", table = "PRXXYZCAB")
 public class PrxXyzCabecalho { ... }
 
-// 2) Tabela nativa, instância NOVA do addon — só isNativeTable
-@JapeEntity(entity = "PrxXyzDefensivos", table = "TGFDFAGR", isNativeTable = true)
-public class PrxXyzDefensivos { ... }
-
-// 3) Tabela e instância nativas — os dois flags
+// 2) Tabela e instância nativas — os dois flags
 @JapeEntity(entity = "CabecalhoNota", table = "TGFCAB",
             isNativeTable = true, isNativeInstance = true)
 public class CabecalhoNota { ... }
@@ -467,6 +464,7 @@ Entidades completas — PK simples, PK composta + relacionamentos, `@OneToMany` 
 | Colocar `@GeneratedValue` no `@Id`                      | Sequência fica no XML (`sequenceType`/`sequenceField`).   |
 | Colocar `@Expression` no campo                          | Expressões ficam no XML (`<expression>`).                 |
 | Omitir `isNativeTable = true` em tabela nativa Sankhya  | Obrigatório para TGFCAB, TGFFIN, TGFORD, TGFVEI, TGFEMP, TGFPAR — KSP rejeita sem ele com erro de entidade duplicada. |
+| `@Column` de coluna nova do addon na entidade nativa, ou instância nova sobre tabela nativa | Tabela de extensão com merge-on-root (skill `merge-on-root`). |
 | Omitir `isNativeInstance = true` em instância nativa    | Obrigatório quando o `entity` reusa um nome nativo (`CabecalhoNota`, `Parceiro`, `Produto`, etc.). Sem ele, o deploy regrava a instância para o owner do addon e quebra regras/validações nativas. |
 | Criar `@OneToOne` quando só precisa do valor da FK      | Use `@Column(name = "FK")` se não precisa navegar.        |
 | Esquecer de criar o XML do dicionário                   | Toda entidade **precisa** do XML correspondente.          |

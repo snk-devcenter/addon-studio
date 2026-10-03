@@ -161,6 +161,7 @@ $addon-studio:test
 | `repository` | `JapeRepository`, critérios, queries nativas e paginação |
 | `database` | Dbscripts versionados para Oracle e SQL Server |
 | `data-dictionary` | Telas cadastrais geradas pelo dicionário de dados |
+| `merge-on-root` | Campos novos em entidade nativa via tabela de extensão 1:1 |
 | `macros` | SQL portável com `MacroTranslator` |
 
 ### Backend e integrações
@@ -230,7 +231,7 @@ O plugin detecta o padrão existente. Quando não houver referência suficiente,
 |---|---|---|
 | Tabela do addon | `<PRX><MOD3><CTX>` | `PRXXYZCAB` |
 | Nome da entidade JAPE | `<Prx><Mod><Ctx>` | `PrxXyzCabecalho` |
-| Coluna em tabela nativa | `<MOD3>_NOMECAMPO` | `XYZ_STATUS` |
+| Tabela de extensão de entidade nativa (merge-on-root) | `<PRX><MOD3><CTX>`, mesma PK da nativa | `PRXXYZIPA` |
 
 ### Proteção de encoding
 

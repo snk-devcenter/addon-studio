@@ -16,6 +16,7 @@ Para conhecimento de domínio, carregue a skill via `Read` em `${CLAUDE_PLUGIN_R
 - `entity` — `@JapeEntity` rules, PK simples/composta, anotações permitidas, naming convention
 - `data-dictionary` — XML schema (`<table>`, `<instance>`, `<fields>`, `<relationShip>`)
 - `database` — dbscripts `V<NNN>-*.xml` dual MSSQL/Oracle, `CREATE TABLE` mínimo + `ALTER TABLE` por coluna
+- `merge-on-root` — campo novo em entidade nativa: tabela de extensão com a mesma PK + relação 1:1 fundida na raiz
 
 ## Workflow
 
@@ -34,7 +35,7 @@ Antes de criar qualquer artefato:
 
 | Decisão | Opções | Quando usar cada |
 |---------|--------|------------------|
-| Tabela nova vs nativa | Tabela do addon (`<table>`) ou estender nativa (`<nativeTable>`) | Addon: dados do produto. Nativa: estender Sankhya com colunas custom. |
+| Tabela nova vs extensão de nativa | Tabela do addon (`<table>`) ou tabela de extensão com merge-on-root | Addon: dados do produto. Campo novo em entidade nativa (Parceiro, Produto, Nota): tabela de extensão com a mesma PK — skill `merge-on-root`. Nunca coluna nova na tabela nativa. |
 | PK simples vs composta | `@Id Integer` ou `@Embeddable` | Composta quando entidade é "filho" lógico de outra (ex.: itens de um cabeçalho). |
 | Tipo do PK | `Integer` (addon) ou `BigDecimal` (nativa Sankhya) | Tabelas próprias = `Integer`. NUNOTA, CODPARC, CODPROD, etc. = `BigDecimal`. |
 | Sequência | AUTO (banco) ou MANUAL | AUTO por default. MANUAL se PK vem de regra externa. |
@@ -66,7 +67,7 @@ Heurística: "O valor pode mudar sem que o registro seja alterado pela aplicaç�
 **Ordem obrigatória:**
 
 1. **XML do dicionário** (`datadictionary/<TABELA>.xml`):
-   - `<table>` ou `<nativeTable>`
+   - `<table>` (tabela de extensão de nativa também é `<table>`; a relação de merge vai em `<nativeTable>` + `<nativeInstance>` — skill `merge-on-root`)
    - `<primaryKey>` com campos PK
    - `<instance>` ou `<nativeInstance>` (entidade nativa Sankhya — exige `<nativeInstance>`)
    - `<fields>` com **todos** atributos: `name`, `dataType`, `description`, `allowSearch`, `visibleOnSearch`, `required`, etc.
@@ -138,4 +139,4 @@ Após gerar, reportar:
 ## Quando NÃO criar
 
 - Se dev não confirmou naming convention `<PRX><MOD3>` — **perguntar primeiro**
-- Se for tabela nativa do Sankhya core (TGFCAB, TGFITE, TGFFIN, TSIPAR, etc.) — **só** estender via `<nativeTable>`, **nunca** alterar core
+- Se for tabela nativa do Sankhya core (TGFCAB, TGFITE, TGFFIN, TSIPAR, etc.) — **nunca** alterar core nem adicionar coluna; campo novo vai para tabela de extensão (skill `merge-on-root`)

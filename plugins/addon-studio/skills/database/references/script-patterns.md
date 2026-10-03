@@ -228,23 +228,6 @@ Script:
 
 > **Coluna que aceita nulo:** `CHECK (COL IN (...))` **não** barra `NULL` (`NULL IN (...)` = desconhecido, não violação). Obrigatoriedade é do `NOT NULL` / `nullable="N"`, não da CHECK. Não adicionar `OR COL IS NULL`.
 
-### Constraint em tabela nativa
-
-Vale a mesma regra — mas **só** para colunas do addon (prefixo `<MOD>_`). Nunca criar CHECK em coluna nativa Sankhya.
-
-```xml
-<sql nomeTabela="TGFCAB" ordem="3" executar="SE_NAO_EXISTIR"
-     tipoObjeto="CONSTRAINT" nomeObjeto="CK_TGFCAB_XYZ_STATUS"
-     descricao="Restringir valores do campo XYZ_STATUS">
-    <mssql>
-        ALTER TABLE TGFCAB ADD CONSTRAINT CK_TGFCAB_XYZ_STATUS CHECK (XYZ_STATUS IN ('PENDENTE', 'PROCESSADO'))
-    </mssql>
-    <oracle>
-        ALTER TABLE TGFCAB ADD CONSTRAINT CK_TGFCAB_XYZ_STATUS CHECK (XYZ_STATUS IN ('PENDENTE', 'PROCESSADO'))
-    </oracle>
-</sql>
-```
-
 ### Evolução — mudar as opções de um campo existente
 
 Não existe `ALTER CONSTRAINT` em Oracle nem MSSQL: mudar o domínio = **DROP + recreate**, nessa ordem, `<sql>` separados — e em **arquivo `V<NNN+1>` novo**, nunca editando o script que já criou a CHECK (regra de migração nº 9).
@@ -303,51 +286,9 @@ Adicionar `<option value="C">Opcao C</option>` ao dicionário do campo `TIPO`:
 
 ---
 
-## Tabelas Nativas (`nativeTable`) — Somente ALTER TABLE
+## Tabelas Nativas (`nativeTable`) — Sem Script
 
-Tabelas nativas Sankhya (tag `<nativeTable>` no dicionário) **NÃO têm CREATE TABLE**. Script contém **apenas ALTER TABLE** para colunas **customizadas** do add-on.
-
-### Como identificar o que precisa de script
-
-| Tipo de campo no dicionário                            | Script necessário?          | Motivo                         |
-|:-------------------------------------------------------|:----------------------------|:-------------------------------|
-| Campo nativo (ex: `CODPARC`, `NUNOTA`)                 | **Não**                   | Já existe tabela Sankhya       |
-| Campo customizado (ex: `XYZ_STATUS`, `XYZ_CODRECEITA`) | **Sim** — ALTER TABLE ADD | Adicionado pelo add-on         |
-
-> Convenção: prefixo addon + `_` (ex: `XYZ_`) em campos customizados para identificação fácil.
-
-### Exemplo
-
-```xml
-<!-- V003-ALTER_TABLE_TGFCAB.xml -->
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<scripts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="../.gradle/scripts.xsd">
-
-    <sql nomeTabela="TGFCAB" ordem="1" executar="SE_NAO_EXISTIR"
-         tipoObjeto="COLUMN" nomeObjeto="XYZ_CODRECEITA"
-         descricao="Adicionar campo XYZ_CODRECEITA na tabela TGFCAB">
-        <mssql>
-            ALTER TABLE TGFCAB ADD XYZ_CODRECEITA VARCHAR(100)
-        </mssql>
-        <oracle>
-            ALTER TABLE TGFCAB ADD (XYZ_CODRECEITA VARCHAR2(100))
-        </oracle>
-    </sql>
-
-    <sql nomeTabela="TGFCAB" ordem="2" executar="SE_NAO_EXISTIR"
-         tipoObjeto="COLUMN" nomeObjeto="XYZ_STATUS"
-         descricao="Adicionar campo XYZ_STATUS na tabela TGFCAB">
-        <mssql>
-            ALTER TABLE TGFCAB ADD XYZ_STATUS VARCHAR(50)
-        </mssql>
-        <oracle>
-            ALTER TABLE TGFCAB ADD (XYZ_STATUS VARCHAR2(50))
-        </oracle>
-    </sql>
-
-</scripts>
-```
+Tabela nativa Sankhya (tag `<nativeTable>` no dicionário) **não recebe DDL do addon**: nem CREATE, nem ALTER TABLE ADD. Campo novo em entidade nativa vai para uma tabela de extensão do addon com a mesma PK, fundida via merge-on-root — skill `merge-on-root`. O script é o de tabela nova (CREATE mínimo + ALTER por coluna) na tabela de extensão.
 
 ---
 
@@ -356,7 +297,7 @@ Tabelas nativas Sankhya (tag `<nativeTable>` no dicionário) **NÃO têm CREATE 
 | Tag no dicionário | CREATE TABLE?                    | ALTER TABLE para colunas?                           | Observação                |
 |:------------------|:---------------------------------|:----------------------------------------------------|:--------------------------|
 | `<table>`         | Sim (somente PKs + constraint) | Sim (cada coluna não-PK individualmente)          | Tabela criada pelo add-on |
-| `<nativeTable>`   | Não                            | Somente colunas com prefixo do addon (ex: `XYZ_`) | Tabela nativa Sankhya     |
+| `<nativeTable>`   | Não                            | Não — campo novo vai para tabela de extensão (`merge-on-root`) | Tabela nativa Sankhya     |
 
 ---
 

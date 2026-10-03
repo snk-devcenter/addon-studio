@@ -25,7 +25,8 @@
     "sankhya-utils",
     "sankhya-js",
     "init",
-    "jsp"
+    "jsp",
+    "merge-on-root"
   ],
   "scenarios": {
     "entity": [
@@ -152,6 +153,11 @@
       "preciso por uma tela .jsp no addon usando a taglib snk:query, o que falta no projeto?",
       "quero uma torre de controle com mapa e uns paineis, tela so de leitura, o layout e o produto e eu monto o html na mao",
       "quero criar a tela HTML5 do addon com sk-dynaform ligada numa instancia do dicionario"
+    ],
+    "merge-on-root": [
+      "preciso estender o Parceiro com merge-on-root, tabela de extensao com a mesma PK",
+      "quero guardar um codigo de integracao no cadastro de parceiros e mostrar ele la na tela de parceiros",
+      "cria uma tabela nova de vistorias com placa, data e km e a tela de cadastro dela"
     ]
   }
 }
