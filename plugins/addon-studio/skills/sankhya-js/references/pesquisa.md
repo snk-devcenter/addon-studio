@@ -60,7 +60,7 @@ Com o atributo `sk-datagrid-editor`, o template adapta: o codigo vira editor inl
 
 ## Atributos de scope
 
-Definidos. Agrupados:
+Agrupados:
 
 ### Entidade
 

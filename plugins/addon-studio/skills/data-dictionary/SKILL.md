@@ -23,7 +23,7 @@ Entidade Java (`@JapeEntity`) = classe dominio **limpa** — so `@Column(name = 
 
 **Um XML por tabela/entidade** em `datadictionary/`.
 
-**Convencao:** nome arquivo = nome tabela. Ex: `TDCXYZCAD.xml` pra tabela `TDCXYZCAD`.
+**Convencao:** nome arquivo = nome tabela. Ex: `PRXXYZCAD.xml` pra tabela `PRXXYZCAD`.
 
 ---
 
@@ -48,7 +48,7 @@ Entidade Java (`@JapeEntity`) = classe dominio **limpa** — so `@Column(name = 
 | `<table />`       | Tabela **nova** criada pelo add-on.                                      |
 | `<treeTable />`   | Tabela **hierarquica** (pai/filho) — cadastros tipo centro de custo, categorias de produto, organogramas. Framework gera UI tree + campos `CODIGOPAI`/`ANALITICO`/`GRAU`. Detalhes em [`references/tree-table.md`](references/tree-table.md). |
 | `<nativeTable />` | Extensao tabela **nativa** Sankhya Om (adiciona campos/instancia). |
-| `<nativeFolder />`| Container para `<pastaNativa>` — encaixe em pasta nativa Sankhya (Configuracoes / Cadastros / Consulta / Rotina / Relatorio). Detalhes em [`references/menu.md`](references/menu.md). |
+| `<nativeFolder />`| Encaixe em pasta nativa Sankhya: atributo `name` (`CONFIGURACOES_CADASTROS`/`_CONSULTA`/`_ROTINA`/`_RELATORIO`), filhos iguais aos de `<folder>`. Detalhes em [`references/menu.md`](references/menu.md). |
 | `<menu />`        | Estrutura de menu/navegacao do add-on. Container para `<folder>`, `<dynamicForm>`, `<dynamicTreeView>`, `<ui>`, `<dashboard>`. **Todo no de menu leva `resourceId` explicito de no maximo 50 caracteres** — sem isso o deploy pode derrubar o add-on inteiro. Detalhes em [`references/menu.md`](references/menu.md). |
 | `<dynamicForm />` | Tela CRUD declarativa (sem JS/HTML) gerada a partir de uma `<instance>` da tabela. Vai dentro de `<menu>`/`<folder>`. Detalhes em [`references/dynamic-form.md`](references/dynamic-form.md). |
 | `<filters />`     | Filtros de busca em telas geradas por `<dynamicForm>`/`<dynamicTreeView>`. Filho de `<table>`/`<treeTable>`. Detalhes em [`references/filters.md`](references/filters.md). |
@@ -70,11 +70,11 @@ Entidade Java (`@JapeEntity`) = classe dominio **limpa** — so `@Column(name = 
 `<table>` exige `<description>` propria — registrada em `TDDTAB.DESCRTAB` (NOT NULL). Distinta da `<description>` da `<instance>`: a do `<table>` descreve a tabela fisica, a da `<instance>` descreve a entidade JAPE. Costumam ser iguais, mas as duas precisam estar presentes.
 
 ```xml
-<table name="TDCXYZPRD" sequenceType="A" sequenceField="CODPRODUTO">
+<table name="PRXXYZPRD" sequenceType="A" sequenceField="CODPRODUTO">
     <description>Produtos</description>
     <primaryKey>...</primaryKey>
     <instances>
-        <instance name="TdcXyzProduto">
+        <instance name="PrxXyzProduto">
             <description>Produtos</description>
         </instance>
     </instances>
@@ -110,13 +110,13 @@ Entidade Java (`@JapeEntity`) = classe dominio **limpa** — so `@Column(name = 
 
 ```xml
 <!-- AUTO — padrao, inclui config/log/historico -->
-<table name="TDCXYZPRD" sequenceType="A" sequenceField="CODPRODUTO">
+<table name="PRXXYZPRD" sequenceType="A" sequenceField="CODPRODUTO">
     <description>Produtos</description>
     ...
 </table>
 
 <!-- MANUAL — excecao: PK composta so de FKs (tabela de vinculo) -->
-<table name="TDCXYZVIN" sequenceType="M">
+<table name="PRXXYZVIN" sequenceType="M">
     <description>Vinculo Origem x Produto</description>
     <primaryKey>
         <field name="CODORIG"/>
@@ -162,7 +162,7 @@ Define entidade (instancia JAPE) da tabela. Existem duas tags possiveis dentro d
 ```xml
 <!-- Instancia nova do addon -->
 <instances>
-    <instance name="TdcXyzProduto">
+    <instance name="PrxXyzProduto">
         <description>Produtos</description>
     </instance>
 </instances>
@@ -211,22 +211,22 @@ Define entidade (instancia JAPE) da tabela. Existem duas tags possiveis dentro d
 
 Padrao parametrizado por `<PRX>` (prefixo) + `<MOD3>` (modulo). Ver `database` secao "Descobrir convencao do projeto" antes de criar tabela nova.
 
-| Atributo                                | Padrao                                  | Exemplo (PRX=TDC, MOD3=XYZ)  |
+| Atributo                                | Padrao                                  | Exemplo (PRX=PRX, MOD3=XYZ)  |
 |:----------------------------------------|:----------------------------------------|:-----------------------------|
-| `<table name="...">`                    | `<PRX><MOD3><CTX>` (UPPER)              | `TDCXYZCAB`                  |
-| `<instance name="...">` (em `<table>`)  | `<Prx><Mod><Ctx>` (PascalCase)          | `TdcXyzCabecalho`            |
-| `<instance name="...">` (em `<nativeTable>`, instancia nova) | `<Prx><Mod><Ctx>` (PascalCase) | `TdcXyzDefensivos`     |
+| `<table name="...">`                    | `<PRX><MOD3><CTX>` (UPPER)              | `PRXXYZCAB`                  |
+| `<instance name="...">` (em `<table>`)  | `<Prx><Mod><Ctx>` (PascalCase)          | `PrxXyzCabecalho`            |
+| `<instance name="...">` (em `<nativeTable>`, instancia nova) | `<Prx><Mod><Ctx>` (PascalCase) | `PrxXyzDefensivos`     |
 | `<nativeInstance name="...">` (em `<nativeTable>`) | Nome **exato** da instancia nativa Sankhya | `CabecalhoNota`, `Parceiro`, `ItemNota` |
 
 Componentes do prefixo addon:
 
-- `<Prx>` / `<PRX>`: prefixo fixo do projeto, **3-4 caracteres** (ex.: `Tdc`/`TDC`, `App`/`APP`, `Cst`/`CST`)
+- `<Prx>` / `<PRX>`: prefixo fixo do projeto, **3-4 caracteres** (ex.: `Abc`/`ABC`)
 - `<Mod>` / `<MOD3>`: sigla modulo, **3 caracteres** (ex.: `Xyz`/`XYZ`, `Fin`/`FIN`)
 - `<Ctx>` / `<CTX>`: contexto/entidade (ex.: `Cabecalho`/`CAB`, `Item`/`ITE`)
 
 > Prefixo `<Prx><Mod>` no `<instance>` evita colisao com outros contextos do ERP. Bate com `@JapeEntity(entity = "...")` correspondente. `<nativeInstance>` **nunca** leva prefixo addon — o nome tem que ser identico ao da instancia nativa Sankhya.
 
-> **NOTA:** exemplos seguintes usam `TDC` como prefixo ilustrativo. Substituir pelo `<PRX>` real do projeto.
+> **NOTA:** exemplos seguintes usam o literal `PRX` no lugar do prefixo. Substituir pelo `<PRX>` real do projeto.
 
 ---
 
@@ -247,10 +247,10 @@ Entidade com relacao (`@OneToMany`, `@OneToOne`) declara `<relationShip>` dentro
 Filhos: `<expression>` (opcional) e `<fields>` (obrigatorio). Cada `<field>` do `<fields>` tem `localName` (coluna da tabela atual) e `targetName` (coluna da relacionada).
 
 ```xml
-<instance name="TdcXyzProduto">
+<instance name="PrxXyzProduto">
     <description>Produtos</description>
     <relationShip>
-        <relation entityName="TdcXyzVinculoProduto" relation="OneToMany" removeCascade="S">
+        <relation entityName="PrxXyzVinculoProduto" relation="OneToMany" removeCascade="S">
             <fields>
                 <field localName="CODPRODUTO" targetName="CODPRODUTO"/>
             </fields>
@@ -284,7 +284,7 @@ Pode depender de campo dos **dois** formularios. Alias `form.` = formulario de o
 
 ```xml
 <!-- 1) @ref-param: aba nomeada, forcada como pesquisa -->
-<relation entityName="TdcXyzTipo" relation="OneToOne">
+<relation entityName="PrxXyzTipo" relation="OneToOne">
     <expression><![CDATA[@ref-param[description=Tipo, force-one-to-one=true]]]></expression>
     <fields>
         <field localName="CODTIPO" targetName="CODTIPO"/>
@@ -292,15 +292,15 @@ Pode depender de campo dos **dois** formularios. Alias `form.` = formulario de o
 </relation>
 
 <!-- 2) @form-filter: cruza campo do form de origem (form.) com o destino (this.) -->
-<relation entityName="TdcXyzVinculo" relation="OneToMany">
-    <expression><![CDATA[@form-filter[EXISTS (SELECT 1 FROM TDCXYZCTR C WHERE C.CODEMP = form.CODEMP AND this.CODVINCULO = C.CODVINCULO)]]]></expression>
+<relation entityName="PrxXyzVinculo" relation="OneToMany">
+    <expression><![CDATA[@form-filter[EXISTS (SELECT 1 FROM PRXXYZCTR C WHERE C.CODEMP = form.CODEMP AND this.CODVINCULO = C.CODVINCULO)]]]></expression>
     <fields>
         <field localName="CODPRODUTO" targetName="CODPRODUTO"/>
     </fields>
 </relation>
 
 <!-- 3) Filtro simples: so a entidade destino -->
-<relation entityName="TdcXyzVinculo" relation="OneToMany">
+<relation entityName="PrxXyzVinculo" relation="OneToMany">
     <expression><![CDATA[this.ATIVO='S']]></expression>
     <fields>
         <field localName="CODPRODUTO" targetName="CODPRODUTO"/>
@@ -468,7 +468,7 @@ Use quando a entidade ja existe no Sankhya nativo (`CabecalhoNota`, `Parceiro`, 
     <instances>
         <nativeInstance name="TipoOperacao">
             <relationShip>
-                <relation entityName="TdcXyzVinculo" insert="N" update="N" relation="OneToOne" removeCascade="N">
+                <relation entityName="PrxXyzVinculo" insert="N" update="N" relation="OneToOne" removeCascade="N">
                     <fields>
                         <field localName="CODTIPOPER" targetName="CODTIPOPER"/>
                     </fields>
@@ -488,12 +488,12 @@ Use quando a entidade ja existe no Sankhya nativo (`CabecalhoNota`, `Parceiro`, 
 
 ### Cenario B — Instancia **nova** do addon em tabela nativa: `<instance>`
 
-Use quando o addon cria uma instancia logica nova sobre uma tabela nativa (ex.: `DefensivosAgricolas` sobre `TGFDFAGR`). Combine com `isNativeTable = true` no `@JapeEntity`, **sem** `isNativeInstance`.
+Use quando o addon cria uma instancia logica nova sobre uma tabela nativa (ex.: `PrxXyzDefensivos` sobre `TGFDFAGR`). Combine com `isNativeTable = true` no `@JapeEntity`, **sem** `isNativeInstance`.
 
 ```xml
 <nativeTable name="TGFDFAGR">
     <instances>
-        <instance name="TdcXyzDefensivos">
+        <instance name="PrxXyzDefensivos">
             <description>Defensivos Agricolas</description>
         </instance>
     </instances>
@@ -600,7 +600,7 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 3. [ ] Remover `@Expression`, `@GeneratedValue`, `@Option`, `@Property`.
 4. [ ] Reduzir `@Column` a **so** `name`.
 5. [ ] Reduzir `@JoinColumn` a **so** `name` e `referencedColumnName`.
-6. [ ] Reduzir `@JapeEntity` a **so** `entity` e `table`.
+6. [ ] Reduzir `@JapeEntity` a `entity` e `table` — mais `isNativeTable`/`isNativeInstance` quando a tabela/instancia for nativa (ver [`references/java-to-xml.md`](references/java-to-xml.md)).
 7. [ ] Remover imports nao usados.
 
 ## 4.3 Checklist: Criando entidade Java a partir do XML
@@ -610,7 +610,7 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 3. [ ] Pra cada `<field>` da `<primaryKey>`, mapear como `@Id` + `@Column(name)`.
 4. [ ] PK composta? Criar `@Embeddable` com campos, usar `@Id` no embeddable.
 5. [ ] Pra cada `<field>` dos `<fields>`, criar campo Java com `@Column(name)` + tipo inferido.
-6. [ ] Pra cada `<relation>`, criar `@OneToMany` com `@Relationship`.
+6. [ ] Pra cada `<relation relation="OneToMany">`, criar `@OneToMany` com `@Relationship`.
 7. [ ] PESQUISA com navegacao: adicionar `@OneToOne` + `@JoinColumn(name, referencedColumnName)`.
 8. [ ] **Nao** adicionar `@Expression`, `@GeneratedValue`, `@Option`, `@Property` nem extras.
 

@@ -25,8 +25,9 @@ angular
                 $scope.$on('$destroy', offSaved);
 
                 // initAndRefresh = metadados + refresh. init() so carrega metadados.
-                // A .then aqui resolve apenas apos os dois — getCurrentRow() e seguro.
-                dataset.initAndRefresh();
+                dataset.initAndRefresh().then(function () {
+                    // metadados e registros carregados — getCurrentRow() e seguro aqui.
+                });
             };
 
             // ================================================================
@@ -35,7 +36,7 @@ angular
             // ================================================================
             self.refreshHandler = function (request) {
                 return ServiceProxy.callService('<addon>@MinhaConsultaSP.listar', {
-                    filtro: { $: request.filter }
+                    filtro: request.filter
                 }).then(function (data) {
                     return data.responseBody.body.linhas;
                 });
@@ -59,7 +60,7 @@ angular
             // ================================================================
             self.removeHandler = function (request) {
                 return ServiceProxy.callService('<addon>@MinhaConsultaSP.excluir', {
-                    pk: { $: request.pk }
+                    pk: request.pk
                 });
             };
 

@@ -23,7 +23,7 @@ O servidor Sankhya (Wildfly legado) e o compilador de addons esperam Latin-1. Ar
 
 | Tipo de arquivo | Regra                                                                                    |
 |:----------------|:-----------------------------------------------------------------------------------------|
-| `.java` / `.kt` | Salvo em ISO-8859-1. Acentos diretamente no encoding **ou** escapados como `é`, `ç` etc. |
+| `.java` / `.kt` | Salvo em ISO-8859-1. Acentos diretamente no encoding **ou** escapados como `\u00e9`, `\u00e7` etc. |
 | `.xml` (datadictionary, dbscripts) | Salvo em ISO-8859-1. Cabecalho **obrigatorio**: `<?xml version="1.0" encoding="ISO-8859-1" ?>` |
 | `.properties`   | Salvo em ISO-8859-1 (formato historico do Java 8 para properties).                       |
 
@@ -31,7 +31,7 @@ O servidor Sankhya (Wildfly legado) e o compilador de addons esperam Latin-1. Ar
 
 ## O problema com LLMs
 
-LLMs geram arquivos em UTF-8 por padrao. Apos criar ou editar qualquer `.java`, `.xml`, `.kt` ou `.properties`, **converta o encoding** antes de usar.
+LLMs geram arquivos em UTF-8 por padrao. No Claude Code, o hook `PostToolUse` do plugin converte para ISO-8859-1 apos cada `Write`/`Edit`. Converta a mao so fora dele: outro harness, ou arquivo criado por shell/script.
 
 > **Antes de converter, cheque o charset atual** (`file -i arquivo.java`). So converta se o resultado for `charset=utf-8`. Arquivo ja em ISO-8859-1 reconvertido de "UTF-8" pode ter acentos corrompidos; e `errors='ignore'`/`errors='replace'` apagam ou trocam caracteres silenciosamente.
 
@@ -87,8 +87,10 @@ for ext in ('**/*.java', '**/*.xml', '**/*.kt', '**/*.properties'):
         try:
             c = open(p, 'r', encoding='utf-8').read()
             open(p, 'w', encoding='iso-8859-1').write(c)
-        except (UnicodeDecodeError, UnicodeEncodeError):
-            pass  # nao esta em UTF-8 (ja Latin-1) ou tem char sem equivalente — nao tocar
+        except UnicodeDecodeError:
+            pass  # nao esta em UTF-8 (ja Latin-1) — nao tocar
+        except UnicodeEncodeError:
+            print('PERDA: U+FFFD ou char fora do Latin-1 em', p, '-- restaure via git antes de converter')
 "
 ```
 
@@ -124,8 +126,10 @@ for p in sys.argv[1:]:
     try:
         c = open(p, 'r', encoding='utf-8').read()
         open(p, 'w', encoding='iso-8859-1').write(c)
-    except (UnicodeDecodeError, UnicodeEncodeError):
-        pass  # nao esta em UTF-8 ou tem char sem equivalente — nao tocar
+    except UnicodeDecodeError:
+        pass  # nao esta em UTF-8 (ja Latin-1) — nao tocar
+    except UnicodeEncodeError:
+        print('PERDA: U+FFFD ou char fora do Latin-1 em', p, '-- restaure via git antes de converter')
 " $FILES
 fi
 
@@ -182,7 +186,7 @@ no trecho acentuado e reaplique a edicao — nunca converta o encoding antes dis
 - Em `.java`/`.kt`, escape Unicode (`\u00ea`) mantem o arquivo ASCII puro e imune ao
   round-trip. Em XML, entidade numerica (`&#234;`) tem o mesmo efeito.
 - O hook `PostToolUse` do plugin (`hooks/to-iso88591.sh`) ja barra a conversao e avisa
-  quando encontra `U+FFFD`. Rode `sh hooks/to-iso88591.sh --selftest` para conferir.
+  quando encontra `U+FFFD`. Rode `sh "${CLAUDE_PLUGIN_ROOT}/hooks/to-iso88591.sh" --selftest` para conferir.
 
 ---
 
@@ -200,8 +204,8 @@ Nunca alterar para `UTF-8` mesmo que editor sugira.
 
 ## Caracteres especiais em Java/Kotlin
 
-Preferencia: escrever diretamente em Latin-1 apos conversao de encoding.
-Alternativa segura (portavel, sem depender de encoding): escapes Unicode.
+Em arquivo que sera editado de novo pelo agente, prefira escape Unicode (imune ao
+round-trip, ver "Evitar" acima). Acento direto em Latin-1 e valido em arquivo novo.
 
 | Caractere | Escape Unicode |
 |:----------|:---------------|
@@ -223,7 +227,7 @@ Alternativa segura (portavel, sem depender de encoding): escapes Unicode.
 | Salvar `.java` / `.xml` em UTF-8                    | Sempre ISO-8859-1                               |
 | XML sem cabecalho `encoding="ISO-8859-1"`           | Cabecalho obrigatorio em todo XML               |
 | Alterar cabecalho de XML para `encoding="UTF-8"`    | Manter `ISO-8859-1` sem excecao                 |
-| Deixar arquivo gerado por LLM sem converter         | Rodar `iconv` (Mac/Linux) ou Python3 (Windows) apos cada criacao/edicao |
+| Deixar arquivo gerado por LLM sem converter         | Hook converte no Claude Code; fora dele, `iconv` (Mac/Linux) ou Python3 (Windows) |
 | Converter sem checar `file -i` e `U+FFFD`           | Duas guardas antes de todo `iconv` — sem elas o acento vira `?`         |
 | `iconv ... -o "$f.tmp" && mv`                       | `mktemp` + `cat "$t" > "$f"` — nome fixo sobrescreve `.tmp` do projeto  |
 

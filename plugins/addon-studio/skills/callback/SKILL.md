@@ -201,6 +201,7 @@ public Object call(String id, Map<String, Object> data) {
 
 - **Ordem não é garantida.** Vários callbacks podem estar registrados no mesmo evento (outros add-ons, configuração do ambiente). Nunca faça um depender do outro nem do que outro gravou.
 - **Velocidade.** Roda dentro da transação da confirmação: milissegundos. Chamada externa (HTTP, e-mail, fila) sempre assíncrona.
+- **`@Transactional` no service chamado daqui: confira o `TxType`.** O callback já roda dentro da sessão e da transação da operação. `@Transactional` bare (`REQUIRED`, o default) entra nessa transação — caso seguro. `REQUIRES_NEW` suspende a transação da operação e commita por conta própria: se a operação for revertida depois, o que ele gravou fica. `NOT_SUPPORTED` roda fora dela e não participa do commit/rollback. Nada falha na hora — o bug só aparece quando a operação dá erro depois da chamada.
 
 ---
 
@@ -217,7 +218,7 @@ public Object call(String id, Map<String, Object> data) {
 
 | Anti-Pattern                                            | Correção                                                                     |
 |:--------------------------------------------------------|:-----------------------------------------------------------------------------|
-| Registrar só um dos eventos de confirmação              | Central e Portal são eventos distintos — uma subclasse para cada (seção 7)  |
+| Registrar só um dos eventos de confirmação              | Central e Portal são eventos distintos — uma classe para cada (seção 7)  |
 | Duas anotações `@Callback` na mesma classe              | Não é repetível: uma classe = um par `when`/`event`                          |
 | Superclasse abstrata para compartilhar lógica entre callbacks | Lógica comum no service injetado; cada classe anotada `implements ICustomCallBack` |
 | `@Callback(when = AFTER, event = PROCESS_BILLING)`      | Só existe `BEFORE` — o build quebra                                          |
@@ -234,11 +235,11 @@ public Object call(String id, Map<String, Object> data) {
 ## 11. Checklist: novo `@Callback`
 
 1. [ ] Confirmar que o gancho é ponto de ciclo do documento — se for barramento de nota de saída, `@BusinessRule`; se for CRUD, `@Listener`.
-2. [ ] Escolher o `event` pela **tela**: Central → `PROCESS_CONFIRMATION`; Portal → `CONFIRMATION`; precisa das duas → duas subclasses.
+2. [ ] Escolher o `event` pela **tela**: Central → `PROCESS_CONFIRMATION`; Portal → `CONFIRMATION`; precisa das duas → duas classes.
 3. [ ] Escolher o `when`: abortar/preparar → `BEFORE`; reagir ao resultado → `AFTER`.
 4. [ ] Criar a classe `implements ICustomCallBack` (nomear `<Feature><Origem>Callback`).
 5. [ ] Anotar com os três atributos: `when`, `event`, `description`.
-6. [ ] Injetar dependências via construtor com `@Inject` (na subclasse concreta, se houver base).
+6. [ ] Injetar dependências via construtor com `@Inject`.
 7. [ ] Ler `data` com as chaves e tipos exatos do evento (seção 6) — atenção a `bregras` vs `bRegras`.
 8. [ ] `AFTER`: checar `data.get("error")` na primeira linha.
 9. [ ] Delegar a lógica para Service (`@Component`); integração externa assíncrona.

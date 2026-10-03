@@ -1,6 +1,6 @@
 ---
 name: controller
-description: Cria, revisa e refatora endpoints REST Sankhya com `@Controller` — `serviceName`, SP, `@Transactional`, DTOs, `@Valid`, mapeamento HTTP (GET/POST/PUT/DELETE), códigos de status. Use ao criar, alterar, revisar, auditar ou padronizar controllers REST, ao expor cadastro/feature via REST, ao integrar com app mobile/frontend, ao implementar listagem/lançamento/detalhamento/atualização/exclusão expostos por endpoint (pedido que só diz "listar/filtrar/paginar X" sem citar rota, REST ou app é a query, skill `repository`), ao receber spec de endpoint/API, ao declarar validação de entrada no DTO (`@Valid`, `@NotNull`, `@NotBlank`, `@Size` moram aqui; a resposta de erro da violação é `controller-advice`; injetar o repository/service no controller é `dependency-injection`), ao descobrir como chamar o endpoint de fora (URL a partir do `serviceName`/SP, chamada por Postman ou curl), ao trabalhar com arquivos `*Controller.java`, ou ao tocar em código com `@Controller`/`@GetMapping`/`@PostMapping`/`@RequestMapping`. NÃO usar para consumir API REST de terceiro — expor é aqui, consumir é `retrofit`.
+description: Cria, revisa e refatora endpoints REST Sankhya com `@Controller` — `serviceName`, SP, `@Transactional`, DTOs, `@Valid`, mapeamento HTTP (GET/POST/PUT/DELETE), códigos de status. Use ao criar, alterar, revisar, auditar ou padronizar controllers REST, ao expor cadastro/feature via REST, ao integrar com app mobile/frontend, ao implementar listagem/lançamento/detalhamento/atualização/exclusão expostos por endpoint (pedido que só diz "listar/filtrar/paginar X" sem citar rota, REST ou app é a query, skill `repository`), ao receber spec de endpoint/API, ao declarar validação de entrada no DTO (`@Valid`, `@NotNull`, `@NotBlank`, `@Size` moram aqui; a resposta de erro da violação é `controller-advice`; injetar o service no controller é `dependency-injection`), ao descobrir como chamar o endpoint de fora (URL a partir do `serviceName`/SP, chamada por Postman ou curl), ao trabalhar com arquivos `*Controller.java`, ou ao tocar em código com `@Controller`/`@GetMapping`/`@PostMapping`/`@RequestMapping`. NÃO usar para consumir API REST de terceiro — expor é aqui, consumir é `retrofit`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -41,7 +41,7 @@ public class PedidoController {
         this.mapper = mapper;
     }
 
-    @Transactional                                      // Metodos que alteram dados
+    @Transactional                                      // Todo metodo que chega no repository (secao 3)
     public CriarPedidoResponse criar(@Valid CriarPedidoRequest request) {
         Pedido pedido = mapper.toPedido(request);       // DTO -> entidade @JapeEntity
         Pedido salvo = pedidoService.criar(pedido);
@@ -78,13 +78,13 @@ Nome servico registrado plataforma. **Deve** terminar com sufixo `SP`.
 
 ### `transactionType` (opcional)
 
-Define comportamento transacional **padrao** todos metodos classe.
+Define comportamento transacional **padrao** todos metodos classe. E o atributo de transacao do **container EJB**: diz se o metodo pode rodar dentro de uma transacao do container, mas nao abre nem fecha `JapeSession` nem transacao JAPE — isso so o `@Transactional` no metodo faz (secao 3).
 
 | `EJBTransactionType` | Descricao | Quando usar |
 |:---------------------|:----------|:------------|
 | `Supports` | Usa transacao se ja existir; senao, sem. | **Padrao.** Controllers mistura leitura+escrita. |
 | `Required` | Sempre executa em transacao (cria se nao existir). | Controllers 100% escrita. |
-| `NotSupported` | Executa fora transacao (suspende se existir). | Controllers 100% leitura. |
+| `NotSupported` | Executa fora transacao (suspende se existir). | Controllers 100% leitura — metodo que le via repository ainda leva `@Transactional` (secao 3, sessao JAPE). |
 
 ```java
 // Padrao (leitura + escrita com @Transactional granular)
@@ -135,7 +135,8 @@ Sao enums **distintos e nao equivalentes** — nao ha par para todo valor:
 @Controller(serviceName = "MeuControllerSP", transactionType = EJBTransactionType.NotSupported)
 public class MeuController {
 
-    // Usa o padrao da classe (NotSupported) — sem transacao
+    // Le via repository: @Transactional so para abrir a sessao JAPE (ver abaixo)
+    @Transactional
     public List<MeuResponse> listar() { ... }
 
     // Sobrepoe o padrao — executa em transacao propria
@@ -148,14 +149,24 @@ public class MeuController {
 }
 ```
 
+### Sessao JAPE: `@Transactional` tambem em leitura
+
+O EJB que o SDK gera a partir do `@Controller` (`SP`, `SPBean`, `SPHome`, `SPSession`) nao abre `JapeSession` nos metodos do `SPBean`. Sem nada que abra a sessao entre o endpoint e o repository, qualquer consulta (`findOne`, `findByPK`, `@Criteria`...) falha com **"Nao existe uma sessao jape ativa."**. Nao e erro de transacao — leitura nao precisa de transacao, precisa de sessao.
+
+`transactionType` no `@Controller` (`Supports`, `Required`) **nao resolve**: e controle do container EJB, e a sessao falta dentro do metodo gerado no `SPBean`.
+
+Workaround: `@Transactional` no metodo do controller. Transacao exige sessao, entao a anotacao forca a abertura da `JapeSession` e as consultas passam. Nao abra `JapeSession`/transacao manualmente — a anotacao existe para isso.
+
+> Falha do SDK reportada a equipe de plataforma (correcao proposta: `JapeSession.open()` no `try` do `SPBean` gerado). Quando o SDK corrigir, leitura volta a dispensar `@Transactional` e esta secao sai.
+
 ### Quando usar `@Transactional`
 
 | Operacao | `@Transactional` | Motivo |
 |:---------|:-----------------|:-------|
 | Create / Update / Delete | Sim | Garante atomicidade |
-| Leitura simples | Nao | Sem necessidade transacao |
+| Leitura via repository | Sim | Abre a sessao JAPE (workaround acima) |
 | Leitura + escrita mesmo metodo | Sim | Garante consistencia |
-| Operacao idempotente (sem side effects) | Nao | Desnecessario |
+| Metodo que nao acessa banco | Nao | Desnecessario |
 
 ---
 
@@ -311,7 +322,10 @@ curl --location 'http://localhost:8080/mge/service.sbr?serviceName=MobileLoginSP
   "status": "0",
   "responseBody": {
     "error": {
-      "mensagem": "O campo descricao e obrigatorio"
+      "code": "BAD_REQUEST",
+      "message": "O campo descricao e obrigatorio",
+      "status": 400,
+      "timestamp": 1735689600000
     }
   }
 }
@@ -349,6 +363,7 @@ Tipo retorno cada metodo definido pela regra negocio projeto:
 
 ```java
 // Com retorno de dados
+@Transactional
 public PedidoResponse criarPedido(@Valid CriarPedidoRequest request) {
     ...
     return mapper.toResponse(resultado);
@@ -409,6 +424,7 @@ public void cancelar(@Valid CancelarPedidoRequest request) {
 ### Metodo somente com saida (consulta)
 
 ```java
+@Transactional // sessao JAPE para a consulta (secao 3)
 public List<ProdutoResponse> listarProdutos() {
     List<Produto> produtos = produtoService.listar();
     return produtos.stream()
@@ -459,7 +475,7 @@ Exemplos completos — controller simples (CRUD) e controller completo (múltipl
 6. [ ] Criar Response DTOs.
 7. [ ] Criar MapStruct Mapper (ver `mapstruct`).
 8. [ ] Usar `@Valid` em parametro dos metodos que recebem DTOs.
-9. [ ] Usar `@Transactional` em metodos que alteram dados.
+9. [ ] Usar `@Transactional` em todo metodo que chega no repository — escrita e leitura (sessao JAPE, secao 3).
 10. [ ] Retornar tipo adequado conforme regra negocio (DTO resposta ou `void`).
 11. [ ] **NAO** colocar logica negocio — delegar para o service.
 12. [ ] **NAO** capturar excecoes — deixar `@ControllerAdvice` tratar.
@@ -475,14 +491,17 @@ Exemplos completos — controller simples (CRUD) e controller completo (múltipl
 | Logica de negocio no controller | Mover para o service |
 | Criar um objeto de dominio intermediario entre DTO e `@JapeEntity` por default | Mapear direto para a entidade — terceiro modelo so por decisao explicita do projeto |
 | `try/catch` no controller para excecoes de negocio | Deixar o `@ControllerAdvice` tratar |
-| Controller acessando Repository diretamente | Usar Service como intermediario |
+| Controller acessando Repository diretamente | Usar Service `@Component` como intermediario |
 | Controller chamando Gateway diretamente | Usar Service como intermediario |
 | `serviceName` sem sufixo `SP` | Sempre `<Nome>SP` |
 | Esquecer `@Transactional` em metodo de escrita | Adicionar `@Transactional` |
+| Metodo de leitura via repository sem `@Transactional` | Falha com "Nao existe uma sessao jape ativa." — adicionar `@Transactional` (secao 3) |
+| Abrir `JapeSession` ou transacao manualmente | Usar `@Transactional` |
 | `@Transactional(Transactional.TxType.SUPPORTS)` | Nao existe — omitir `@Transactional` (metodo herda `Supports` da classe) |
 | `@Transactional` na classe | So vale em metodo (`@Target(METHOD)`) — use `transactionType` no `@Controller` |
 | Esquecer `@Valid` no parametro | Adicionar `@Valid` para ativar validacao |
 | Adicionar `@Component` no controller | `@Controller` ja e gerenciado — nao misturar |
+| Anotar o service com `@Service` | `@Service` e legado, substituido pelo `@Controller` (so mapeava o servlet, sem DI completa). Endpoint e `@Controller`; service de negocio e `@Component` |
 | Capturar excecao e retornar `null` | Deixar a excecao propagar para o `@ControllerAdvice` |
 
 

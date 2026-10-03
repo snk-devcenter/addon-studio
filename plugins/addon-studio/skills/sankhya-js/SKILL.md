@@ -154,7 +154,7 @@ MetadataProvider.getEntityMetadata('RecProduto').then(function (entities) {
 });
 ```
 
-Cache por `entidade + locale`. Serve tanto para entidade nativa quanto para a do addon declarada no dicionário.
+Sem cache por padrão (`_useInternalCache = false`): cada chamada vai ao servidor, então busque uma vez e reutilize. Serve tanto para entidade nativa quanto para a do addon declarada no dicionário.
 
 ---
 

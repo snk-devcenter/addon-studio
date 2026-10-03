@@ -27,7 +27,7 @@ Use `@ActionButton` quando o usuario precisar disparar **manualmente** uma rotin
 | Acao em massa | "Aprovar Lotes Selecionados" |
 | Coleta de dados adicionais | Formulario antes de executar logica |
 
-> **Nao use** para logica que dispara automaticamente ao salvar/excluir/modificar registros — use `@BusinessRule` ou Listener.
+> **Nao use** para logica que dispara automaticamente ao salvar/excluir registros — isso e `@Listener` (skill `listener`); regra do barramento comercial na confirmacao/faturamento e `@BusinessRule`.
 
 ---
 
@@ -44,7 +44,7 @@ import com.google.inject.Inject;
     description = "Enviar para E-commerce",          // Obrigatorio: texto no menu
     instanceName = "CabecalhoNota",                  // Obrigatorio: nome da entidade
     transactionType = TransactionType.AUTOMATIC,     // Obrigatorio: AUTOMATIC ou MANUAL
-    resourceId = "br.com.sankhya.core.mov.central"   // Recomendado: restringir a tela
+    resourceId = "<resourceId da tela nativa>"       // Recomendado: restringir a tela
 )
 public class EnviarEcommerceAction implements AcaoRotinaJava {
 
@@ -72,20 +72,27 @@ public class EnviarEcommerceAction implements AcaoRotinaJava {
 |:-------------------|:------------|:------------------|:--------------------------------------------------------------------------------------------|
 | `description`      | Sim         | —                 | Texto exibido no menu "Acoes" para o usuario.                                               |
 | `instanceName`     | Sim         | —                 | Nome da entidade (instancia) associada ao botao (ex.: `"CabecalhoNota"`).                   |
-| `transactionType`  | **Sim**     | — (sem default)   | `TransactionType.AUTOMATIC` (framework gerencia a tx) ou `TransactionType.MANUAL` (controle manual). |
+| `transactionType`  | **Sim**     | — (sem default)   | `TransactionType.AUTOMATIC` (acao ja roda em sessao JAPE + transacao) ou `TransactionType.MANUAL` (sessao JAPE sem transacao). Ver nota abaixo. |
 | `form`             | Nao         | sem form          | Formulario exibido antes de executar a acao. Ver secao 4.                                   |
 | `accessControlled` | Nao         | `false`           | `true` = visibilidade respeita as permissoes de acesso do usuario a tela. Default `false`. |
 | `resourceId`       | Nao         | `""` (todas telas)| Restringe o botao a uma tela especifica pelo seu ID de recurso.                             |
 | `refreshType`      | Nao         | `NONE_ITEM`       | O que atualizar apos execucao. Valores: `NONE_ITEM`, `SELECTED_ITEMS`, `PARENT_ITEM`, `MASTER_ITEM`, `ALL_ITEMS`. |
 
-> **`transactionType` nao tem default — e obrigatorio.** Valores validos: apenas `TransactionType.AUTOMATIC` e `TransactionType.MANUAL`. **Nao existe `REQUIRES_NEW`** (esse pertence ao `EJBTransactionType` de `@Controller`/`@Job`, nao ao hook do botao).
+> **`transactionType` nao tem default — e obrigatorio.** Valores validos: apenas `TransactionType.AUTOMATIC` e `TransactionType.MANUAL`. **Nao existe `REQUIRES_NEW`** aqui (esse valor e de `Transactional.TxType`, no `@Transactional` por metodo).
+
+> **`AUTOMATIC` + `@Transactional` no service: confira o `TxType` do metodo chamado.** Em `AUTOMATIC` a acao ja esta dentro de uma transacao, e e comum reaproveitar metodo de service que ja vem anotado:
+> - `@Transactional` bare (`REQUIRED`, o default) entra na transacao do botao — e o caso seguro.
+> - `REQUIRES_NEW` suspende a transacao do botao e commita por conta propria: se a acao falhar depois, o rollback do botao **nao** desfaz o que esse metodo gravou.
+> - `NOT_SUPPORTED` roda fora da transacao do botao: o que ele faz nao participa do commit/rollback da acao.
+>
+> O bug passa batido porque nada falha — so aparece quando a acao da erro depois da chamada e parte da gravacao fica. Em `MANUAL` existe sessao (consulta via repository funciona), mas nao existe transacao: gravacao vai em metodo de service com `@Transactional`.
 
 ```java
 // Exemplo com todos os atributos
 @ActionButton(
     description = "Aprovar Nota",
     instanceName = "CabecalhoNota",
-    resourceId = "br.com.sankhya.core.mov.centraldenotas",
+    resourceId = "<resourceId da tela nativa>",
     transactionType = TransactionType.AUTOMATIC,
     accessControlled = true,
     refreshType = RefreshTypeEnum.ALL_ITEMS
@@ -175,7 +182,7 @@ import com.google.inject.Inject;
     description = "Exportar Dados para Planilha",
     instanceName = "CabecalhoNota",
     transactionType = TransactionType.AUTOMATIC,
-    resourceId = "br.com.sankhya.core.mov.centraldenotas",
+    resourceId = "<resourceId da tela nativa>",
     form = @Form(
         fields = {
             @Field(
@@ -242,11 +249,12 @@ public class ExportarDadosAction implements AcaoRotinaJava {
 |:-------------|:---------|
 | Omitir `transactionType` (e obrigatorio) | Sempre definir `TransactionType.AUTOMATIC` ou `MANUAL` |
 | `transactionType = TransactionType.REQUIRES_NEW` | Nao existe — usar `AUTOMATIC` ou `MANUAL` |
+| Em `AUTOMATIC`, chamar metodo de service `REQUIRES_NEW`/`NOT_SUPPORTED` sem querer | Gravacao escapa do rollback da acao — usar metodo `REQUIRED` (bare) ou isolar de proposito |
 | `type = FieldType.CHECKBOX` | Nao existe — usar `FieldType.BOOLEAN` |
 | `refreshType = RefreshTypeEnum.ALL` / `ITEM` | Usar `ALL_ITEMS` / `NONE_ITEM` (valores reais) |
 | Logica de negocio no `doAction()` | Mover para Service (`@Component`) |
 | Nao chamar `setMensagemRetorno()` | Sempre fornecer feedback ao usuario |
-| Usar para logica automatica (salvar/excluir) | Usar `@BusinessRule` ou Listener |
+| Usar para logica automatica (salvar/excluir) | Usar `@Listener` |
 | `description` generica ("Processar", "Executar") | Descricao clara e contextualizada |
 | `new` em dependencias gerenciadas | Injetar via construtor com `@Inject` |
 | Usar para telas customizadas | Em telas customizadas, crie botoes proprios na UI |
@@ -262,7 +270,7 @@ public class ExportarDadosAction implements AcaoRotinaJava {
 5. [ ] Injetar dependencias via construtor com `@Inject` (Guice).
 6. [ ] Implementar `doAction()` delegando logica para Service.
 7. [ ] Chamar `contexto.setMensagemRetorno()` em todos os caminhos (sucesso e erro).
-8. [ ] Confirmar `transactionType` (**obrigatorio**): `AUTOMATIC` (framework gerencia) ou `MANUAL` (controle manual).
+8. [ ] Confirmar `transactionType` (**obrigatorio**): `AUTOMATIC` (sessao + transacao) ou `MANUAL` (so sessao). Em `AUTOMATIC`, conferir o `TxType` dos metodos de service chamados — `REQUIRES_NEW`/`NOT_SUPPORTED` escapam do rollback da acao.
 9. [ ] Definir `refreshType` se precisar atualizar mais que o registro atual (`ALL_ITEMS`, `SELECTED_ITEMS`, etc.).
 10. [ ] Registrar no modulo Guice os **services/dependencias injetados** na classe — a action em si nao precisa de binding (o SDK a descobre pela anotacao `@ActionButton`). Ver `dependency-injection`.
 

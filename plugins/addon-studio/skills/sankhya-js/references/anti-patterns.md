@@ -18,7 +18,7 @@ $timeout(function() {
 }, 500);
 ```
 
- `setTimeout` envolvendo `$popupInstance.dismiss` dentro de um `.catch` para "mover o throw para fora da cadeia de promise".
+Variante: `setTimeout` envolvendo `$popupInstance.dismiss` dentro de um `.catch` para "mover o throw para fora da cadeia de promise".
 
 ### Por que quebra
 

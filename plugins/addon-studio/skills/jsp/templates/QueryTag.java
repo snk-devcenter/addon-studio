@@ -1,4 +1,4 @@
-package br.com.sankhya.<addon>.servlet.taglibs;
+package <pacote.das.taglibs>;
 
 import br.com.sankhya.jape.EntityFacade;
 import br.com.sankhya.jape.core.JapeSession;

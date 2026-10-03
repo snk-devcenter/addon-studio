@@ -109,8 +109,8 @@ Pos-gerar XML, **limpe entidade Java** removendo tudo que foi pro dicionario.
 **ANTES (metadata no Java):**
 
 ```java
-@JapeEntity(entity = "TdcXyzProduto", table = "TDCXYZPRD", description = "Produtos")
-public class TdcXyzProduto {
+@JapeEntity(entity = "PrxXyzProduto", table = "PRXXYZPRD", description = "Produtos")
+public class PrxXyzProduto {
 
     @Id
     @GeneratedValue(strategy = GeneratedValue.GenerationType.AUTO)
@@ -127,8 +127,8 @@ public class TdcXyzProduto {
 **DEPOIS (limpo):**
 
 ```java
-@JapeEntity(entity = "TdcXyzProduto", table = "TDCXYZPRD")
-public class TdcXyzProduto {
+@JapeEntity(entity = "PrxXyzProduto", table = "PRXXYZPRD")
+public class PrxXyzProduto {
 
     @Id
     @Column(name = "CODPRODUTO")
@@ -139,7 +139,7 @@ public class TdcXyzProduto {
 }
 ```
 
-Toda metadata (description, dataType, order, readOnly, etc.) fica no `TDCXYZPRD.xml`.
+Toda metadata (description, dataType, order, readOnly, etc.) fica no `PRXXYZPRD.xml`.
 
 ---
 

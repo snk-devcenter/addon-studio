@@ -12,8 +12,8 @@ Por baixo e um `SanPopup.open` com `templateUrl: 'components/popupparameter/popu
 Ou seja: **todo campo suportado pelo `sk-form` funciona aqui** ([form.md](form.md), [inputs.md](inputs.md)).
 
 Fontes (framework, nao versionado no addon):
-- components/popupparameter/popupparameter.service.js (291 linhas) — API publica + builder
-- components/popupparameter/popupparameter.controller.js (105 linhas) — validacao e montagem do resultado
+- components/popupparameter/popupparameter.service.js — API publica + builder
+- components/popupparameter/popupparameter.controller.js — validacao e montagem do resultado
 - components/popupparameter/popupparameter.tpl.html, .module.js, .less
 
 Modulo `snk.components.popupparameter`, ja incluido no bundle `snk`. Na tela do addon basta injetar `'PopUpParameter'` na DI por array — nao ha nada a declarar em `angular.module('<Tela>App', ['snk'])`.

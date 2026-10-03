@@ -1,27 +1,27 @@
 # Passo a Passo: Criando Entidade do Zero — Entity
 
-## Cenário: Criar uma nova entidade `TdcXyzFornecedor`
+## Cenário: Criar uma nova entidade `PrxXyzFornecedor`
 
-Tabela `TDCXYZFOR`, PK simples `CODFORN` (auto), campos `NOME`, `CNPJ`, `ATIVO`, com vinculo para `Parceiro`.
+Tabela `PRXXYZFOR`, PK simples `CODFORN` (auto), campos `NOME`, `CNPJ`, `ATIVO`, com vinculo para `Parceiro`.
 
 ---
 
 ## Passo 1 — Criar o XML do dicionário de dados
 
-Arquivo `datadictionary/TDCXYZFOR.xml`:
+Arquivo `datadictionary/PRXXYZFOR.xml`:
 
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <metadados xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:noNamespaceSchemaLocation="../.gradle/metadados.xsd">
 
-    <table name="TDCXYZFOR" sequenceType="A" sequenceField="CODFORN">
+    <table name="PRXXYZFOR" sequenceType="A" sequenceField="CODFORN">
         <description>Fornecedores</description>
         <primaryKey>
             <field name="CODFORN"/>
         </primaryKey>
         <instances>
-            <instance name="TdcXyzFornecedor">
+            <instance name="PrxXyzFornecedor">
                 <description>Fornecedores</description>
             </instance>
         </instances>
@@ -55,7 +55,7 @@ Arquivo `datadictionary/TDCXYZFOR.xml`:
 
 ## Passo 2 — Criar a entidade Java
 
-Arquivo `TdcXyzFornecedor.java`:
+Arquivo `PrxXyzFornecedor.java`:
 
 ```java
 import br.com.sankhya.studio.persistence.Column;
@@ -73,10 +73,10 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @JapeEntity(
-    entity = "TdcXyzFornecedor",
-    table = "TDCXYZFOR"
+    entity = "PrxXyzFornecedor",
+    table = "PRXXYZFOR"
 )
-public class TdcXyzFornecedor {
+public class PrxXyzFornecedor {
 
     @Id
     @Column(name = "CODFORN")
@@ -105,7 +105,7 @@ public class TdcXyzFornecedor {
 
 ## Passo 3 — (Se PK composta) Criar a classe `@Embeddable`
 
-Entidade com PK composta — criaria em `TdcXyzFornecedorId.java`.
+Entidade com PK composta — criaria em `PrxXyzFornecedorId.java`.
 
 ---
 

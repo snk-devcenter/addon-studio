@@ -8,19 +8,6 @@ Este arquivo **nao** repete os anti-padroes operacionais ja cobertos em `anti-pa
 
 ## 1. Padroes de codigo
 
-### Early return em vez de aninhamento profundo
-
-Saia cedo dos casos invalidos. Evita piramide de `if` e deixa o caminho feliz no nivel zero de indentacao.
-
-```javascript
-function processarLinha() {
-    if (!self.ds || self.ds.isEmpty()) { return; }
-
-    var row = self.ds.getCurrentRow();
-    // caminho feliz, sem aninhar
-}
-```
-
 ### Separacao de responsabilidades
 
 Cada camada tem um papel. Nao misture:
@@ -45,20 +32,6 @@ var txt = dia + '/' + mes + '/' + d.getFullYear();
 var txt = DateUtils.formatDate(d, DateUtilsConstants.DEFAULT_DATE_FORMAT);
 ```
 
-### Escopo de variavel
-
-Declare no menor escopo possivel. Nao pendure estado de uma requisicao especifica em singleton/service compartilhado entre telas - service no AngularJS e singleton, e dois usuarios da mesma tela passam a ler/escrever o mesmo campo.
-
-```javascript
-// Ruim: estado de tela vivendo no service singleton
-angular.module('<Tela>App').service('MinhaSvc', function() {
-    this.nunotaAtual = null; // vaza entre telas/abas
-});
-
-// Bom: estado fica no controller; o service recebe por parametro
-ServiceProxy.callService('<addon>@MeuServicoSP.metodo', { nunota: { $: nunota } });
-```
-
 ---
 
 ## 2. Performance
@@ -77,17 +50,17 @@ Polling com `setInterval`/`$timeout` para "esperar" dataset ou servico nao so qu
 ### Rede
 
 - **Nao trave a UI a toa**: chamada de background usa `ignoreLoadingBar: true` (ver `patterns.md`, Padrao 2).
-- **Evite N chamadas em laco**: prefira um servico que recebe a lista, ou agrupe com `$q.all([...])`.
+- **Evite N chamadas em laco**: prefira um servico que recebe a lista. Se as N chamadas forem inevitaveis, junte as promises com `$q.all` para tratar o fim uma vez so (continua sendo N requests).
 
 ```javascript
 // Ruim: N requests em laco
 parceiros.forEach(function(p) {
-    ServiceProxy.callService('<addon>@MeuServicoSP.metodo', { cod: { $: p } });
+    ServiceProxy.callService('<addon>@MeuServicoSP.metodo', { cod: p });
 });
 
-// Bom: $q.all, ou um servico que recebe a lista
+// Se nao houver servico que receba a lista: N requests, um unico ponto de conclusao
 $q.all(parceiros.map(function(p) {
-    return ServiceProxy.callService('<addon>@MeuServicoSP.metodo', { cod: { $: p } });
+    return ServiceProxy.callService('<addon>@MeuServicoSP.metodo', { cod: p });
 })).then(consolidar);
 ```
 
@@ -116,7 +89,7 @@ $scope.nome = nomeDigitado; // no template: <b ng-bind="nome"></b>
 
 ### Nao monte SQL no frontend
 
-O cliente envia parametros (`{ $: valor }`) ao servico; a query e responsabilidade do backend, que deve parametrizar (anti-SQL injection - skills `repository` e `entity`). String de WHERE concatenada no JS e bug e brecha ao mesmo tempo.
+O cliente envia parametros ao servico; a query e responsabilidade do backend, que deve parametrizar (anti-SQL injection - skills `repository` e `entity`). String de WHERE concatenada no JS e bug e brecha ao mesmo tempo.
 
 ### Exposicao de servico e decisao do backend
 
@@ -129,19 +102,6 @@ O build do addon nao roda lint nem minifica o `.js` da tela: o arquivo vai como 
 ---
 
 ## 4. Comentarios e documentacao
-
-### Comente o porque, com rastreabilidade
-
-Comentario bom explica regra fiscal/financeira/UX nao obvia e aponta o chamado. Nao comente o obvio; remova codigo morto dentro do escopo que esta mexendo.
-
-```javascript
-// Chamado #0000 - aliquota de ICMS-ST nao entra na base quando UF origem = destino
-if (ufOrigem === ufDestino) {
-    base = base - valorST;
-}
-
-// Chamado #0000 - regra de negocio exige confirmacao antes de cancelar nota faturada
-```
 
 ### Documente o contrato de diretiva e service
 
@@ -176,16 +136,13 @@ Ao precisar mexer numa dessas:
 
 ## Checklist de qualidade
 
-- [ ] Casos invalidos saem por early return; caminho feliz sem aninhamento profundo?
 - [ ] Renderizacao, logica de tela e acesso a servico em camadas separadas?
 - [ ] Procurou util do framework antes de reescrever validacao/formatacao?
-- [ ] Estado de requisicao fora de service singleton compartilhado?
 - [ ] Sem expressao cara em binding nem lista enorme sem paginacao?
-- [ ] Sem N chamadas em laco (agrupou ou usou `$q.all`)?
+- [ ] Sem N chamadas em laco quando existe servico que recebe a lista?
 - [ ] `MetadataProvider` buscado uma vez, nao em laco?
 - [ ] HTML do usuario via binding seguro, nunca concatenado cru?
-- [ ] SQL fica no backend; frontend so manda `{ $: valor }` e `serviceName` com prefixo `<addon>@`?
+- [ ] SQL fica no backend; frontend so manda parametros e `serviceName` com prefixo `<addon>@`?
 - [ ] Lint do editor limpo e tela aberta no navegador apos o deploy (o build nao acusa erro de JS)?
-- [ ] Comentario aponta o porque e o chamado/ticket?
 - [ ] Diretiva/service reusado por outra tela com contrato documentado no arquivo?
 - [ ] Nao engordou tela gigante; extraiu helper; testou regressao de fluxo fiscal/financeiro?

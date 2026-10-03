@@ -55,7 +55,7 @@ Cria classe `@Embeddable`:
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
-public class TdcXyzEntidadeId {
+public class PrxXyzEntidadeId {
 
     @Column(name = "CODORIG")
     private Integer codOrig;
@@ -71,7 +71,7 @@ Na entidade:
 
 ```java
 @Id
-private TdcXyzEntidadeId embeddedId;
+private PrxXyzEntidadeId embeddedId;
 ```
 
 ---
@@ -109,10 +109,10 @@ Pra **cada** `<field>` no XML, cria campo Java com **so** `@Column(name = "<nome
 
 ## Mapeamento `<relationShip>` -> `@OneToMany`
 
-Pra cada `<relation>` dentro `<relationShip>`, cria campo `@OneToMany`:
+Pra cada `<relation relation="OneToMany">` dentro `<relationShip>`, cria campo `@OneToMany`:
 
 ```xml
-<relation entityName="TdcXyzVinculoProduto">
+<relation entityName="PrxXyzVinculoProduto" relation="OneToMany">
     <fields>
         <field localName="CODPRODUTO" targetName="CODPRODUTO"/>
     </fields>
@@ -126,7 +126,7 @@ Pra cada `<relation>` dentro `<relationShip>`, cria campo `@OneToMany`:
         @Relationship(fromField = "CODPRODUTO", toField = "CODPRODUTO")
     }
 )
-private List<TdcXyzVinculoProduto> vinculos;
+private List<PrxXyzVinculoProduto> vinculos;
 ```
 
 | XML           | Java `@Relationship` |
@@ -166,12 +166,12 @@ Nesses casos, `referencedColumnName` = **campo unico na tabela destino** — **n
 
 **Exemplo correto - FK local aponta pra campo unico `CODORIGEM` na destino:**
 ```java
-// Tabela TDCXYZREL possui coluna CODPRODUTO que referencia CODORIGEM de TDCXYZPRD
+// Tabela PRXXYZREL possui coluna CODPRODUTO que referencia CODORIGEM de PRXXYZPRD
 @OneToOne
 @JoinColumn(name = "CODPRODUTO", referencedColumnName = "CODORIGEM")
 private Produto produto;
 
-// Tabela TDCXYZREL possui coluna CODCULTURA que referencia CODORIGEM de TDCXYZCUL
+// Tabela PRXXYZREL possui coluna CODCULTURA que referencia CODORIGEM de PRXXYZCUL
 @OneToOne
 @JoinColumn(name = "CODCULTURA", referencedColumnName = "CODORIGEM")
 private Cultura cultura;
@@ -179,7 +179,7 @@ private Cultura cultura;
 
 **Exemplo errado - `name` e `referencedColumnName` invertidos:**
 ```java
-// NUNCA FAÇA ISSO - CODORIGEM nao é um campo local de TDCXYZREL
+// NUNCA FAÇA ISSO - CODORIGEM nao é um campo local de PRXXYZREL
 @JoinColumn(name = "CODORIGEM", referencedColumnName = "CODPRODUTO")
 private Produto produto;
 ```

@@ -1,6 +1,6 @@
 // TEMPLATE -- antes de usar, troque o package pelo do seu add-on e faca o
 // <tag-class> do sankhyaUtil.tld apontar para a mesma FQN.
-package br.com.sankhya.<addon>.servlet.taglibs;
+package <pacote.das.taglibs>;
 
 import java.io.IOException;
 

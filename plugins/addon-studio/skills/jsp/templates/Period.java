@@ -1,4 +1,4 @@
-package br.com.sankhya.<addon>.servlet.taglibs;
+package <pacote.das.taglibs>;
 
 public class Period {
 

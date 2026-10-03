@@ -1,6 +1,6 @@
 # Menu (`<menu>`) — Data Dictionary
 
-Define ponto de entrada na barra de navegação principal do Sankhya Om. Container hierárquico para `<folder>`, `<dynamicForm>`, `<dynamicTreeView>`, `<ui>`, `<dashboard>`, `<pastaNativa>`.
+Define ponto de entrada na barra de navegação principal do Sankhya Om. Container hierárquico para `<folder>`, `<dynamicForm>`, `<dynamicTreeView>`, `<ui>`, `<dashboard>`.
 
 > **Regra que derruba deploy:** todo `<ui>` e todo `<folder>` — e todo `<dynamicForm>`/`<dynamicTreeView>`/`<dashboard>` — leva `resourceId` explícito de no máximo 50 caracteres. O XSD deixa o atributo opcional; trate como obrigatório. Sem ele o `NOME` gravado em `TRDCON` recebe o prefixo do contexto do add-on, estoura os 50 caracteres da coluna e **o módulo inteiro não carrega**. Ver [`resourceId` e o teto de 50](#resourceid--obrigatório-na-prática-teto-de-50-em-trdconnome).
 
@@ -20,23 +20,23 @@ Define ponto de entrada na barra de navegação principal do Sankhya Om. Contain
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <metadados>
-    <menu id="TDC_MENU_XYZ"
+    <menu id="PRX_MENU_XYZ"
           description="Modulo XYZ"
           icon="/$ctx/assets/xyz_icone.png">
-        <folder id="TDC_FLD_CADASTROS" resourceId="TDC_FLD_CADASTROS" description="Cadastros">
+        <folder id="PRX_FLD_CADASTROS" resourceId="PRX_FLD_CADASTROS" description="Cadastros">
             <!-- Atendimento e Departamento sao <table> regulares -->
-            <dynamicForm id="TDC_FORM_ATD"
-                         resourceId="TDC_FORM_ATD"
-                         instance="TdcXyzAtendimento"
+            <dynamicForm id="PRX_FORM_ATD"
+                         resourceId="PRX_FORM_ATD"
+                         instance="PrxXyzAtendimento"
                          description="Atendimentos"/>
-            <dynamicForm id="TDC_FORM_DEP"
-                         resourceId="TDC_FORM_DEP"
-                         instance="TdcXyzDepartamento"
+            <dynamicForm id="PRX_FORM_DEP"
+                         resourceId="PRX_FORM_DEP"
+                         instance="PrxXyzDepartamento"
                          description="Departamentos"/>
             <!-- Centro de Custo eh <treeTable> hierarquica - usar dynamicTreeView -->
-            <dynamicTreeView id="TDC_TREE_CCU"
-                             resourceId="TDC_TREE_CCU"
-                             instance="TdcXyzCentroCusto"
+            <dynamicTreeView id="PRX_TREE_CCU"
+                             resourceId="PRX_TREE_CCU"
+                             instance="PrxXyzCentroCusto"
                              description="Centro de Custo"/>
         </folder>
     </menu>
@@ -47,14 +47,14 @@ Define ponto de entrada na barra de navegação principal do Sankhya Om. Contain
 
 | Atributo | Obrigatório | Descrição | Exemplo |
 |----------|:-----------:|-----------|---------|
-| `id` | Sim | Identificador único. Pattern `[a-zA-Z0-9_.-]+`. Usar prefixo do projeto (`<PRX>_MENU_<MOD3>`) | `TDC_MENU_XYZ` |
+| `id` | Sim | Identificador único. Pattern `[a-zA-Z0-9_.-]+`. Usar prefixo do projeto (`<PRX>_MENU_<MOD3>`) | `PRX_MENU_XYZ` |
 | `description` | Sim | Label visível na barra de navegação | `Modulo XYZ` |
 | `icon` | Sim | URL do ícone (local `/$ctx/assets/...` ou externa) | `/$ctx/assets/xyz.png` |
 | `license` | Não | Identificador de licença (controle por feature) | — |
 
 ## Filhos de `<menu>` / `<folder>` (folderSubItens)
 
-`folderSubItens` aceita 6 tipos de filhos (todos 0..N, ordem livre):
+`folderSubItens` aceita 5 tipos de filhos (todos 0..N, ordem livre):
 
 | Filho | Função | Detalhes |
 |-------|--------|----------|
@@ -63,19 +63,17 @@ Define ponto de entrada na barra de navegação principal do Sankhya Om. Contain
 | `<dynamicTreeView>` | Tela CRUD com tree-view para `<treeTable>` hierárquica. Atributos idênticos ao `<dynamicForm>` (`id`, `instance`, `description`, `resourceId`, `license`). **Regra:** `<table>` → `<dynamicForm>`; `<treeTable>` → `<dynamicTreeView>` | Ver [`tree-table.md`](tree-table.md) |
 | `<ui>` | Tela custom (xhtml5/JS/HTML) | URL aponta para arquivo XHTML5 |
 | `<dashboard>` | Dashboard de gráficos/KPIs | Arquivo em `/dashboards/` |
-| `<pastaNativa>` | Encaixe em pasta nativa do Sankhya | Apenas 4 valores enum (ver abaixo) |
-| `<uiDesignSystem>` | Tela usando design system padrão Sankhya | Pouco usado, consultar projeto |
 
 ## `<folder>` — submenu recursivo
 
 ```xml
-<folder id="TDC_FLD_CADASTROS" resourceId="TDC_FLD_CADASTROS" description="Cadastros">
-    <folder id="TDC_FLD_CAD_BASICOS" resourceId="TDC_FLD_CAD_BASICOS" description="Cadastros Basicos">
-        <dynamicForm id="TDC_FORM_CCU" resourceId="TDC_FORM_CCU" instance="TdcXyzCentroCusto" description="Centro de Custo"/>
-        <dynamicForm id="TDC_FORM_DEP" resourceId="TDC_FORM_DEP" instance="TdcXyzDepartamento" description="Departamento"/>
+<folder id="PRX_FLD_CADASTROS" resourceId="PRX_FLD_CADASTROS" description="Cadastros">
+    <folder id="PRX_FLD_CAD_BASICOS" resourceId="PRX_FLD_CAD_BASICOS" description="Cadastros Basicos">
+        <dynamicForm id="PRX_FORM_CCU" resourceId="PRX_FORM_CCU" instance="PrxXyzCentroCusto" description="Centro de Custo"/>
+        <dynamicForm id="PRX_FORM_DEP" resourceId="PRX_FORM_DEP" instance="PrxXyzDepartamento" description="Departamento"/>
     </folder>
-    <folder id="TDC_FLD_CAD_AVANCADOS" resourceId="TDC_FLD_CAD_AVANCADOS" description="Cadastros Avancados">
-        <dynamicForm id="TDC_FORM_CFG" resourceId="TDC_FORM_CFG" instance="TdcXyzConfiguracao" description="Configuracoes"/>
+    <folder id="PRX_FLD_CAD_AVANCADOS" resourceId="PRX_FLD_CAD_AVANCADOS" description="Cadastros Avancados">
+        <dynamicForm id="PRX_FORM_CFG" resourceId="PRX_FORM_CFG" instance="PrxXyzConfiguracao" description="Configuracoes"/>
     </folder>
 </folder>
 ```
@@ -92,9 +90,9 @@ Define ponto de entrada na barra de navegação principal do Sankhya Om. Contain
 Usa quando UI não pode ser gerada declarativamente (gráficos, layouts custom, fluxos não-CRUD):
 
 ```xml
-<folder id="TDC_FLD_RELATORIOS" resourceId="TDC_FLD_RELATORIOS" description="Relatorios">
-    <ui id="TDC_UI_RPT_XYZ"
-        resourceId="TDC_UI_RPT_XYZ"
+<folder id="PRX_FLD_RELATORIOS" resourceId="PRX_FLD_RELATORIOS" description="Relatorios">
+    <ui id="PRX_UI_RPT_XYZ"
+        resourceId="PRX_UI_RPT_XYZ"
         url="/$ctx/addon/xyz/relatorio_custom.xhtml5"
         description="Relatorio XYZ Customizado">
         <acesso description="Visualizar" acronym="VIS" sequence="1"/>
@@ -139,20 +137,7 @@ limite é o `NOME`.
 
 ### O teto: `VARCHAR2(50)`
 
-`TRDCON.NOME` é `VARCHAR2(50)` na plataforma. Medido num banco de produção — todo domínio do produto
-cabe, com zero de folga em vários deles:
-
-| `DOMAIN` | controles de menu | maior `NOME` |
-|----------|------------------:|-------------:|
-| `mge` | 1115 | 50 |
-| `mgepes` | 167 | 50 |
-| `mgeliv` | 107 | 50 |
-| `mgecontab` | 82 | 50 |
-| `mgeprod` | 68 | 50 |
-| `mgewms` | 63 | 49 |
-
-Seis add-ons de terceiros no mesmo banco: todos ≤ 49. O único a passar de 50 foi um add-on com 129
-controles — e ele quebrou.
+`TRDCON.NOME` é `VARCHAR2(50)` na plataforma, e os domínios nativos já ocupam a coluna inteira — não há folga.
 
 ### O orçamento do `id` quando falta `resourceId`
 
@@ -194,7 +179,7 @@ ORA-12899: valor muito grande para a coluna "SANKHYA"."TRDCON"."NOME" (real: 60,
 
 Com `resourceId` o `NOME` é o `resourceId` puro, sem prefixo de domínio, e o orçamento volta a ser os 50
 inteiros. Encurtar o `id` trata o sintoma, deixa o `NOME` dependente do tamanho do contexto e quebra a
-convenção observada em produção: **119 de 129 nós usam `id` igual ao `resourceId`**. Repetir o valor nos
+convenção de produção de `id` igual ao `resourceId`. Repetir o valor nos
 dois atributos deixa o `NOME` gravado previsível a partir do XML — é o padrão usado nos exemplos deste
 arquivo.
 
@@ -203,7 +188,7 @@ arquivo.
 Define níveis de acesso (roles/perfis) para a tela. Cada `<acesso>` vira uma permissão específica que admin pode atribuir a perfis de usuário:
 
 ```xml
-<ui id="TDC_UI_PEDIDOS" resourceId="TDC_UI_PEDIDOS" url="..." description="Pedidos">
+<ui id="PRX_UI_PEDIDOS" resourceId="PRX_UI_PEDIDOS" url="..." description="Pedidos">
     <acesso description="Visualizar" acronym="VIS" sequence="1"/>
     <acesso description="Editar" acronym="EDI" sequence="2"/>
     <acesso description="Cancelar" acronym="CAN" sequence="3"/>
@@ -224,9 +209,9 @@ Acesso não declarado = permissão liberada para todos. Acesso declarado = admin
 Aponta para arquivo de dashboard em `/dashboards/`:
 
 ```xml
-<folder id="TDC_FLD_DASHBOARDS" resourceId="TDC_FLD_DASHBOARDS" description="Dashboards">
-    <dashboard id="TDC_DSH_VENDAS"
-               resourceId="TDC_DSH_VENDAS"
+<folder id="PRX_FLD_DASHBOARDS" resourceId="PRX_FLD_DASHBOARDS" description="Dashboards">
+    <dashboard id="PRX_DSH_VENDAS"
+               resourceId="PRX_DSH_VENDAS"
                file="/dashboards/vendas.json"
                description="Dashboard de Vendas"/>
 </folder>
@@ -240,9 +225,9 @@ Aponta para arquivo de dashboard em `/dashboards/`:
 | `resourceId` | Opcional no XSD, **obrigatório na prática** | Máx. 50 caracteres — ver [teto de 50](#resourceid--obrigatório-na-prática-teto-de-50-em-trdconnome) |
 | `license` | Não | Licença |
 
-## `<pastaNativa>` — encaixe em pasta nativa Sankhya
+## `<nativeFolder>` — encaixe em pasta nativa Sankhya
 
-Quando o add-on adiciona apenas 1-2 telas em estrutura existente do Sankhya, evitar `<menu>` próprio e usar `<pastaNativa>`. Atributo `name` aceita 4 valores enum:
+Quando o add-on adiciona apenas 1-2 telas em estrutura existente do Sankhya, evitar `<menu>` próprio e usar `<nativeFolder>`. Atributo `name` de `<nativeFolder>` aceita 4 valores enum:
 
 | Valor de `name` | Onde encaixa |
 |-----------------|--------------|
@@ -255,18 +240,16 @@ Exemplo:
 
 ```xml
 <metadados>
-    <nativeFolder>
-        <pastaNativa name="CONFIGURACOES_CADASTROS" resourceId="tdc_xyz_cad">
-            <dynamicForm id="TDC_FORM_CCU"
-                         resourceId="TDC_FORM_CCU"
-                         instance="TdcXyzCentroCusto"
-                         description="Centro de Custo (Add-on XYZ)"/>
-        </pastaNativa>
+    <nativeFolder name="CONFIGURACOES_CADASTROS" resourceId="prx_xyz_cad">
+        <dynamicForm id="PRX_FORM_CCU"
+                     resourceId="PRX_FORM_CCU"
+                     instance="PrxXyzCentroCusto"
+                     description="Centro de Custo (Add-on XYZ)"/>
     </nativeFolder>
 </metadados>
 ```
 
-> **Atenção:** `<pastaNativa>` vai dentro de `<nativeFolder>` (top-level), **não** dentro de `<menu>`.
+> **Atenção:** `<nativeFolder>` é top-level (irmão de `<menu>`), não filho dele.
 
 ## `controlproperties` — propriedades avançadas
 
@@ -281,7 +264,7 @@ Filho `<properties>` em `<ui>`/`<dynamicForm>`/`<dynamicTreeView>` aceita 3 sub-
 Exemplo `paramMenuAtivo` — habilita o form só se parâmetro Sankhya `XYZ_FEAT_ATD = 'S'`:
 
 ```xml
-<dynamicForm id="TDC_FORM_ATD" resourceId="TDC_FORM_ATD" instance="TdcXyzAtendimento" description="Atendimentos">
+<dynamicForm id="PRX_FORM_ATD" resourceId="PRX_FORM_ATD" instance="PrxXyzAtendimento" description="Atendimentos">
     <properties>
         <paramMenuAtivo>SELECT 1 FROM TSIPAR WHERE CHAVE = 'XYZ_FEAT_ATD' AND VALOR = 'S'</paramMenuAtivo>
     </properties>
@@ -295,27 +278,27 @@ Item somente aparece no menu se a query retornar pelo menos 1 row no banco.
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <metadados>
-    <menu id="TDC_MENU_XYZ"
+    <menu id="PRX_MENU_XYZ"
           description="Modulo XYZ"
           icon="/$ctx/assets/xyz_icone.png">
 
-        <folder id="TDC_FLD_CADASTROS" resourceId="TDC_FLD_CADASTROS" description="Cadastros">
+        <folder id="PRX_FLD_CADASTROS" resourceId="PRX_FLD_CADASTROS" description="Cadastros">
             <!-- Departamento eh <table> regular -->
-            <dynamicForm id="TDC_FORM_DEP"
-                         resourceId="TDC_FORM_DEP"
-                         instance="TdcXyzDepartamento"
+            <dynamicForm id="PRX_FORM_DEP"
+                         resourceId="PRX_FORM_DEP"
+                         instance="PrxXyzDepartamento"
                          description="Departamento"/>
             <!-- Centro de Custo eh <treeTable> - usar dynamicTreeView -->
-            <dynamicTreeView id="TDC_TREE_CCU"
-                             resourceId="TDC_TREE_CCU"
-                             instance="TdcXyzCentroCusto"
+            <dynamicTreeView id="PRX_TREE_CCU"
+                             resourceId="PRX_TREE_CCU"
+                             instance="PrxXyzCentroCusto"
                              description="Centro de Custo"/>
         </folder>
 
-        <folder id="TDC_FLD_MOVIMENTOS" resourceId="TDC_FLD_MOVIMENTOS" description="Movimentos">
-            <dynamicForm id="TDC_FORM_ATD"
-                         resourceId="TDC_FORM_ATD"
-                         instance="TdcXyzAtendimento"
+        <folder id="PRX_FLD_MOVIMENTOS" resourceId="PRX_FLD_MOVIMENTOS" description="Movimentos">
+            <dynamicForm id="PRX_FORM_ATD"
+                         resourceId="PRX_FORM_ATD"
+                         instance="PrxXyzAtendimento"
                          description="Atendimentos">
                 <properties>
                     <filterExpression>STATUS &lt;&gt; 'CANCELADO'</filterExpression>
@@ -323,9 +306,9 @@ Item somente aparece no menu se a query retornar pelo menos 1 row no banco.
             </dynamicForm>
         </folder>
 
-        <folder id="TDC_FLD_CONSULTAS" resourceId="TDC_FLD_CONSULTAS" description="Consultas">
-            <ui id="TDC_UI_REL_PROD"
-                resourceId="TDC_UI_REL_PROD"
+        <folder id="PRX_FLD_CONSULTAS" resourceId="PRX_FLD_CONSULTAS" description="Consultas">
+            <ui id="PRX_UI_REL_PROD"
+                resourceId="PRX_UI_REL_PROD"
                 url="/$ctx/addon/xyz/relatorio_produtividade.xhtml5"
                 description="Relatorio de Produtividade">
                 <acesso description="Visualizar" acronym="VIS" sequence="1"/>
@@ -333,9 +316,9 @@ Item somente aparece no menu se a query retornar pelo menos 1 row no banco.
             </ui>
         </folder>
 
-        <folder id="TDC_FLD_DASHBOARDS" resourceId="TDC_FLD_DASHBOARDS" description="Dashboards">
-            <dashboard id="TDC_DSH_VENDAS"
-                       resourceId="TDC_DSH_VENDAS"
+        <folder id="PRX_FLD_DASHBOARDS" resourceId="PRX_FLD_DASHBOARDS" description="Dashboards">
+            <dashboard id="PRX_DSH_VENDAS"
+                       resourceId="PRX_DSH_VENDAS"
                        file="/dashboards/xyz_vendas.json"
                        description="Vendas"/>
         </folder>
@@ -351,7 +334,7 @@ Item somente aparece no menu se a query retornar pelo menos 1 row no banco.
 | `<dynamicTreeView>` | `<instance>` de `<treeTable>` | CRUD com tree-view (hierarquia) |
 | `<ui>` | Arquivo `.xhtml5` próprio | Layout/lógica custom além de CRUD |
 | `<dashboard>` | Arquivo de dashboard JSON | Gráficos, KPIs, painéis analíticos |
-| `<pastaNativa>` | Estrutura nativa Sankhya | Adicionar a `Configurações` existente |
+| `<nativeFolder>` | Estrutura nativa Sankhya | Adicionar a `Configurações` existente |
 
 ## Anti-patterns
 
@@ -364,7 +347,7 @@ Item somente aparece no menu se a query retornar pelo menos 1 row no banco.
 - [ ] `icon` com path quebrado — menu aparece sem ícone
 - [ ] Menus/folders vazios sem filhos — UI confusa para o usuário
 - [ ] Misturar definição de `<menu>` no mesmo XML de `<table>` — separar arquivos
-- [ ] Criar `<menu>` dedicado para 1-2 telas isoladas — usar `<pastaNativa>` em `<nativeFolder>`
+- [ ] Criar `<menu>` dedicado para 1-2 telas isoladas — usar `<nativeFolder name="...">`
 - [ ] Esquecer `<acesso>` em `<ui>` que faz operações sensíveis — sem permissões, qualquer usuário acessa
 - [ ] Conflito de `id` com entidade nativa Sankhya (`Produto`, `Parceiro`, etc.)
 

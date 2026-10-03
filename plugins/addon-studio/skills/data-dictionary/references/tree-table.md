@@ -20,7 +20,7 @@ Casos típicos:
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <metadados>
-    <treeTable name="TDCXYZCCU" defaultMask="##.##.##">
+    <treeTable name="PRXXYZCCU" defaultMask="##.##.##" maskName="XYZ_MASK_CCU">
         <description>Centro de Custo</description>
 
         <primaryKey>
@@ -28,15 +28,21 @@ Casos típicos:
         </primaryKey>
 
         <instances>
-            <instance name="TdcXyzCentroCusto">
+            <instance name="PrxXyzCentroCusto">
                 <description>Centro de Custo</description>
             </instance>
         </instances>
 
         <fields>
-            <field name="CODCCU" dataType="INTEIRO" required="S" allowSearch="S" visibleOnSearch="S"/>
-            <field name="DESCRCCU" dataType="TEXTO" size="100" required="S" allowSearch="S" visibleOnSearch="S"/>
-            <field name="ATIVO" dataType="CHECKBOX" required="S" allowSearch="N" visibleOnSearch="N"/>
+            <field name="CODCCU" dataType="INTEIRO" required="S" allowSearch="S" visibleOnSearch="S">
+                <description>Codigo</description>
+            </field>
+            <field name="DESCRCCU" dataType="TEXTO" size="100" required="S" allowSearch="S" visibleOnSearch="S">
+                <description>Descricao</description>
+            </field>
+            <field name="ATIVO" dataType="CHECKBOX" required="S" allowSearch="N" visibleOnSearch="N">
+                <description>Ativo</description>
+            </field>
         </fields>
     </treeTable>
 </metadados>
@@ -48,11 +54,11 @@ Filhos (`xs:all`, mesmo de `<table>`): `<description>`, `<primaryKey>`, `<instan
 
 | Atributo | Obrigatório | Descrição | Exemplo |
 |----------|:-----------:|-----------|---------|
-| `name` | Sim | Nome da tabela no banco (segue convenção `<PRX><MOD3><CTX>`) | `TDCXYZCCU` |
-| `defaultMask` | Sim* | Máscara de formatação dos códigos hierárquicos. Pattern: `((#){0,4}(\.)?){0,6}`, max 15 chars | `##.##.##` |
-| `maskName` | Sim* | Referência a máscara pré-definida no sistema. 3-15 chars, `[a-zA-Z0-9_]+` | `CENTROCUSTO_MASK` |
+| `name` | Sim | Nome da tabela no banco (segue convenção `<PRX><MOD3><CTX>`) | `PRXXYZCCU` |
+| `defaultMask` | Sim | Máscara de formatação dos códigos hierárquicos. Pattern: `((#){0,4}(\.)?){0,6}`, max 15 chars | `##.##.##` |
+| `maskName` | Sim | Nome do parâmetro que configura a máscara. 3-15 chars, `[a-zA-Z0-9_]+` | `CENTROCUSTO_MASK` |
 
-\* Schema exige ao menos um (`defaultMask` ou `maskName`). Conferir convenção do projeto antes de escolher.
+Schema exige os dois atributos.
 
 ## Campos de controle hierárquico (obrigatórios)
 
@@ -77,42 +83,49 @@ Toda `<treeTable>` exige 3 campos de controle que o framework usa para navegaç�
 <scripts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="../.gradle/scripts.xsd">
 
-    <sql nomeTabela="TDCXYZCCU" ordem="1" executar="SE_NAO_EXISTIR"
-         tipoObjeto="TABLE" nomeObjeto="TDCXYZCCU"
-         descricao="Criacao da tabela hierarquica TDCXYZCCU">
+    <sql nomeTabela="PRXXYZCCU" ordem="1" executar="SE_NAO_EXISTIR"
+         tipoObjeto="TABLE" nomeObjeto="PRXXYZCCU"
+         descricao="Criacao da tabela hierarquica PRXXYZCCU">
         <mssql>
-            CREATE TABLE TDCXYZCCU (
+            CREATE TABLE PRXXYZCCU (
             CODCCU INT NOT NULL,
             CODIGOPAI INT DEFAULT -999999999 NOT NULL,
             ANALITICO CHAR(1) DEFAULT 'S' NOT NULL,
             GRAU INT NOT NULL,
-            CONSTRAINT PK_TDCXYZCCU PRIMARY KEY (CODCCU)
+            CONSTRAINT PK_PRXXYZCCU PRIMARY KEY (CODCCU)
             )
         </mssql>
         <oracle>
-            CREATE TABLE TDCXYZCCU (
+            CREATE TABLE PRXXYZCCU (
             CODCCU NUMBER(10) NOT NULL,
             CODIGOPAI NUMBER(10) DEFAULT -999999999 NOT NULL,
             ANALITICO CHAR(1) DEFAULT 'S' NOT NULL,
             GRAU NUMBER(10) NOT NULL,
-            CONSTRAINT PK_TDCXYZCCU PRIMARY KEY (CODCCU)
+            CONSTRAINT PK_PRXXYZCCU PRIMARY KEY (CODCCU)
             )
         </oracle>
     </sql>
 
     <!-- ALTER TABLE para colunas próprias (uma por <sql>, na ordem do projeto) -->
-    <sql nomeTabela="TDCXYZCCU" ordem="2" executar="SE_NAO_EXISTIR"
+    <sql nomeTabela="PRXXYZCCU" ordem="2" executar="SE_NAO_EXISTIR"
          tipoObjeto="COLUMN" nomeObjeto="DESCRCCU"
-         descricao="Adicionar campo DESCRCCU em TDCXYZCCU">
-        <mssql>ALTER TABLE TDCXYZCCU ADD DESCRCCU VARCHAR(100) NOT NULL</mssql>
-        <oracle>ALTER TABLE TDCXYZCCU ADD (DESCRCCU VARCHAR2(100) NOT NULL)</oracle>
+         descricao="Adicionar campo DESCRCCU em PRXXYZCCU">
+        <mssql>ALTER TABLE PRXXYZCCU ADD DESCRCCU VARCHAR(100) NOT NULL</mssql>
+        <oracle>ALTER TABLE PRXXYZCCU ADD (DESCRCCU VARCHAR2(100) NOT NULL)</oracle>
     </sql>
 
-    <sql nomeTabela="TDCXYZCCU" ordem="3" executar="SE_NAO_EXISTIR"
+    <sql nomeTabela="PRXXYZCCU" ordem="3" executar="SE_NAO_EXISTIR"
          tipoObjeto="COLUMN" nomeObjeto="ATIVO"
-         descricao="Adicionar campo ATIVO em TDCXYZCCU">
-        <mssql>ALTER TABLE TDCXYZCCU ADD ATIVO CHAR(1) DEFAULT 'S' NOT NULL</mssql>
-        <oracle>ALTER TABLE TDCXYZCCU ADD (ATIVO VARCHAR2(1) DEFAULT 'S' NOT NULL)</oracle>
+         descricao="Adicionar campo ATIVO em PRXXYZCCU">
+        <mssql>ALTER TABLE PRXXYZCCU ADD ATIVO CHAR(1) DEFAULT 'S' NOT NULL</mssql>
+        <oracle>ALTER TABLE PRXXYZCCU ADD (ATIVO VARCHAR2(1) DEFAULT 'S' NOT NULL)</oracle>
+    </sql>
+
+    <sql nomeTabela="PRXXYZCCU" ordem="4" executar="SE_NAO_EXISTIR"
+         tipoObjeto="CONSTRAINT" nomeObjeto="CK_PRXXYZCCU_ATIVO"
+         descricao="Restringir o campo ATIVO aos valores S e N">
+        <mssql>ALTER TABLE PRXXYZCCU ADD CONSTRAINT CK_PRXXYZCCU_ATIVO CHECK (ATIVO IN ('S', 'N'))</mssql>
+        <oracle>ALTER TABLE PRXXYZCCU ADD CONSTRAINT CK_PRXXYZCCU_ATIVO CHECK (ATIVO IN ('S', 'N'))</oracle>
     </sql>
 
 </scripts>
@@ -141,8 +154,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JapeEntity(entity = "TdcXyzCentroCusto", table = "TDCXYZCCU")
-public class TdcXyzCentroCusto {
+@JapeEntity(entity = "PrxXyzCentroCusto", table = "PRXXYZCCU")
+public class PrxXyzCentroCusto {
 
     @Id
     @Column(name = "CODCCU")
@@ -197,7 +210,7 @@ public class TdcXyzCentroCusto {
 - [ ] **`GRAU` raiz = `0`** — Sankhya começa raiz em `1`. Filhos diretos = `2`, netos = `3`. `0` desalinha com tabelas nativas (`TGFNAT`, etc.) e quebra queries hierárquicas.
 - [ ] `ANALITICO` sem `DEFAULT 'S'` — força preenchimento explícito em todo INSERT
 - [ ] Usar `<treeTable>` para dados sem relação pai/filho — complica modelo desnecessariamente, prefira `<table>`
-- [ ] Esquecer `defaultMask` ou `maskName` — schema exige pelo menos um
+- [ ] Omitir `defaultMask` ou `maskName` — schema exige ambos
 - [ ] Definir `defaultMask` fora do pattern `((#){0,4}(\.)?){0,6}` ou `maskName` fora de `[a-zA-Z0-9_]+` 3-15 chars
 - [ ] Esquecer dos 3 campos de controle na entidade `@JapeEntity` — framework precisa deles para tree-view funcionar
 
@@ -205,6 +218,6 @@ public class TdcXyzCentroCusto {
 
 - Sempre definir `defaultMask` (ex.: `##.##.##` para 3 níveis de 2 dígitos cada) para consistência visual dos códigos
 - Nome da tabela segue convenção `<PRX><MOD3><CTX>` igual a `<table>` regular
-- Instance name em PascalCase (`TdcXyzCentroCusto`) para mapear `@JapeEntity(entity = "...")`
+- Instance name em PascalCase (`PrxXyzCentroCusto`) para mapear `@JapeEntity(entity = "...")`
 - Bloco de auditoria (`DHALTER`, `DHCREATE`, `CODUSU`) em `treeTable` segue mesmas regras das tabelas regulares — perguntar ao dev se inclui
 - Validar via teste manual após deploy: criar 2-3 registros com pai/filho, abrir UI, conferir que tree-view monta níveis corretamente

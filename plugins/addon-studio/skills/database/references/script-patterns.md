@@ -8,19 +8,19 @@ Script criação contém **exclusivamente** colunas PK + constraint PK.
 
 ```xml
 
-<sql nomeTabela="TDCXYZCAD" ordem="1" executar="SE_NAO_EXISTIR"
-     tipoObjeto="TABLE" nomeObjeto="TDCXYZCAD"
-     descricao="Criacao da tabela TDCXYZCAD">
+<sql nomeTabela="PRXXYZCAD" ordem="1" executar="SE_NAO_EXISTIR"
+     tipoObjeto="TABLE" nomeObjeto="PRXXYZCAD"
+     descricao="Criacao da tabela PRXXYZCAD">
     <mssql>
-        CREATE TABLE TDCXYZCAD (
+        CREATE TABLE PRXXYZCAD (
         CODCAD INT NOT NULL,
-        CONSTRAINT PK_TDCXYZCAD PRIMARY KEY (CODCAD)
+        CONSTRAINT PK_PRXXYZCAD PRIMARY KEY (CODCAD)
         )
     </mssql>
     <oracle>
-        CREATE TABLE TDCXYZCAD (
+        CREATE TABLE PRXXYZCAD (
         CODCAD NUMBER(10) NOT NULL,
-        CONSTRAINT PK_TDCXYZCAD PRIMARY KEY (CODCAD)
+        CONSTRAINT PK_PRXXYZCAD PRIMARY KEY (CODCAD)
         )
     </oracle>
 </sql>
@@ -30,21 +30,21 @@ Script criação contém **exclusivamente** colunas PK + constraint PK.
 
 ```xml
 
-<sql nomeTabela="TDCXYZFAT" ordem="1" executar="SE_NAO_EXISTIR"
-     tipoObjeto="TABLE" nomeObjeto="TDCXYZFAT"
-     descricao="Criacao da tabela TDCXYZFAT">
+<sql nomeTabela="PRXXYZFAT" ordem="1" executar="SE_NAO_EXISTIR"
+     tipoObjeto="TABLE" nomeObjeto="PRXXYZFAT"
+     descricao="Criacao da tabela PRXXYZFAT">
     <mssql>
-        CREATE TABLE TDCXYZFAT (
+        CREATE TABLE PRXXYZFAT (
         CODPARC INT NOT NULL,
         DTFAT DATETIME NOT NULL,
-        CONSTRAINT PK_TDCXYZFAT PRIMARY KEY (CODPARC, DTFAT)
+        CONSTRAINT PK_PRXXYZFAT PRIMARY KEY (CODPARC, DTFAT)
         )
     </mssql>
     <oracle>
-        CREATE TABLE TDCXYZFAT (
+        CREATE TABLE PRXXYZFAT (
         CODPARC NUMBER(10) NOT NULL,
         DTFAT DATE NOT NULL,
-        CONSTRAINT PK_TDCXYZFAT PRIMARY KEY (CODPARC, DTFAT)
+        CONSTRAINT PK_PRXXYZFAT PRIMARY KEY (CODPARC, DTFAT)
         )
     </oracle>
 </sql>
@@ -56,58 +56,58 @@ Após `CREATE TABLE`, cada coluna adicional criada via `ALTER TABLE ADD` com `ex
 
 ```xml
 
-<sql nomeTabela="TDCXYZCAD" ordem="2" executar="SE_NAO_EXISTIR"
+<sql nomeTabela="PRXXYZCAD" ordem="2" executar="SE_NAO_EXISTIR"
      tipoObjeto="COLUMN" nomeObjeto="DESCR"
-     descricao="Adicionar campo DESCR na tabela TDCXYZCAD">
+     descricao="Adicionar campo DESCR na tabela PRXXYZCAD">
     <mssql>
-        ALTER TABLE TDCXYZCAD ADD DESCR VARCHAR(200)
+        ALTER TABLE PRXXYZCAD ADD DESCR VARCHAR(200)
     </mssql>
     <oracle>
-        ALTER TABLE TDCXYZCAD ADD (DESCR VARCHAR2(200))
+        ALTER TABLE PRXXYZCAD ADD (DESCR VARCHAR2(200))
     </oracle>
 </sql>
 
-<sql nomeTabela="TDCXYZCAD" ordem="3" executar="SE_NAO_EXISTIR"
+<sql nomeTabela="PRXXYZCAD" ordem="3" executar="SE_NAO_EXISTIR"
      tipoObjeto="COLUMN" nomeObjeto="CODPARC"
-     descricao="Adicionar campo CODPARC na tabela TDCXYZCAD">
+     descricao="Adicionar campo CODPARC na tabela PRXXYZCAD">
 <mssql>
-    ALTER TABLE TDCXYZCAD ADD CODPARC INT
+    ALTER TABLE PRXXYZCAD ADD CODPARC INT
 </mssql>
 <oracle>
-    ALTER TABLE TDCXYZCAD ADD (CODPARC NUMBER(10))
+    ALTER TABLE PRXXYZCAD ADD (CODPARC NUMBER(10))
 </oracle>
 </sql>
 
-<sql nomeTabela="TDCXYZCAD" ordem="4" executar="SE_NAO_EXISTIR"
+<sql nomeTabela="PRXXYZCAD" ordem="4" executar="SE_NAO_EXISTIR"
      tipoObjeto="COLUMN" nomeObjeto="VLRTOTAL"
-     descricao="Adicionar campo VLRTOTAL na tabela TDCXYZCAD">
+     descricao="Adicionar campo VLRTOTAL na tabela PRXXYZCAD">
 <mssql>
-    ALTER TABLE TDCXYZCAD ADD VLRTOTAL FLOAT(53)
+    ALTER TABLE PRXXYZCAD ADD VLRTOTAL FLOAT(53)
 </mssql>
 <oracle>
-    ALTER TABLE TDCXYZCAD ADD (VLRTOTAL FLOAT(126))
+    ALTER TABLE PRXXYZCAD ADD (VLRTOTAL FLOAT(126))
 </oracle>
 </sql>
 
-<sql nomeTabela="TDCXYZCAD" ordem="5" executar="SE_NAO_EXISTIR"
+<sql nomeTabela="PRXXYZCAD" ordem="5" executar="SE_NAO_EXISTIR"
      tipoObjeto="COLUMN" nomeObjeto="ATIVO"
-     descricao="Adicionar campo ATIVO na tabela TDCXYZCAD">
+     descricao="Adicionar campo ATIVO na tabela PRXXYZCAD">
 <mssql>
-    ALTER TABLE TDCXYZCAD ADD ATIVO CHAR(1)
+    ALTER TABLE PRXXYZCAD ADD ATIVO CHAR(1)
 </mssql>
 <oracle>
-    ALTER TABLE TDCXYZCAD ADD (ATIVO VARCHAR2(1))
+    ALTER TABLE PRXXYZCAD ADD (ATIVO VARCHAR2(1))
 </oracle>
 </sql>
 
-<sql nomeTabela="TDCXYZCAD" ordem="6" executar="SE_NAO_EXISTIR"
+<sql nomeTabela="PRXXYZCAD" ordem="6" executar="SE_NAO_EXISTIR"
      tipoObjeto="COLUMN" nomeObjeto="DHALTER"
-     descricao="Adicionar campo DHALTER na tabela TDCXYZCAD">
+     descricao="Adicionar campo DHALTER na tabela PRXXYZCAD">
 <mssql>
-    ALTER TABLE TDCXYZCAD ADD DHALTER DATETIME
+    ALTER TABLE PRXXYZCAD ADD DHALTER DATETIME
 </mssql>
 <oracle>
-    ALTER TABLE TDCXYZCAD ADD (DHALTER DATE)
+    ALTER TABLE PRXXYZCAD ADD (DHALTER DATE)
 </oracle>
 </sql>
 ```
@@ -116,14 +116,14 @@ Após `CREATE TABLE`, cada coluna adicional criada via `ALTER TABLE ADD` com `ex
 
 ```xml
 
-<sql nomeTabela="TDCXYZCAD" ordem="1" executar="SE_EXISTIR"
+<sql nomeTabela="PRXXYZCAD" ordem="1" executar="SE_EXISTIR"
      tipoObjeto="COLUMN" nomeObjeto="DESCR"
-     descricao="Alterar tamanho do campo DESCR na tabela TDCXYZCAD">
+     descricao="Alterar tamanho do campo DESCR na tabela PRXXYZCAD">
     <mssql>
-        ALTER TABLE TDCXYZCAD ALTER COLUMN DESCR VARCHAR(500)
+        ALTER TABLE PRXXYZCAD ALTER COLUMN DESCR VARCHAR(500)
     </mssql>
     <oracle>
-        ALTER TABLE TDCXYZCAD MODIFY (DESCR VARCHAR2(500))
+        ALTER TABLE PRXXYZCAD MODIFY (DESCR VARCHAR2(500))
     </oracle>
 </sql>
 ```
@@ -158,7 +158,7 @@ Duas granularidades diferentes, **não confundir**:
 
 > Sintaxe `ADD CONSTRAINT ... CHECK` é idêntica em Oracle e MSSQL — mas as duas tags continuam obrigatórias (regra do projeto).
 >
-> **Limite de 30 caracteres no Oracle** (até 12.1): `CK_TDCXYZCAD_DESCRSITUACAO` = 26 OK; nomes maiores estouram. Encurtar o sufixo da coluna e **confirmar com o dev** — nunca truncar em silêncio.
+> **Limite de 30 caracteres no Oracle** (até 12.1): `CK_PRXXYZCAD_DESCRSITUACAO` = 26 OK; nomes maiores estouram. Encurtar o sufixo da coluna e **confirmar com o dev** — nunca truncar em silêncio.
 
 ### `LISTA` (opções do `<fieldOptions>`)
 
@@ -177,25 +177,25 @@ Dicionário:
 Script:
 
 ```xml
-<sql nomeTabela="TDCXYZCAD" ordem="7" executar="SE_NAO_EXISTIR"
+<sql nomeTabela="PRXXYZCAD" ordem="7" executar="SE_NAO_EXISTIR"
      tipoObjeto="COLUMN" nomeObjeto="TIPO"
-     descricao="Adicionar campo TIPO na tabela TDCXYZCAD">
+     descricao="Adicionar campo TIPO na tabela PRXXYZCAD">
     <mssql>
-        ALTER TABLE TDCXYZCAD ADD TIPO VARCHAR(1)
+        ALTER TABLE PRXXYZCAD ADD TIPO VARCHAR(1)
     </mssql>
     <oracle>
-        ALTER TABLE TDCXYZCAD ADD (TIPO VARCHAR2(1))
+        ALTER TABLE PRXXYZCAD ADD (TIPO VARCHAR2(1))
     </oracle>
 </sql>
 
-<sql nomeTabela="TDCXYZCAD" ordem="8" executar="SE_NAO_EXISTIR"
-     tipoObjeto="CONSTRAINT" nomeObjeto="CK_TDCXYZCAD_TIPO"
+<sql nomeTabela="PRXXYZCAD" ordem="8" executar="SE_NAO_EXISTIR"
+     tipoObjeto="CONSTRAINT" nomeObjeto="CK_PRXXYZCAD_TIPO"
      descricao="Restringir valores do campo TIPO aos definidos no dicionario">
 <mssql>
-    ALTER TABLE TDCXYZCAD ADD CONSTRAINT CK_TDCXYZCAD_TIPO CHECK (TIPO IN ('A', 'B'))
+    ALTER TABLE PRXXYZCAD ADD CONSTRAINT CK_PRXXYZCAD_TIPO CHECK (TIPO IN ('A', 'B'))
 </mssql>
 <oracle>
-    ALTER TABLE TDCXYZCAD ADD CONSTRAINT CK_TDCXYZCAD_TIPO CHECK (TIPO IN ('A', 'B'))
+    ALTER TABLE PRXXYZCAD ADD CONSTRAINT CK_PRXXYZCAD_TIPO CHECK (TIPO IN ('A', 'B'))
 </oracle>
 </sql>
 ```
@@ -203,25 +203,25 @@ Script:
 ### `CHECKBOX` (sempre `'S'` / `'N'`)
 
 ```xml
-<sql nomeTabela="TDCXYZCAD" ordem="5" executar="SE_NAO_EXISTIR"
+<sql nomeTabela="PRXXYZCAD" ordem="5" executar="SE_NAO_EXISTIR"
      tipoObjeto="COLUMN" nomeObjeto="ATIVO"
-     descricao="Adicionar campo ATIVO na tabela TDCXYZCAD">
+     descricao="Adicionar campo ATIVO na tabela PRXXYZCAD">
     <mssql>
-        ALTER TABLE TDCXYZCAD ADD ATIVO CHAR(1)
+        ALTER TABLE PRXXYZCAD ADD ATIVO CHAR(1)
     </mssql>
     <oracle>
-        ALTER TABLE TDCXYZCAD ADD (ATIVO VARCHAR2(1))
+        ALTER TABLE PRXXYZCAD ADD (ATIVO VARCHAR2(1))
     </oracle>
 </sql>
 
-<sql nomeTabela="TDCXYZCAD" ordem="6" executar="SE_NAO_EXISTIR"
-     tipoObjeto="CONSTRAINT" nomeObjeto="CK_TDCXYZCAD_ATIVO"
+<sql nomeTabela="PRXXYZCAD" ordem="6" executar="SE_NAO_EXISTIR"
+     tipoObjeto="CONSTRAINT" nomeObjeto="CK_PRXXYZCAD_ATIVO"
      descricao="Restringir o campo ATIVO aos valores S e N">
 <mssql>
-    ALTER TABLE TDCXYZCAD ADD CONSTRAINT CK_TDCXYZCAD_ATIVO CHECK (ATIVO IN ('S', 'N'))
+    ALTER TABLE PRXXYZCAD ADD CONSTRAINT CK_PRXXYZCAD_ATIVO CHECK (ATIVO IN ('S', 'N'))
 </mssql>
 <oracle>
-    ALTER TABLE TDCXYZCAD ADD CONSTRAINT CK_TDCXYZCAD_ATIVO CHECK (ATIVO IN ('S', 'N'))
+    ALTER TABLE PRXXYZCAD ADD CONSTRAINT CK_PRXXYZCAD_ATIVO CHECK (ATIVO IN ('S', 'N'))
 </oracle>
 </sql>
 ```
@@ -252,30 +252,30 @@ Não existe `ALTER CONSTRAINT` em Oracle nem MSSQL: mudar o domínio = **DROP + 
 Adicionar `<option value="C">Opcao C</option>` ao dicionário do campo `TIPO`:
 
 ```xml
-<!-- V006-ALTER_CONSTRAINT_TDCXYZCAD.xml -->
+<!-- V006-ALTER_CONSTRAINT_PRXXYZCAD.xml -->
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <scripts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="../.gradle/scripts.xsd">
 
-    <sql nomeTabela="TDCXYZCAD" ordem="1" executar="SE_EXISTIR"
-         tipoObjeto="CONSTRAINT" nomeObjeto="CK_TDCXYZCAD_TIPO"
+    <sql nomeTabela="PRXXYZCAD" ordem="1" executar="SE_EXISTIR"
+         tipoObjeto="CONSTRAINT" nomeObjeto="CK_PRXXYZCAD_TIPO"
          descricao="Remover CHECK antiga do campo TIPO">
         <mssql>
-            ALTER TABLE TDCXYZCAD DROP CONSTRAINT CK_TDCXYZCAD_TIPO
+            ALTER TABLE PRXXYZCAD DROP CONSTRAINT CK_PRXXYZCAD_TIPO
         </mssql>
         <oracle>
-            ALTER TABLE TDCXYZCAD DROP CONSTRAINT CK_TDCXYZCAD_TIPO
+            ALTER TABLE PRXXYZCAD DROP CONSTRAINT CK_PRXXYZCAD_TIPO
         </oracle>
     </sql>
 
-    <sql nomeTabela="TDCXYZCAD" ordem="2" executar="SE_NAO_EXISTIR"
-         tipoObjeto="CONSTRAINT" nomeObjeto="CK_TDCXYZCAD_TIPO"
+    <sql nomeTabela="PRXXYZCAD" ordem="2" executar="SE_NAO_EXISTIR"
+         tipoObjeto="CONSTRAINT" nomeObjeto="CK_PRXXYZCAD_TIPO"
          descricao="Recriar CHECK do campo TIPO incluindo a opcao C">
         <mssql>
-            ALTER TABLE TDCXYZCAD ADD CONSTRAINT CK_TDCXYZCAD_TIPO CHECK (TIPO IN ('A', 'B', 'C'))
+            ALTER TABLE PRXXYZCAD ADD CONSTRAINT CK_PRXXYZCAD_TIPO CHECK (TIPO IN ('A', 'B', 'C'))
         </mssql>
         <oracle>
-            ALTER TABLE TDCXYZCAD ADD CONSTRAINT CK_TDCXYZCAD_TIPO CHECK (TIPO IN ('A', 'B', 'C'))
+            ALTER TABLE PRXXYZCAD ADD CONSTRAINT CK_PRXXYZCAD_TIPO CHECK (TIPO IN ('A', 'B', 'C'))
         </oracle>
     </sql>
 
@@ -287,14 +287,14 @@ Adicionar `<option value="C">Opcao C</option>` ao dicionário do campo `TIPO`:
 **Opção removida do domínio** (ex.: `'B'` sai da lista): dado já gravado com o valor antigo faz o `ADD CONSTRAINT` falhar e **quebra o deploy inteiro** no cliente. Migrar antes, em `ordem` intermediária:
 
 ```xml
-<sql nomeTabela="TDCXYZCAD" ordem="2" executar="SEMPRE"
+<sql nomeTabela="PRXXYZCAD" ordem="2" executar="SEMPRE"
      tipoObjeto="TABLE" nomeObjeto="MIGRA_TIPO_B"
      descricao="Migrar registros com TIPO=B para A antes de recriar a CHECK">
     <mssql>
-        UPDATE TDCXYZCAD SET TIPO = 'A' WHERE TIPO = 'B'
+        UPDATE PRXXYZCAD SET TIPO = 'A' WHERE TIPO = 'B'
     </mssql>
     <oracle>
-        UPDATE TDCXYZCAD SET TIPO = 'A' WHERE TIPO = 'B'
+        UPDATE PRXXYZCAD SET TIPO = 'A' WHERE TIPO = 'B'
     </oracle>
 </sql>
 ```
@@ -366,20 +366,20 @@ A PK da tabela é gerada pelo dicionário (`sequenceType="A"`). O seed **não fi
 
 ```xml
 
-<sql nomeTabela="TDCXYZCTL" ordem="1" executar="SEMPRE"
+<sql nomeTabela="PRXXYZCTL" ordem="1" executar="SEMPRE"
      tipoObjeto="TABLE" nomeObjeto="INSERT_ROTINA_X"
      descricao="Registrar rotina X no controle">
     <mssql>
-        INSERT INTO TDCXYZCTL (CODCTL, ROTINA)
+        INSERT INTO PRXXYZCTL (CODCTL, ROTINA)
         SELECT COALESCE(MAX(CODCTL), 0) + 1, 'ROTINA_X'
-        FROM TDCXYZCTL
-        WHERE NOT EXISTS (SELECT 1 FROM TDCXYZCTL WHERE ROTINA = 'ROTINA_X')
+        FROM PRXXYZCTL
+        WHERE NOT EXISTS (SELECT 1 FROM PRXXYZCTL WHERE ROTINA = 'ROTINA_X')
     </mssql>
     <oracle>
-        INSERT INTO TDCXYZCTL (CODCTL, ROTINA)
+        INSERT INTO PRXXYZCTL (CODCTL, ROTINA)
         SELECT NVL(MAX(CODCTL), 0) + 1, 'ROTINA_X'
-        FROM TDCXYZCTL
-        WHERE NOT EXISTS (SELECT 1 FROM TDCXYZCTL WHERE ROTINA = 'ROTINA_X')
+        FROM PRXXYZCTL
+        WHERE NOT EXISTS (SELECT 1 FROM PRXXYZCTL WHERE ROTINA = 'ROTINA_X')
     </oracle>
 </sql>
 ```

@@ -7,8 +7,8 @@
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JapeEntity(entity = "TdcXyzEntidade", table = "TDCXYZENT")
-public class TdcXyzEntidade {
+@JapeEntity(entity = "PrxXyzEntidade", table = "PRXXYZENT")
+public class PrxXyzEntidade {
 
     @Id
     @Column(name = "CODENTIDADE")
@@ -31,11 +31,11 @@ public class TdcXyzEntidade {
 
 @Data
 @NoArgsConstructor
-@JapeEntity(entity = "TdcXyzRelacao", table = "TDCXYZREL")
-public class TdcXyzRelacao {
+@JapeEntity(entity = "PrxXyzRelacao", table = "PRXXYZREL")
+public class PrxXyzRelacao {
 
     @Id
-    private TdcXyzRelacaoId embeddedId;
+    private PrxXyzRelacaoId embeddedId;
 
     @Column(name = "NUREF")
     private BigDecimal nuRef;
@@ -46,7 +46,7 @@ public class TdcXyzRelacao {
     // Navegação OneToOne — FK aponta direto pra PK da entidade alvo
     @OneToOne
     @JoinColumn(name = "CODORIGEM", referencedColumnName = "CODPRODUTO")
-    private TdcXyzProduto produtoOrigem;
+    private PrxXyzProduto produtoOrigem;
 
     // Métodos auxiliares para PK composta
     public Integer getCodOrig() {
@@ -64,8 +64,8 @@ public class TdcXyzRelacao {
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JapeEntity(entity = "TdcXyzProduto", table = "TDCXYZPRD")
-public class TdcXyzProduto {
+@JapeEntity(entity = "PrxXyzProduto", table = "PRXXYZPRD")
+public class PrxXyzProduto {
 
     @Id
     @Column(name = "CODPRODUTO")
@@ -80,7 +80,7 @@ public class TdcXyzProduto {
             @Relationship(fromField = "CODPRODUTO", toField = "CODPRODUTO")
         }
     )
-    private List<TdcXyzVinculoProduto> vinculos;
+    private List<PrxXyzVinculoProduto> vinculos;
 }
 ```
 
@@ -142,11 +142,11 @@ public class CabecalhoNota {
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JapeEntity(entity = "TdcXyzVinculo", table = "TDCXYZVIN")
-public class TdcXyzVinculo {
+@JapeEntity(entity = "PrxXyzVinculo", table = "PRXXYZVIN")
+public class PrxXyzVinculo {
 
     @Id
-    private TdcXyzVinculoId embeddedId;
+    private PrxXyzVinculoId embeddedId;
 }
 ```
 

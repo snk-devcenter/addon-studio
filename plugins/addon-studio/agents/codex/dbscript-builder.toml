@@ -1,5 +1,5 @@
 name = "dbscript-builder"
-description = "Gera, revisa e padroniza dbscripts de migration Sankhya (`dbscripts/V<NNN>-*.xml`) com DDL dual MSSQL/Oracle e macros SQL portáveis a partir de uma entidade `@JapeEntity` ou de um XML de dicionário de dados existente. **Use proativamente** ao pedir migration nova, alteração de tabela (ALTER), script de dados de configuração, ao revisar/auditar dbscripts existentes, ou ao padronizar mapeamento de tipos Oracle/MSSQL. **MUST BE USED** ao criar migration nova ou ao gerar dbscript a partir de entidade/dicionário — coluna nova numa entidade já publicada (ALTER) é aqui; ajuste pontual em script existente pode ser feito inline com a skill `database`. Se o pedido inclui também a entidade Java e o XML do dicionário, use `entity-architect` em vez deste."
+description = "Gera, revisa e padroniza dbscripts de migration Sankhya (`dbscripts/V<NNN>-*.xml`) com DDL dual MSSQL/Oracle a partir de uma entidade `@JapeEntity` ou de um XML de dicionário de dados existente. **Use proativamente** ao pedir migration nova, alteração de tabela (ALTER), script de dados de configuração, ao revisar/auditar dbscripts existentes, ou ao padronizar mapeamento de tipos Oracle/MSSQL. **MUST BE USED** ao criar migration nova ou ao gerar dbscript a partir de entidade/dicionário — coluna nova numa entidade já publicada (ALTER) é aqui; ajuste pontual em script existente pode ser feito inline com a skill `database`. Se o pedido inclui também a entidade Java e o XML do dicionário, use `entity-architect` em vez deste."
 model = "gpt-5.6-luna"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
@@ -14,7 +14,6 @@ Para conhecimento de domínio, carregue a skill correspondente `addon-studio:<sk
 - `database` — schema do dbscript XML, DDL patterns, dual MSSQL/Oracle, anti-patterns, exemplos completos
 - `data-dictionary` — XML do dicionário (fonte para inferir colunas)
 - `entity` — `@JapeEntity` Java (alternativa de fonte para inferir colunas)
-- `macros` — MacroTranslator SQL macros (`dbDate`, `nullValue`, `ignorecase`, etc.) para portabilidade
 
 ## Workflow
 
@@ -28,7 +27,7 @@ Inputs possíveis (perguntar ao dev qual é a fonte):
 
 Ações:
 
-- `Glob plugins/.../*.java` ou `Glob datadictionary/*.xml` se for inferir
+- `Glob **/*.java` ou `Glob datadictionary/*.xml` se for inferir
 - `Glob dbscripts/V*.xml` para descobrir próximo `<NNN>` sequencial (formato comum: 3 dígitos zero-padded — `V001`, `V002`, ..., `V042`)
 
 ### 2. Decisões obrigatórias
@@ -43,7 +42,7 @@ Ações:
 
 ### 3. Gerar dbscript
 
-**Localização:** `dbscripts/V<NNN>-<OPERACAO>_<TABELA>.xml` (ex.: `V001-CREATE_TABLE_TDCXYZCAB.xml`).
+**Localização:** `dbscripts/V<NNN>-<OPERACAO>_<TABELA>.xml` (ex.: `V001-CREATE_TABLE_PRXXYZCAB.xml`).
 
 **Formato XML base:**
 
@@ -94,19 +93,19 @@ Ações:
 #### 4.1 CREATE TABLE — somente PK + constraint
 
 ```xml
-<sql nomeTabela="TDCXYZCAB" ordem="1" executar="SE_NAO_EXISTIR"
-     tipoObjeto="TABLE" nomeObjeto="TDCXYZCAB"
-     descricao="Criacao da tabela TDCXYZCAB">
+<sql nomeTabela="PRXXYZCAB" ordem="1" executar="SE_NAO_EXISTIR"
+     tipoObjeto="TABLE" nomeObjeto="PRXXYZCAB"
+     descricao="Criacao da tabela PRXXYZCAB">
     <mssql>
-        CREATE TABLE TDCXYZCAB (
+        CREATE TABLE PRXXYZCAB (
         CODCAB INT NOT NULL,
-        CONSTRAINT PK_TDCXYZCAB PRIMARY KEY (CODCAB)
+        CONSTRAINT PK_PRXXYZCAB PRIMARY KEY (CODCAB)
         )
     </mssql>
     <oracle>
-        CREATE TABLE TDCXYZCAB (
+        CREATE TABLE PRXXYZCAB (
         CODCAB NUMBER(10) NOT NULL,
-        CONSTRAINT PK_TDCXYZCAB PRIMARY KEY (CODCAB)
+        CONSTRAINT PK_PRXXYZCAB PRIMARY KEY (CODCAB)
         )
     </oracle>
 </sql>
@@ -115,25 +114,25 @@ Ações:
 #### 4.2 ALTER TABLE ADD — uma coluna por bloco `<sql>`
 
 ```xml
-<sql nomeTabela="TDCXYZCAB" ordem="2" executar="SE_NAO_EXISTIR"
+<sql nomeTabela="PRXXYZCAB" ordem="2" executar="SE_NAO_EXISTIR"
      tipoObjeto="COLUMN" nomeObjeto="DESCRICAO"
-     descricao="Adicionar campo DESCRICAO em TDCXYZCAB">
+     descricao="Adicionar campo DESCRICAO em PRXXYZCAB">
     <mssql>
-        ALTER TABLE TDCXYZCAB ADD DESCRICAO VARCHAR(200)
+        ALTER TABLE PRXXYZCAB ADD DESCRICAO VARCHAR(200)
     </mssql>
     <oracle>
-        ALTER TABLE TDCXYZCAB ADD (DESCRICAO VARCHAR2(200))
+        ALTER TABLE PRXXYZCAB ADD (DESCRICAO VARCHAR2(200))
     </oracle>
 </sql>
 
-<sql nomeTabela="TDCXYZCAB" ordem="3" executar="SE_NAO_EXISTIR"
+<sql nomeTabela="PRXXYZCAB" ordem="3" executar="SE_NAO_EXISTIR"
      tipoObjeto="COLUMN" nomeObjeto="VALOR"
-     descricao="Adicionar campo VALOR em TDCXYZCAB">
+     descricao="Adicionar campo VALOR em PRXXYZCAB">
     <mssql>
-        ALTER TABLE TDCXYZCAB ADD VALOR NUMERIC(15,2)
+        ALTER TABLE PRXXYZCAB ADD VALOR NUMERIC(15,2)
     </mssql>
     <oracle>
-        ALTER TABLE TDCXYZCAB ADD (VALOR NUMBER(15,2))
+        ALTER TABLE PRXXYZCAB ADD (VALOR NUMBER(15,2))
     </oracle>
 </sql>
 ```
@@ -141,10 +140,10 @@ Ações:
 **Nunca:**
 ```xml
 <!-- ❌ ERRADO: várias colunas no mesmo CREATE -->
-<sql nomeTabela="TDCXYZCAB" ordem="1" executar="SE_NAO_EXISTIR"
-     tipoObjeto="TABLE" nomeObjeto="TDCXYZCAB">
+<sql nomeTabela="PRXXYZCAB" ordem="1" executar="SE_NAO_EXISTIR"
+     tipoObjeto="TABLE" nomeObjeto="PRXXYZCAB">
     <mssql>
-        CREATE TABLE TDCXYZCAB (
+        CREATE TABLE PRXXYZCAB (
         CODCAB INT NOT NULL,
         DESCRICAO VARCHAR(200),
         VALOR NUMERIC(15,2),
@@ -224,9 +223,9 @@ Macros SQL Sankhya (`dbDate`, `nullValue`, etc.) funcionam em `<expression>` do 
 
 | Ordem | Operação | Tabela | Detalhe |
 |-------|----------|--------|---------|
-| 1 | CREATE_TABLE | TDCXYZCAB | PK CODCAB |
-| 2 | ALTER_TABLE | TDCXYZCAB | ADD DESCRICAO VARCHAR(200) |
-| 3 | ALTER_TABLE | TDCXYZCAB | ADD VALOR NUMERIC(15,2) |
+| 1 | CREATE_TABLE | PRXXYZCAB | PK CODCAB |
+| 2 | ALTER_TABLE | PRXXYZCAB | ADD DESCRICAO VARCHAR(200) |
+| 3 | ALTER_TABLE | PRXXYZCAB | ADD VALOR NUMERIC(15,2) |
 
 ### Próximos passos sugeridos
 

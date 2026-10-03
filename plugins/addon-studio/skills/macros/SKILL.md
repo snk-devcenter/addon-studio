@@ -1,6 +1,6 @@
 ---
 name: macros
-description: Macros SQL do MacroTranslator Sankhya (`dbDate`, `nullValue`, `ignorecase`, `normalizeText`, `truncMonth`, `yearMonth`, `addMonths`) para portabilidade Oracle/MSSQL. Use ao escrever, revisar, auditar ou portar SQL em `queries/`, `datadictionary/`, dbscripts ou `@NativeQuery`, ao ver `NVL`, `ISNULL`, `COALESCE`, `SYSDATE`, `GETDATE`, `TRUNC(`, `SUBSTR` ou `UPPER` em SQL do addon, ao identificar oportunidades de substituir SQL específico de banco por macro, ou ao diagnosticar diferenças de comportamento entre Oracle e MSSQL.
+description: Macros SQL do MacroTranslator Sankhya (`dbDate`, `nullValue`, `ignorecase`, `normalizeText`, `truncMonth`, `yearMonth`, `addMonths`) para portabilidade Oracle/MSSQL. Use ao escrever, revisar, auditar ou portar SQL em `queries/`, `datadictionary/` ou `@NativeQuery`, ao ver `NVL`, `ISNULL`, `COALESCE`, `SYSDATE`, `GETDATE`, `TRUNC(`, `SUBSTR` ou `UPPER` em SQL do addon, ao identificar oportunidades de substituir SQL específico de banco por macro, ou ao diagnosticar diferenças de comportamento entre Oracle e MSSQL. NÃO usar em `dbscripts/` — lá cada tag `<mssql>`/`<oracle>` usa a sintaxe nativa do banco (skill `database`).
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -11,7 +11,6 @@ Macros SQL traduzidas automaticamente entre Oracle e MSSQL pelo framework Sankhy
 
 > **Onde aparecem:**
 > - `<expression>` em metadata XML (`datadictionary/`) — quando contem SQL
-> - `selectQuery` em `<fieldOptions>` (lookup customizado)
 > - `@Criteria(clause = "...")` em `@Repository`
 > - `@NativeQuery("...")` em `@Repository`
 > - Queries externas em `model/src/main/resources/queries/*.sql` ou `queries/*.xml`
@@ -177,7 +176,7 @@ GROUP BY VEND.CODVEND, VEND.NOMEVEND, getYear(CAB.DTNEG)
 
 - **Operacao muito especifica** de um banco sem equivalente no outro (ex.: window function avancada Oracle-only). Nesses casos, separar em `queries/<arquivo>.xml` com tags `<oracle>` e `<mssql>`. Ver `repository` §4.
 - **Logica em `<expression>` BeanShell** (nao SQL). Use variaveis de contexto BeanShell (`$col_*`, `$ctx_*`).
-- **DDL** em `dbscripts/` — scripts de banco ja sao split via tags `<mssql>`/`<oracle>`. Macros nao se aplicam ali.
+- **`dbscripts/`** (DDL e seed) — scripts de banco ja sao split via tags `<mssql>`/`<oracle>`; cada tag usa a sintaxe nativa do seu banco. Macros nao se aplicam ali.
 
 
 ## Skills relacionadas

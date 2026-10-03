@@ -9,16 +9,16 @@
 <metadados xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:noNamespaceSchemaLocation="../.gradle/metadados.xsd">
 
-    <table name="TDCXYZPRD" sequenceType="A" sequenceField="CODPRODUTO">
+    <table name="PRXXYZPRD" sequenceType="A" sequenceField="CODPRODUTO">
         <description>Produtos</description>
         <primaryKey>
             <field name="CODPRODUTO"/>
         </primaryKey>
         <instances>
-            <instance name="TdcXyzProduto">
+            <instance name="PrxXyzProduto">
                 <description>Produtos</description>
                 <relationShip>
-                    <relation entityName="TdcXyzVinculoProduto">
+                    <relation entityName="PrxXyzVinculoProduto" relation="OneToMany">
                         <fields>
                             <field localName="CODPRODUTO" targetName="CODPRODUTO"/>
                         </fields>
@@ -47,13 +47,13 @@
 Log, registro, historico e auditoria seguem o default `"A"` — a PK e sequencia gerada pelo framework, igual a cadastro:
 
 ```xml
-<table name="TDCXYZLOG" sequenceType="A" sequenceField="NULOG">
+<table name="PRXXYZLOG" sequenceType="A" sequenceField="NULOG">
     <description>Log de Processamento</description>
     <primaryKey>
         <field name="NULOG"/>
     </primaryKey>
     <instances>
-        <instance name="TdcXyzLogProcessamento">
+        <instance name="PrxXyzLogProcessamento">
             <description>Log de Processamento</description>
         </instance>
     </instances>
@@ -69,7 +69,7 @@ Log, registro, historico e auditoria seguem o default `"A"` — a PK e sequencia
 ### PK Composta (AUTO)
 
 ```xml
-<table name="TDCXYZREL" sequenceType="A" sequenceField="NURELACAO">
+<table name="PRXXYZREL" sequenceType="A" sequenceField="NURELACAO">
     <description>Relacao Origem x Produto</description>
     <primaryKey>
         <field name="CODORIG"/>
@@ -84,14 +84,14 @@ Log, registro, historico e auditoria seguem o default `"A"` — a PK e sequencia
 `sequenceType="M"` **so** quando a PK nao tem coluna pra sequenciar ou o valor vem de fora — aqui, PK composta so de FKs (tabela de vinculo). Config/log/cadastro **nao** entram nesse caso:
 
 ```xml
-<table name="TDCXYZVIN" sequenceType="M">
+<table name="PRXXYZVIN" sequenceType="M">
     <description>Vinculo Origem x Produto</description>
     <primaryKey>
         <field name="CODORIG"/>
         <field name="CODPROD"/>
     </primaryKey>
     <instances>
-        <instance name="TdcXyzVinculoProduto">
+        <instance name="PrxXyzVinculoProduto">
             <description>Vinculo Origem x Produto</description>
         </instance>
     </instances>
@@ -115,7 +115,7 @@ Log, registro, historico e auditoria seguem o default `"A"` — a PK e sequencia
     <instances>
         <nativeInstance name="TipoOperacao">
             <relationShip>
-                <relation entityName="TdcXyzVinculoTop" insert="N" update="N" relation="OneToOne" removeCascade="N">
+                <relation entityName="PrxXyzVinculoTop" insert="N" update="N" relation="OneToOne" removeCascade="N">
                     <fields>
                         <field localName="CODTIPOPER" targetName="CODTIPOPER"/>
                     </fields>
@@ -136,7 +136,7 @@ Log, registro, historico e auditoria seguem o default `"A"` — a PK e sequencia
 ```xml
 <nativeTable name="TGFDFAGR">
     <instances>
-        <instance name="TdcXyzDefensivos">
+        <instance name="PrxXyzDefensivos">
             <description>Defensivos Agricolas</description>
         </instance>
     </instances>
@@ -152,16 +152,16 @@ Log, registro, historico e auditoria seguem o default `"A"` — a PK e sequencia
 
 ## XML -> Java completo
 
-**XML (`TDCXYZCFG.xml`):**
+**XML (`PRXXYZCFG.xml`):**
 
 ```xml
-<table name="TDCXYZCFG" sequenceType="A" sequenceField="CODCONF">
+<table name="PRXXYZCFG" sequenceType="A" sequenceField="CODCONF">
     <description>Configuracao</description>
     <primaryKey>
         <field name="CODCONF"/>
     </primaryKey>
     <instances>
-        <instance name="TdcXyzConfiguracao">
+        <instance name="PrxXyzConfiguracao">
             <description>Configuracao</description>
         </instance>
     </instances>
@@ -197,10 +197,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JapeEntity(
-    entity = "TdcXyzConfiguracao",
-    table = "TDCXYZCFG"
+    entity = "PrxXyzConfiguracao",
+    table = "PRXXYZCFG"
 )
-public class TdcXyzConfiguracao {
+public class PrxXyzConfiguracao {
 
     @Id
     @Column(name = "CODCONF")

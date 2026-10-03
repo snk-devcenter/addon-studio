@@ -99,7 +99,7 @@ Todos opcionais exceto `sk-dataset` (ou `sk-standalone-dataset-object`).
 
 ### Drag & drop
 
-`sk-drag-enabled`, `sk-drop-enabled`, `sk-drag-field-presentation`, `sk-drag-start`, `sk-drag-enter`, `sk-drag-over`, `sk-drop`, `sk-drag-end`, `sk-drop-tree` — todos em :180-188.
+`sk-drag-enabled`, `sk-drop-enabled`, `sk-drag-field-presentation`, `sk-drag-start`, `sk-drag-enter`, `sk-drag-over`, `sk-drop`, `sk-drag-end`, `sk-drop-tree`.
 
 ### Modo arvore
 
@@ -114,7 +114,7 @@ Combinar ambos:
 
 ### Eventos de linha / celula
 
-`sk-on-dbl-click`, `sk-on-click`, `sk-click-row-focus`, `sk-fn-save-row-on-enter`, `sk-fn-save-row-on-arrow-down`, `sk-fn-save-on-click`, `sk-new-row-on-tab`, `sk-new-row-on-arrow-down`, `sk-enter-as-tab`, `sk-arrow-focus-field`, `sk-nextrow-aftersave`, `sk-focus-out` — ver :164-216.
+`sk-on-dbl-click`, `sk-on-click`, `sk-click-row-focus`, `sk-fn-save-row-on-enter`, `sk-fn-save-row-on-arrow-down`, `sk-fn-save-on-click`, `sk-new-row-on-tab`, `sk-new-row-on-arrow-down`, `sk-enter-as-tab`, `sk-arrow-focus-field`, `sk-nextrow-aftersave`, `sk-focus-out`.
 
 ---
 
@@ -229,7 +229,7 @@ datagrid.addGridReadyListener(function() {
 
 ## Integracao com dataset (observer)
 
-O grid se auto-registra como `DatasetObserver` no dataset vinculado, via o contrato `allEvents`/`refreshed`/`currentLineChanged`/etc. documentado em [dataset.md](dataset.md). Handlers automaticos em :2751-2759:
+O grid se auto-registra como `DatasetObserver` no dataset vinculado, via o contrato `allEvents`/`refreshed`/`currentLineChanged`/etc. documentado em [dataset.md](dataset.md). Handlers automaticos:
 
 ```javascript
 _self.refreshed                 = onDatasetRefresh;
@@ -243,7 +243,7 @@ _self.insertionModeActivated    = insertionModeActivated;
 _self.insertionCanceled         = insertionCanceled;
 ```
 
-Implicacao pratica: o grid responde a eventos do dataset automaticamente — nao e necessario chamar `refreshView()` manualmente apos `ds.refresh()`, `ds.saveRecord()`, `ds.addRecord()`, etc.
+Implicacao pratica: o grid responde a eventos do dataset automaticamente — nao e necessario chamar `refreshView()` manualmente apos `ds.refresh()`, `ds.save()`, `ds.addRecords()`, etc.
 
 ---
 
@@ -380,7 +380,7 @@ A funcao e empilhada em `_gridReadyListeners` e nunca removida por API publica. 
 
 ### 2. Selecao multipla desligada por default
 
-`sk-allow-multiple-selection` nao informado = so selecao unica. Checado em :5427-5429.
+`sk-allow-multiple-selection` nao informado = so selecao unica.
 
 ### 3. `sk-disable-pagination` tem custo
 
@@ -423,7 +423,7 @@ No calculo, `occurrences++` esta fora do `if (!isNaN(fieldValue))`: linha com va
 - [ ] Se o controller do grid e acessado, foi via `attrs.id`, `sk-on-datagrid-loaded` ou `SkComponentRegistry`? Order de inicializacao correta?
 - [ ] `sk-only-custom` esta presente? Entao so renderiza colunas explicitas.
 - [ ] Selecao multipla requer `sk-allow-multiple-selection="true"` explicito.
-- [ ] `refresh()` sincrono apos `ds.saveRecord()` nao e necessario — grid observa dataset.
+- [ ] `refresh()` sincrono apos `ds.save()` nao e necessario — grid observa dataset.
 - [ ] Em grade editavel, checar `sk-editable`, `sk-fn-save-row-on-enter`, `sk-new-row-on-tab`.
 - [ ] Custom column invisivel em producao? Checar expressao de `sk-visible` no controller.
 - [ ] Grade com permissao de config? So aparece se `ACCESS_CONTROL_CONFIG_GRID` autorizada.

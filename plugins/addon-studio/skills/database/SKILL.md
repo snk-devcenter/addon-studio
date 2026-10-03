@@ -17,11 +17,11 @@ Cada arquivo migração = XML versionamento sequencial estilo **Flyway**:
 
 ```
 dbscripts/
-|-- V001-CREATE_TABLE_TDCXYZCAD.xml
-|-- V002-CREATE_TABLE_TDCXYZFAT.xml
+|-- V001-CREATE_TABLE_PRXXYZCAD.xml
+|-- V002-CREATE_TABLE_PRXXYZFAT.xml
 |-- V003-ALTER_TABLE_TGFCAB.xml
-|-- V004-ALTER_TABLE_TDCXYZCAD.xml
-|-- V005-INSERT_DATA_TDCXYZCTL.xml
+|-- V004-ALTER_TABLE_PRXXYZCAD.xml
+|-- V005-INSERT_DATA_PRXXYZCTL.xml
 |-- V<NNN>-<OPERACAO>_<TABELA>.xml
 ```
 
@@ -35,7 +35,7 @@ dbscripts/
 |:-------------|:--------------------------------------------------------------------|:---------------------------------------------|
 | `V<NNN>`     | Versão sequencial **3 dígitos** (zero-padded), nunca reutilizar     | `V001`, `V002`, `V003`                       |
 | `<OPERACAO>` | Operação principal script                                           | `CREATE_TABLE`, `ALTER_TABLE`, `INSERT_DATA` |
-| `<TABELA>`   | Nome tabela afetada                                                 | `TDCXYZCAD`, `TGFCAB`                        |
+| `<TABELA>`   | Nome tabela afetada                                                 | `PRXXYZCAD`, `TGFCAB`                        |
 
 ---
 
@@ -110,7 +110,7 @@ CREATE TABLE EXEMPLO (CODEXEMPLO NUMBER(10) NOT NULL, CONSTRAINT PK_EXEMPLO PRIM
 
 Componentes:
 
-- `<PRX>`: prefixo fixo do projeto, **3-4 caracteres** UPPER (ex.: `TDC`, `APP`, `CST`)
+- `<PRX>`: prefixo fixo do projeto, **3-4 caracteres** UPPER (ex.: `ABC`)
 - `<MOD3>`: sigla do modulo, **3 caracteres** (ex.: `FIN`, `FAT`, `CFG`, `CAD`)
 - `<CTX>`: sigla curta do contexto/entidade da tabela (ex.: `CAB`, `ITE`, `CFG`, `LOG`)
 
@@ -118,33 +118,33 @@ Componentes:
 
 1. **Inspecionar projeto:** procurar tabelas existentes em `dbscripts/*.xml` (`CREATE TABLE`), `datadictionary/*.xml` (`<table name="...">`), entities `@JapeEntity(table = "...")`. Se houver padrao consistente (todas com mesmo prefixo), reusar `<PRX>`.
 2. **Se projeto novo / sem padrao:** perguntar ao dev:
-   - "Qual prefixo (`<PRX>`, 3-4 chars UPPER) usar para tabelas custom? Ex.: `TDC`, `APP`, `CST`."
+   - "Qual prefixo (`<PRX>`, 3-4 chars UPPER) usar para tabelas custom? Ex.: `ABC`."
    - "Qual sigla 3 chars (`<MOD3>`) representa este modulo? Ex.: `FIN`, `FAT`."
    - "Qual contexto/entidade (`<CTX>`)? Ex.: `CAB`, `ITE`, `CFG`."
 3. **Confirmar nome final** antes de gerar artefatos.
 
-Exemplos ilustrativos (`<PRX>`=`TDC`, `<MOD3>`=`XYZ`):
+Exemplos ilustrativos (`<PRX>`=`PRX`, `<MOD3>`=`XYZ`):
 
 | Conceito       | PRX    | MOD3   | CTX      | Resultado    |
 |:---------------|:-------|:-------|:---------|:-------------|
-| Cadastro       | `TDC`  | `XYZ`  | `CAD`    | `TDCXYZCAD`  |
-| Faturamento    | `TDC`  | `XYZ`  | `FAT`    | `TDCXYZFAT`  |
-| Configuracao   | `TDC`  | `XYZ`  | `CFG`    | `TDCXYZCFG`  |
-| Cabecalho nota | `TDC`  | `XYZ`  | `CAB`    | `TDCXYZCAB`  |
-| Item nota      | `TDC`  | `XYZ`  | `ITE`    | `TDCXYZITE`  |
+| Cadastro       | `PRX`  | `XYZ`  | `CAD`    | `PRXXYZCAD`  |
+| Faturamento    | `PRX`  | `XYZ`  | `FAT`    | `PRXXYZFAT`  |
+| Configuracao   | `PRX`  | `XYZ`  | `CFG`    | `PRXXYZCFG`  |
+| Cabecalho nota | `PRX`  | `XYZ`  | `CAB`    | `PRXXYZCAB`  |
+| Item nota      | `PRX`  | `XYZ`  | `ITE`    | `PRXXYZITE`  |
 
-> **NOTA:** exemplos abaixo usam `TDC` como prefixo ilustrativo. Substituir pelo `<PRX>` real do projeto.
+> **NOTA:** exemplos abaixo usam o literal `PRX` no lugar do prefixo. Substituir pelo `<PRX>` real do projeto.
 
 ### Nome de Constraint
 
 | Tipo  | Padrao                     | Exemplo                                       |
 |:------|:---------------------------|:----------------------------------------------|
-| PK    | `PK_<NOME_TABELA>`         | `CONSTRAINT PK_TDCXYZCAD PRIMARY KEY (CODCAD)` |
-| CHECK | `CK_<NOME_TABELA>_<COLUNA>` | `CONSTRAINT CK_TDCXYZCAD_ATIVO CHECK (ATIVO IN ('S', 'N'))` |
+| PK    | `PK_<NOME_TABELA>`         | `CONSTRAINT PK_PRXXYZCAD PRIMARY KEY (CODCAD)` |
+| CHECK | `CK_<NOME_TABELA>_<COLUNA>` | `CONSTRAINT CK_PRXXYZCAD_ATIVO CHECK (ATIVO IN ('S', 'N'))` |
 
 ```sql
-CONSTRAINT PK_TDCXYZCAD PRIMARY KEY (CODCAD)
-CONSTRAINT PK_TDCXYZFAT PRIMARY KEY (CODPARC, DTFAT)
+CONSTRAINT PK_PRXXYZCAD PRIMARY KEY (CODCAD)
+CONSTRAINT PK_PRXXYZFAT PRIMARY KEY (CODPARC, DTFAT)
 ```
 
 > **Oracle limita identificadores a 30 caracteres** (ate 12.1). `CK_<TABELA>_<COLUNA>` com nomes longos estoura — encurtar o sufixo e **confirmar com o dev**, nunca truncar em silencio.
@@ -237,14 +237,14 @@ Padrões completos de DDL — `CREATE TABLE` mínimo (somente PK + constraint), 
 Campo `LISTA` (valores das `<option>`) e campo `CHECKBOX` (`'S'`/`'N'`) geram **CHECK constraint** em `<sql>` próprio, logo após o `ALTER TABLE ADD` da coluna. Nome: `CK_<TABELA>_<COLUNA>`, com `tipoObjeto="CONSTRAINT"`.
 
 ```xml
-<sql nomeTabela="TDCXYZCAD" ordem="6" executar="SE_NAO_EXISTIR"
-     tipoObjeto="CONSTRAINT" nomeObjeto="CK_TDCXYZCAD_ATIVO"
+<sql nomeTabela="PRXXYZCAD" ordem="6" executar="SE_NAO_EXISTIR"
+     tipoObjeto="CONSTRAINT" nomeObjeto="CK_PRXXYZCAD_ATIVO"
      descricao="Restringir o campo ATIVO aos valores S e N">
     <mssql>
-        ALTER TABLE TDCXYZCAD ADD CONSTRAINT CK_TDCXYZCAD_ATIVO CHECK (ATIVO IN ('S', 'N'))
+        ALTER TABLE PRXXYZCAD ADD CONSTRAINT CK_PRXXYZCAD_ATIVO CHECK (ATIVO IN ('S', 'N'))
     </mssql>
     <oracle>
-        ALTER TABLE TDCXYZCAD ADD CONSTRAINT CK_TDCXYZCAD_ATIVO CHECK (ATIVO IN ('S', 'N'))
+        ALTER TABLE PRXXYZCAD ADD CONSTRAINT CK_PRXXYZCAD_ATIVO CHECK (ATIVO IN ('S', 'N'))
     </oracle>
 </sql>
 ```
@@ -311,20 +311,20 @@ CREATE TABLE TABELA (CODCAD NUMBER(10) NOT NULL, CONSTRAINT PK_TABELA PRIMARY KE
 ```xml
 <!-- ERRADO — todas as colunas no CREATE TABLE -->
 <oracle>
-    CREATE TABLE TDCXYZCAD (
+    CREATE TABLE PRXXYZCAD (
     CODCAD NUMBER(10) NOT NULL,
     DESCR VARCHAR2(200),
     CODPARC NUMBER(10),
     ATIVO VARCHAR2(1),
-    CONSTRAINT PK_TDCXYZCAD PRIMARY KEY (CODCAD)
+    CONSTRAINT PK_PRXXYZCAD PRIMARY KEY (CODCAD)
     )
 </oracle>
 
     <!-- CORRETO | CREATE TABLE só com PK + constraint -->
 <oracle>
-CREATE TABLE TDCXYZCAD (
+CREATE TABLE PRXXYZCAD (
 CODCAD NUMBER(10) NOT NULL,
-CONSTRAINT PK_TDCXYZCAD PRIMARY KEY (CODCAD)
+CONSTRAINT PK_PRXXYZCAD PRIMARY KEY (CODCAD)
 )
 </oracle>
     <!-- Seguido de ALTER TABLE ADD para cada coluna não-PK -->
@@ -372,7 +372,7 @@ Cada `<sql>` no mesmo XML **deve** ter `ordem` único. Duplicados causam comport
 
 ### 9. Alterar scripts já aplicados
 
-Scripts migração **imutáveis** após deploy. Sempre criar novo `V<N+1>_<OPERACAO>_<TABELA>.xml`.
+Scripts migração **imutáveis** após deploy. Sempre criar novo `V<NNN>-<OPERACAO>_<TABELA>.xml` com o próximo número.
 
 ### 10. Declarar FOREIGN KEY constraints no DDL
 
@@ -383,14 +383,14 @@ Relacionamentos entre tabelas definidos **exclusivamente** em `datadictionary/` 
 ```xml
 <!-- ERRADO — campo LISTA/CHECKBOX sem constraint: banco aceita qualquer valor -->
 <oracle>
-    ALTER TABLE TDCXYZCAD ADD (ATIVO VARCHAR2(1))
+    ALTER TABLE PRXXYZCAD ADD (ATIVO VARCHAR2(1))
 </oracle>
 
     <!-- CORRETO — ALTER TABLE ADD seguido de <sql> com a CHECK -->
 <oracle>
-ALTER TABLE TDCXYZCAD ADD (ATIVO VARCHAR2(1))
+ALTER TABLE PRXXYZCAD ADD (ATIVO VARCHAR2(1))
 </oracle>
-    <!-- + <sql tipoObjeto="CONSTRAINT" nomeObjeto="CK_TDCXYZCAD_ATIVO"> com CHECK (ATIVO IN ('S', 'N')) -->
+    <!-- + <sql tipoObjeto="CONSTRAINT" nomeObjeto="CK_PRXXYZCAD_ATIVO"> com CHECK (ATIVO IN ('S', 'N')) -->
 ```
 
 > `<fieldOptions>` e `CHECKBOX` restringem a **UI**. Sem CHECK, integração/listener/SQL direto grava valor fora do domínio.
@@ -400,7 +400,7 @@ ALTER TABLE TDCXYZCAD ADD (ATIVO VARCHAR2(1))
 ```xml
 <!-- ERRADO — constraint no mesmo <sql> da coluna: executar/tipoObjeto só verifica um objeto -->
 <oracle>
-    ALTER TABLE TDCXYZCAD ADD (ATIVO VARCHAR2(1) CHECK (ATIVO IN ('S', 'N')))
+    ALTER TABLE PRXXYZCAD ADD (ATIVO VARCHAR2(1) CHECK (ATIVO IN ('S', 'N')))
 </oracle>
 ```
 
@@ -415,8 +415,8 @@ V2.xml
 script_tabela.xml
 
 <!-- CORRETO -->
-V001-CREATE_TABLE_TDCXYZCAD.xml
-V002-CREATE_TABLE_TDCXYZFAT.xml
+V001-CREATE_TABLE_PRXXYZCAD.xml
+V002-CREATE_TABLE_PRXXYZFAT.xml
 V003-ALTER_TABLE_TGFCAB.xml
 ```
 
@@ -449,7 +449,7 @@ V003-ALTER_TABLE_TGFCAB.xml
 
 ## Exemplos Completos
 
-Exemplos completos de XMLs — `V001-CREATE_TABLE_TDCXYZCAD.xml` (PK simples), `V002-CREATE_TABLE_TDCXYZFAT.xml` (PK composta), `V003-ALTER_TABLE_TGFCAB.xml` (tabela nativa) e `V005-INSERT_DATA_TDCXYZCTL.xml` (dados iniciais com PK derivada) — em [`references/examples.md`](references/examples.md).
+Exemplos completos de XMLs — `V001-CREATE_TABLE_PRXXYZCAD.xml` (PK simples), `V002-CREATE_TABLE_PRXXYZFAT.xml` (PK composta), `V003-ALTER_TABLE_TGFCAB.xml` (tabela nativa) e `V005-INSERT_DATA_PRXXYZCTL.xml` (dados iniciais com PK derivada) — em [`references/examples.md`](references/examples.md).
 
 ---
 
@@ -507,7 +507,7 @@ Exemplos completos de XMLs — `V001-CREATE_TABLE_TDCXYZCAD.xml` (PK simples), `
 ### Dados iniciais (seed)
 
 - [ ] Verificar último `V<NNN>-*.xml` existente para definir `N+1` (3 dígitos, zero-padded)
-- [ ] Nomear arquivo `V<NNN>-INSERT_DATA_<TABELA>.xml` (ex: `V005-INSERT_DATA_TDCXYZCTL.xml`)
+- [ ] Nomear arquivo `V<NNN>-INSERT_DATA_<TABELA>.xml` (ex: `V005-INSERT_DATA_PRXXYZCTL.xml`)
 - [ ] Usar `executar="SEMPRE"` com `INSERT ... WHERE NOT EXISTS` ou `MERGE` para idempotência
 - [ ] PK derivada de `MAX(<PK>)+1` (`COALESCE` no MSSQL, `NVL` no Oracle) — **nunca** valor literal, a sequência é do dicionário
 - [ ] `WHERE NOT EXISTS` pela **chave de negócio** do registro, não pela PK

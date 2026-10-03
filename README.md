@@ -89,7 +89,7 @@ O comando valida o `build.gradle`, copia as regras permanentes para `docs/ADDON.
 Depois, trabalhe normalmente:
 
 ```text
-Crie a entidade, o dbscript e o dicionário para a tabela TDCXYZCAB.
+Crie a entidade, o dbscript e o dicionário para a tabela PRXXYZCAB.
 ```
 
 ### Codex CLI
@@ -97,7 +97,7 @@ Crie a entidade, o dbscript e o dicionário para a tabela TDCXYZCAB.
 As skills ficam disponíveis automaticamente após a instalação. Você pode descrevê-las em linguagem natural ou invocá-las pelo nome com `$`:
 
 ```text
-$addon-studio:entity crie a entidade da tabela TDCXYZCAB
+$addon-studio:entity crie a entidade da tabela PRXXYZCAB
 ```
 
 Para usar um especialista, peça pelo nome:
@@ -228,8 +228,8 @@ O plugin detecta o padrão existente. Quando não houver referência suficiente,
 
 | Artefato | Padrão | Exemplo |
 |---|---|---|
-| Tabela do addon | `<PRX><MOD3><CTX>` | `TDCXYZCAB` |
-| Nome da entidade JAPE | `<Prx><Mod><Ctx>` | `TdcXyzCabecalho` |
+| Tabela do addon | `<PRX><MOD3><CTX>` | `PRXXYZCAB` |
+| Nome da entidade JAPE | `<Prx><Mod><Ctx>` | `PrxXyzCabecalho` |
 | Coluna em tabela nativa | `<MOD3>_NOMECAMPO` | `XYZ_STATUS` |
 
 ### Proteção de encoding

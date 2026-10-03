@@ -8,8 +8,8 @@ Dois servicos complementares para dialogos modais:
 Existe um terceiro, tambem construido sobre `SanPopup`: **`PopUpParameter`**, que monta um popup de formulario a partir de uma lista de campos, sem template nem controller proprios. Antes de escrever `.tpl.html` + `.controller.js` para um popup que so pede campos, ver [popup-parameter.md](popup-parameter.md).
 
 Fontes:
-- core/util/message/messageutil.service.js (969 linhas)
-- components/popup/popup.service.js (386 linhas)
+- core/util/message/messageutil.service.js
+- components/popup/popup.service.js
 
 ---
 
@@ -80,8 +80,6 @@ MessageUtils.confirm('Deseja fechar sem salvar?')
         }
     });
 ```
-
-Convencao dos `reason` strings documentada no proprio codigo.
 
 ### Builders fluentes
 
@@ -173,8 +171,6 @@ Retorna objeto com:
 
 ### Opcoes principais
 
-Defaults em :39-60, lista completa documentada em :78-123.
-
 | Opcao | Default | Uso |
 |-------|---------|-----|
 | `title` | — | Titulo no cabecalho |
@@ -215,7 +211,7 @@ Defaults em :39-60, lista completa documentada em :78-123.
 ```javascript
 var popupInstance = SanPopup.open({
     title: 'Cadastro de Observacao',
-    templateUrl: 'commons/observacao/observacao.tpl.html',
+    templateUrl: 'html5/<Tela>/popup/observacao.tpl.html',
     controller: 'ObservacaoPopupController',
     controllerAs: 'ctrl',
     size: 'md',
@@ -234,7 +230,7 @@ popupInstance.result.then(function(resultado) {
 
 ### `$success` / `$dismiss` no scope
 
-SanPopup injeta no `$scope` do popup duas funcoes ():
+SanPopup injeta no `$scope` do popup duas funcoes:
 
 ```html
 <button ng-click="$success(ctrl.resultado)">Salvar</button>
@@ -244,7 +240,7 @@ SanPopup injeta no `$scope` do popup duas funcoes ():
 Elas disparam o fechamento e resolvem/rejeitam a promise `popupInstance.result`. Se o popup tem controller, `$popupInstance` e injetado automaticamente:
 
 ```javascript
-angular.module('x').controller('ObservacaoPopupController',
+angular.module('<Tela>App').controller('ObservacaoPopupController',
     ['$scope', '$popupInstance', 'parametros',
     function($scope, $popupInstance, parametros) {
         var ctrl = this;
@@ -349,7 +345,7 @@ function excluir() {
         'Deseja realmente excluir este registro?',
         true  // showAsWarning
     ).then(function() {
-        self.ds.deleteRecord();
+        self.ds.removeCurrentRow();
     });
 }
 ```
@@ -371,7 +367,7 @@ ServiceProxy.callService('mge@X.salvar', payload)
 ```javascript
 SanPopup.open({
     title: SkI18nService.instant('Financeiro.lblAjuste'),
-    templateUrl: 'commons/ajuste/ajuste.tpl.html',
+    templateUrl: 'html5/<Tela>/popup/ajuste.tpl.html',
     controller: 'AjusteController',
     controllerAs: 'ctrl',
     size: 'md',

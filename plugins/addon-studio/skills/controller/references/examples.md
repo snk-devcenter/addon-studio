@@ -4,21 +4,21 @@
 
 ```java
 @Controller(
-    serviceName = "AlvoControllerSP",
+    serviceName = "ProdutoControllerSP",
     transactionType = EJBTransactionType.Supports
 )
-public class AlvoController {
+public class ProdutoController {
 
-    private final AlvoService alvoService;
+    private final ProdutoService produtoService;
 
     @Inject
-    public AlvoController(AlvoService alvoService) {
-        this.alvoService = alvoService;
+    public ProdutoController(ProdutoService produtoService) {
+        this.produtoService = produtoService;
     }
 
     @Transactional
-    public List<AlvoResponse> importar() {
-        return alvoService.importar();
+    public List<ProdutoResponse> importar() {
+        return produtoService.importar();
     }
 }
 ```

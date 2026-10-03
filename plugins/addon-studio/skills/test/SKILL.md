@@ -9,12 +9,6 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 
 Documento define como desenvolver testes automatizados backend Addon Studio 2.0 com libs de mercado.
 
-## Objetivo
-
-- Garantir comportamento regras negocio.
-- Permitir refator seguro.
-- Reduzir regressao em servicos e mapeamentos.
-
 ## Bibliotecas recomendadas
 
 - JUnit 5 (`org.junit.jupiter`)
@@ -80,7 +74,7 @@ testlogger {
 
 dependencies {
     // SDK do Addon Studio no classpath de teste.
-    // Obrigatorio: repositorios (ex.: TdcXyzCadastroRepository) estendem JapeRepository
+    // Obrigatorio: repositorios (ex.: PrxModCadastroRepository) estendem JapeRepository
     // do SDK da Sankhya, que so e disponibilizado para compilacao principal pelo
     // plugin Gradle do Studio. Sem isso, o compilador nao resolve findByPK/save nos testes.
     testImplementation 'br.com.sankhya.studio:sdk-sankhya:2+'
@@ -106,9 +100,9 @@ test {
 Output visual `test-logger` tema `mocha` similar a Jest:
 
 ```
-com.example.addon.ProcessarEntidadeServiceTest
+com.example.addon.PedidoServiceTest
 
-  ✔ deveProcessar_quandoGatewayRetornarDados()
+  ✔ deveListarPendentes_quandoGatewayRetornarDados()
   ✔ deveLancarEntityNotFoundException_quandoEntidadeNaoEncontrada()
   ✘ deveLancarRuntimeException_quandoRepositorioFalhar()
     ...stack trace...
@@ -133,28 +127,28 @@ import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class ProcessarEntidadeServiceTest {
+class PedidoServiceTest {
 
     @Mock
-    private EntidadeRepository entidadeRepository;
+    private PedidoRepository pedidoRepository;
 
     @Mock
-    private EntidadeGateway entidadeGateway;
+    private PedidoGateway pedidoGateway;
 
     @InjectMocks
-    private ProcessarEntidadeService service;
+    private PedidoService service;
 
     @Test
-    void deveProcessarEntidade_quandoGatewayRetornarDados() throws Exception {
+    void deveListarPendentes_quandoGatewayRetornarDados() throws Exception {
         // arrange
-        when(entidadeGateway.buscarDados()).thenReturn(Arrays.asList(new EntidadeDominio()));
+        when(pedidoGateway.buscarPendentes()).thenReturn(Arrays.asList(new Pedido()));
 
         // act
-        List<EntidadeDominio> resultado = service.execute();
+        List<Pedido> resultado = service.listarPendentes();
 
         // assert
         assertThat(resultado).hasSize(1);
-        verify(entidadeGateway, times(1)).buscarDados();
+        verify(pedidoGateway, times(1)).buscarPendentes();
     }
 }
 ```
@@ -211,7 +205,7 @@ Controller so orquestra — nao contem logica de negocio (ver skill `controller`
 class PedidoControllerTest {
 
     @Mock
-    private CriarPedidoService criarPedidoService;
+    private PedidoService pedidoService;
 
     @Mock
     private PedidoRestMapper mapper;
@@ -220,22 +214,22 @@ class PedidoControllerTest {
     private PedidoController controller;
 
     @Test
-    void deveDelegarParaServiceEMapper_quandoCriarPedido() {
+    void deveDelegarParaServiceEMapper_quandoCriar() {
         // arrange
         CriarPedidoRequest request = new CriarPedidoRequest();
         Pedido pedido = new Pedido();
-        PedidoResponse response = new PedidoResponse();
+        CriarPedidoResponse response = new CriarPedidoResponse();
 
         when(mapper.toPedido(request)).thenReturn(pedido);
-        when(criarPedidoService.execute(pedido)).thenReturn(pedido);
+        when(pedidoService.criar(pedido)).thenReturn(pedido);
         when(mapper.toCriarResponse(pedido)).thenReturn(response);
 
         // act
-        PedidoResponse resultado = controller.criarPedido(request);
+        CriarPedidoResponse resultado = controller.criar(request);
 
         // assert
         assertThat(resultado).isSameAs(response);
-        verify(criarPedidoService, times(1)).execute(pedido);
+        verify(pedidoService).criar(pedido);
     }
 }
 ```
@@ -263,7 +257,7 @@ class PedidoRestMapperTest {
 }
 ```
 
-> Mapper `abstract class` com `@Inject` (repository/deps) nao funciona com `Mappers.getMapper` sem container: instancie a impl gerada (`new PedidoMapperImpl()`) atribuindo mocks aos campos, ou cubra o mapper via teste do service que o usa.
+> Mapper `abstract class` com `@Inject` (repository/deps) nao funciona com `Mappers.getMapper` sem container: instancie a impl gerada passando os `uses` no construtor (`new PedidoMapperImpl(normalizer)`) e atribua o repository mockado ao campo `protected`, ou cubra o mapper pelo teste do service.
 
 ## Armadilha: objetos iguais por Lombok `@Data` conflitam em stubs
 
@@ -299,15 +293,13 @@ nos textos excecao runtime. Evite asserções com acentos em
 **Fragil (pode falhar por encoding):**
 ```java
 assertThat(ex.getMessage()).contains("número da nota");
-assertThat(ex.getMessage()).contains("agrônomo");
-assertThat(ex.getMessage()).contains("área tratada");
+assertThat(ex.getMessage()).contains("condição de pagamento");
 ```
 
 **Robusto — usar substring ASCII que aparece na mensagem:**
 ```java
 assertThat(ex.getMessage()).contains("da nota");
-assertThat(ex.getMessage()).contains("agr");
-assertThat(ex.getMessage()).contains("tratada");
+assertThat(ex.getMessage()).contains("de pagamento");
 ```
 
 Se mensagem vem de wrapper (ex.: `"Erro ao criar o pedido. Motivo: %s"`),
@@ -355,24 +347,13 @@ void deveLancarIntegrationException_quandoGatewayFalhar() throws Exception {
 
 ## Boas praticas
 
-- Estrutura AAA: Arrange, Act, Assert.
-- Use `@ExtendWith(MockitoExtension.class)` pra inicializar mocks.
-- Prefira `@InjectMocks` + construtor da classe alvo.
-- Valide comportamento e efeitos observaveis. Evite detalhes internos.
-- Um cenario por teste.
-- Dado teste simples e explicito.
 - Declare `throws Exception` em metodos teste que interajam com repositorios JapeRepository.
 
 ## O que evitar
 
-1. Teste com dependencia horario real sem controle.
-2. Assert generico (ex.: so `notNull`) quando regra exige validacao forte.
-3. Mockar propria classe sob teste.
-4. Teste que cobre varios cenarios nao relacionados no mesmo metodo.
-5. Banco real em teste unitario.
-6. Mockito 5.x em projetos Java 8 — usar 4.11.0.
-7. Asserções mensagem com acentos (`ã`, `ç`, `ô`, `ú` etc.).
-8. Dois `new Entidade()` identicos como args de stubs distintos.
+1. Mockito 5.x em projetos Java 8 — usar 4.11.0.
+2. Asserções mensagem com acentos (`ã`, `ç`, `ô`, `ú` etc.).
+3. Dois `new Entidade()` identicos como args de stubs distintos.
 
 ## Testes de excecao
 

@@ -32,7 +32,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
-public class TdcXyzEntidadeId {
+public class PrxXyzEntidadeId {
 
     @Column(name = "CODORIG")
     private Integer codOrig;
@@ -49,14 +49,14 @@ public class TdcXyzEntidadeId {
 ```java
 
 @Id
-private TdcXyzEntidadeId embeddedId;
+private PrxXyzEntidadeId embeddedId;
 ```
 
 ## Convenções da PK composta
 
 | Regra          | Detalhe                                                             |
 |:---------------|:--------------------------------------------------------------------|
-| Nome da classe | `<NomeEntidade>Id` (ex: `TdcXyzProdutoId`)                             |
+| Nome da classe | `<NomeEntidade>Id` (ex: `PrxXyzProdutoId`)                             |
 | Anotações      | `@Data`, `@AllArgsConstructor`, `@NoArgsConstructor`, `@Embeddable` |
 | Campos         | Cada campo com `@Column(name = "...")` — somente `name`             |
 | Na entidade    | Campo anotado apenas com `@Id` (sem `@Column`)                      |

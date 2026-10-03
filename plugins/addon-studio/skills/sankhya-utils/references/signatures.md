@@ -690,7 +690,7 @@ File getTempViewerFileDir()
 
 ## Base64Impl
 
-Encode/decode Base64 (alternativa Java 8 sem `java.util.Base64` do JDK, mantida por compatibilidade com o restante da plataforma).
+Encode/decode Base64.
 
 ```java
 String encode(byte[])

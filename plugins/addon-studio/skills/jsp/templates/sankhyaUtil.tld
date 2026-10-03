@@ -47,7 +47,7 @@
 
 	<tag>
 		<name>query</name>
-		<tag-class>br.com.sankhya.<addon>.servlet.taglibs.QueryTag</tag-class>
+		<tag-class><pacote.das.taglibs>.QueryTag</tag-class>
 		<body-content>JSP</body-content>
 		<description>
 			Executes the SQL query defined in its body or through the sql attribute.
@@ -81,7 +81,7 @@
 
 	<tag>
 		<name>load</name>
-		<tag-class>br.com.sankhya.<addon>.servlet.taglibs.HTMLGadgetSetupTag</tag-class>
+		<tag-class><pacote.das.taglibs>.HTMLGadgetSetupTag</tag-class>
 		<body-content>JSP</body-content>
 		<description>
 			Load the html5component functions.

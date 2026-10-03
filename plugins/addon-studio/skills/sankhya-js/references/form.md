@@ -8,8 +8,6 @@ Tres componentes de formulario. `sk-dynaform` e a cabeca de tela de entidade (or
 
 ### Atributos de scope
 
-Definidos:
-
 | Atributo | Binding | Proposito |
 |----------|---------|-----------|
 | `sk-dataset` / `dataset` | `=?` | Dataset de onde vem os campos |
@@ -68,11 +66,11 @@ SkComponentRegistry.get('myForm').then(function(form) { ... });
 
 ## 2. `sk-dynaform`
 
-Cabeca de tela de entidade — componente de mais baixo nivel do sankhya-js. Orquestra dataset, form, datagrid, filter panel, tree (hierarquia), abas, navegador, configuracao de tela e bloco de outras opcoes.
+Cabeca de tela de entidade — o componente de mais alto nivel do sankhya-js. Orquestra dataset, form, datagrid, filter panel, tree (hierarquia), abas, navegador, configuracao de tela e bloco de outras opcoes.
 
 ### Atributos de scope mais usados
 
-Definidos. Os mais relevantes:
+Os mais relevantes:
 
 **Entidade / dados**
 - `sk-entity-name` (`@`) — nome da entidade (obrigatorio). O dataset interno e criado a partir disso.
@@ -140,7 +138,7 @@ O dynaform aceita slots atraves de `<dynaform-{entity-name-dashcase}>`. Tags rec
 Exemplo:
 
 ```html
-<sk-dynaform sk-entity-name="Parceiro" sk-resource-id="br.com.sankhya.Parceiros">
+<sk-dynaform sk-entity-name="Parceiro" sk-resource-id="<resourceId>">
   <dynaform-parceiro>
     <sk-right-top-bar>
       <button ng-click="ctrl.extra()">Acao extra</button>
@@ -512,8 +510,6 @@ Parecem iguais mas sao diferentes:
 
 - `sk-suppress-screen-config` — desabilita o botao **E** impede carregar config salva do banco.
 - `sk-hide-form-layout-config` — so esconde o botao; config salva ainda e aplicada.
-
-Documentado.
 
 ### 6.5. Ordem das abas diferente do Flex
 

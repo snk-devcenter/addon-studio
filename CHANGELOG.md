@@ -10,6 +10,26 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Alterado
+
+- Sub-agent `dbscript-builder` roda em `sonnet` em vez de `haiku` — o plugin usa só Opus e Sonnet.
+- `@Controller` nunca acessa repository: o dado passa por um service `@Component`. A regra entra no `ADDON.md` (sempre ativa) e nas skills `controller`, `dependency-injection` e `repository`.
+- Skill `controller` cataloga `@Service` como erro comum: é legado, endpoint é `@Controller` e service de negócio é `@Component`.
+- Exemplos usam o prefixo genérico `PRX` no lugar de `TDC` em todas as skills, sub-agents e no `README.md`.
+- Skill `job`: `@Transactional` sai do `onSchedule()` e vai para o método do service — com o `try/catch` do job, a transação no `onSchedule()` commitava escrita parcial. Lote item a item documentado com persistência por item em `REQUIRES_NEW`.
+- Skill `entity`: sufixo `Enum` no nome da classe passa a ser opcional; obrigatório é o campo de opções ser `enum`.
+- Skill `encoding` e `build` deixam de mandar converter à mão após cada `Write`/`Edit` — o hook do plugin já converte; a conversão manual fica para o que o hook não alcança.
+
+### Corrigido
+
+- Skill `action-button` explica o que `AUTOMATIC` (sessão + transação) e `MANUAL` (só sessão) entregam e alerta que, em `AUTOMATIC`, método de service `REQUIRES_NEW`/`NOT_SUPPORTED` escapa do rollback da ação.
+- Skills `listener`, `before-load-listener`, `business-rule` e `callback` alertam que o hook já roda em sessão + transação: método de service `REQUIRES_NEW`/`NOT_SUPPORTED` chamado dali escapa do rollback da operação.
+- Skills `controller` e `job` documentam o workaround da sessão JAPE: o EJB gerado do `@Controller`/`@Job` não abre `JapeSession`, então leitura via repository sem `@Transactional` no caminho falha com "Não existe uma sessão jape ativa." — `transactionType` não resolve. Leitura passa a levar `@Transactional`; `controller-designer` e `troubleshooter` alinhados.
+- Exemplos e templates que ensinavam API inexistente ou errada: `<pastaNativa>` e `selectQuery` no dicionário, `EJBTransactionType.REQUIRES_NEW`, `@EmbeddedId` (JPA) no `entity-architect`, payload `{ $: valor }` em chamada a `@Controller` do addon, `sk-items`, `value=` em input standalone, `templateUrl` relativo que dá 404.
+- Exemplos de dbscript criam a CHECK de `CHECKBOX`/`LISTA`, e o `<treeTable>` declara `defaultMask` e `maskName` (o schema exige os dois).
+- Contradições entre skills, sub-agents e `ADDON.md`: logging com `@Log`, exceção tipada em `@BusinessRule`, JIT do Guice, callback sem herança, guardas de U+FFFD no `troubleshooter`, mock de `JapeRepository` no `test-writer`.
+- Exemplos sem `resourceId` nativo concreto nem `package` que sugira layout de projeto.
+
 ## [3.1.5] - 2026-09-23
 
 ### Corrigido

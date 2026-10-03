@@ -11,10 +11,9 @@ angular
             self.carregar = function (codParc) {
                 // serviceName DEVE ter prefixo: <addon>@ para servico do proprio addon,
                 // mge@/mgecom@/mgefin@ para nativo. Sem prefixo cai em "mge" (gotcha 1).
-                // { $: valor } e a notacao herdada do transform XML/JSON do backend.
                 ServiceProxy.callService(
                     '<addon>@MeuServicoSP.listar',
-                    { codParc: { $: codParc } }
+                    { codParc: codParc }
                 ).then(function (data) {
                     // Retorno do @Controller vem em responseBody.body — sem o
                     // nivel body, todo campo lido volta undefined.
