@@ -132,7 +132,7 @@ ctx.getBarramentoRegra().addLiberacaoSolicitada(lib);
 
 ```java
 // Lance excecao — mensagem exibida ao usuario e transacao revertida
-throw new Exception("Limite de credito excedido. Operacao bloqueada.");
+throw new LimiteCreditoExcedidoException("Limite de credito excedido. Operacao bloqueada."); // excecao tipada do projeto
 ```
 
 ---
@@ -147,7 +147,7 @@ public void beforeUpdate(ContextoRegra ctx) throws Exception {
     DynamicVO notaVO    = (DynamicVO) ctx.getPrePersistEntityState().getNewVO();
     DynamicVO oldNotaVO = (DynamicVO) ctx.getPrePersistEntityState().getOldVO();
 
-    // Abordagem 1: comparar campo CONFIRMADA entre old e new
+    // Comparar CONFIRMADA entre old e new — alternativa: JapeSession.getProperty("CabecalhoNota.confirmando.nota") (Exemplo 1)
     boolean isConfirmando = "S".equals(notaVO.asString("CONFIRMADA"))
         && (oldNotaVO == null || !"S".equals(oldNotaVO.asString("CONFIRMADA")));
 
@@ -280,10 +280,11 @@ public class IntegracaoExternaRegra implements Regra {
 ## 8. Boas Praticas
 
 - **Velocidade**: Regra roda dentro da transacao da confirmacao. Deve executar em milissegundos.
+- **`@Transactional` no service chamado daqui: confira o `TxType`.** A regra ja roda dentro da sessao e da transacao da operacao. `@Transactional` bare (`REQUIRED`, o default) entra nessa transacao — caso seguro. `REQUIRES_NEW` suspende a transacao da operacao e commita por conta propria: se a operacao for revertida depois, o que ele gravou fica. `NOT_SUPPORTED` roda fora dela e nao participa do commit/rollback. Nada falha na hora — o bug so aparece quando a operacao da erro depois da chamada.
 - **Assincronismo para integracoes**: Chamadas a APIs externas = sempre `CompletableFuture`, `ExecutorService` ou JMS. Nunca sincrono.
 - **Logica em Services**: Mantenha a classe da `@BusinessRule` enxuta — delegue para `@Component`.
 - **Feedback ao usuario**: Use `addMensagem()` para informar acoes automaticas executadas.
-- **Excecoes para bloqueio**: Lance `Exception` com mensagem clara para impedir a operacao.
+- **Excecoes para bloqueio**: lance excecao tipada do projeto com mensagem clara para impedir a operacao.
 
 ---
 
@@ -294,7 +295,7 @@ public class IntegracaoExternaRegra implements Regra {
 | Usar para CRUD simples (salvar/excluir)         | Usar `@Listener`                                            |
 | Chamada sincrona a API/Web Service              | Usar `CompletableFuture` ou JMS                             |
 | Logica de negocio no metodo da interface        | Mover para Service (`@Component`)                           |
-| Usar `afterInsert` para validacao               | Validar em `beforeInsert` — apos salvar e tarde demais      |
+| Usar `afterInsert` para validacao               | Validar antes de gravar — `@Listener` `beforeInsert` (ou `beforeUpdate` da regra na confirmacao) |
 | `new` em dependencias gerenciadas               | Injetar via construtor com `@Inject`                        |
 | Usar para Notas de Entrada (compras)            | Usar `@Callback` — skill `callback`                         |
 
@@ -306,7 +307,7 @@ public class IntegracaoExternaRegra implements Regra {
 2. [ ] Criar classe implementando `Regra` (nomear `<Feature>Regra`).
 3. [ ] Anotar com `@BusinessRule(description = "...")`.
 4. [ ] Injetar dependencias via construtor com `@Inject` (Guice).
-5. [ ] Implementar apenas os metodos de evento necessarios.
+5. [ ] Implementar a logica so nos metodos de evento necessarios; os demais ficam com corpo vazio (a interface exige os 6).
 6. [ ] Detectar o momento correto (confirmacao, faturamento) via comparacao `oldVO`/`newVO` ou `JapeSession`.
 7. [ ] Delegar logica de negocio para Service (`@Component`).
 8. [ ] Integracoes externas: usar mecanismo assincrono.

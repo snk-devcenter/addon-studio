@@ -14,7 +14,7 @@ angular.module('<Tela>App')
     function($scope, ServiceProxy) {
 
       ServiceProxy.callService('<addon>@OrdemServicoSP.listarFinanceiros', {
-        codParc: { $: $scope.codParc }
+        codParc: $scope.codParc
       }).then(function(data) {
         $scope.dados = data.responseBody.body;
       }).catch(function(err) {
@@ -27,7 +27,7 @@ angular.module('<Tela>App')
 
 **Observacoes:**
 - `serviceName` sempre com prefixo: `<addon>@` para servico do proprio addon, `mge@`/`mgecom@`/`mgefin@` para servico nativo. Sem prefixo vai para `mge`.
-- Campos primitivos no `params` usam notacao `{ $: valor }` (herdada do transform XML/JSON do backend).
+- Payload de `@Controller` do addon e JSON simples: cada chave e o nome do parametro Java do metodo (skill `controller`). A notacao `{ $: valor }` e de servico nativo (`mge@...`), nao do addon.
 - Retorno do `@Controller` fica em `data.responseBody.body` — o `body` e o nivel que o framework acrescenta. Servico nativo nao tem esse nivel: e `data.responseBody.<no>` (ex.: `responseBody.queryExecResult`).
 
 ---
@@ -41,7 +41,7 @@ var chamador = ServiceProxy.builder()
   .serviceName('<addon>@OrdemServicoSP.listarItens')
   .ignoreLoadingBar(true);
 
-chamador.params({ nunota: { $: 12345 } }).call()
+chamador.params({ nunota: 12345 }).call()
   .then(handleItens);
 ```
 

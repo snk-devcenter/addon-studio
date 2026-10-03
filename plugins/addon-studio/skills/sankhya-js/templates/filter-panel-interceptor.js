@@ -36,13 +36,11 @@ angular
             self.onFilterPanelReady = function ($filter) {
                 self.panel = $filter;
 
-                // addHasFilterListener nao tem removeEventListener publicado —
-                // listener vive ate o $destroy do scope do panel (gotcha 15).
-                // Guardar para desregistrar manualmente quando o consumidor morre.
-                var off = $filter.addHasFilterListener(function (hasFilter) {
+                // addHasFilterListener nao devolve desregistro: o listener vive ate o
+                // $destroy do scope do panel (gotcha 15).
+                $filter.addHasFilterListener(function (hasFilter) {
                     self.temFiltroAtivo = hasFilter;
                 });
-                $scope.$on('$destroy', off);
             };
 
             // ============================================================
@@ -128,7 +126,7 @@ angular
 //                            sk-label="Nome"></sk-text-input>
 //             <sk-combobox sk-value="ctrl.filtros.ativo"
 //                          sk-label="Ativo"
-//                          sk-items="[{v:'S',l:'Sim'},{v:'N',l:'Nao'}]"></sk-combobox>
+//                          sk-options="[{data:'S',value:'Sim'},{data:'N',value:'Nao'}]"></sk-combobox>
 //         </default-group>
 //
 //         <!-- Accordion extra (label obrigatorio) -->

@@ -16,11 +16,11 @@ Filtros declarativos exibidos acima da grade de resultados em telas geradas via 
 `<filters>` é filho de `<table>`, `<treeTable>` ou `<view>` (`xs:all` em `tableOrView`). Vai junto de `<fields>`, `<primaryKey>`, `<instances>`:
 
 ```xml
-<table name="TDCXYZATD" sequenceType="A" sequenceField="CODATD">
+<table name="PRXXYZATD" sequenceType="A" sequenceField="CODATD">
     <description>Atendimento</description>
     <primaryKey><field name="CODATD"/></primaryKey>
     <instances>
-        <instance name="TdcXyzAtendimento">
+        <instance name="PrxXyzAtendimento">
             <description>Atendimento</description>
         </instance>
     </instances>
@@ -182,7 +182,6 @@ UI: lookup que abre busca de usuário, mesmo widget do form.
 - [ ] Esquecer `useLikeExpression="S"` em campos de texto livre (`descricao`, `nome`) — busca exata raramente é o que o usuário quer
 - [ ] Usar `type="PERIODO"` em campo que **não** é de data — não funciona
 - [ ] `type="MULTI_SELECAO"` em campo `dataType` que não suporta — limitação documentada
-- [ ] Omitir `label` em filtros — usuário vê o nome técnico da coluna (ex.: `DHCRIACAO` em vez de `Data de Criacao`)
 - [ ] `required="S"` sem necessidade — força usuário preencher antes de buscar (use só quando volume justificar)
 - [ ] Filtros em campos com `calculated="S"` — performance ruim (executa expression a cada filtro), avaliar caso a caso
 
@@ -203,7 +202,7 @@ Filtros declarados em `<table>` aparecem **automaticamente** na tela gerada por 
 Para **filtros fixos** (não-editáveis, sempre aplicados), usar `<filterExpression>` em `<properties>` do `<dynamicForm>`:
 
 ```xml
-<dynamicForm id="TDC_FORM_ATD_ABERTOS" resourceId="TDC_FORM_ATD_ABERTOS" instance="TdcXyzAtendimento"
+<dynamicForm id="PRX_FORM_ATD_ABERTOS" resourceId="PRX_FORM_ATD_ABERTOS" instance="PrxXyzAtendimento"
              description="Atendimentos Abertos">
     <properties>
         <filterExpression>STATUS = 'ABERTO'</filterExpression>

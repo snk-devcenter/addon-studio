@@ -17,7 +17,7 @@ public class MeuController {
 
     @Transactional
     public MeuResponse criar(@Valid MeuRequest request) {
-        MeuEntity entidade = mapper.toDomain(request);
+        MeuEntity entidade = mapper.toMeuEntity(request);
         MeuEntity salva = meuService.criar(entidade);   // regra de negocio no service
         return mapper.toResponse(salva);
     }

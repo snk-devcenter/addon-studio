@@ -3,7 +3,7 @@
 // Referencia: references/wizard.md
 //
 // ATENCAO:
-// - current-step e TITULO do step, nao indice (gotcha 1).
+// - current-step NAO navega: o lookup do framework esta quebrado (gotcha 1). Navegue pela api: SkWizardHandler.wizard('nome').goToByName(...).
 // - setCanNext(val) muda canNext E completed simultaneamente (gotcha 3).
 // - canEnterStep / canExitStep sao codigo morto — use sk-validate-step (gotcha 4).
 
@@ -11,7 +11,7 @@
 // Controller do wizard — captura ponteiro, mantem contexto compartilhado
 // ================================================================
 angular
-    .module('minhaTelaApp')
+    .module('<Tela>App')
     .controller('MeuWizardCtrl', ['SkWizardHandler',
         function (SkWizardHandler) {
             var self = this;
@@ -22,9 +22,6 @@ angular
                 dados: {},
                 resultadoFinal: null
             };
-
-            // Titulo do step inicial (nao indice).
-            self.stepAtual = 'Dados';
 
             self.onWizardCreate = function (wizard) {
                 self.wizard = wizard;
@@ -57,7 +54,7 @@ angular
 // viva antes da primeira visita, mover para o controller do wizard.
 // ================================================================
 angular
-    .module('minhaTelaApp')
+    .module('<Tela>App')
     .controller('DadosStepCtrl', ['$scope', '$wizard', '$step', '$stepEventBus',
         function ($scope, $wizard, $step, $stepEventBus) {
             var sctrl = this;
@@ -99,7 +96,6 @@ angular
 // <div ng-controller="MeuWizardCtrl as ctrl">
 //
 //     <sk-wizard name="meuWizard"
-//                current-step="ctrl.stepAtual"
 //                sk-context="ctrl.wizardCtx"
 //                sk-on-create="ctrl.onWizardCreate(wizard)"
 //                sk-on-finish="ctrl.onFinalizar()"
@@ -107,7 +103,7 @@ angular
 //                sk-creation-policy="lazy">
 //
 //         <sk-step sk-title="Dados"
-//                  sk-template-url="app/dados.html"
+//                  sk-template-url="html5/<Tela>/dados.tpl.html"
 //                  sk-controller="DadosStepCtrl"
 //                  sk-controller-as="sctrl">
 //         </sk-step>

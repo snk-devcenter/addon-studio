@@ -275,7 +275,7 @@ public class ParceiroAuthInterceptor implements Interceptor {
 ```
 
 **Regras:**
-- `@Component @Singleton` — uma instância para todas as chamadas.
+- `@Component @Singleton` — só para o **primeiro** interceptor do addon; a partir do segundo, `@Provides @Singleton` do tipo concreto (ver aviso abaixo).
 - Implementa `okhttp3.Interceptor`.
 - `chain.proceed(request)` é **obrigatório** — sem ele a request não vai pra rede.
 - `@Inject` via construtor para resolver dependências (token provider, config, etc.).
@@ -395,7 +395,7 @@ Estes patterns são comuns mas opcionais. Skill não detalha — implemente conf
 
 | Erro | Causa | Correção |
 |:-----|:------|:---------|
-| `NoClassDefFoundError: retrofit2/Retrofit` em runtime | Declarado só como `implementation`, sem `moduleLib` | Trocar para `moduleLib` (ou ambos em versões antigas do plugin Gradle) |
+| `NoClassDefFoundError: retrofit2/Retrofit` em runtime | Declarado só como `implementation`, sem `moduleLib` | Trocar para `moduleLib` |
 | `IllegalArgumentException: Illegal URL` no `Retrofit.Builder` | Base URL sem barra final | Adicionar `/` no fim: `"https://api.x.com/"` |
 | `EOFException` em response com `204 No Content` | Tentou desserializar corpo vazio | Use `Call<Void>` ou cheque `response.body() == null` |
 | `MalformedJsonException` ao deserializar | DTO não bate com JSON | Adicionar `@Json(name = "...")` em campos com nome diferente |
@@ -415,7 +415,7 @@ Estes patterns são comuns mas opcionais. Skill não detalha — implemente conf
 3. [ ] Criar DTOs Java 8 com Lombok (`@Data`) — usar `@Json(name=...)` quando JSON não casar.
 4. [ ] Criar `@CustomModule` com `@Provides @Singleton` retornando o cliente.
 5. [ ] Se múltiplas APIs no addon, considerar `RetrofitClientFactory` (opção B).
-6. [ ] Criar interceptors necessários (auth, logging) como `@Component @Singleton`.
+6. [ ] Criar interceptors (auth, logging): o primeiro como `@Component @Singleton`, os demais via `@Provides @Singleton` em `@CustomModule` (`BindingAlreadySet`, seção 4).
 7. [ ] Gateway/adapter (`@Component`) injeta o client e expõe métodos de domínio.
 8. [ ] Tratar response status, body nulo, `IOException` — extrair executor compartilhado se boilerplate repetir.
 

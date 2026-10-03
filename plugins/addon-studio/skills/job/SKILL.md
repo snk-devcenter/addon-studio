@@ -7,7 +7,7 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 
 # Jobs Agendados (`@Job`) — Addon Studio 2.0
 
-`@Job` substitui a configuracao via `mgeschedule.xml` por abordagem declarativa diretamente na classe Java. Jobs sao gerenciados pelo SDK e suportam injecao de dependencias.
+`@Job` declara o agendamento direto na classe Java. Jobs sao gerenciados pelo SDK e suportam injecao de dependencias.
 
 ---
 
@@ -15,7 +15,6 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 
 ```java
 import br.com.sankhya.studio.annotations.Job;
-import br.com.sankhya.studio.persistence.Transactional;
 import br.com.sankhya.studio.stereotypes.IJob;
 import com.google.inject.Inject;
 
@@ -33,9 +32,8 @@ public class ProcessadorDeFilaJob extends IJob {  // IJob e CLASSE ABSTRATA — 
     }
 
     @Override
-    @Transactional
     public void onSchedule() {
-        filaService.processarItens();   // Logica delegada ao Service
+        filaService.processarItens();   // Logica e transacao ficam no Service (secao 4)
     }
 }
 ```
@@ -104,9 +102,18 @@ public String getScheduleConfig() {
 
 | Cenario                     | Abordagem                                                          |
 |:----------------------------|:-------------------------------------------------------------------|
-| Job modifica dados          | `@Transactional` no `onSchedule()` — garante atomicidade          |
-| Job somente leitura         | `transactionType = EJBTransactionType.NotSupported` — melhor desempenho |
+| Job modifica dados          | `@Transactional` no metodo do service que grava; `onSchedule()` sem `@Transactional`, so captura e loga |
+| Lote processado item a item | Service persiste cada item em metodo `@Transactional(Transactional.TxType.REQUIRES_NEW)` — item que falha nao desfaz os outros |
+| Job somente leitura         | Consulta do service tambem sob `@Transactional` — so para abrir a sessao JAPE (ver abaixo) |
 | Controle granular por trecho| `transactionType = EJBTransactionType.Supports` (padrao) + `@Transactional` no metodo |
+
+> **Por que nao `@Transactional` no `onSchedule()`:** o job precisa de `try/catch` (secao 7). Com a transacao no `onSchedule()`, o `catch` que so loga faz o metodo terminar normalmente e a transacao **commita o que foi gravado ate o erro**. Com a transacao no service, a excecao sai do metodo transacional (rollback) e so depois e capturada pelo job. No Sankhya **qualquer** excecao que sai do metodo transacional faz rollback — `RuntimeException` ou checked (`throws Exception`), diferente do default EJB/Spring, que nao desfaz em checked.
+
+### Sessao JAPE: `@Transactional` tambem em leitura
+
+O EJB que o SDK gera a partir do `@Job` nao abre `JapeSession`. Sem um `@Transactional` no caminho entre o `onSchedule()` e o repository, qualquer consulta (`findOne`, `findByPK`, `@Criteria`...) falha com **"Nao existe uma sessao jape ativa."** — leitura nao precisa de transacao, precisa de sessao, e a transacao forca a abertura da sessao. `transactionType` no `@Job` **nao resolve**: e o controle do container EJB, nao abre nem fecha sessao. Nao abra `JapeSession`/transacao manualmente.
+
+> Mesma falha do EJB gerado do `@Controller` (skill `controller`, secao 3), reportada a equipe de plataforma. Quando o SDK corrigir, leitura volta a dispensar `@Transactional` e esta secao sai.
 
 ### Valores de `Transactional.TxType`
 
@@ -115,7 +122,7 @@ public String getScheduleConfig() {
 | `TxType` | Semantica |
 |:---------|:----------|
 | `REQUIRED` | **Default** do `@Transactional` bare. Usa a transacao existente; cria uma se nao houver. |
-| `REQUIRES_NEW` | Sempre cria transacao nova, suspendendo a atual se existir. |
+| `REQUIRES_NEW` | Sempre cria transacao nova, suspendendo a atual se existir; commita ao sair e retoma a anterior. Rollback posterior da transacao externa **nao** desfaz o que o metodo `REQUIRES_NEW` ja commitou. |
 | `MANDATORY` | Exige transacao ativa; lanca excecao se nao houver. |
 | `NOT_SUPPORTED` | Executa fora de transacao; suspende a atual se existir. |
 | `NEVER` | Lanca excecao se houver transacao ativa. |
@@ -123,28 +130,77 @@ public String getScheduleConfig() {
 > **Nao existe `TxType.SUPPORTS`** — esses cinco valores sao o enum inteiro. `EJBTransactionType` (classe) e `Transactional.TxType` (metodo) sao enums **distintos e nao equivalentes**: `Required` → `REQUIRED` e `NotSupported` → `NOT_SUPPORTED`, mas `Supports` **nao tem equivalente por metodo** (para segui-lo, omita `@Transactional`), e `REQUIRES_NEW`/`MANDATORY`/`NEVER` nao tem equivalente de classe.
 
 ```java
-// Job de escrita — transacao atomica
+// Job de escrita — a transacao e do service
+@Log
 @Job(serviceName = "SincronizadorSP", frequency = "0 0 2 * * ?")
 public class SincronizadorJob extends IJob {
 
     @Override
-    @Transactional
     public void onSchedule() {
-        sincronizarService.executar();
+        try {
+            sincronizadorService.executar();
+        } catch (Exception e) {
+            log.log(Level.SEVERE, "Falha na sincronizacao: {0}", e.getMessage());
+        }
     }
 }
 
-// Job de leitura — sem overhead transacional
-@Job(
-    serviceName = "RelatorioSP",
-    frequency = "0 0 6 * * ?",
-    transactionType = EJBTransactionType.NotSupported
-)
+@Component
+public class SincronizadorService {
+
+    @Transactional
+    public void executar() {
+        // tudo ou nada: excecao aqui desfaz todas as gravacoes do metodo
+        // (consultas aqui dentro tambem ganham a sessao JAPE)
+    }
+}
+
+// Lote item a item — cada item na sua transacao
+@Log
+@Component
+public class ProcessadorFilaService {
+
+    private final ItemFilaRepository itemFilaRepository;
+
+    @Inject
+    public ProcessadorFilaService(ItemFilaRepository itemFilaRepository) {
+        this.itemFilaRepository = itemFilaRepository;
+    }
+
+    @Transactional // abre a sessao JAPE para o findPendentes; cada item commita na propria transacao
+    public void processarPendentes() throws Exception {
+        for (ItemFila item : itemFilaRepository.findPendentes()) {
+            try {
+                processarItem(item);
+            } catch (Exception e) {
+                // rollback ja aconteceu so neste item; segue para o proximo
+                log.log(Level.SEVERE, "Falha no item " + item.getId(), e);
+            }
+        }
+    }
+
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public void processarItem(ItemFila item) throws Exception {
+        // gravacao do item; falha aqui desfaz so este item
+    }
+}
+
+// Job de leitura — a consulta ainda precisa de sessao JAPE
+@Job(serviceName = "RelatorioSP", frequency = "0 0 6 * * ?")
 public class RelatorioJob extends IJob {
 
     @Override
     public void onSchedule() {
         relatorioService.gerar();
+    }
+}
+
+@Component
+public class RelatorioService {
+
+    @Transactional // so abre a sessao JAPE; nada e gravado
+    public void gerar() {
+        // consultas via repository
     }
 }
 ```
@@ -157,16 +213,14 @@ public class RelatorioJob extends IJob {
 
 ```java
 import br.com.sankhya.studio.annotations.Job;
-import br.com.sankhya.studio.persistence.Transactional;
 import br.com.sankhya.studio.stereotypes.IJob;
 import com.google.inject.Inject;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import lombok.extern.java.Log;
 
+@Log
 @Job(serviceName = "SincronizadorDeEstoqueSP", frequency = "0 0 2 * * ?")
 public class SincronizadorDeEstoqueJob extends IJob {
-
-    private static final Logger log = Logger.getLogger(SincronizadorDeEstoqueJob.class.getName());
 
     private final EstoqueService estoqueService;
 
@@ -176,10 +230,9 @@ public class SincronizadorDeEstoqueJob extends IJob {
     }
 
     @Override
-    @Transactional
     public void onSchedule() {
         try {
-            estoqueService.sincronizar();
+            estoqueService.sincronizar(); // @Transactional no metodo do service
             log.info("Sincronizacao de estoque finalizada.");
         } catch (Exception e) {
             log.log(Level.SEVERE, "Falha na sincronizacao de estoque: {0}", e.getMessage());
@@ -193,10 +246,9 @@ public class SincronizadorDeEstoqueJob extends IJob {
 ```java
 import br.com.sankhya.modelcore.util.MGECoreParameter;
 
+@Log
 @Job(serviceName = "ProcessadorFilaSP", frequency = "&300000") // default ms: 5 min
 public class ProcessadorFilaJob extends IJob {
-
-    private static final Logger log = Logger.getLogger(ProcessadorFilaJob.class.getName());
 
     private final FilaService filaService;
 
@@ -216,7 +268,6 @@ public class ProcessadorFilaJob extends IJob {
     }
 
     @Override
-    @Transactional
     public void onSchedule() {
         try {
             filaService.processarItens();
@@ -263,10 +314,10 @@ public class MeuJob extends IJob {
 
 - **Logica em Services**: `onSchedule()` orquestra — delega para `@Component`.
 - **Tratamento de erros**: sempre `try/catch` no `onSchedule()` — falha sem captura pode impedir execucoes futuras.
-- **Logging**: `Logger` (`java.util.logging`) + nivel adequado. Nunca `System.out`.
-- **Transacao adequada**: `@Transactional` em jobs de escrita; `NotSupported` em jobs somente leitura.
+- **Logging**: `@Log` Lombok + `java.util.logging`. Nunca `System.out`.
+- **Transacao adequada**: escrita → `@Transactional` no metodo do service; lote item a item → metodo por item com `REQUIRES_NEW`; somente leitura → consulta tambem sob `@Transactional` (sessao JAPE).
 - **Frequencia configuravel**: Use `getScheduleConfig()` (`String`) + parametro do sistema para evitar hardcode.
-- **Assincrono para integracoes externas**: chamadas a APIs dentro do job = `CompletableFuture` ou similar.
+- **Integracoes externas**: o job e o worker natural da tabela-fila alimentada por listener/regra; mantenha a chamada HTTP fora do trecho `@Transactional`.
 
 ---
 
@@ -283,10 +334,10 @@ public class MeuJob extends IJob {
 | `getScheduleConfigHook()` retornando `String` p/ freq   | `getScheduleConfig()` retorna a freq (`Hook` e `void`/obsoleto) |
 | `TransactionType.X`                                     | `EJBTransactionType.X`                                    |
 | Logica de negocio no `onSchedule()`                     | Mover para Service (`@Component`)                         |
-| Chamada sincrona a API externa no job                   | Usar `CompletableFuture` ou fila assincrona              |
-| `System.out.println` para logging                       | Usar `Logger` (`java.util.logging`)                       |
+| `System.out.println` para logging                       | `@Log` Lombok + `java.util.logging`                       |
 | `new` em dependencias gerenciadas                       | Injetar via construtor com `@Inject`                      |
-| Job de escrita sem `@Transactional`                     | Adicionar `@Transactional` no `onSchedule()`             |
+| `@Transactional` no `onSchedule()` com `try/catch` que so loga | Commita a escrita parcial — `@Transactional` no metodo do service |
+| Consulta via repository sem `@Transactional` no caminho | Falha com "Nao existe uma sessao jape ativa." — `@Transactional` no metodo do service (secao 4) |
 | `@Transactional(Transactional.TxType.SUPPORTS)`         | Nao existe — omitir `@Transactional` (metodo herda `Supports` da classe) |
 
 ---
@@ -299,8 +350,8 @@ public class MeuJob extends IJob {
 4. [ ] Imports corretos: `annotations.Job`, `persistence.Transactional`, `stereotypes.IJob`, `annotations.enums.EJBTransactionType`.
 5. [ ] Injetar dependencias via construtor com `@Inject` (Guice).
 6. [ ] Implementar `onSchedule()` (retorno `void`) delegando logica para Service.
-7. [ ] Adicionar `@Transactional` se job modificar dados.
-8. [ ] Definir `transactionType = EJBTransactionType.NotSupported` se job for somente leitura.
+7. [ ] Se o job grava: `@Transactional` no metodo do service, nao no `onSchedule()`; lote item a item: gravacao por item em metodo `REQUIRES_NEW`.
+8. [ ] Somente leitura: a consulta do service tambem fica sob `@Transactional` (sessao JAPE, secao 4) — `transactionType` nao abre sessao.
 9. [ ] Envolver corpo de `onSchedule()` em `try/catch` com logging adequado.
 10. [ ] Se frequencia for dinamica: sobrescrever `getScheduleConfig()` retornando `String` (nao `getScheduleConfigHook()`).
 11. [ ] Confirmar que **nao existem** `mgeschedule.xml` nem `mgechedule-cfg.xml` no projeto.
@@ -311,4 +362,3 @@ public class MeuJob extends IJob {
 - `dependency-injection` — wiring Guice dos services injetados no job
 - `repository` — jobs tipicamente operam sobre dados via repository
 - `value` — configuração agendamento via `@Value`/`SANKHYA_PARAM`
-- `database` — migration XML do registro do job

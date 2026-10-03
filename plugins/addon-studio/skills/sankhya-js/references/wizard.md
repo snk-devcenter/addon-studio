@@ -17,14 +17,13 @@ Arquivos: wizard.directive.js, wizard.controller.js, steps/steps.directive.js, w
 
 ```html
 <sk-wizard name="meuWizard"
-           current-step="ctrl.stepAtual"
            sk-on-finish="ctrl.onFinalizar()"
            sk-on-cancel="ctrl.onCancelar()"
            sk-context="ctrl.wizardCtx"
            sk-on-create="ctrl.onWizardCreate(wizard)"
            sk-creation-policy="lazy">
 
-    <sk-step sk-title="Dados" sk-template-url="app/dados.html"
+    <sk-step sk-title="Dados" sk-template-url="html5/<Tela>/dados.tpl.html"
              sk-controller="DadosStepCtrl" sk-controller-as="sctrl">
     </sk-step>
 
@@ -42,7 +41,7 @@ Arquivos: wizard.directive.js, wizard.controller.js, steps/steps.directive.js, w
 No controller de um step (injetado via DI):
 
 ```javascript
-angular.module('app').controller('DadosStepCtrl',
+angular.module('<Tela>App').controller('DadosStepCtrl',
   ['$scope', '$wizard', '$step', '$stepEventBus',
   function($scope, $wizard, $step, $stepEventBus) {
     $step.onEnterStep = function() { /* ... */ };
@@ -55,7 +54,7 @@ angular.module('app').controller('DadosStepCtrl',
 
 | Binding | Tipo | Proposito |
 |---|---|---|
-| `current-step` | `=` | **titulo** do step corrente (nao indice); two-way |
+| `current-step` | `=` | **nao funciona** (gotcha 1); para navegar use `goTo`/`goToByName` |
 | `sk-on-finish` | `&` | callback final |
 | `sk-on-cancel` | `&` | callback cancelar |
 | `sk-on-step-change` | `&?` | `{$step, $index}` a cada mudanca |

@@ -48,7 +48,7 @@ var app = SkApplication.instance();
 SkApplication.instance(self);  // joga erro se ja setado
 
 // 3. standalone (dev isolado) — em config, antes do bootstrap
-angular.module('meuApp').config(['SkApplicationProvider',
+angular.module('<Tela>App').config(['SkApplicationProvider',
   function(SkApplicationProvider) {
     SkApplicationProvider.setStandaloneApp('MinhaTelaDev', '<PROFILE_ID>', {
       appDescription: 'Minha tela de dev',
@@ -141,7 +141,7 @@ app.isMinRequiredVersion('4.35.0');  // compara com window.top.SYSVERSION
 ### Ciclo de vida
 
 ```javascript
-app.openApp('br.com.sankhya.com.mov', { NUNOTA: { $: 123, type: 'I' } });
+app.openApp('<resourceId>', { NUNOTA: { $: 123, type: 'I' } });
 app.closeApp();                   // fecha a propria; ou closeApp(outroResourceId)
 app.reloadApp(resourceId, pkObj); // recarrega
 app.openWindow(url, target, specs); // avisa popup bloqueado (exceto electron)
@@ -195,7 +195,7 @@ app.setDecodeUTF8UrlLoadByPk(true);                       // afeta getPkObject
 ## Callbacks sobrescritiveis pelo `$scope`
 
 ```javascript
-angular.module('meuApp').controller('MinhaTelaCtrl', ['$scope',
+angular.module('<Tela>App').controller('MinhaTelaCtrl', ['$scope',
   function($scope) {
     $scope.loadByPK = function(pk) {
       // disparado automaticamente em mudanca de hash/URL; recebe pkObject

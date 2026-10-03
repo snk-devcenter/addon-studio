@@ -24,7 +24,7 @@ Para conhecimento de domínio, carregue a skill via `Read` em `${CLAUDE_PLUGIN_R
 
 Antes de gerar:
 
-1. `Glob plugins/.../*Controller.java` para ver padrão existente do projeto.
+1. `Glob **/*Controller.java` para ver padrão existente do projeto.
 2. Identificar entidade-alvo (passado pelo dev ou inferir do contexto).
 3. Verificar se já existe `@ControllerAdvice` no projeto: `Grep '@ControllerAdvice'`.
 4. Verificar `transactionType` padrão usado (geralmente `Supports`).
@@ -37,7 +37,7 @@ Antes de gerar:
 | `transactionType` | `Supports`, `Required`, `NotSupported` | `Supports` (mistura leitura+escrita). `Required` p/ 100% escrita. `NotSupported` p/ 100% leitura. |
 | Operações | criar, listar, buscar por id, atualizar, deletar, ações específicas | Conforme requisito. |
 | Tipo de retorno | DTO Response direto ou `void` | `void` p/ ações sem retorno. DTO p/ leitura/criação. |
-| `@Transactional` | granular por método | Em métodos que **alteram dados**. Leitura simples = sem. |
+| `@Transactional` | granular por método | Em todo método que chega no repository — escrita **e** leitura (leitura: só para abrir a sessão JAPE que o EJB gerado não abre; ver skill `controller` §3). |
 | Validação | `@Valid` + `@NotNull`/`@NotBlank`/`@DecimalMin`/`@Size` | Sempre `@Valid` em parâmetro DTO Request. |
 | @ControllerAdvice | criar novo ou reusar existente | Reusar se já houver no projeto. Se não, agent cria. |
 
@@ -65,7 +65,7 @@ Antes de gerar:
    - Dependências via `@Inject` construtor (`com.google.inject.Inject`)
    - Métodos públicos = endpoints
    - `@Valid` em parâmetros DTO Request
-   - `@Transactional` em métodos de escrita
+   - `@Transactional` em todo método que acessa repository (escrita e leitura — sessão JAPE)
    - Retorno: DTO Response direto ou `void`
    - **Sem** lógica de negócio — delegar para o `<Feature>Service`
    - **Sem** `try/catch` — deixar `@ControllerAdvice` tratar
@@ -81,7 +81,7 @@ Antes de gerar:
 
 ### 4. Validar consistência
 
-- `serviceName` único no projeto (`Grep '@Controller(serviceName' plugins/`)
+- `serviceName` único no projeto (`Grep '@Controller(serviceName'`)
 - DTOs Request com validações apropriadas
 - Mapper cobre todos métodos do controller
 - Exceções lançadas pelo serviço estão cobertas por handlers no advice
@@ -102,11 +102,11 @@ Após gerar, reportar:
 
 ### Arquivos criados
 
-- `<pacote>/dto/<Acao><Feature>Request.java`
-- `<pacote>/dto/<Acao><Feature>Response.java`
-- `<pacote>/mapper/<Feature>RestMapper.java`
-- `<pacote>/<Feature>Controller.java`
-- (Se aplicável) `<pacote>/<Feature>ControllerAdvice.java`
+- `<caminho>/<Acao><Feature>Request.java`
+- `<caminho>/<Acao><Feature>Response.java`
+- `<caminho>/<Feature>RestMapper.java`
+- `<caminho>/<Feature>Controller.java`
+- (Se aplicável) `<caminho>/<Feature>ControllerAdvice.java`
 
 ### Endpoints gerados
 
@@ -127,5 +127,4 @@ Após gerar, reportar:
 ## Quando NÃO criar
 
 - Se entidade-alvo não existir — usar agent `entity-architect` antes
-- Se feature já tiver controller — usar agent `addon-reviewer` para revisar antes de modificar
 - Se tudo for endpoint público sem auth: avisar que **toda** requisição Sankhya exige `mgeSession` (auth via `MobileLoginSP.login` ou Gateway)

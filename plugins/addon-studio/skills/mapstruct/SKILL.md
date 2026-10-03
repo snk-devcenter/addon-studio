@@ -1,6 +1,6 @@
 ---
 name: mapstruct
-description: Cria, revisa e refatora mappers MapStruct para Sankhya (`@Mapper` com `componentModel="jakarta"`, `injectionStrategy=CONSTRUCTOR`, padrões create/merge, `@MappingTarget`, `@AfterMapping`, `@Named`) para conversão DTO↔Entidade campo a campo, sem escrever get/set à mão. Use ao criar, alterar, revisar, auditar ou padronizar mappers, ao trabalhar com arquivos `*Mapper.java`, ou ao tocar em código com `@Mapper`/`@Mapping`. Escopo: o mapper e as anotações de mapeamento; o DTO e a rota são `controller`. NÃO usar para controlar como um tipo serializa em JSON — isso é `@GlobalTypeAdapter`, skill `type-adapter`.
+description: Cria, revisa e refatora mappers MapStruct para Sankhya (`componentModel="jakarta"` global no `build.gradle`, nunca no `@Mapper`; `injectionStrategy=CONSTRUCTOR`, padrões create/merge, `@MappingTarget`, `@AfterMapping`, `@Named`) para conversão DTO↔Entidade campo a campo, sem escrever get/set à mão. Use ao criar, alterar, revisar, auditar ou padronizar mappers, ao trabalhar com arquivos `*Mapper.java`, ou ao tocar em código com `@Mapper`/`@Mapping`. Escopo: o mapper e as anotações de mapeamento; o DTO e a rota são `controller`. NÃO usar para controlar como um tipo serializa em JSON — isso é `@GlobalTypeAdapter`, skill `type-adapter`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -47,21 +47,13 @@ tasks.withType(JavaCompile) {
 | `unmappedTargetPolicy` | `IGNORE` | Campos target sem mapeamento explicito ignorados sem erro compilacao. |
 | `lombok-mapstruct-binding` | `0.2.0` | Garante compatibilidade Lombok (getters/setters gerados) com MapStruct (annotation processor). |
 
-> **ATENCAO — Nao confunda `componentModel` com `injectionStrategy`:**
+> Nao confunda `componentModel` com `injectionStrategy`:
 >
-> | Parametro | Configurado globalmente? | Regra |
-> |:----------|:-------------------------|:------|
-> | `componentModel` | **SIM** — `jakarta` no `build.gradle` | **NUNCA** declare no `@Mapper` individual. Declarar sobrescreve global. |
-> | `injectionStrategy` | **NAO** — sem flag global | **SEMPRE** declare `InjectionStrategy.CONSTRUCTOR` em mapper `abstract class` (com `@Inject` repository) ou que use `uses = {...}`. |
-> | repositories em `abstract class` | **N/A** | **SEMPRE** use field injection (`@Inject` no campo). Limitacao MapStruct: processador nao gera `super(...)` com parametros construtor classe abstrata, impossibilita constructor injection pra repositorios. |
->
-> **IMPORTANTE — componentModel:** `componentModel` **NUNCA** declare no `@Mapper` individual. Ja global como `jakarta` em `build.gradle`. Declarar — mesmo com mesmo valor `"jakarta"` — sobrescreve global, causa conflitos injecao ou falhas silenciosas no Guice.
->
-> **IMPORTANTE — injectionStrategy:** `injectionStrategy` **NAO** global. Declare explicito como `InjectionStrategy.CONSTRUCTOR` em mapper que:
-> - `abstract class` com `@Inject` (repositorios ou deps), OU
-> - use `uses = {...}` com componentes externos.
->
-> Omitir = field injection Guice sem garantia ordem inicializacao.
+> | Parametro | Global? | Regra |
+> |:----------|:--------|:------|
+> | `componentModel` | Sim (`jakarta` no `build.gradle`) | Nao declare no `@Mapper`, nem com `"jakarta"`: declarar sobrescreve o global e quebra a injecao no Guice. |
+> | `injectionStrategy` | Nao | Declare `InjectionStrategy.CONSTRUCTOR` em mapper com `uses = {...}` ou `abstract class` com `@Inject`; omitir cai em field injection sem ordem de inicializacao garantida. |
+> | repository em `abstract class` | — | Field injection (`@Inject` no campo): o MapStruct nao gera `super(...)` com parametros do construtor da abstrata. |
 
 ---
 
@@ -89,7 +81,7 @@ import org.mapstruct.Mapping;
 @Mapper
 public interface MeuRestMapper {
 
-    MeuEntity toDomain(MeuRequest dto);
+    MeuEntity toMeuEntity(MeuRequest dto);
 
     @Mapping(source = "campo1", target = "campoDto1")
     @Mapping(source = "campo2", target = "campoDto2")
@@ -168,9 +160,9 @@ import org.mapstruct.Mapping;
 )
 public abstract class MeuMapper {
 
-    @Mapping(source = "idExterno", target = "cultura.idOrigem")
-    @Mapping(source = "idAlvo", target = "alvo.idOrigem")
-    @Mapping(source = "doseMin", target = "doseMinima")
+    @Mapping(source = "idExterno", target = "categoria.idOrigem")
+    @Mapping(source = "idFornecedor", target = "fornecedor.idOrigem")
+    @Mapping(source = "qtdMin", target = "quantidadeMinima")
     public abstract MeuEntity toDomain(MeuExternalDTO dto);
 }
 ```

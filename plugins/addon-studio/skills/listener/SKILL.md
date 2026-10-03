@@ -41,13 +41,13 @@ import lombok.extern.java.Log;
 import java.math.BigDecimal;
 
 @Log
-@Listener(instanceNames = "TdcXyzPedido")
-public class TdcXyzPedidoListener extends PersistenceEventAdapter {
+@Listener(instanceNames = "PrxXyzPedido")
+public class PrxXyzPedidoListener extends PersistenceEventAdapter {
 
     private final CalculoPedidoService calculoService;
 
     @Inject
-    public TdcXyzPedidoListener(CalculoPedidoService calculoService) {
+    public PrxXyzPedidoListener(CalculoPedidoService calculoService) {
         this.calculoService = calculoService;
     }
 
@@ -82,11 +82,11 @@ public class TdcXyzPedidoListener extends PersistenceEventAdapter {
 | `instanceNames` | `String[]` | Sim         | Nome(s) da(s) **instância(s)** a escutar — o mesmo valor de `@JapeEntity(entity = "...")`, de `<instance name="...">` no XML, ou o nome da instância nativa. **Não** é o nome da tabela. |
 
 ```java
-@Listener(instanceNames = "TdcXyzPedido")                        // uma instancia
+@Listener(instanceNames = "PrxXyzPedido")                        // uma instancia
 @Listener(instanceNames = {"CabecalhoNota", "Financeiro"})       // varias instancias (nativas)
 ```
 
-> **Gotcha:** `instanceNames` é o **nome lógico da entidade**, não a tabela. Para `@JapeEntity(entity = "TdcXyzPedido", table = "TDCXYZPED")`, usa-se `@Listener(instanceNames = "TdcXyzPedido")`.
+> **Gotcha:** `instanceNames` é o **nome lógico da entidade**, não a tabela. Para `@JapeEntity(entity = "PrxXyzPedido", table = "PRXXYZPED")`, usa-se `@Listener(instanceNames = "PrxXyzPedido")`.
 
 ---
 
@@ -140,7 +140,7 @@ Para trabalhar com a entidade `@JapeEntity` em vez de strings de campo:
 ```java
 import br.com.sankhya.sdk.data.repository.impl.EntityMapper;
 
-TdcXyzPedido pedido = EntityMapper.fromVO(event.getVo(), TdcXyzPedido.class);
+PrxXyzPedido pedido = EntityMapper.fromVO(event.getVo(), PrxXyzPedido.class);
 if (!pedido.deveProcessar()) return;  // regra de dominio na entidade, nao no listener
 ```
 
@@ -179,13 +179,13 @@ public void beforeUpdate(PersistenceEvent event) throws Exception {
 
 ```java
 @Log
-@Listener(instanceNames = "TdcXyzPedido")
-public class TdcXyzPedidoListener extends PersistenceEventAdapter {
+@Listener(instanceNames = "PrxXyzPedido")
+public class PrxXyzPedidoListener extends PersistenceEventAdapter {
 
     private final LimiteCreditoService limiteService;
 
     @Inject
-    public TdcXyzPedidoListener(LimiteCreditoService limiteService) {
+    public PrxXyzPedidoListener(LimiteCreditoService limiteService) {
         this.limiteService = limiteService;
     }
 
@@ -210,6 +210,7 @@ O listener roda **dentro da transação da operação**:
 
 - Exceção em `before*` → operação **cancelada** (rollback) e mensagem propagada ao usuário.
 - Acesso a banco na mesma transação: use `event.getJdbcWrapper()` ou repositories — **nunca** abra/feche conexão própria.
+- **`@Transactional` no service chamado daqui: confira o `TxType`.** O listener já roda dentro da sessão e da transação da operação. `@Transactional` bare (`REQUIRED`, o default) entra nessa transação — caso seguro. `REQUIRES_NEW` suspende a transação da operação e commita por conta própria: se a operação for revertida depois, o que ele gravou fica. `NOT_SUPPORTED` roda fora dela e não participa do commit/rollback. Nada falha na hora — o bug só aparece quando a operação dá erro depois da chamada.
 - **Chamada externa síncrona (API HTTP) dentro do listener é PROIBIDA** — segura a transação e derruba o tempo de resposta da gravação. Padrão correto: gravar numa **tabela-fila** e processar via `@Job` ou worker pool assíncrono (fire-and-forget).
 
 ### Loop de eventos

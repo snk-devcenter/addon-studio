@@ -116,7 +116,7 @@ Constantes: `StringUtils.ISO_8859_1`, `StringUtils.UTF_8` — use no lugar de li
 import com.sankhya.util.BigDecimalUtil;
 ```
 
-| Método | Assinatura | Comportamento (verificado no bytecode) |
+| Método | Assinatura | Comportamento |
 |:-------|:-----------|:---------------------------------------|
 | `getValueOrZero` | `(BigDecimal) : BigDecimal` | `null` → `ZERO_VALUE` |
 | `getValue` | `(BigDecimal, BigDecimal) : BigDecimal` | `null` → padrão |
@@ -188,7 +188,8 @@ Opera em `java.sql.Timestamp` e `long` (millis) — o par natural das entidades 
 | `toTimestamp` | `(String[, String pattern]) : Timestamp` | parse com padrão explícito |
 | `formataDDMMYYYY` / `formataDDMMYYYYHHMM` / `formataDDMMYYYYHHMMSS` / `formataHHMM` / `formataYYYYMMDD` / `formataMMYYYY` | `(Object) : String` | formatação pronta; **argumento `null` devolve a máscara em branco** (`"  /  /  "`), não `null` |
 | `timestamp2BigDecimal` / `bigDecimal2Timestamp` | conversão | data como número (campos legados) |
-| `minutes2Time` / `time2Minutes` / `getHoraDecimal` | `(BigDecimal)` | hora decimal ↔ minutos |
+| `minutes2Time` / `time2Minutes` | `(BigDecimal)` | hora decimal ↔ minutos |
+| `getHoraDecimal` | `(Timestamp) : BigDecimal` | hora do timestamp em decimal |
 | `isSunday` / `isFirstDayOfMonth` / `isLastDayOfMonth` | `(long) : boolean` | testes de calendário |
 | `isWeekend` | `(long) : boolean` | fim de semana — declara `throws Exception` |
 
@@ -334,7 +335,7 @@ TimeUtils.dataAddDay(dtBase, 30)
 | Concatenar `IN (` em loop com `StringBuilder` | `SQLUtils.buildINClause` / `buildINClauseByValues` |
 | Regex de CPF/CNPJ/e-mail copiada entre projetos | `ValidadorCpfCnpj` / `ValidadorEmail` / `ValidadorPIS` |
 | `e.getCause().getMessage()` sem checar `null` | `ExceptionNavigator.getLastNotEmptyMessage(e)` |
-| `synchronized` em método de service para serializar recurso de negócio | `ResourceLock.getLock(chave)` (funciona no cluster) |
+| `synchronized` em método de service para serializar recurso de negócio | `ResourceLock.getLock(chave)`; `getDistributedLock(chave)` quando a exclusão precisa valer no cluster (§7) |
 | Copiar util do Sankhya para dentro do addon "para não depender" | importar de `com.sankhya.util` — já está no classpath |
 | Adicionar Apache Commons Lang no `build.gradle` para `isEmpty`/`isBlank` | usar o que a plataforma já expõe |
 

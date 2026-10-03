@@ -1,6 +1,6 @@
 ---
 name: dependency-injection
-description: Configura, revisa e debuga DI Guice em Sankhya Addon Studio — `@Inject` de `com.google.inject`, `@Component`, `@CustomModule`, `Provider<T>`, `Multibinder`, `@Singleton`, escopos. Use ao montar wiring, criar/alterar módulos Guice, ao injetar repository/service em controller, job ou listener (costura entre camadas), ao revisar/auditar dependências, quando o addon sobe (deploy) e reclama que não conseguiu criar/instanciar um componente, que "não achou como criar" o seu service, que falta implementação ligada ou que não achou construtor (`ConfigurationException`, `CreationException`, `No implementation bound`, `Could not find a suitable constructor`), ou ao tocar em código com `@Inject`/`@CustomModule`/`AbstractModule`. Erro de deploy que nomeia o componente que o Guice não conseguiu criar já é diagnóstico pronto: o dono é esta skill, não o sub-agent `troubleshooter`. NÃO usar quando o valor a injetar é parâmetro de configuração do Sankhya — isso é `@Value`, skill `value`.
+description: Configura, revisa e debuga DI Guice em Sankhya Addon Studio — `@Inject` de `com.google.inject`, `@Component`, `@CustomModule`, `Provider<T>`, `Multibinder`, `@Singleton`, escopos. Use ao montar wiring, criar/alterar módulos Guice, ao injetar service em controller, ou repository/service em service, job ou listener (costura entre camadas; pedido de repository direto no controller também é aqui — a resposta é passar por um service `@Component`), ao revisar/auditar dependências, quando o addon sobe (deploy) e reclama que não conseguiu criar/instanciar um componente, que "não achou como criar" o seu service, que falta implementação ligada ou que não achou construtor (`ConfigurationException`, `CreationException`, `No implementation bound`, `Could not find a suitable constructor`), ou ao tocar em código com `@Inject`/`@CustomModule`/`AbstractModule`. Erro de deploy que nomeia o componente que o Guice não conseguiu criar já é diagnóstico pronto: o dono é esta skill, não o sub-agent `troubleshooter`. NÃO usar quando o valor a injetar é parâmetro de configuração do Sankhya — isso é `@Value`, skill `value`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -32,7 +32,7 @@ public class MeuService {
 }
 ```
 
-> **NUNCA** `@Inject` de `javax.inject`. Sempre `com.google.inject.Inject`.
+> Use `com.google.inject.Inject`, não `javax.inject.Inject`.
 
 ---
 
@@ -67,7 +67,7 @@ Framework scaneia e registra classes com:
 Regras DI relevantes:
 
 - `@Inject` de `com.google.inject.Inject` no construtor; deps `private final`.
-- **NÃO** adicionar `@Component` — `@Controller` já gerenciado pelo framework.
+- Não adicionar `@Component` — `@Controller` já gerenciado pelo framework.
 - Anatomia completa (`serviceName`, `transactionType`, `@Transactional`, DTOs): ver skill `controller`.
 
 ### 3.2 `@Repository` — Interfaces de Acesso a Dados
@@ -85,8 +85,8 @@ public interface MeuProdutoRepository extends JapeRepository<Integer, MeuProduto
 **Regras:**
 - Sempre **interface** (nunca classe concreta).
 - Estende `JapeRepository<PKType, EntityType>`.
-- **NÃO** adicionar `@Component` — framework gera implementação e registra no Guice.
-- Injetável direto em qualquer `@Component` ou `@Controller`.
+- Não adicionar `@Component` — framework gera implementação e registra no Guice.
+- Injetável em `@Component` (o service). `@Controller` não injeta repository — acessa o dado pelo service.
 
 ### 3.3 `@Component` — Classes Gerais
 
@@ -153,7 +153,7 @@ public class IntegrationPlatformConfig extends AbstractModule {
         Multibinder<IntegrationPlatformAdapter> binder =
             Multibinder.newSetBinder(binder(), IntegrationPlatformAdapter.class);
 
-        binder.addBinding().to(WebReceitaAdapter.class);
+        binder.addBinding().to(PlataformaXAdapter.class);
         // binder.addBinding().to(OutraPlataformaAdapter.class);
     }
 }
@@ -405,7 +405,7 @@ Pontos de injeção que pedem o tipo concreto continuam funcionando sem alteraç
 
 1. [ ] Anotar com `@Singleton`.
 2. [ ] Dep circular? Usar `Provider<T>`.
-3. [ ] Não é `@Component`? Garantir registro em algum `@CustomModule`.
+3. [ ] Interface sem `@Component` implementando? Registrar binding em `@CustomModule`. Classe concreta com construtor `@Inject` resolve por JIT (seção 9).
 
 ---
 
@@ -419,8 +419,7 @@ Pontos de injeção que pedem o tipo concreto continuam funcionando sem alteraç
 | Criar implementação manual de Repository | Use interface `JapeRepository` — framework gera implementação. |
 | Usar `new` pra instanciar dep | Injete via construtor. Guice resolve automático. |
 | Dep circular com `@Singleton` | Use `Provider<T>` pra quebrar ciclo. |
-| Classe sem estereótipo que precisa injeção | Adicione `@Component` ou registre em `@CustomModule`. |
-| `@Singleton` sem `@Component` e sem módulo | Guice não encontra. Adicione um dos dois. |
+| Interface sem implementação `@Component` nem binding | Adicione `@Component` na implementação ou binding em `@CustomModule`. Classe concreta com construtor `@Inject` já resolve por JIT. |
 | Mapper MapStruct com `uses` sem `injectionStrategy` | Adicione `injectionStrategy = InjectionStrategy.CONSTRUCTOR`. |
 | `@Provides` em classe sem `@CustomModule` | Guice não encontra provider. Adicione `@CustomModule`. |
 | `Guice/BindingAlreadySet` no deploy (build/testes passam) | Dois `@Component` implementam a mesma interface. Remova o stereotype de um deles e proveja via `@Provides @Singleton` do tipo concreto em `@CustomModule` (ver seção 9). |
@@ -428,8 +427,8 @@ Pontos de injeção que pedem o tipo concreto continuam funcionando sem alteraç
 
 ## Skills relacionadas
 
-- `controller` — controllers gerenciados automaticamente pelo framework — NÃO anotar @Component
-- `controller-advice` — advice gerenciado automaticamente pelo framework — NÃO anotar @Component
+- `controller` — anatomia completa do controller
+- `controller-advice` — anatomia completa do advice
 - `mapstruct` — mappers são registrados no container Guice
 - `retrofit` — wiring completo de cliente HTTP (interface + interceptor + `@Provides`) e exemplos práticos de `@Provides @Singleton`
 - `value` — injeção de valores de configuração via `@Value`

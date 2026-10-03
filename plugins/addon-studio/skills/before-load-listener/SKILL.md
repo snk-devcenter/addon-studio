@@ -78,7 +78,7 @@ public class MinhaInstanciaFinderListener implements FinderListener {
 |:-----------|:------------|:-------------------------------------------------------------------------------------------|
 | `instance` | Sim         | Nome da **instância (entidade)** a interceptar — o mesmo valor de `@JapeEntity(entity = "...")` ou de `<instance name="...">` no XML do dicionário. **Não** é o nome da tabela. |
 
-> **Gotcha:** `instance` é o **nome lógico da entidade**, não a tabela. Para `@JapeEntity(entity = "CabecalhoNota", table = "TGFCAB")`, usa-se `@BeforeLoadListener(instance = "CabecalhoNota")`.
+> **Gotcha:** `instance` é o **nome lógico da entidade**, não a tabela. Para `@JapeEntity(entity = "PrxXyzPedido", table = "PRXXYZPED")`, usa-se `@BeforeLoadListener(instance = "PrxXyzPedido")`.
 
 ---
 
@@ -108,8 +108,8 @@ Use o `finder` para critérios baseados no usuário logado:
 
 ```java
 @Log
-@BeforeLoadListener(instance = "TdcXyzPedido")
-public class TdcXyzPedidoFinderListener implements FinderListener {
+@BeforeLoadListener(instance = "PrxXyzPedido")
+public class PrxXyzPedidoFinderListener implements FinderListener {
 
     @Override
     public void beforeExecute(EntityMetaData entity, FinderWrapper finder) throws Exception {
@@ -135,13 +135,13 @@ import com.google.inject.Inject;
 import lombok.extern.java.Log;
 
 @Log
-@BeforeLoadListener(instance = "TdcXyzContrato")
-public class TdcXyzContratoFinderListener implements FinderListener {
+@BeforeLoadListener(instance = "PrxXyzContrato")
+public class PrxXyzContratoFinderListener implements FinderListener {
 
     private final EscopoUsuarioService escopoService;
 
     @Inject
-    public TdcXyzContratoFinderListener(EscopoUsuarioService escopoService) {
+    public PrxXyzContratoFinderListener(EscopoUsuarioService escopoService) {
         this.escopoService = escopoService;
     }
 
@@ -175,6 +175,7 @@ public class TdcXyzContratoFinderListener implements FinderListener {
 - **Evite** consultas pesadas ao banco dentro de `beforeExecute`.
 - Cacheie dados estáveis (config, perfis) em vez de reconsultar a cada busca.
 - Lógica complexa → delegar a service injetado, com cache quando aplicável.
+- **`@Transactional` no service chamado daqui: confira o `TxType`.** O `beforeExecute` já roda dentro da sessão e da transação da operação. `@Transactional` bare (`REQUIRED`, o default) entra nessa transação — caso seguro. `REQUIRES_NEW` suspende a transação da operação e commita por conta própria: se a operação for revertida depois, o que ele gravou fica. `NOT_SUPPORTED` roda fora dela e não participa do commit/rollback. Nada falha na hora — o bug só aparece quando a operação dá erro depois da chamada.
 
 ---
 

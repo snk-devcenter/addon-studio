@@ -30,28 +30,28 @@ Entidade Java = representação domínio de tabela banco. **Limpa** — contém 
 
 Padrao parametrizado por `<PRX>` (prefixo) + `<MOD3>` (modulo). Ver `database` secao "Descobrir convencao do projeto" antes de criar.
 
-| Atributo  | Padrao                              | Exemplo (PRX=TDC, MOD3=XYZ)  |
+| Atributo  | Padrao                              | Exemplo (PRX=PRX, MOD3=XYZ)  |
 |:----------|:------------------------------------|:-----------------------------|
-| `entity`  | `<Prx><Mod><Ctx>` (PascalCase)      | `TdcXyzCabecalho`            |
-| `table`   | `<PRX><MOD3><CTX>` (UPPER)          | `TDCXYZCAB`                  |
+| `entity`  | `<Prx><Mod><Ctx>` (PascalCase)      | `PrxXyzCabecalho`            |
+| `table`   | `<PRX><MOD3><CTX>` (UPPER)          | `PRXXYZCAB`                  |
 
 Componentes:
 
-- `<Prx>` / `<PRX>`: prefixo fixo do projeto, **3-4 chars** (ex.: `Tdc`/`TDC`, `App`/`APP`, `Cst`/`CST`)
+- `<Prx>` / `<PRX>`: prefixo fixo do projeto, **3-4 chars** (ex.: `Abc`/`ABC`)
 - `<Mod>` / `<MOD3>`: sigla do modulo, **3 caracteres** (ex.: `Xyz`/`XYZ`, `Fin`/`FIN`, `Fat`/`FAT`)
 - `<Ctx>` / `<CTX>`: contexto/entidade (ex.: `Cabecalho`/`CAB`, `Item`/`ITE`, `Configuracao`/`CFG`)
 
 `entity` usa PascalCase legivel (`Xyz`, nao `XYZ`). `table` usa UPPER concatenado.
 
-Exemplo coerente (`<PRX>`=`TDC`, `<MOD3>`=`XYZ`):
+Exemplo coerente (`<PRX>`=`PRX`, `<MOD3>`=`XYZ`):
 
 ```java
-@JapeEntity(entity = "TdcXyzCabecalho", table = "TDCXYZCAB")
+@JapeEntity(entity = "PrxXyzCabecalho", table = "PRXXYZCAB")
 ```
 
 > Antes criar entidade nova: (1) inspecionar projeto pra detectar `<PRX>` existente; (2) se ausente, perguntar dev `<PRX>` + `<MOD3>` + `<CTX>`; (3) confirmar `entity` + `table` final.
 
-> **NOTA:** exemplos seguintes usam `TDC` como prefixo ilustrativo. Substituir pelo `<PRX>` real do projeto.
+> **NOTA:** exemplos seguintes usam o literal `PRX` no lugar do prefixo. Substituir pelo `<PRX>` real do projeto.
 
 ### 1.2 Tabelas e Instâncias Nativas Sankhya (`isNativeTable` / `isNativeInstance`)
 
@@ -70,12 +70,12 @@ Instâncias nativas mais comuns associadas: `CabecalhoNota` (TGFCAB), `ItemNota`
 
 ```java
 // 1) Tabela e instância do addon — sem flags
-@JapeEntity(entity = "TdcXyzCabecalho", table = "TDCXYZCAB")
-public class TdcXyzCabecalho { ... }
+@JapeEntity(entity = "PrxXyzCabecalho", table = "PRXXYZCAB")
+public class PrxXyzCabecalho { ... }
 
 // 2) Tabela nativa, instância NOVA do addon — só isNativeTable
-@JapeEntity(entity = "TdcXyzDefensivos", table = "TGFDFAGR", isNativeTable = true)
-public class TdcXyzDefensivos { ... }
+@JapeEntity(entity = "PrxXyzDefensivos", table = "TGFDFAGR", isNativeTable = true)
+public class PrxXyzDefensivos { ... }
 
 // 3) Tabela e instância nativas — os dois flags
 @JapeEntity(entity = "CabecalhoNota", table = "TGFCAB",
@@ -83,7 +83,7 @@ public class TdcXyzDefensivos { ... }
 public class CabecalhoNota { ... }
 ```
 
-> **Regra prática:** se o `entity` for um nome usado pelo Sankhya nativo (`CabecalhoNota`, `ItemNota`, `Parceiro`, `Produto`, etc.), use `isNativeInstance = true`. Se o `entity` segue a convenção `Tdc<Modulo><Contexto>` do addon, é instância nova — não use `isNativeInstance`.
+> **Regra prática:** se o `entity` for um nome usado pelo Sankhya nativo (`CabecalhoNota`, `ItemNota`, `Parceiro`, `Produto`, etc.), use `isNativeInstance = true`. Se o `entity` segue a convenção `<Prx><Mod><Ctx>` do addon, é instância nova — não use `isNativeInstance`.
 
 ---
 
@@ -110,8 +110,8 @@ Representa tabela no banco. Tem `@JapeEntity`, `@Id`, `@Column`, opcionalmente r
 
 ```java
 
-@JapeEntity(entity = "TdcXyzAlvo", table = "TDCXYZALV")
-public class TdcXyzAlvo { ...
+@JapeEntity(entity = "PrxXyzAlvo", table = "PRXXYZALV")
+public class PrxXyzAlvo { ...
 }
 ```
 
@@ -122,7 +122,7 @@ Tabela com PK composta — classe separada anotada com `@Embeddable`.
 ```java
 
 @Embeddable
-public class TdcXyzEntidadeId { ...
+public class PrxXyzEntidadeId { ...
 }
 ```
 
@@ -137,7 +137,7 @@ Valores finitos de domínio (listas opções). Usados como tipo campo em entidad
 | `@Getter` (Lombok)                 | Gera o getter de `value` automaticamente.                        |
 | `@AllArgsConstructor` (Lombok)     | Gera o construtor que recebe `value`.                            |
 | Campo `private final String value` | Valor persistido no banco (código curto).                        |
-| Sufixo `Enum`                      | Nome da classe sempre termina com `Enum` (ex: `TipoStatusEnum`). |
+| Nome da classe                     | Sufixo `Enum` é opcional (`TipoStatus` ou `TipoStatusEnum`) — siga o que o projeto já usa. Obrigatório é o campo de opções ser `enum`, não `String`. |
 
 **Anatomia completa:**
 
@@ -379,7 +379,7 @@ public class DocumentoGerado {
 
 ## 11. Métodos de Domínio
 
-Entidades podem (e devem) conter **lógica negócio** relacionada ao estado interno.
+Entidades podem conter lógica de negócio sobre o próprio estado, se o projeto já segue esse estilo.
 
 ### Regras
 
@@ -417,7 +417,7 @@ public Boolean deveProcessar() {
 
 ## 12. Passo a Passo: Criando uma Entidade do Zero
 
-Tutorial completo (criar XML do dicionário → entidade Java → `@Embeddable` se PK composta → enum se aplicável → validar) usando exemplo `TdcXyzFornecedor` — em [`references/walkthrough.md`](references/walkthrough.md).
+Tutorial completo (criar XML do dicionário → entidade Java → `@Embeddable` se PK composta → enum se aplicável → validar) usando exemplo `PrxXyzFornecedor` — em [`references/walkthrough.md`](references/walkthrough.md).
 
 ---
 

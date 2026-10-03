@@ -25,7 +25,7 @@ Entidade com lista de filhos.
         )
     }
 )
-private List<TdcXyzVinculoProduto> vinculos;
+private List<PrxXyzVinculoProduto> vinculos;
 ```
 
 | Atributo    | Significado                                                                  |
@@ -153,7 +153,7 @@ Navegação inversa: filho -> pai.
 
 @ManyToOne
 @JoinColumn(name = "CODORIGEM", referencedColumnName = "CODPRODUTO")
-private TdcXyzProduto produto;
+private PrxXyzProduto produto;
 ```
 
 ## Quando usar cada relacionamento

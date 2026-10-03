@@ -22,7 +22,7 @@ Para conhecimento de domínio, carregue a skill correspondente `addon-studio:<sk
 
 ## Workflow
 
-1. Run `git diff` (staged + unstaged) e `git log -1 --stat` para identificar arquivos alterados.
+1. Rodar `git diff HEAD` (staged + unstaged) e `git log -1 --stat` para identificar arquivos alterados.
 2. Triagem: classificar cada arquivo por categoria (tabela abaixo).
 3. **Obrigatório:** para cada categoria com arquivo alterado, carregue a skill `addon-studio:<skill>` **antes** de reportar — a skill é a fonte de verdade das regras (assinaturas, anotações permitidas/proibidas, contratos). Não revisar de memória.
 4. Read de cada arquivo modificado completo, aplicar checks universais + regras da skill da categoria.
@@ -30,9 +30,9 @@ Para conhecimento de domínio, carregue a skill correspondente `addon-studio:<sk
 
 ## Checks universais (valem para todo arquivo, não mudam com o SDK)
 
-- [ ] Encoding ISO-8859-1 em `.java`/`.xml`/`.kt` (não UTF-8) — quebra runtime silenciosamente
+- [ ] Encoding ISO-8859-1 em `.java`/`.xml`/`.kt`/`.properties` (não UTF-8) — quebra runtime silenciosamente
 - [ ] Acento destruído por round-trip de edição — `file -i` **não** pega, arquivo com `?` no lugar de `ê` é Latin-1 válido. Rodar nos arquivos alterados:
-      `grep -lF "$(printf '\357\277\275')" <arquivos>` (U+FFFD gravado pela tool) e conferir no `git diff` se algum acento virou `?`. Achado → 🔴 Blocker, restaurar via git (ver skill `encoding`, seção "Perda silenciosa de acento")
+      usar a tool Grep com padrão `(?-u:\xEF\xBF\xBD)` nos arquivos alterados (U+FFFD gravado pela tool) e conferir no `git diff` se algum acento virou `?`. Achado → 🔴 Blocker, restaurar via git (ver skill `encoding`, seção "Perda silenciosa de acento")
 - [ ] Java 8 strict: sem `var`, `List.of`/`Map.of`/`Set.of`, `String.isBlank`, `Stream.toList`, records, text blocks — nenhuma API pós-Java 8
 - [ ] `@Inject` sempre de `com.google.inject.Inject`, nunca `javax.inject.Inject`
 
@@ -57,19 +57,19 @@ Estruturar feedback em 3 níveis de severidade:
 
 ### 🔴 Blockers (must-fix antes de merge)
 - Violação que quebra runtime ou compromete segurança
-- Inclui: encoding errado, JPA padrão em vez de @JapeEntity, `new` em dep gerenciada, RuntimeException cru, controller com try/catch, repository manual
+- Inclui: encoding errado, API pós-Java 8 (`var`, `List.of`, `isBlank`...), JPA padrão em vez de @JapeEntity, `new` em dep gerenciada, RuntimeException cru, controller com try/catch, repository manual
 - Inclui: `<table sequenceType="M">` em tabela de config/log/registro/apoio do addon (tela grava sem chave → `ORA-01400`); seed em dbscript com PK literal em tabela de PK automática. `"M"` só passa com PK composta só de FKs, código de negócio externo ou espelho de chave nativa — ver skill `data-dictionary`, seção "Como determinar `sequenceType`"
 
 ### 🟡 Warnings (should-fix)
 - Violação que funciona mas foge do padrão e dificulta manutenção
-- Inclui: Java 8 violations (var, List.of), SLF4J em vez de @Log, DTO mapeamento manual em vez de MapStruct, falta de `@Valid`, `serviceName` sem `SP`
+- Inclui: SLF4J em vez de @Log, DTO mapeamento manual em vez de MapStruct, falta de `@Valid`, `serviceName` sem `SP`
 
 ### 🔵 Suggestions (nice-to-have)
 - Melhorias estilísticas
 - Inclui: nomenclatura de variável, falta de `@Builder` quando útil, métodos longos passíveis de extração
 
 Para cada item, citar:
-- **Arquivo + linha**: `plugins/.../File.java:42`
+- **Arquivo + linha**: `<arquivo>.java:42`
 - **Trecho ofensor**: snippet de código atual
 - **Correção sugerida**: snippet de código corrigido
 - **Razão**: 1 linha explicando *por que* viola a regra

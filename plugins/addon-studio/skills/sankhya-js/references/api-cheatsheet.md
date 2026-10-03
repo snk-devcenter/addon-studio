@@ -17,7 +17,7 @@ Service em `snk.core.util`.
 
 ### Formato do `serviceName`
 
-`"modulo@Servico.metodo"` ou apenas `"Servico.metodo"` (assume `defModule = "mge"`). Split em `@` em.
+`"modulo@Servico.metodo"` ou apenas `"Servico.metodo"` (assume `defModule = "mge"`).
 
 ### URL montada
 
@@ -59,7 +59,7 @@ sktk: <sktk.y(requestContent)>
 | `removeClientEvent(eventId, handler?)` | Remove handler especifico ou todos do id |
 | `hasClientEvent(eventId)` | Boolean |
 
-Eventos sao injetados automaticamente no request body (`clientEventList.clientEvent`) em.
+Eventos sao injetados automaticamente no request body (`clientEventList.clientEvent`).
 
 ### Listeners de impressao
 
@@ -115,7 +115,7 @@ Mensagem de erro exata quando `required` falta: `"Variável X é requerida e nã
 
 ## `MetadataProvider` — metadados de entidades
 
-Service em `snk.core.metadataprovider` (depende de `snk.core.util`)..
+Service em `snk.core.metadataprovider` (depende de `snk.core.util`).
 
 | Metodo | Uso |
 |---|---|
@@ -133,7 +133,7 @@ Exposto globalmente em `top.mdProvider`.
 
 ## `SkComponentRegistry` — compartilhamento de instancias
 
-Factory em `snk.core.services.registry`..
+Factory em `snk.core.services.registry`.
 
 | Metodo | Uso |
 |---|---|
@@ -149,7 +149,7 @@ Handle vazio ou undefined no `register`: retorna `angular.noop`.
 
 ## `SkI18nService` — internacionalizacao
 
-Service em `snk.i18n`..
+Service em `snk.i18n`.
 
 | Metodo | Uso |
 |---|---|

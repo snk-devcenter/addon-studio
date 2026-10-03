@@ -20,7 +20,7 @@ angular
             self.abrirAjuste = function (linhaAtual) {
                 var popupInstance = SanPopup.open({
                     title: SkI18nService.instant('Financeiro.lblAjuste'),
-                    templateUrl: 'commons/ajuste/ajuste.tpl.html',
+                    templateUrl: 'html5/<Tela>/popup/ajuste.tpl.html',
                     controller: 'AjusteController',
                     controllerAs: 'ctrl',
                     size: 'md',
@@ -100,14 +100,14 @@ angular
 // </div>
 //
 // ====================================================================
-// USO em HTML — commons/ajuste/ajuste.tpl.html (template do popup)
+// USO em HTML — html5/<Tela>/popup/ajuste.tpl.html (template do popup)
 // ====================================================================
 // SanPopup injeta no $scope do popup duas funcoes: $success e $dismiss.
 // Usar em ng-click equivale a chamar $popupInstance.success/dismiss no controller.
 //
 // <div>
 //     <p>Valor original: {{ ctrl.valorOriginal }}</p>
-//     <sk-text-input value="ctrl.valorAjustado"></sk-text-input>
+//     <sk-text-input sk-value="ctrl.valorAjustado"></sk-text-input>
 //
 //     <!-- Opcao A: $success / $dismiss injetados diretamente -->
 //     <button ng-click="$success({ valor: ctrl.valorAjustado })">Salvar</button>

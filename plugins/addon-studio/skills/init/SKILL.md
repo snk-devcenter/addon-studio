@@ -58,7 +58,7 @@ Nada além disso — sem título, sem seção de customizações, sem placeholde
 
 ### 4. Confirmar para o dev
 
-Reporte em 2-3 linhas:
+Reporte em poucas linhas:
 
 - `docs/ADDON.md` copiado (ou atualizado).
 - `CLAUDE.md` criado / import adicionado / já estava OK.
@@ -75,7 +75,7 @@ Não sugira conteúdo pro `CLAUDE.md` nem ofereça preencher regras do projeto �
 ## O que NÃO fazer
 
 - Não regenerar o conteúdo do `ADDON.md` do zero — sempre copie do `assets/`. Fonte de verdade é o plugin.
-- Não inserir conteúdo do `ADDON.md` direto no `CLAUDE.md` (era o approach antigo, agora deprecated em favor de `@import`).
+- Não inserir conteúdo do `ADDON.md` direto no `CLAUDE.md` — o import `@docs/ADDON.md` é o que deixa o arquivo atualizável pela skill.
 
 ## Skills relacionadas
 

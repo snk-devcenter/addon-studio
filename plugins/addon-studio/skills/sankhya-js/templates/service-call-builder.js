@@ -74,7 +74,7 @@ angular
 //
 // <div ng-controller="MinhaCtrl as ctrl">
 //     <sk-button label="Buscar"
-//                ng-click="ctrl.buscar({ filtro: { $: 'X' } })">
+//                ng-click="ctrl.buscar({ filtro: 'X' })">
 //     </sk-button>
 //
 //     <sk-button label="Cancelar"
@@ -82,6 +82,6 @@ angular
 //     </sk-button>
 //
 //     <sk-button label="Salvar"
-//                ng-click="ctrl.salvarComErroCustom({ dados: { $: 'Y' } })">
+//                ng-click="ctrl.salvarComErroCustom({ dados: 'Y' })">
 //     </sk-button>
 // </div>

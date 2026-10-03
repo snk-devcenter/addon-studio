@@ -29,7 +29,7 @@ projeto é o `package`.
 | Onde | Arquivo | Papel |
 |:-----|:--------|:------|
 | `webapp/WEB-INF/tld/` | `sankhyaUtil.tld` | Declara `<snk:query>` e `<snk:load/>`. O `<tag-class>` precisa bater com o `package` real das classes. |
-| `src/main/java/.../taglibs/` | `QueryTag.java` | Implementa `<snk:query>` — executa SQL no render. |
+| `src/main/java/<pacote.das.taglibs>/` | `QueryTag.java` | Implementa `<snk:query>` — executa SQL no render. |
 | | `ResultImpl.java` | Resultado do `QueryTag` (`javax.servlet.jsp.jstl.sql.Result`). |
 | | `Period.java` | Suporte a parâmetro de período nomeado do `QueryTag`. |
 | | `HTMLGadgetSetupTag.java` | Implementa `<snk:load/>` — injeta a API JavaScript. |
@@ -154,7 +154,7 @@ quando você quer só uma **ilha**: um popup nativo, uma chamada de serviço com
 tratados, um trecho reativo dentro de uma tela que continua server-side. **Tela nova não
 entra aqui**: se ela vai carregar o stack Angular inteiro de qualquer jeito, ela devia ser
 `.xhtml5` — o `Html5Launcher` já faz isso, é o caminho suportado, e não deixa 8 `<script>`
-de caminho absoluto sob sua manutenção. Tier A se paga por **não reescrever**, não por ser
+de caminho absoluto sob sua manutenção. A ilha se paga por **não reescrever**, não por ser
 mais leve.
 
 ### Os 8 scripts, nesta ordem

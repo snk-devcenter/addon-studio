@@ -22,10 +22,10 @@ Componente UI declarativo que **gera tela de cadastro CRUD completa** sem escrev
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <metadados>
-    <menu id="TDC_MENU_XYZ" description="Modulo XYZ" icon="https://.../icon.png">
-        <dynamicForm id="TDC_FORM_CCU"
-                     resourceId="TDC_FORM_CCU"
-                     instance="TdcXyzCentroCusto"
+    <menu id="PRX_MENU_XYZ" description="Modulo XYZ" icon="https://.../icon.png">
+        <dynamicForm id="PRX_FORM_CCU"
+                     resourceId="PRX_FORM_CCU"
+                     instance="PrxXyzCentroCusto"
                      description="Cadastro de Centro de Custo"/>
     </menu>
 </metadados>
@@ -35,10 +35,10 @@ Componente UI declarativo que **gera tela de cadastro CRUD completa** sem escrev
 
 | Atributo | Obrigatório | Descrição | Exemplo |
 |----------|:-----------:|-----------|---------|
-| `id` | Sim | Identificador único. Pattern `[a-zA-Z0-9_.-]+`. Use prefixo do projeto (`<PRX>_FORM_<CTX>`) | `TDC_FORM_CCU` |
-| `instance` | Sim | Nome da `<instance>` declarada no `<table>`. **Deve bater exatamente** | `TdcXyzCentroCusto` |
+| `id` | Sim | Identificador único. Pattern `[a-zA-Z0-9_.-]+`. Use prefixo do projeto (`<PRX>_FORM_<CTX>`) | `PRX_FORM_CCU` |
+| `instance` | Sim | Nome da `<instance>` declarada no `<table>`. **Deve bater exatamente** | `PrxXyzCentroCusto` |
 | `description` | Sim | Label do menu visível ao usuário | `Cadastro de Centro de Custo` |
-| `resourceId` | Opcional no XSD, **obrigatório na prática** | Recurso para controle de permissão. Mesmo valor do `id`, máx. 50 caracteres — sem ele o `NOME` gravado em `TRDCON` recebe o prefixo do contexto do add-on e pode derrubar o carregamento do módulo. Ver [`menu.md`](menu.md#resourceid--obrigatório-na-prática-teto-de-50-em-trdconnome) | `TDC_FORM_CCU` |
+| `resourceId` | Opcional no XSD, **obrigatório na prática** | Recurso para controle de permissão. Mesmo valor do `id`, máx. 50 caracteres — sem ele o `NOME` gravado em `TRDCON` recebe o prefixo do contexto do add-on e pode derrubar o carregamento do módulo. Ver [`menu.md`](menu.md#resourceid--obrigatório-na-prática-teto-de-50-em-trdconnome) | `PRX_FORM_CCU` |
 | `license` | Não | Identificador de licença | — |
 
 ## Como o `instance` conecta tudo
@@ -46,12 +46,12 @@ Componente UI declarativo que **gera tela de cadastro CRUD completa** sem escrev
 `instance` é o **elo lógico** entre `<dynamicForm>` e a tabela:
 
 ```xml
-<!-- Arquivo: datadictionary/TDCXYZATD.xml -->
-<table name="TDCXYZATD" sequenceType="A" sequenceField="CODATD">
+<!-- Arquivo: datadictionary/PRXXYZATD.xml -->
+<table name="PRXXYZATD" sequenceType="A" sequenceField="CODATD">
     <description>Atendimento</description>
     <primaryKey><field name="CODATD"/></primaryKey>
     <instances>
-        <instance name="TdcXyzAtendimento">    <!-- ← instance declarada aqui -->
+        <instance name="PrxXyzAtendimento">    <!-- ← instance declarada aqui -->
             <description>Atendimento</description>
         </instance>
     </instances>
@@ -60,12 +60,12 @@ Componente UI declarativo que **gera tela de cadastro CRUD completa** sem escrev
 ```
 
 ```xml
-<!-- Arquivo: datadictionary/TDCXYZ_MENU.xml -->
+<!-- Arquivo: datadictionary/PRXXYZ_MENU.xml -->
 <metadados>
-    <menu id="TDC_MENU_XYZ" description="Modulo XYZ" icon="...">
-        <dynamicForm id="TDC_FORM_ATD"
-                     resourceId="TDC_FORM_ATD"
-                     instance="TdcXyzAtendimento"   <!-- ← bate com instance acima -->
+    <menu id="PRX_MENU_XYZ" description="Modulo XYZ" icon="...">
+        <dynamicForm id="PRX_FORM_ATD"
+                     resourceId="PRX_FORM_ATD"
+                     instance="PrxXyzAtendimento"   <!-- ← bate com instance acima -->
                      description="Atendimentos"/>
     </menu>
 </metadados>
@@ -98,11 +98,11 @@ Framework monta a tela a partir de:
 
 ```xml
 <!-- Tabela -->
-<table name="TDCXYZATD" sequenceType="A" sequenceField="CODATD">
+<table name="PRXXYZATD" sequenceType="A" sequenceField="CODATD">
     <description>Atendimento</description>
     <primaryKey><field name="CODATD"/></primaryKey>
     <instances>
-        <instance name="TdcXyzAtendimento">
+        <instance name="PrxXyzAtendimento">
             <description>Atendimento</description>
         </instance>
     </instances>
@@ -131,10 +131,10 @@ Framework monta a tela a partir de:
 
 <!-- Menu (em arquivo separado) -->
 <metadados>
-    <menu id="TDC_MENU_ATD" description="Atendimentos" icon="...">
-        <dynamicForm id="TDC_FORM_ATD"
-                     resourceId="TDC_FORM_ATD"
-                     instance="TdcXyzAtendimento"
+    <menu id="PRX_MENU_ATD" description="Atendimentos" icon="...">
+        <dynamicForm id="PRX_FORM_ATD"
+                     resourceId="PRX_FORM_ATD"
+                     instance="PrxXyzAtendimento"
                      description="Cadastro de Atendimentos"/>
     </menu>
 </metadados>
@@ -153,7 +153,7 @@ Resultado: tela com 4 campos, `CODUSU` lookup pra Usuario com default = usuário
 | `<paramMenuAtivo>` | SQL que retorna 1+ row para liberar acesso à tela |
 
 ```xml
-<dynamicForm id="TDC_FORM_ATD" resourceId="TDC_FORM_ATD" instance="TdcXyzAtendimento" description="Atendimentos">
+<dynamicForm id="PRX_FORM_ATD" resourceId="PRX_FORM_ATD" instance="PrxXyzAtendimento" description="Atendimentos">
     <properties>
         <paramMenuAtivo>SELECT 1 FROM TSIPAR WHERE CHAVE = 'XYZ_FEAT_ATD' AND VALOR = 'S'</paramMenuAtivo>
     </properties>
@@ -185,7 +185,7 @@ Resultado: tela com 4 campos, `CODUSU` lookup pra Usuario com default = usuário
 
 ## Boas práticas
 
-- ID segue padrão `<PRX>_FORM_<CTX>` (ex.: `TDC_FORM_CCU`, `TDC_FORM_ATD`)
+- ID segue padrão `<PRX>_FORM_<CTX>` (ex.: `PRX_FORM_CCU`, `PRX_FORM_ATD`)
 - `description` clara e em português (visível ao usuário final)
 - Organizar campos com `UITabName` (default `__main`) e `UIGroupName` para tela limpa
 - `order` numérico crescente para garantir disposição consistente

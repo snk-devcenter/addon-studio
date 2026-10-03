@@ -17,12 +17,11 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 import br.com.sankhya.studio.web.ControllerAdvice;
 import br.com.sankhya.studio.web.ExceptionHandler;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import lombok.extern.java.Log;
 
+@Log
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
-    private static final Logger log = Logger.getLogger(GlobalExceptionHandler.class.getName());
 
     @ExceptionHandler({ObjectNotFoundException.class})
     public ErrorResponse handleNotFound(ObjectNotFoundException e) {

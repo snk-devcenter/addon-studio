@@ -1,6 +1,6 @@
 ---
 name: repository
-description: Cria, revisa e refatora interfaces `@Repository` Sankhya estendendo `JapeRepository<ID, Entity>` com `@Criteria`, `@NativeQuery`, `@Modifying`, `@Parameter(name = "...")`, paginação, `findByPK` (retorno nullable, `throws Exception`). Use ao criar, alterar, revisar, auditar ou padronizar a camada de acesso a dados, ao implementar consulta/listagem/filtro/paginação/busca — a query mora aqui, inclusive quando o pedido é só "listar/filtrar/paginar X" sem citar rota nem app; se o pedido cita endpoint, rota, REST ou app mobile, o dono é `controller`, que chama este repository, ao escrever query custom, ao paginar (registros por página) ou filtrar por faixa de data/período, ao trabalhar com arquivos `*Repository.java`, ou ao tocar em código com `@Repository`/`JapeRepository`.
+description: Cria, revisa e refatora interfaces `@Repository` Sankhya estendendo `JapeRepository<ID, Entity>` com `@Criteria`, `@NativeQuery`, `@Modifying`, `@Parameter(name = "...")`, paginação, `findByPK` (retorno nullable, `throws Exception`). Use ao criar, alterar, revisar, auditar ou padronizar a camada de acesso a dados, ao implementar consulta/listagem/filtro/paginação/busca — a query mora aqui, inclusive quando o pedido é só "listar/filtrar/paginar X" sem citar rota nem app; se o pedido cita endpoint, rota, REST ou app mobile, o dono é `controller`, cujo service chama este repository, ao escrever query custom, ao paginar (registros por página) ou filtrar por faixa de data/período, ao trabalhar com arquivos `*Repository.java`, ou ao tocar em código com `@Repository`/`JapeRepository`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -121,8 +121,9 @@ Crie interface anotada com `@NativeQuery.Result` para mapear colunas retornadas:
 
 ```java
 
+// arquivo proprio: VeiculoDTO.java
 @NativeQuery.Result
-interface VeiculoDTO {
+public interface VeiculoDTO {
 
     BigDecimal getCodVeiculo();   // mapeia coluna CODVEICULO
 
@@ -166,7 +167,7 @@ Long contarPendentes(JdbcWrapper jdbc);
 void reajustarPrecoPorGrupo(BigDecimal fator, BigDecimal grupo);
 
 @Modifying
-@NativeQuery("DELETE FROM TDCXYZLOG WHERE DTEXPIRACAO < :data")
+@NativeQuery("DELETE FROM PRXMODLOG WHERE DTEXPIRACAO < :data")
 void excluirLogsExpirados(java.sql.Date data);
 ```
 
