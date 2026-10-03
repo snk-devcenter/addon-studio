@@ -10,6 +10,11 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Alterado
+
+- Organização em camadas volta a ser decisão do projeto: "controller fino, regra de negócio e acesso a dado em outra classe (ex.: service `@Component`)" passa de regra (`ADDON.md` e anti-pattern) a boa prática nas skills `controller`, `action-button`, `business-rule`, `callback`, `job` e `listener` e no sub-agent `controller-designer`.
+- Descriptions de `listener`, `business-rule` e `test` reforçam o gatilho indireto (auditoria de status em documento nativo; teste de regra/cálculo do addon), e a do sub-agent `entity-architect` aponta campo novo em entidade nativa para `merge-on-root`.
+
 ## [3.2.0] - 2026-10-03
 
 ### Adicionado

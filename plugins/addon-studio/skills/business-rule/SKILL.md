@@ -1,6 +1,6 @@
 ---
 name: business-rule
-description: Cria, revisa e refatora regras de negócio Sankhya com `@BusinessRule` (interface `Regra` + `ContextoRegra`) para barramento de eventos do módulo comercial, liberação de limite e regras transacionais. Use ao criar, alterar, revisar, auditar ou padronizar regras de negócio do comercial (nota, pedido, fatura, limite de crédito), ao implementar `beforeInsert`/`beforeUpdate`/`beforeDelete`/`afterInsert`/`afterUpdate`/`afterDelete` de `Regra`, ao trabalhar com arquivos `*Regra.java`, ou ao tocar em código com `@BusinessRule`. NÃO usar quando o documento é Nota de Entrada (compra) ou quando o gancho é o ponto de confirmação em si, na Central ou no Portal de Vendas — isso é `@Callback`/`ICustomCallBack`, skill `callback`. NÃO usar para evento de persistência de entidade JAPE genérica, inclusive tabela `AD_` do próprio addon (validar/preencher campo no insert, auditoria de alteração, bloquear exclusão) — isso é `@Listener`/`PersistenceEventAdapter`, skill `listener`.
+description: Cria, revisa e refatora regras de negócio Sankhya com `@BusinessRule` (interface `Regra` + `ContextoRegra`) para barramento de eventos do módulo comercial, liberação de limite e regras transacionais. Use ao criar, alterar, revisar, auditar ou padronizar regras de negócio do comercial (nota, pedido, fatura, limite de crédito), ao implementar `beforeInsert`/`beforeUpdate`/`beforeDelete`/`afterInsert`/`afterUpdate`/`afterDelete` de `Regra`, ao trabalhar com arquivos `*Regra.java`, ou ao tocar em código com `@BusinessRule`. NÃO usar quando o documento é Nota de Entrada (compra) ou quando o gancho é o ponto de confirmação em si, na Central ou no Portal de Vendas — isso é `@Callback`/`ICustomCallBack`, skill `callback`. NÃO usar para evento de persistência de qualquer tabela — documento nativo (pedido, nota) ou tabela `AD_` do próprio addon — fora do barramento: validar/preencher campo no insert, auditoria de alteração (quem mudou e quando), mudança de status, bloquear exclusão — isso é `@Listener`/`PersistenceEventAdapter`, skill `listener`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -282,7 +282,7 @@ public class IntegracaoExternaRegra implements Regra {
 - **Velocidade**: Regra roda dentro da transacao da confirmacao. Deve executar em milissegundos.
 - **`@Transactional` no service chamado daqui: confira o `TxType`.** A regra ja roda dentro da sessao e da transacao da operacao. `@Transactional` bare (`REQUIRED`, o default) entra nessa transacao — caso seguro. `REQUIRES_NEW` suspende a transacao da operacao e commita por conta propria: se a operacao for revertida depois, o que ele gravou fica. `NOT_SUPPORTED` roda fora dela e nao participa do commit/rollback. Nada falha na hora — o bug so aparece quando a operacao da erro depois da chamada.
 - **Assincronismo para integracoes**: Chamadas a APIs externas = sempre `CompletableFuture`, `ExecutorService` ou JMS. Nunca sincrono.
-- **Logica em Services**: Mantenha a classe da `@BusinessRule` enxuta — delegue para `@Component`.
+- **Classe enxuta (boa pratica)**: a classe da `@BusinessRule` filtra o evento e delega a regra para outra classe injetada (ex.: service `@Component`) — a organizacao em camadas e do projeto.
 - **Feedback ao usuario**: Use `addMensagem()` para informar acoes automaticas executadas.
 - **Excecoes para bloqueio**: lance excecao tipada do projeto com mensagem clara para impedir a operacao.
 
@@ -294,7 +294,6 @@ public class IntegracaoExternaRegra implements Regra {
 |:-----------------------------------------------|:------------------------------------------------------------|
 | Usar para CRUD simples (salvar/excluir)         | Usar `@Listener`                                            |
 | Chamada sincrona a API/Web Service              | Usar `CompletableFuture` ou JMS                             |
-| Logica de negocio no metodo da interface        | Mover para Service (`@Component`)                           |
 | Usar `afterInsert` para validacao               | Validar antes de gravar — `@Listener` `beforeInsert` (ou `beforeUpdate` da regra na confirmacao) |
 | `new` em dependencias gerenciadas               | Injetar via construtor com `@Inject`                        |
 | Usar para Notas de Entrada (compras)            | Usar `@Callback` — skill `callback`                         |

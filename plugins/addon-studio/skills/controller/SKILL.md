@@ -1,13 +1,13 @@
 ---
 name: controller
-description: Cria, revisa e refatora endpoints REST Sankhya com `@Controller` — `serviceName`, SP, `@Transactional`, DTOs, `@Valid`, mapeamento HTTP (GET/POST/PUT/DELETE), códigos de status. Use ao criar, alterar, revisar, auditar ou padronizar controllers REST, ao expor cadastro/feature via REST, ao integrar com app mobile/frontend, ao implementar listagem/lançamento/detalhamento/atualização/exclusão expostos por endpoint (pedido que só diz "listar/filtrar/paginar X" sem citar rota, REST ou app é a query, skill `repository`), ao receber spec de endpoint/API, ao declarar validação de entrada no DTO (`@Valid`, `@NotNull`, `@NotBlank`, `@Size` moram aqui; a resposta de erro da violação é `controller-advice`; injetar o service no controller é `dependency-injection`), ao descobrir como chamar o endpoint de fora (URL a partir do `serviceName`/SP, chamada por Postman ou curl), ao trabalhar com arquivos `*Controller.java`, ou ao tocar em código com `@Controller`/`@GetMapping`/`@PostMapping`/`@RequestMapping`. NÃO usar para consumir API REST de terceiro — expor é aqui, consumir é `retrofit`.
+description: Cria, revisa e refatora endpoints REST Sankhya com `@Controller` — `serviceName`, SP, `@Transactional`, DTOs, `@Valid`, mapeamento HTTP (GET/POST/PUT/DELETE), códigos de status. Use ao criar, alterar, revisar, auditar ou padronizar controllers REST, ao expor cadastro/feature via REST, ao integrar com app mobile/frontend, ao implementar listagem/lançamento/detalhamento/atualização/exclusão expostos por endpoint (pedido que só diz "listar/filtrar/paginar X" sem citar rota, REST ou app é a query, skill `repository`), ao receber spec de endpoint/API, ao declarar validação de entrada no DTO (`@Valid`, `@NotNull`, `@NotBlank`, `@Size` moram aqui; a resposta de erro da violação é `controller-advice`; injetar o repository/service no controller é `dependency-injection`), ao descobrir como chamar o endpoint de fora (URL a partir do `serviceName`/SP, chamada por Postman ou curl), ao trabalhar com arquivos `*Controller.java`, ou ao tocar em código com `@Controller`/`@GetMapping`/`@PostMapping`/`@RequestMapping`. NÃO usar para consumir API REST de terceiro — expor é aqui, consumir é `retrofit`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
 
 # Controller (`@Controller`) — Addon Studio 2.0
 
-`@Controller` marca classes = pontos entrada API interna add-on. Cada metodo publico auto-exposto como endpoint servico. Controllers **orquestram** fluxo requisicao — **nunca** contem logica negocio.
+`@Controller` marca classes = pontos entrada API interna add-on. Cada metodo publico auto-exposto como endpoint servico. Controllers **orquestram** o fluxo da requisicao; a boa pratica e manter regra de negocio fora deles (secao 10).
 
 > **Referencias complementares:**
 > - `dependency-injection` — Injecao de dependencia (Guice)
@@ -463,6 +463,8 @@ Exemplos completos — controller simples (CRUD) e controller completo (múltipl
 
 > **Service por feature, nao por endpoint.** Um `<Feature>Service` com metodos nomeados e o padrao — mantem o construtor do controller enxuto. Quebrar em classe por operacao (`CriarPedidoService.execute(...)`) e legitimo quando a operacao cresce a ponto de ter deps proprias, mas e decisao do projeto: **nao gerar um service por endpoint por default.**
 
+> **Boa pratica, nao regra:** controller fino — orquestra a requisicao e delega regra de negocio, acesso a repository e chamada a gateway para outra classe (o padrao de mercado e um service `@Component`). A organizacao em camadas e decisao do projeto: espelhe o que o repositorio ja usa.
+
 ---
 
 ## 11. Checklist: Novo Controller
@@ -488,11 +490,8 @@ Exemplos completos — controller simples (CRUD) e controller completo (múltipl
 | Anti-Pattern | Correcao |
 |:-------------|:---------|
 | Retornar entidade `@JapeEntity` diretamente | Usar Response DTO + MapStruct |
-| Logica de negocio no controller | Mover para o service |
 | Criar um objeto de dominio intermediario entre DTO e `@JapeEntity` por default | Mapear direto para a entidade — terceiro modelo so por decisao explicita do projeto |
 | `try/catch` no controller para excecoes de negocio | Deixar o `@ControllerAdvice` tratar |
-| Controller acessando Repository diretamente | Usar Service `@Component` como intermediario |
-| Controller chamando Gateway diretamente | Usar Service como intermediario |
 | `serviceName` sem sufixo `SP` | Sempre `<Nome>SP` |
 | Esquecer `@Transactional` em metodo de escrita | Adicionar `@Transactional` |
 | Metodo de leitura via repository sem `@Transactional` | Falha com "Nao existe uma sessao jape ativa." — adicionar `@Transactional` (secao 3) |
@@ -510,5 +509,5 @@ Exemplos completos — controller simples (CRUD) e controller completo (múltipl
 - `controller-advice` — tratamento global de exceções lançadas pelo controller
 - `dependency-injection` — wiring Guice do controller (injeção de serviços)
 - `mapstruct` — controller usa mapper MapStruct para DTO ↔ entidade `@JapeEntity`
-- `repository` — service delega persistência ao repository (controller nunca acessa repository direto)
+- `repository` — consultas e persistência que o controller (ou o service, se o projeto usa um) aciona
 - `test` — JUnit + Mockito do controller
