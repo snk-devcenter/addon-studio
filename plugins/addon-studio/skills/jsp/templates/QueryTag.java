@@ -143,7 +143,9 @@ public class QueryTag extends BodyTagSupport implements SQLExecutionTag {
 			NativeSql query = new NativeSql(da.jdbc);
 
 			if (maxRows > -1) {
-				query.setMaxRows(maxRows);
+				// O JDBC conta as linhas que o startRow descarta, e a linha alem do teto e o que
+				// deixa o ResultImpl ligar isLimitedByMaxRows.
+				query.setMaxRows(startRow + maxRows + 1);
 			}
 
 			query.appendSql(da.command);

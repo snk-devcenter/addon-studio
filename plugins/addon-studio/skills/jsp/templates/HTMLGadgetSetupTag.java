@@ -67,7 +67,7 @@ public class HTMLGadgetSetupTag extends BodyTagSupport {
 		html.append("fetch(url, { method: 'POST', credentials: 'same-origin',");
 		html.append(" headers: { 'Content-Type': 'application/json' },");
 		html.append(" body: JSON.stringify({ serviceName: 'ExecQuerySP.execQuery', requestBody: { querydata: qd } }) })");
-		html.append(".then(function (r) { return r.json(); })");
+		html.append(".then(function (r) { return r.arrayBuffer().then(function (b) { return JSON.parse(new TextDecoder(__snkCharset(r)).decode(b)); }); })");
 		html.append(".then(function (j) {");
 		html.append("var body = j.responseBody || {};");
 		html.append("if (String(j.status) !== '1') { callbackJsErrorFunction(j.statusMessage || 'Falha ao executar a consulta.'); return; }");
@@ -76,6 +76,12 @@ public class HTMLGadgetSetupTag extends BodyTagSupport {
 		html.append("})");
 		html.append(".catch(function (e) { callbackJsErrorFunction(e && e.message ? e.message : String(e)); });");
 		html.append("};");
+
+		// Response.json() ignora o charset do Content-Type e decodifica sempre como UTF-8, mas o
+		// service.sbr responde no charset da JVM (ISO-8859-1 com -Dfile.encoding=ISO-8859-1) e
+		// o acento do banco virava U+FFFD na tela. Decodificar pelo charset do header e o que o
+		// XHR das telas nativas faz; sem charset no header vale o UTF-8 do JSON.
+		html.append("function __snkCharset(r) { var m = /charset=([^;]+)/i.exec(r.headers.get('Content-Type') || ''); return m ? m[1].trim() : 'utf-8'; };");
 
 		// line e column chegam como objeto unico quando ha so um -- normaliza para array.
 		html.append("function __snkArr(v) { return v == null ? [] : (Object.prototype.toString.call(v) === '[object Array]' ? v : [v]); };");
