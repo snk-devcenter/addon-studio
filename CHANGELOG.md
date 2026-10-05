@@ -15,6 +15,11 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 - Organização em camadas volta a ser decisão do projeto: "controller fino, regra de negócio e acesso a dado em outra classe (ex.: service `@Component`)" passa de regra (`ADDON.md` e anti-pattern) a boa prática nas skills `controller`, `action-button`, `business-rule`, `callback`, `job` e `listener` e no sub-agent `controller-designer`.
 - Descriptions de `listener`, `business-rule` e `test` reforçam o gatilho indireto (auditoria de status em documento nativo; teste de regra/cálculo do addon), e a do sub-agent `entity-architect` aponta campo novo em entidade nativa para `merge-on-root`.
 
+### Corrigido
+
+- Template `QueryTag` da skill `jsp` passa a ligar `isLimitedByMaxRows()` quando o resultado passa de `maxRows` — antes o teto cortava no JDBC e o flag nunca ficava `true`.
+- Template `HTMLGadgetSetupTag` da skill `jsp` decodifica a resposta do `executeQuery` pelo charset do `Content-Type` — acento vindo do banco deixa de virar `�` em servidor com `-Dfile.encoding=ISO-8859-1`.
+
 ## [3.2.0] - 2026-10-03
 
 ### Adicionado
