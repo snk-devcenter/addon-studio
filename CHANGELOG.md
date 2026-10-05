@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.2.1] - 2026-10-05
+
 ### Alterado
 
 - Organização em camadas volta a ser decisão do projeto: "controller fino, regra de negócio e acesso a dado em outra classe (ex.: service `@Component`)" passa de regra (`ADDON.md` e anti-pattern) a boa prática nas skills `controller`, `action-button`, `business-rule`, `callback`, `job` e `listener` e no sub-agent `controller-designer`.
@@ -398,7 +400,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.2.0...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.2.1...HEAD
+[3.2.1]: https://github.com/snk-devcenter/addon-studio/compare/v3.2.0...v3.2.1
 [3.2.0]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.5...v3.2.0
 [3.1.5]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.4...v3.1.5
 [3.1.4]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.3...v3.1.4
