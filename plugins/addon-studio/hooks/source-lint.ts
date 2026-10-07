@@ -22,23 +22,51 @@ const ADDON = 'init/assets/ADDON.md'
 const USE_LOG = 'use `@Log` Lombok + `java.util.logging`'
 const USE_GUICE_INJECT = 'use `com.google.inject.Inject`'
 
+// A regra Java 8 estrito do ADDON.md proíbe o que não existe no Java 8; a lista dela é exemplo, não o limite.
+// Fica de fora o símbolo Java 9+ cujo nome também existe no Java 8 ou em lib comum
+// (`Optional.isEmpty`, `.or(`, `.lines()`, `.transferTo(`, `getFirst()`, `.reversed()`).
+const notInJava8 = (pattern: RegExp, symbol: string, version: number, instead?: string): Rule => ({
+  pattern,
+  message: `${symbol} é Java ${version}+ (projeto é Java 8 estrito)${instead === undefined ? '' : ` — use ${instead}`}`,
+  source: ADDON,
+})
+
+const JAVA_8_RULES: Rule[] = [
+  notInJava8(/\bvar\s+[A-Za-z_$][\w$]*\s*[=:,)]/g, '`var`', 10),
+  notInJava8(/\b(?:List|Set|Map)\.(?:of|copyOf)\s*\(/g, '`List`/`Set`/`Map` `.of`/`.copyOf`', 9, '`Arrays.asList`/`Collections.unmodifiable*`'),
+  notInJava8(/\bMap\.(?:ofEntries|entry)\s*\(/g, '`Map.ofEntries`/`Map.entry`', 9, '`new AbstractMap.SimpleEntry<>(k, v)`'),
+  notInJava8(/\.isBlank\(\s*\)/g, '`String.isBlank()`', 11, '`trim().isEmpty()`'),
+  notInJava8(/\.strip(?:Leading|Trailing|Indent)?\(\s*\)/g, '`String.strip*()`', 11, '`trim()`'),
+  notInJava8(/(?<!\b(?:StringUtils|Strings))\.repeat\s*\(/g, '`String.repeat`', 11),
+  notInJava8(/\.(?:indent|formatted)\s*\(|\.translateEscapes\(\s*\)/g, '`String.indent`/`formatted`/`translateEscapes`', 12, '`String.format`'),
+  notInJava8(/(?<!\bCollectors)\.toList\(\s*\)/g, '`Stream.toList()`', 16, '`collect(Collectors.toList())`'),
+  notInJava8(/\.(?:takeWhile|dropWhile)\s*\(|\bStream\.ofNullable\s*\(/g, '`takeWhile`/`dropWhile`/`Stream.ofNullable`', 9),
+  notInJava8(/\.mapMulti\s*\(/g, '`Stream.mapMulti`', 16),
+  notInJava8(/\btoUnmodifiable(?:List|Set|Map)\s*\(|\bCollectors\.(?:filtering|flatMapping|teeing)\s*\(/g, '`Collectors` `toUnmodifiable*`/`filtering`/`flatMapping`/`teeing`', 9),
+  notInJava8(/\.orElseThrow\(\s*\)/g, '`orElseThrow()` sem argumento', 10, '`orElseThrow(Supplier)`'),
+  notInJava8(/\.ifPresentOrElse\s*\(/g, '`Optional.ifPresentOrElse`', 9),
+  notInJava8(/\bPredicate\.not\s*\(/g, '`Predicate.not`', 11),
+  notInJava8(/\bObjects\.(?:requireNonNullElse(?:Get)?|checkIndex|checkFromToIndex|checkFromIndexSize)\s*\(/g, '`Objects.requireNonNullElse`/`check*Index`', 9),
+  notInJava8(/\bFiles\.(?:readString|writeString)\s*\(|\bPath\.of\s*\(/g, '`Files.readString`/`writeString`/`Path.of`', 11, '`Paths.get` e `Files.readAllBytes`/`write`'),
+  notInJava8(/\.readAllBytes\(\s*\)|\.readNBytes\s*\(/g, '`InputStream.readAllBytes()`/`readNBytes`', 9),
+  notInJava8(/\.(?:orTimeout|completeOnTimeout)\s*\(|\bCompletableFuture\.(?:failedFuture|delayedExecutor|completedStage|failedStage)\s*\(/g, '`CompletableFuture` timeout/`failedFuture`', 9),
+  notInJava8(/\bMath\.clamp\s*\(/g, '`Math.clamp`', 21),
+  notInJava8(/\b(?:ProcessHandle|StackWalker|VarHandle|HexFormat)\b|^[ \t]*import\s+java\.net\.http\./gm, '`ProcessHandle`/`StackWalker`/`VarHandle`/`HexFormat`/`java.net.http`', 9),
+  notInJava8(/\bThread\.(?:ofVirtual|ofPlatform|startVirtualThread)\s*\(|\bnewVirtualThreadPerTaskExecutor\s*\(/g, 'virtual thread', 21),
+  notInJava8(/@Deprecated\s*\(/g, '`@Deprecated(since/forRemoval)`', 9, '`@Deprecated` sem argumento'),
+  notInJava8(/\bnew\s+[\w$.]+\s*<>\s*\((?:[^()]|\([^()]*\))*\)\s*\{/g, 'diamond `<>` em classe anônima', 9, 'o tipo explícito em `new X<Tipo>() {`'),
+  notInJava8(/\btry\s*\(\s*[\w$.]+\s*[;)]/g, 'try-with-resources com variável já declarada', 9, '`try (Tipo nome = ...)`'),
+  notInJava8(/\bcase\b[^:;{}]*->|\bdefault\s*->/g, '`switch` com `->`', 14, '`case X:` com `break`'),
+  notInJava8(/(?<![.\w$])yield\s+[\w$"'(-]/g, '`yield` em switch', 14),
+  notInJava8(/\binstanceof\s+(?:final\s+)?[\w$.]+(?:<[^>]*>)?(?:\[\])*(?:\s+[A-Za-z_$][\w$]*\b|\s*\()/g, 'pattern matching em `instanceof`', 16, 'cast explícito depois do `instanceof`'),
+  notInJava8(/\brecord\s+[A-Z][\w$]*\s*[(<]/g, '`record`', 16, 'classe com Lombok `@Data`'),
+  notInJava8(/\b(?:non-)?sealed\s+(?:abstract\s+|static\s+)*(?:class|interface)\b/g, '`sealed`', 17),
+  notInJava8(/"""/g, 'text block', 15),
+  notInJava8(/^[ \t]*(?:open\s+)?module\s+[\w.]+\s*\{/gm, '`module-info`', 9),
+]
+
 const JAVA_RULES: Rule[] = [
-  { pattern: /\bvar\s+[A-Za-z_$][\w$]*\s*[=:]/g, message: '`var` é Java 10+ (projeto é Java 8 estrito)', source: ADDON },
-  { pattern: /\b(?:List|Map)\.of\s*\(/g, message: '`List.of`/`Map.of` é Java 9+ (projeto é Java 8 estrito)', source: ADDON },
-  { pattern: /\.isBlank\(\s*\)/g, message: '`String.isBlank()` é Java 11+ (projeto é Java 8 estrito)', source: ADDON },
-  { pattern: /(?<!\bCollectors)\.toList\(\s*\)/g, message: '`Stream.toList()` é Java 16+ — use `collect(Collectors.toList())`', source: ADDON },
-  {
-    pattern: /\.orElseThrow\(\s*\)/g,
-    message: '`orElseThrow()` sem argumento é Java 10+ — use `orElseThrow(Supplier)`',
-    source: ADDON,
-  },
-  { pattern: /\brecord\s+[A-Z][\w$]*\s*[(<]/g, message: '`record` é Java 16+ (projeto é Java 8 estrito)', source: ADDON },
-  {
-    pattern: /\b(?:non-)?sealed\s+(?:abstract\s+|static\s+)*(?:class|interface)\b/g,
-    message: '`sealed` é Java 17+ (projeto é Java 8 estrito)',
-    source: ADDON,
-  },
-  { pattern: /"""/g, message: 'text block é Java 15+ (projeto é Java 8 estrito)', source: ADDON },
+  ...JAVA_8_RULES,
   {
     pattern: /^[ \t]*import\s+(?:javax|jakarta)\.persistence\./gm,
     message: 'JPA padrão — use `@JapeEntity` e as anotações de `br.com.sankhya.studio.persistence`',
