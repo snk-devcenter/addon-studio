@@ -71,7 +71,7 @@ servlet ou um filtro, antes da tag rodar.
 ```jsp
 <%
   request.setAttribute("CODPARC", codparc);
-  request.setAttribute("CODPARC_TYPE", "I");
+  request.setAttribute("CODPARC_TYPE", "INTEGER");
 %>
 <snk:query var="registros">
 SELECT NOMEPARC FROM TGFPAR WHERE CODPARC = :CODPARC
@@ -81,6 +81,16 @@ SELECT NOMEPARC FROM TGFPAR WHERE CODPARC = :CODPARC
 **Cada `:nome` precisa de um `nome_TYPE` na requisição.** O tipo diz como converter o valor
 antes de ligá-lo à consulta; sem ele a tag falha ao montar o parâmetro. É o esquecimento mais
 comum, e o erro que ele produz não aponta para o atributo que faltou.
+
+| `nome_TYPE` | Valor ligado |
+|---|---|
+| `INTEGER`, `DECIMAL` | `BigDecimal` |
+| `DATE`, `DATETIME`, `DATEPERIOD` | `Timestamp.valueOf(valor.toString())` — o texto precisa estar em `yyyy-MM-dd HH:mm:ss` |
+| qualquer outro | `String` |
+
+Só os nomes por extenso são reconhecidos (maiúscula ou minúscula). Abreviação como `"I"` não dá
+erro: cai em "qualquer outro" e o valor vai como texto. No Oracle a conversão implícita faz a
+consulta parecer certa, mas o tipo se perdeu.
 
 Valor ausente ou vazio vira `null` no parâmetro — a consulta roda, com o efeito que `null`
 tiver na cláusula. Se a intenção era "sem filtro", escreva isso no SQL em vez de contar com
