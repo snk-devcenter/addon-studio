@@ -1,4 +1,4 @@
-import { test, expect } from 'claude-code/testing'
+import { test, expect, type Engine } from 'claude-code/testing'
 import type { On } from 'claude-code'
 
 const ROOT = '/addon'
@@ -31,7 +31,7 @@ const sessionIn = (on: On, cwd: string, files: Record<string, string>) => {
 
 const CORE_BLOCKS = { blocks: [{ name: 'currentDate', text: '2026-10-07' }] }
 
-const injected = async ($: Parameters<Parameters<typeof test>[1]>[0]) =>
+const injected = async ($: Engine) =>
   (await $.prompt.context(CORE_BLOCKS)).blocks.filter(block => block.name !== 'currentDate')
 
 test('projeto sem build.gradle não recebe as regras', async ($, on) => {

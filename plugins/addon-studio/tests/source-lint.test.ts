@@ -1,4 +1,4 @@
-import { test, expect } from 'claude-code/testing'
+import { test, expect, type Engine } from 'claude-code/testing'
 import type { On } from 'claude-code'
 
 const ROOT = '/addon'
@@ -31,7 +31,7 @@ const fakeProject = (on: On, files: Record<string, string> = { [`${ROOT}/build.g
 
 const lintOf = (ran: { context?: readonly string[] }) => (ran.context ?? []).filter(c => c.startsWith('source-lint')).join('\n')
 
-const writeJava = async ($: Parameters<Parameters<typeof test>[1]>[0], content: string, filePath = JAVA_FILE) =>
+const writeJava = async ($: Engine, content: string, filePath = JAVA_FILE) =>
   lintOf(await $.tool.call({ tool: 'Write', file_path: filePath, content } as never))
 
 // Cada caso: código que viola, código parecido que não viola, e o trecho da mensagem.
@@ -111,7 +111,7 @@ test('aviso aponta a linha e a skill de origem', async ($, on) => {
   const lint = await writeJava($, 'class A {\n  /* var a = 1; */\n  void f() { System.out.println(1); }\n}')
 
   expect(lint).toContain('linha 3: `System.out`')
-  expect(lint).toContain('[init/assets/ADDON.md:15, job/SKILL.md:336]')
+  expect(lint).toContain('[init/assets/ADDON.md, job/SKILL.md]')
 })
 
 test('arquivo fora de projeto addon não é verificado', async ($, on) => {

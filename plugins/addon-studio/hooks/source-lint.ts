@@ -14,7 +14,7 @@ type Rule = {
 }
 
 const JAVA_FILE = /\.java$/
-// encoding/SKILL.md:27 restringe o cabeçalho obrigatório ao XML de dicionário e dbscripts.
+// encoding/SKILL.md restringe o cabeçalho obrigatório ao XML de dicionário e dbscripts.
 const HEADER_XML_FILE = /[\\/](dbscripts|datadictionary)[\\/][^\\/]*\.xml$/
 const XML_DECLARATION_WITH_ENCODING = /^\s*<\?xml[^?]*\bencoding\s*=/i
 
@@ -23,155 +23,155 @@ const USE_LOG = 'use `@Log` Lombok + `java.util.logging`'
 const USE_GUICE_INJECT = 'use `com.google.inject.Inject`'
 
 const JAVA_RULES: Rule[] = [
-  { pattern: /\bvar\s+[A-Za-z_$][\w$]*\s*[=:]/g, message: '`var` é Java 10+ (projeto é Java 8 estrito)', source: `${ADDON}:11` },
-  { pattern: /\b(?:List|Map)\.of\s*\(/g, message: '`List.of`/`Map.of` é Java 9+ (projeto é Java 8 estrito)', source: `${ADDON}:11` },
-  { pattern: /\.isBlank\(\s*\)/g, message: '`String.isBlank()` é Java 11+ (projeto é Java 8 estrito)', source: `${ADDON}:11` },
-  { pattern: /(?<!\bCollectors)\.toList\(\s*\)/g, message: '`Stream.toList()` é Java 16+ — use `collect(Collectors.toList())`', source: `${ADDON}:11` },
+  { pattern: /\bvar\s+[A-Za-z_$][\w$]*\s*[=:]/g, message: '`var` é Java 10+ (projeto é Java 8 estrito)', source: ADDON },
+  { pattern: /\b(?:List|Map)\.of\s*\(/g, message: '`List.of`/`Map.of` é Java 9+ (projeto é Java 8 estrito)', source: ADDON },
+  { pattern: /\.isBlank\(\s*\)/g, message: '`String.isBlank()` é Java 11+ (projeto é Java 8 estrito)', source: ADDON },
+  { pattern: /(?<!\bCollectors)\.toList\(\s*\)/g, message: '`Stream.toList()` é Java 16+ — use `collect(Collectors.toList())`', source: ADDON },
   {
     pattern: /\.orElseThrow\(\s*\)/g,
     message: '`orElseThrow()` sem argumento é Java 10+ — use `orElseThrow(Supplier)`',
-    source: `${ADDON}:11`,
+    source: ADDON,
   },
-  { pattern: /\brecord\s+[A-Z][\w$]*\s*[(<]/g, message: '`record` é Java 16+ (projeto é Java 8 estrito)', source: `${ADDON}:11` },
+  { pattern: /\brecord\s+[A-Z][\w$]*\s*[(<]/g, message: '`record` é Java 16+ (projeto é Java 8 estrito)', source: ADDON },
   {
     pattern: /\b(?:non-)?sealed\s+(?:abstract\s+|static\s+)*(?:class|interface)\b/g,
     message: '`sealed` é Java 17+ (projeto é Java 8 estrito)',
-    source: `${ADDON}:11`,
+    source: ADDON,
   },
-  { pattern: /"""/g, message: 'text block é Java 15+ (projeto é Java 8 estrito)', source: `${ADDON}:11` },
+  { pattern: /"""/g, message: 'text block é Java 15+ (projeto é Java 8 estrito)', source: ADDON },
   {
     pattern: /^[ \t]*import\s+(?:javax|jakarta)\.persistence\./gm,
     message: 'JPA padrão — use `@JapeEntity` e as anotações de `br.com.sankhya.studio.persistence`',
-    source: `${ADDON}:13`,
+    source: ADDON,
   },
   {
     pattern: /\b(?:JapeWrapper|EntityFacade)\b/g,
     onlyWith: /@Controller\b/,
     message: '`JapeWrapper`/`EntityFacade` direto em controller — use interface estendendo `JapeRepository`',
-    source: `${ADDON}:13`,
+    source: ADDON,
   },
-  { pattern: /^[ \t]*import\s+javax\.inject\./gm, message: `\`javax.inject\` — ${USE_GUICE_INJECT}`, source: `${ADDON}:14, dependency-injection/SKILL.md:416` },
-  { pattern: /^[ \t]*import\s+org\.slf4j\./gm, message: `SLF4J — ${USE_LOG}`, source: `${ADDON}:15` },
-  { pattern: /@Slf4j\b/g, message: `SLF4J — ${USE_LOG}`, source: `${ADDON}:15` },
-  { pattern: /\bSystem\.out\b/g, message: `\`System.out\` — ${USE_LOG}`, source: `${ADDON}:15, job/SKILL.md:336` },
+  { pattern: /^[ \t]*import\s+javax\.inject\./gm, message: `\`javax.inject\` — ${USE_GUICE_INJECT}`, source: `${ADDON}, dependency-injection/SKILL.md` },
+  { pattern: /^[ \t]*import\s+org\.slf4j\./gm, message: `SLF4J — ${USE_LOG}`, source: ADDON },
+  { pattern: /@Slf4j\b/g, message: `SLF4J — ${USE_LOG}`, source: ADDON },
+  { pattern: /\bSystem\.out\b/g, message: `\`System.out\` — ${USE_LOG}`, source: `${ADDON}, job/SKILL.md` },
   {
     pattern: /\bthrow\s+new\s+RuntimeException\s*\(/g,
     message: '`RuntimeException` cru — lance exceção tipada estendendo `RuntimeException` com mensagem de negócio',
-    source: `${ADDON}:16, listener/SKILL.md:245`,
+    source: `${ADDON}, listener/SKILL.md`,
   },
   {
     pattern: /@Service\b/g,
     message: '`@Service` é legado — endpoint é `@Controller`, service de negócio é `@Component`',
-    source: 'controller/SKILL.md:503',
+    source: 'controller/SKILL.md',
   },
   {
     pattern: /@Component\b/g,
     onlyWith: /@(?:Controller|Repository)\b/,
     message: '`@Controller`/`@Repository` já são gerenciados — não adicione `@Component`',
-    source: 'dependency-injection/SKILL.md:45, controller/SKILL.md:502',
+    source: 'dependency-injection/SKILL.md, controller/SKILL.md',
   },
   {
     pattern: /\bTxType\.SUPPORTS\b/g,
     message: '`TxType.SUPPORTS` não existe — omita `@Transactional` (o método herda `Supports` da classe)',
-    source: 'controller/SKILL.md:499',
+    source: 'controller/SKILL.md',
   },
   {
     pattern: /^[ \t]*import\s+[\w.]+\.transaction\.Transactional\s*;/gm,
     message: 'import errado de `@Transactional` — use `br.com.sankhya.studio.persistence.Transactional`',
-    source: 'job/SKILL.md:331',
+    source: 'job/SKILL.md',
   },
   {
     pattern: /^[ \t]*import\s+[\w.]+\.stereotypes\.Job\s*;/gm,
     message: 'import errado de `@Job` — use `br.com.sankhya.studio.annotations.Job`',
-    source: 'job/SKILL.md:330',
+    source: 'job/SKILL.md',
   },
   {
     pattern: /\bimplements\s+(?:[\w.<>]+\s*,\s*)*IJob\b/g,
     message: '`IJob` é classe abstrata — use `extends IJob`',
-    source: 'job/SKILL.md:329',
+    source: 'job/SKILL.md',
   },
-  { pattern: /@Job\s*\([^)]*\bname\s*=/g, message: '`@Job(name = ...)` — use `@Job(serviceName = ...)`', source: 'job/SKILL.md:332' },
+  { pattern: /@Job\s*\([^)]*\bname\s*=/g, message: '`@Job(name = ...)` — use `@Job(serviceName = ...)`', source: 'job/SKILL.md' },
   {
     pattern: /\bString\s+getScheduleConfigHook\s*\(/g,
     message: 'frequência vem de `getScheduleConfig()` — `getScheduleConfigHook()` é obsoleto',
-    source: 'job/SKILL.md:334',
+    source: 'job/SKILL.md',
   },
   {
     pattern: /\bTransactionType\.REQUIRES_NEW\b/g,
     message: '`TransactionType.REQUIRES_NEW` não existe — use `AUTOMATIC` ou `MANUAL`',
-    source: 'action-button/SKILL.md:251',
+    source: 'action-button/SKILL.md',
   },
-  { pattern: /\bFieldType\.CHECKBOX\b/g, message: '`FieldType.CHECKBOX` não existe — use `FieldType.BOOLEAN`', source: 'action-button/SKILL.md:253' },
+  { pattern: /\bFieldType\.CHECKBOX\b/g, message: '`FieldType.CHECKBOX` não existe — use `FieldType.BOOLEAN`', source: 'action-button/SKILL.md' },
   {
     pattern: /\bRefreshTypeEnum\.(?:ALL|ITEM)\b/g,
     message: '`RefreshTypeEnum.ALL`/`ITEM` não existem — use `ALL_ITEMS`/`NONE_ITEM`',
-    source: 'action-button/SKILL.md:254',
+    source: 'action-button/SKILL.md',
   },
   {
     pattern: /@Callback\s*\((?=[^)]*\bAFTER\b)(?=[^)]*\bPROCESS_BILLING\b)/g,
     message: '`PROCESS_BILLING` só existe com `BEFORE`',
-    source: 'callback/SKILL.md:225',
+    source: 'callback/SKILL.md',
   },
   {
     pattern: /@ExceptionHandler\s*\(\s*(?:value\s*=\s*)?\{?\s*Exception\.class\s*\}?\s*\)/g,
     message: '`@ExceptionHandler(Exception.class)` pega-tudo — declare exceções específicas',
-    source: 'controller-advice/SKILL.md:168',
+    source: 'controller-advice/SKILL.md',
   },
   {
     pattern: /@ExceptionHandler\s*\(\s*(?:value\s*=\s*)?\{\s*\}\s*\)/g,
     message: '`@ExceptionHandler({})` vazio — declare ao menos uma classe',
-    source: 'controller-advice/SKILL.md:171',
+    source: 'controller-advice/SKILL.md',
   },
   {
     pattern: /\bfindByPK\s*\((?:[^()]|\([^()]*\))*\)\s*\.\s*(?:orElseThrow|map)\s*\(/g,
     message: '`findByPK` retorna `T` nullable, não `Optional` — use null-check',
-    source: 'repository/SKILL.md:582',
+    source: 'repository/SKILL.md',
   },
-  { pattern: /@Delete\b/g, message: '`@Delete` descontinuada — use `@Modifying` + `@NativeQuery`', source: 'repository/SKILL.md:580' },
+  { pattern: /@Delete\b/g, message: '`@Delete` descontinuada — use `@Modifying` + `@NativeQuery`', source: 'repository/SKILL.md' },
   {
     pattern: /@Modifying\b[^;{}]*?\bint\s+[\w$]+\s*\(/g,
     message: '`@Modifying` retornando `int` — use `void` ou `Boolean`',
-    source: 'repository/SKILL.md:581',
+    source: 'repository/SKILL.md',
   },
   {
     pattern: /^[ \t]*import\s+br\.com\.sankhya\.sdk\.data\.repository\.NativeQuery\s*;/gm,
     message: 'import errado de `@NativeQuery` — use `br.com.sankhya.studio.persistence.NativeQuery`',
-    source: 'repository/SKILL.md:584',
+    source: 'repository/SKILL.md',
   },
   {
     pattern: /\bPageable\.of\s*\(/g,
     message: '`Pageable` não tem factory — use `PageRequest.of(...)`',
-    source: 'repository/SKILL.md:585',
+    source: 'repository/SKILL.md',
   },
   {
     pattern: /\.getTotal(?:Elements|Pages)\s*\(/g,
     message: '`Page<T>` não tem total — use `hasNext()`/`isLast()` ou `COUNT` próprio',
-    source: 'repository/SKILL.md:586',
+    source: 'repository/SKILL.md',
   },
   {
     pattern: /^[ \t]*import\s+br\.com\.sankhya\.jape\.util\.JdbcWrapper\s*;/gm,
     message: 'import errado — use `br.com.sankhya.jape.dao.JdbcWrapper`',
-    source: 'listener/SKILL.md:249',
+    source: 'listener/SKILL.md',
   },
   {
     pattern: /\bDynamicVO\s+[\w$]+\s*=\s*[\w$.]+\.getVo\s*\(\s*\)/g,
     message: '`getVo()` sem cast — use `(DynamicVO) event.getVo()`',
-    source: 'listener/SKILL.md:238',
+    source: 'listener/SKILL.md',
   },
   {
     pattern: /@Value\s*\([^)]*\)\s*(?:@[\w.]+(?:\([^)]*\))?\s*)*(?:(?:private|protected|public|static)\s+)*final\s+(?!class\b)/g,
     message: 'campo `final` com `@Value` — remova o `final`',
-    source: 'value/SKILL.md:210',
+    source: 'value/SKILL.md',
   },
   {
     pattern: /@Value\s*\((?=[^)]*\bvalue\s*=)(?=[^)]*\bparam\s*=)/g,
     message: '`@Value` com `value` e `param` juntos — use só `param`',
-    source: 'value/SKILL.md:212',
+    source: 'value/SKILL.md',
   },
   {
     pattern: /@Value\s*\((?=[^)]*\bgroup\s*=)(?=[^)]*\b(?:ENV_VAR|SYSTEM_PROPERTY)\b)/g,
     message: '`group` só funciona com `SANKHYA_PARAM`',
-    source: 'value/SKILL.md:213',
+    source: 'value/SKILL.md',
   },
 ]
 
@@ -179,7 +179,7 @@ const XML_RULES: Rule[] = [
   {
     pattern: /<\?xml[^?]*\bencoding\s*=\s*["'](?!ISO-8859-1["'])/gi,
     message: 'cabeçalho XML com encoding diferente — use `<?xml version="1.0" encoding="ISO-8859-1" ?>`',
-    source: 'encoding/SKILL.md:230',
+    source: 'encoding/SKILL.md',
   },
 ]
 
@@ -188,7 +188,7 @@ type Finding = { line: number; message: string; source: string }
 const missingXmlHeader: Finding = {
   line: 1,
   message: 'XML sem cabeçalho obrigatório `<?xml version="1.0" encoding="ISO-8859-1" ?>`',
-  source: 'encoding/SKILL.md:229',
+  source: 'encoding/SKILL.md',
 }
 
 // Troca o conteúdo de comentários e literais por espaço, mantendo as quebras de linha, para o
@@ -236,12 +236,10 @@ const report = (where: string, found: Finding[]) =>
 const readIfExists = ($: EngineInterface) => async (path: string) =>
   (await $.fs.exists(path)) ? await $.fs.read(path) : undefined
 
-const hasSucceeded = (ran: ToolCallResult) => ran.deny === undefined && !ran.isError
-
 // O tipo garante o texto, mas tests/encoding.test.ts chama Write/Edit sem ele: sem o guard do
 // chamador o lint lança e o engine pula este hook, quebrando a conversão de encoding da cadeia.
 const lintAfter = async ($: EngineInterface, ran: ToolCallResult, filePath: string, lint: () => Finding[], where: string) => {
-  if (!hasSucceeded(ran)) return ran
+  if (ran.deny !== undefined || ran.isError) return ran
   const found = lint()
   if (found.length === 0) return ran
   if (!(await isInAddonProject(parentOf(filePath), readIfExists($)))) return ran
@@ -249,10 +247,13 @@ const lintAfter = async ($: EngineInterface, ran: ToolCallResult, filePath: stri
 }
 
 // O arquivo já foi gravado quando o lint roda: falha dele vira aviso, não derruba a tool.
-const reportFailure = (filePath: string, error: HookFailure, ran: ToolCallResult) => ({
-  ...ran,
-  context: [...(ran.context ?? []), `source-lint: hook falhou em "${filePath}" (${error.message ?? error.kind}) -- arquivo gravado sem verificação das regras das skills.`],
-})
+const reportFailure = (filePath: string, error: HookFailure, ran: ToolCallResult) =>
+  ran.deny !== undefined
+    ? ran
+    : {
+        ...ran,
+        context: [...(ran.context ?? []), `source-lint: hook falhou em "${filePath}" (${error.message ?? error.kind}) -- arquivo gravado sem verificação das regras das skills.`],
+      }
 
 export const register: Register = on => {
   on('tool.call', { tool: 'Write' }, async ($, e, next) =>
