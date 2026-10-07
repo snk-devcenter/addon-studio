@@ -1,4 +1,4 @@
-import { test, expect } from 'claude-code/testing'
+import { test, expect, type Engine } from 'claude-code/testing'
 import type { On } from 'claude-code'
 
 const ROOT = '/addon'
@@ -105,30 +105,33 @@ test('em projeto addon, Skill tool carrega skill do plugin', async ($, on) => {
   expect(ran.deny).toBeUndefined()
 })
 
-const statusShown = (on: On) => {
-  const shown: (string | undefined)[] = []
-  on('ui.status', (_$, e) => {
-    shown.push(e.text)
-    return { value: undefined }
+// O engine desenha a linha de dica com o que a cadeia deixou em props: a base guarda a cauda.
+const hintTail = async ($: Engine, on: On, tail?: string) => {
+  let drawnTail: string | undefined
+  on('ui.render', (h$, e) => {
+    drawnTail = (e.props as { tail?: string }).tail
+    const { Text } = h$.ui.resolve(e)
+    return Text({ children: '' })
   })
-  on('session.start', (_$, e) => ({ cwd: e.cwd }))
-  return shown
+  const props = { isDraft: false, isWorking: false, hint: '? for shortcuts', ...(tail === undefined ? {} : { tail }) }
+  await $.ui.render({ component: 'PromptHint', surface: 'terminal', requestId: 'hint', props })
+  return drawnTail
 }
 
-test('em projeto addon, a status line diz que o plugin está ativo', async ($, on) => {
+test('em projeto addon, a linha de dica do prompt indica o plugin', async ($, on) => {
   sessionIn(on, ROOT)
-  const shown = statusShown(on)
 
-  await $.session.start({ cwd: ROOT, surface: 'terminal', isInteractive: true })
-
-  expect(shown).toEqual(['addon-studio ativo'])
+  expect(await hintTail($, on)).toBe('addon-studio')
 })
 
-test('fora de projeto addon, a status line fica limpa', async ($, on) => {
+test('em projeto addon, o indicador soma à cauda de outro plugin', async ($, on) => {
+  sessionIn(on, ROOT)
+
+  expect(await hintTail($, on, 'outro')).toBe('outro · addon-studio')
+})
+
+test('fora de projeto addon, a linha de dica fica como está', async ($, on) => {
   sessionIn(on, OTHER_ROOT)
-  const shown = statusShown(on)
 
-  await $.session.start({ cwd: OTHER_ROOT, surface: 'terminal', isInteractive: true })
-
-  expect(shown).toEqual([])
+  expect(await hintTail($, on)).toBeUndefined()
 })

@@ -1,5 +1,5 @@
 import type { Register, EngineInterface } from 'claude-code'
-import { ACTIVE_STATUS, isInAddonProject } from './commons.ts'
+import { isInAddonProject } from './commons.ts'
 
 // Fora de projeto Addon Studio o plugin some do contexto: listagem de skills, sub-agents,
 // Skill tool e menu `/`. Permite instalar o plugin no escopo de usuário sem que as
@@ -9,6 +9,8 @@ const readIfExists = ($: EngineInterface) => async (path: string) =>
   (await $.fs.exists(path)) ? await $.fs.read(path) : undefined
 
 const isOutsideAddonProject = async ($: EngineInterface) => !(await isInAddonProject(await $.session.cwd(), readIfExists($)))
+
+const INDICATOR = 'addon-studio'
 
 const ownPrefix = ($: EngineInterface) => `${$.plugin.name}:`
 
@@ -20,9 +22,11 @@ const withoutOwnSkills = (listing: string, prefix: string) =>
     .join('\n')
 
 export const register: Register = on => {
-  on('session.start', async ($, e, next) => {
-    if (!(await isOutsideAddonProject($))) $.ui.status(ACTIVE_STATUS)
-    return next(e)
+  // Indicador discreto (cinza, no fim da linha de dica do prompt): `$.ui.status` sai como aviso.
+  on('ui.render', { component: 'PromptHint' }, async ($, e, next) => {
+    if (await isOutsideAddonProject($)) return next(e)
+    const tail = e.props.tail === undefined ? INDICATOR : `${e.props.tail} · ${INDICATOR}`
+    return next({ ...e, props: { ...e.props, tail } })
   })
 
   on('prompt.attachment', { type: 'skill_listing' }, async ($, e, next) => {

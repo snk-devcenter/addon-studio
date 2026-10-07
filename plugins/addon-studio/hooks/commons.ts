@@ -1,9 +1,6 @@
 const ADDON_GRADLE_PLUGIN = 'br.com.sankhya.addonstudio'
 const BUILD_FILES = ['build.gradle', 'build.gradle.kts']
 
-// A status line é uma só por plugin: quem a usa de passagem devolve este texto ao terminar.
-export const ACTIVE_STATUS = 'addon-studio ativo'
-
 export const parentOf = (path: string) => path.replace(/[\\/]+[^\\/]*$/, '')
 
 // Conteúdo do arquivo, ou undefined quando ele não existe. Recebido de quem chama porque
