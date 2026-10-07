@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.4.0] - 2026-10-07
+
 ### Adicionado
 
 - No Claude Code, fora de projeto Addon Studio (sem o plugin Gradle `br.com.sankhya.addonstudio`), as skills e os sub-agents do plugin saem do contexto do modelo e do menu `/`: instalado no escopo do usuário, o plugin só aparece nos projetos do SDK.
@@ -423,7 +425,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.3.0...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.0...HEAD
+[3.4.0]: https://github.com/snk-devcenter/addon-studio/compare/v3.3.0...v3.4.0
 [3.3.0]: https://github.com/snk-devcenter/addon-studio/compare/v3.2.1...v3.3.0
 [3.2.1]: https://github.com/snk-devcenter/addon-studio/compare/v3.2.0...v3.2.1
 [3.2.0]: https://github.com/snk-devcenter/addon-studio/compare/v3.1.5...v3.2.0
