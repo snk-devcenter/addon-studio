@@ -12,24 +12,36 @@ set -u
 
 ADDON_MD="${CLAUDE_PLUGIN_ROOT:-$(dirname "$0")/..}/skills/init/assets/ADDON.md"
 
+# Imprime o diretorio, a partir de $1 subindo, cujo build.gradle aplica o plugin Gradle --
+# o unico sinal confiavel de projeto Addon Studio. O modulo -vc nao aplica, a raiz sim:
+# mesma regra do isInAddonProject em commons.ts.
+addon_root() {
+    dir=$1
+    while :; do
+        for f in "$dir/build.gradle" "$dir/build.gradle.kts"; do
+            [ -f "$f" ] || continue
+            if grep -q 'br\.com\.sankhya\.addonstudio' "$f" 2> /dev/null; then
+                printf '%s' "$dir"
+                return 0
+            fi
+        done
+        parent=$(dirname "$dir")
+        [ "$parent" != "$dir" ] || return 1
+        dir=$parent
+    done
+}
+
 # cwd vem no payload JSON do hook (stdin). Sem python3 nao ha como serializar a saida
 # com seguranca -- fica silencioso em vez de emitir JSON quebrado.
 emit() {
-    cwd=$1
     [ -f "$ADDON_MD" ] || return 0
     command -v python3 > /dev/null 2>&1 || return 0
+    root=$(addon_root "$1") || return 0
 
-    # Projeto Addon Studio? O plugin Gradle e o unico sinal confiavel.
-    plugin_applied=1
-    for f in "$cwd/build.gradle" "$cwd/build.gradle.kts"; do
-        [ -f "$f" ] || continue
-        if grep -q 'br\.com\.sankhya\.addonstudio' "$f" 2> /dev/null; then plugin_applied=0; fi
-    done
-    [ "$plugin_applied" -eq 0 ] || return 0
-
-    # Ja rodou o init: o ADDON.md do projeto ja esta no contexto via CLAUDE.md. Nao repetir.
-    if [ -f "$cwd/docs/ADDON.md" ] && [ -f "$cwd/CLAUDE.md" ] &&
-        grep -q '@docs/ADDON\.md' "$cwd/CLAUDE.md" 2> /dev/null; then
+    # Ja rodou o init: o ADDON.md do projeto ja esta no contexto via CLAUDE.md, que o Claude
+    # Code carrega tambem dos diretorios acima do cwd. Nao repetir.
+    if [ -f "$root/docs/ADDON.md" ] && [ -f "$root/CLAUDE.md" ] &&
+        grep -q '@docs/ADDON\.md' "$root/CLAUDE.md" 2> /dev/null; then
         return 0
     fi
 
@@ -59,9 +71,12 @@ if [ "${1:-}" = "--selftest" ]; then
     check "build.gradle de outro stack" vazio "$tmp/outro"
     mkdir -p "$tmp/addon" && echo "plugins { id 'br.com.sankhya.addonstudio' }" > "$tmp/addon/build.gradle"
     check "projeto addon sem init" json "$tmp/addon"
+    mkdir -p "$tmp/addon/addon-vc" && echo "plugins { id 'java' }" > "$tmp/addon/addon-vc/build.gradle"
+    check "sessao no modulo -vc de addon sem init" json "$tmp/addon/addon-vc"
     mkdir -p "$tmp/addon/docs" && : > "$tmp/addon/docs/ADDON.md"
     echo '@docs/ADDON.md' > "$tmp/addon/CLAUDE.md"
     check "projeto addon com init" vazio "$tmp/addon"
+    check "sessao no modulo -vc de addon com init" vazio "$tmp/addon/addon-vc"
     exit $fail
 fi
 

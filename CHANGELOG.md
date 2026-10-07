@@ -10,12 +10,17 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Adicionado
+
+- No Claude Code, fora de projeto Addon Studio (sem o plugin Gradle `br.com.sankhya.addonstudio`), as skills e os sub-agents do plugin saem do contexto do modelo e do menu `/`: instalado no escopo do usuário, o plugin só aparece nos projetos do SDK.
+
 ### Alterado
 
 - Hook de encoding roda inteiro no mod (`hooks/encoding.ts`): o `to-iso88591.sh` sai, e `Read` de arquivo fora de projeto addon deixa de abrir processo.
 
 ### Corrigido
 
+- Regras do `ADDON.md` passam a ser injetadas também em sessão aberta num submódulo do addon (ex. `-vc`): o hook de início de sessão procura o plugin Gradle subindo até a raiz do projeto.
 - Skill `jsp` documenta os valores aceitos em `nome_TYPE` do `QueryTag` e corrige o exemplo `CODPARC_TYPE = "I"`, que ligava o parâmetro como texto, para `"INTEGER"`.
 - `Edit` em arquivo ISO-8859-1 deixa de trocar os acentos do trecho não editado por U+FFFD: o hook de encoding passa o arquivo para UTF-8 antes de `Read`/`Edit` e devolve para ISO-8859-1 depois.
 
