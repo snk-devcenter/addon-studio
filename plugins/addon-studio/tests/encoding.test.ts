@@ -193,18 +193,21 @@ test('iconv falhando mantém o arquivo em UTF-8 e avisa o modelo', async ($, on)
   expect(ran.context?.join('\n') ?? '').toContain('iconv: falhou')
 })
 
-test('sem iconv, cai no python3', async ($, on) => {
+test('sem iconv, mantém o arquivo em UTF-8 e avisa o modelo', async ($, on) => {
   const file = `${ROOT}/A.java`
   const SHELL_COMMAND_NOT_FOUND = 127
-  const withoutIconv: FakeProcess = (argv, stdin, disk) =>
-    argv[0] === 'sh' ? processRan(SHELL_COMMAND_NOT_FOUND) : iconvWrites(argv, stdin, disk)
+  const withoutIconv: FakeProcess = (_argv, _stdin, disk) => {
+    disk.set(file, new Uint8Array())
+    return processRan(SHELL_COMMAND_NOT_FOUND, 'sh: 1: iconv: not found')
+  }
   const { disk, processes } = fakeDisk(on, { [`${ROOT}/build.gradle`]: ADDON_BUILD }, withoutIconv)
   writeTool(on, disk, 'olá\n')
 
-  await $.tool.call({ tool: 'Write', file_path: file } as never)
+  const ran = await $.tool.call({ tool: 'Write', file_path: file } as never)
 
-  expect(processes.map(argv => argv[0])).toEqual(['sh', 'python3'])
-  expect(hex(disk.get(file))).toBe('6f6ce10a')
+  expect(processes.map(argv => argv[0])).toEqual(['sh'])
+  expect(hex(disk.get(file))).toBe('6f6cc3a10a')
+  expect(ran.context?.join('\n') ?? '').toContain('iconv: not found')
 })
 
 test('falha inesperada do hook avisa o modelo sem derrubar a tool', async ($, on) => {

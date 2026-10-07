@@ -9,7 +9,6 @@ const BUILD_FILES = ['build.gradle', 'build.gradle.kts']
 const REPLACEMENT_CHARACTER = '�'
 const UTF8_BOM_LENGTH = 3
 const FROM_CHAR_CODE_CHUNK = 8192
-const SHELL_COMMAND_NOT_FOUND = 127
 
 const parentOf = (path: string) => path.replace(/[\\/]+[^\\/]*$/, '')
 
@@ -56,24 +55,11 @@ const decodeLatin1 = (bytes: Uint8Array) => {
   return text
 }
 
-// $.fs.write só grava UTF-8: os bytes ISO-8859-1 saem do iconv, ou do python3 onde não há
-// iconv. //TRANSLIT aproxima o que não existe em Latin-1 (— vira -).
-const writeLatin1 = async ($: EngineInterface, filePath: string, text: string) => {
-  const viaIconv = await $.process.run(
-    ['sh', '-c', 'iconv -f UTF-8 -t ISO-8859-1//TRANSLIT > "$1"', 'sh', filePath],
-    { stdin: text },
-  )
-  if (viaIconv.exitCode !== SHELL_COMMAND_NOT_FOUND) return viaIconv
-  return $.process.run(
-    [
-      'python3',
-      '-c',
-      'import sys; data = sys.stdin.buffer.read().decode("utf-8").encode("iso-8859-1", "replace"); open(sys.argv[1], "wb").write(data)',
-      filePath,
-    ],
-    { stdin: text },
-  )
-}
+// $.fs.write só grava UTF-8: os bytes ISO-8859-1 saem do iconv, que vem com glibc, macOS e o
+// Git Bash que o Claude Code exige no Windows. Node não serve: o instalador nativo não o traz.
+// //TRANSLIT aproxima o que não existe em Latin-1 (— vira -).
+const writeLatin1 = ($: EngineInterface, filePath: string, text: string) =>
+  $.process.run(['sh', '-c', 'iconv -f UTF-8 -t ISO-8859-1//TRANSLIT > "$1"', 'sh', filePath], { stdin: text })
 
 // Devolve o aviso para o modelo, quando há um.
 const toIso = async ($: EngineInterface, filePath: string) => {
