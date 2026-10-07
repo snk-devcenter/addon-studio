@@ -40,6 +40,8 @@ curl -fsSL https://github.com/snk-devcenter/addon-studio/releases/latest/downloa
 
 O instalador registra o marketplace `snk-devcenter` e instala `addon-studio@snk-devcenter` no escopo do usuário. Skills, agents e hooks são carregados pelo próprio plugin.
 
+Skills e agents só entram no contexto em projeto Addon Studio, reconhecido pelo plugin Gradle `br.com.sankhya.addonstudio` no `build.gradle` do diretório da sessão ou de um diretório acima. Nos demais repositórios o plugin fica fora do caminho.
+
 <details>
 <summary>Instalação manual pelo Claude Code</summary>
 

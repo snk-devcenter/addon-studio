@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Adicionado
+
+- No Claude Code, fora de projeto Addon Studio (sem o plugin Gradle `br.com.sankhya.addonstudio`), as skills e os sub-agents do plugin saem do contexto do modelo e do menu `/`: instalado no escopo do usuário, o plugin só aparece nos projetos do SDK.
+
 ### Alterado
 
 - Hook de encoding roda inteiro no mod (`hooks/encoding.ts`): o `to-iso88591.sh` sai, e `Read` de arquivo fora de projeto addon deixa de abrir processo.

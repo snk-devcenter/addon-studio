@@ -1,34 +1,20 @@
 import type { Register, EngineInterface, HookFailure, ToolCallResult } from 'claude-code'
+import { isInAddonProject, parentOf } from './commons.ts'
 
 // Converte arquivo-fonte de addon Sankhya para ISO-8859-1 depois de Write/Edit, e
 // entrega Read/Edit sobre UTF-8. As tools decodificam o arquivo como UTF-8: num arquivo
 // em ISO-8859-1, o Edit regravaria cada acento do trecho não editado como U+FFFD (#45).
 const SOURCE_EXTENSION = /\.(java|xml|kt|properties)$/
-const ADDON_GRADLE_PLUGIN = 'br.com.sankhya.addonstudio'
-const BUILD_FILES = ['build.gradle', 'build.gradle.kts']
 const REPLACEMENT_CHARACTER = '�'
 const UTF8_BOM_LENGTH = 3
 const FROM_CHAR_CODE_CHUNK = 8192
 
-const parentOf = (path: string) => path.replace(/[\\/]+[^\\/]*$/, '')
+const readIfExists = ($: EngineInterface) => async (path: string) =>
+  (await $.fs.exists(path)) ? await $.fs.read(path) : undefined
 
-// O módulo -vc não aplica o plugin Gradle, a raiz sim: por isso a subida até a raiz.
-// Sem isso o hook converteria .java de qualquer projeto da máquina.
-const isInAddonProject = async ($: EngineInterface, filePath: string) => {
-  for (let dir = parentOf(filePath); dir !== ''; ) {
-    for (const name of BUILD_FILES) {
-      const build = `${dir}/${name}`
-      if ((await $.fs.exists(build)) && (await $.fs.read(build)).includes(ADDON_GRADLE_PLUGIN)) return true
-    }
-    const parent = parentOf(dir)
-    if (parent === dir) return false
-    dir = parent
-  }
-  return false
-}
-
+// Sem o filtro de projeto o hook converteria .java de qualquer projeto da máquina.
 const isAddonSource = async ($: EngineInterface, filePath: string) =>
-  SOURCE_EXTENSION.test(filePath) && (await $.fs.exists(filePath)) && (await isInAddonProject($, filePath))
+  SOURCE_EXTENSION.test(filePath) && (await $.fs.exists(filePath)) && (await isInAddonProject(parentOf(filePath), readIfExists($)))
 
 const readBytes = async ($: EngineInterface, filePath: string) => {
   const { base64 } = await $.fs.read(filePath, { as: 'bytes' })
