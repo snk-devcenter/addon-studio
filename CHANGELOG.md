@@ -16,6 +16,7 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ### Corrigido
 
+- Skill `jsp` documenta os valores aceitos em `nome_TYPE` do `QueryTag` e corrige o exemplo `CODPARC_TYPE = "I"`, que ligava o parâmetro como texto, para `"INTEGER"`.
 - `Edit` em arquivo ISO-8859-1 deixa de trocar os acentos do trecho não editado por U+FFFD: o hook de encoding passa o arquivo para UTF-8 antes de `Read`/`Edit` e devolve para ISO-8859-1 depois.
 
 ## [3.3.0] - 2026-10-07
