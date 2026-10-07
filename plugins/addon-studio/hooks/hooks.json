@@ -1,4 +1,7 @@
 {
+  "modules": [
+    "./encoding.ts"
+  ],
   "hooks": {
     "SessionStart": [
       {
@@ -7,18 +10,6 @@
           {
             "type": "command",
             "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/session-context.sh\""
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "statusMessage": "Convertendo encoding para ISO-8859-1...",
-            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/to-iso88591.sh\""
           }
         ]
       }

@@ -1,5 +1,5 @@
 #!/bin/sh
-# PostToolUse (Write|Edit): converte arquivo-fonte de addon Sankhya para ISO-8859-1.
+# Chamado por hooks/encoding.ts apos Write|Edit: converte arquivo-fonte de addon Sankhya para ISO-8859-1.
 #
 # Lê o payload do hook em stdin (JSON) e converte o arquivo tocado, quando aplicável.
 # Rode `sh to-iso88591.sh --selftest` para verificar o comportamento.
@@ -43,7 +43,7 @@ convert_file() {
     is_addon_project "$file" || return 0
 
     # 1. Perda de dado já ocorrida: nada a converter, o byte original não existe mais.
-    #    exit 2 em PostToolUse devolve o stderr para o agente.
+    #    exit 2: hooks/encoding.ts devolve o stderr para o agente.
     if LC_ALL=C grep -qF "$FFFD" "$file"; then
         printf 'encoding: "%s" contem U+FFFD -- acento perdido ao ler arquivo ISO-8859-1 como UTF-8.\n' "$file" >&2
         printf 'encoding: arquivo NAO convertido. Restaure o trecho acentuado (git diff / git checkout -- "%s") e reaplique a edicao.\n' "$file" >&2

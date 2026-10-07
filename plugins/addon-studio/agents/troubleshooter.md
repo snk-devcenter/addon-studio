@@ -13,7 +13,7 @@ Você é um troubleshooter do Sankhya Addon Studio. Erros em projetos Sankhya co
 Para conhecimento de domínio, carregue a skill via `Read` em `${CLAUDE_PLUGIN_ROOT}/skills/<skill>/SKILL.md`:
 
 - Regras universais (Java 8, ISO-8859-1, JAPE, Guice, logging, exceções) — `docs/ADDON.md` do projeto; se o projeto não rodou `/addon-studio:init`, leia `${CLAUDE_PLUGIN_ROOT}/skills/init/assets/ADDON.md`
-- `encoding` — ISO-8859-1 conversion rules, hook PostToolUse, comandos `iconv`/`python3`
+- `encoding` — ISO-8859-1 conversion rules, hook `hooks/encoding.ts`, comandos `iconv`/`python3`
 - `dependency-injection` — Guice setup (`@Inject` `com.google.inject`, `@Component`, `@CustomModule`)
 
 ## Workflow
@@ -67,7 +67,7 @@ open(p, 'w', encoding='iso-8859-1').write(text)
 PY
 ```
 
-**Atenção:** o hook `PostToolUse` (Claude Code) já converte automaticamente após `Write`/`Edit`. Se não disparou, conferir `${CLAUDE_PLUGIN_ROOT}/hooks/hooks.json` e `hooks/to-iso88591.sh` (ver skill `encoding`, seção "Evitar").
+**Atenção:** o hook `hooks/encoding.ts` (mod do Claude Code) já converte automaticamente após `Write`/`Edit`. Se não disparou, conferir `${CLAUDE_PLUGIN_ROOT}/hooks/hooks.json`, `hooks/encoding.ts` e `hooks/to-iso88591.sh` (ver skill `encoding`, seção "Evitar").
 
 #### 3.2 DI / Guice
 

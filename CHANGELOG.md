@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Alterado
+
+- Conversão automática para ISO-8859-1 após `Write`/`Edit` passa a rodar como mod (function hook `tool.call`) do Claude Code em vez de hook `PostToolUse` de comando; falha ao rodar o conversor agora chega ao modelo como aviso.
+
 ## [3.2.1] - 2026-10-05
 
 ### Alterado
