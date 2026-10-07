@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Alterado
+
+- Hook de encoding roda inteiro no mod (`hooks/encoding.ts`): o `to-iso88591.sh` sai, e `Read` de arquivo fora de projeto addon deixa de abrir processo.
+
 ### Corrigido
 
 - `Edit` em arquivo ISO-8859-1 deixa de trocar os acentos do trecho não editado por U+FFFD: o hook de encoding passa o arquivo para UTF-8 antes de `Read`/`Edit` e devolve para ISO-8859-1 depois.

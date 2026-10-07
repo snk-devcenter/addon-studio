@@ -31,7 +31,7 @@ O servidor Sankhya (Wildfly legado) e o compilador de addons esperam Latin-1. Ar
 
 ## O problema com LLMs
 
-LLMs geram arquivos em UTF-8 por padrao. No Claude Code, o hook do plugin (`hooks/encoding.ts`, mod do Claude Code) converte para ISO-8859-1 apos cada `Write`/`Edit`. Converta a mao so fora dele: outro harness, ou arquivo criado por shell/script.
+LLMs geram arquivos em UTF-8 por padrao. No Claude Code, o hook do plugin (`hooks/encoding.ts`, mod do Claude Code) converte para ISO-8859-1 apos cada `Write`/`Edit` e entrega `Read`/`Edit` sobre o arquivo em UTF-8. Converta a mao so fora dele: outro harness, ou arquivo criado por shell/script.
 
 > **Antes de converter, cheque o charset atual** (`file -i arquivo.java`). So converta se o resultado for `charset=utf-8`. Arquivo ja em ISO-8859-1 reconvertido de "UTF-8" pode ter acentos corrompidos; e `errors='ignore'`/`errors='replace'` apagam ou trocam caracteres silenciosamente.
 
@@ -185,8 +185,9 @@ no trecho acentuado e reaplique a edicao — nunca converta o encoding antes dis
   confiar no conteudo lido.
 - Em `.java`/`.kt`, escape Unicode (`\u00ea`) mantem o arquivo ASCII puro e imune ao
   round-trip. Em XML, entidade numerica (`&#234;`) tem o mesmo efeito.
-- O hook do plugin (`hooks/encoding.ts`, que chama `hooks/to-iso88591.sh`) ja barra a conversao e avisa
-  quando encontra `U+FFFD`. Rode `sh "${CLAUDE_PLUGIN_ROOT}/hooks/to-iso88591.sh" --selftest` para conferir.
+- No Claude Code, o hook do plugin (`hooks/encoding.ts`) entrega `Read`/`Edit` sobre o arquivo em
+  UTF-8 e devolve para ISO-8859-1 depois, entao o round-trip nao acontece. Se ainda assim encontrar
+  `U+FFFD`, ele barra a conversao e avisa.
 
 ---
 

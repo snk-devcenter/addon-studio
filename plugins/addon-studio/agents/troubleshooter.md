@@ -67,7 +67,7 @@ open(p, 'w', encoding='iso-8859-1').write(text)
 PY
 ```
 
-**Atenção:** o hook `hooks/encoding.ts` (mod do Claude Code) já converte automaticamente após `Write`/`Edit`. Se não disparou, conferir `${CLAUDE_PLUGIN_ROOT}/hooks/hooks.json`, `hooks/encoding.ts` e `hooks/to-iso88591.sh` (ver skill `encoding`, seção "Evitar").
+**Atenção:** o hook `hooks/encoding.ts` (mod do Claude Code) já converte automaticamente após `Write`/`Edit`. Se não disparou, conferir `${CLAUDE_PLUGIN_ROOT}/hooks/hooks.json` e `hooks/encoding.ts` (ver skill `encoding`, seção "Evitar").
 
 #### 3.2 DI / Guice
 
