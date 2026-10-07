@@ -236,8 +236,6 @@ const report = (where: string, found: Finding[]) =>
 const readIfExists = ($: EngineInterface) => async (path: string) =>
   (await $.fs.exists(path)) ? await $.fs.read(path) : undefined
 
-// O tipo garante o texto, mas tests/encoding.test.ts chama Write/Edit sem ele: sem o guard do
-// chamador o lint lança e o engine pula este hook, quebrando a conversão de encoding da cadeia.
 const lintAfter = async ($: EngineInterface, ran: ToolCallResult, filePath: string, lint: () => Finding[], where: string) => {
   if (ran.deny !== undefined || ran.isError) return ran
   const found = lint()
@@ -257,9 +255,9 @@ const reportFailure = (filePath: string, error: HookFailure, ran: ToolCallResult
 
 export const register: Register = on => {
   on('tool.call', { tool: 'Write' }, async ($, e, next) =>
-    lintAfter($, await next(e), e.file_path, () => (e.content === undefined ? [] : writeViolations(e.file_path, e.content)), `"${e.file_path}"`),
+    lintAfter($, await next(e), e.file_path, () => writeViolations(e.file_path, e.content), `"${e.file_path}"`),
   ).catch(async ($, e, next) => reportFailure(e.file_path, next.error, await next(e)))
   on('tool.call', { tool: 'Edit' }, async ($, e, next) =>
-    lintAfter($, await next(e), e.file_path, () => (e.new_string === undefined ? [] : editViolations(e.file_path, e.new_string)), `o trecho novo (new_string) de "${e.file_path}"`),
+    lintAfter($, await next(e), e.file_path, () => editViolations(e.file_path, e.new_string), `o trecho novo (new_string) de "${e.file_path}"`),
   ).catch(async ($, e, next) => reportFailure(e.file_path, next.error, await next(e)))
 }
