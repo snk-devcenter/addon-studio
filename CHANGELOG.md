@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Alterado
+
+- Indicador de projeto Addon Studio sai da status line, onde aparecia como aviso amarelo, e vira um `addon-studio` discreto em cinza no fim da linha de dica do prompt.
+
 ## [3.4.0] - 2026-10-07
 
 ### Adicionado
