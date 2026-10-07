@@ -251,7 +251,7 @@ No Claude Code, também é possível atualizar manualmente:
 
 Após atualizar no Claude Code, execute `/addon-studio:init` em cada projeto que precise receber a versão nova de `docs/ADDON.md`.
 
-No Codex, rode `/addon-studio:init` em cada projeto: sem `docs/ADDON.md` as regras universais do plugin não entram no contexto (o hook `SessionStart` que faz esse piso é do Claude Code). Customizações locais dos TOMLs continuam preservadas. Use `--force` ou `-Force` apenas para substituí-las.
+No Codex, rode `/addon-studio:init` em cada projeto: sem `docs/ADDON.md` as regras universais do plugin não entram no contexto (o mod que faz esse piso só roda no Claude Code). Customizações locais dos TOMLs continuam preservadas. Use `--force` ou `-Force` apenas para substituí-las.
 
 ## Estrutura do repositório
 

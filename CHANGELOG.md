@@ -13,10 +13,13 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 ### Adicionado
 
 - No Claude Code, fora de projeto Addon Studio (sem o plugin Gradle `br.com.sankhya.addonstudio`), as skills e os sub-agents do plugin saem do contexto do modelo e do menu `/`: instalado no escopo do usuário, o plugin só aparece nos projetos do SDK.
+- Ao gravar `.java` (e XML de `dbscripts/`/`datadictionary/`) em projeto Addon Studio, o modelo recebe aviso de cada violação de regra documentada nas skills — Java 8 estrito, JPA, `javax.inject`, SLF4J, imports errados do SDK, cabeçalho ISO-8859-1 —, com a skill de origem. Só avisa, não bloqueia.
+- Status line mostra `addon-studio ativo` quando a sessão está num projeto Addon Studio.
 
 ### Alterado
 
 - Hook de encoding roda inteiro no mod (`hooks/encoding.ts`): o `to-iso88591.sh` sai, e `Read` de arquivo fora de projeto addon deixa de abrir processo.
+- Regras do `ADDON.md` em projeto sem init passam a ser injetadas pelo mod do plugin, sem depender de `sh` nem `python3`.
 
 ### Corrigido
 

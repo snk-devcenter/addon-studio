@@ -71,9 +71,23 @@ test('Write em projeto addon grava o .java em ISO-8859-1', async ($, on) => {
   const { disk } = fakeDisk(on, { [`${ROOT}/build.gradle`]: ADDON_BUILD })
   writeTool(on, disk, 'olá ê\n')
 
-  await $.tool.call({ tool: 'Write', file_path: `${ROOT}/A.java` } as never)
+  await $.tool.call({ tool: 'Write', file_path: `${ROOT}/A.java`, content: 'olá ê\n' } as never)
 
   expect(hex(disk.get(`${ROOT}/A.java`))).toBe('6f6ce120ea0a')
+})
+
+test('conversão devolve a status line ao indicador do plugin', async ($, on) => {
+  const { disk } = fakeDisk(on, { [`${ROOT}/build.gradle`]: ADDON_BUILD })
+  writeTool(on, disk, 'olá\n')
+  const shown: (string | undefined)[] = []
+  on('ui.status', (_$, e) => {
+    shown.push(e.text)
+    return { value: undefined }
+  })
+
+  await $.tool.call({ tool: 'Write', file_path: `${ROOT}/A.java`, content: 'olá\n' } as never)
+
+  expect(shown.at(-1)).toBe('addon-studio ativo')
 })
 
 test('Write em submódulo sem o plugin, sob raiz que aplica, converte', async ($, on) => {
@@ -83,7 +97,7 @@ test('Write em submódulo sem o plugin, sob raiz que aplica, converte', async ($
   })
   writeTool(on, disk, 'olá\n')
 
-  await $.tool.call({ tool: 'Write', file_path: `${ROOT}/addon-vc/F.java` } as never)
+  await $.tool.call({ tool: 'Write', file_path: `${ROOT}/addon-vc/F.java`, content: 'olá\n' } as never)
 
   expect(hex(disk.get(`${ROOT}/addon-vc/F.java`))).toBe('6f6ce10a')
 })
@@ -92,7 +106,7 @@ test('Write fora de projeto addon não converte', async ($, on) => {
   const { disk, processes } = fakeDisk(on, { '/outro/build.gradle': "plugins { id 'java' }\n" })
   writeTool(on, disk, 'olá\n')
 
-  await $.tool.call({ tool: 'Write', file_path: '/outro/E.java' } as never)
+  await $.tool.call({ tool: 'Write', file_path: '/outro/E.java', content: 'olá\n' } as never)
 
   expect(hex(disk.get('/outro/E.java'))).toBe('6f6cc3a10a')
   expect(processes).toEqual([])
@@ -102,7 +116,7 @@ test('Write de extensão fora da lista não converte', async ($, on) => {
   const { disk, processes } = fakeDisk(on, { [`${ROOT}/build.gradle`]: ADDON_BUILD })
   writeTool(on, disk, 'olá\n')
 
-  await $.tool.call({ tool: 'Write', file_path: `${ROOT}/D.md` } as never)
+  await $.tool.call({ tool: 'Write', file_path: `${ROOT}/D.md`, content: 'olá\n' } as never)
 
   expect(hex(disk.get(`${ROOT}/D.md`))).toBe('6f6cc3a10a')
   expect(processes).toEqual([])
@@ -112,7 +126,7 @@ test('U+FFFD no arquivo: não converte e avisa o modelo', async ($, on) => {
   const { disk, processes } = fakeDisk(on, { [`${ROOT}/build.gradle`]: ADDON_BUILD })
   writeTool(on, disk, 'ol�\n')
 
-  const ran = await $.tool.call({ tool: 'Write', file_path: `${ROOT}/C.java` } as never)
+  const ran = await $.tool.call({ tool: 'Write', file_path: `${ROOT}/C.java`, content: 'ol�\n' } as never)
 
   expect(hex(disk.get(`${ROOT}/C.java`))).toBe('6f6cefbfbd0a')
   expect(processes).toEqual([])
@@ -124,7 +138,7 @@ test('Edit enxerga o arquivo ISO-8859-1 em UTF-8 e devolve em ISO-8859-1 (#45)',
   const { disk } = fakeDisk(on, { [`${ROOT}/build.gradle`]: ADDON_BUILD, [file]: latin1('/* Frequência */ "x"\n') })
   editTool(on, disk, '"x"', '"ação"')
 
-  const ran = await $.tool.call({ tool: 'Edit', file_path: file } as never)
+  const ran = await $.tool.call({ tool: 'Edit', file_path: file, old_string: '"x"', new_string: '"ação"' } as never)
 
   expect(ran.isError).toBeUndefined()
   expect(hex(disk.get(file))).toBe(hex(latin1('/* Frequência */ "ação"\n')))
@@ -136,7 +150,7 @@ test('Edit com erro devolve o arquivo convertido como estava', async ($, on) => 
   const { disk } = fakeDisk(on, { [`${ROOT}/build.gradle`]: ADDON_BUILD, [file]: original })
   editTool(on, disk, 'inexistente', 'y')
 
-  await $.tool.call({ tool: 'Edit', file_path: file } as never)
+  await $.tool.call({ tool: 'Edit', file_path: file, old_string: 'inexistente', new_string: 'y' } as never)
 
   expect(hex(disk.get(file))).toBe(hex(original))
 })
@@ -187,7 +201,7 @@ test('iconv falhando mantém o arquivo em UTF-8 e avisa o modelo', async ($, on)
   const { disk } = fakeDisk(on, { [`${ROOT}/build.gradle`]: ADDON_BUILD }, truncatesAndFails)
   writeTool(on, disk, 'olá\n')
 
-  const ran = await $.tool.call({ tool: 'Write', file_path: file } as never)
+  const ran = await $.tool.call({ tool: 'Write', file_path: file, content: 'olá\n' } as never)
 
   expect(hex(disk.get(file))).toBe('6f6cc3a10a')
   expect(ran.context?.join('\n') ?? '').toContain('iconv: falhou')
@@ -203,7 +217,7 @@ test('sem iconv, mantém o arquivo em UTF-8 e avisa o modelo', async ($, on) => 
   const { disk, processes } = fakeDisk(on, { [`${ROOT}/build.gradle`]: ADDON_BUILD }, withoutIconv)
   writeTool(on, disk, 'olá\n')
 
-  const ran = await $.tool.call({ tool: 'Write', file_path: file } as never)
+  const ran = await $.tool.call({ tool: 'Write', file_path: file, content: 'olá\n' } as never)
 
   expect(processes.map(argv => argv[0])).toEqual(['sh'])
   expect(hex(disk.get(file))).toBe('6f6cc3a10a')
@@ -214,7 +228,7 @@ test('falha inesperada do hook avisa o modelo sem derrubar a tool', async ($, on
   on('fs.exists', () => ({ deny: 'EACCES' }))
   on('tool.call', () => ({ result: { filePath: `${ROOT}/A.java` } }) as never)
 
-  const ran = await $.tool.call({ tool: 'Write', file_path: `${ROOT}/A.java` } as never)
+  const ran = await $.tool.call({ tool: 'Write', file_path: `${ROOT}/A.java`, content: 'olá\n' } as never)
 
   expect(ran.result).toEqual({ filePath: `${ROOT}/A.java` })
   expect(ran.context?.join('\n') ?? '').toContain('encoding: hook falhou')

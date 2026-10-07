@@ -1,5 +1,5 @@
 import type { Register, EngineInterface, HookFailure, ToolCallResult } from 'claude-code'
-import { isInAddonProject, parentOf } from './commons.ts'
+import { ACTIVE_STATUS, isInAddonProject, parentOf } from './commons.ts'
 
 // Converte arquivo-fonte de addon Sankhya para ISO-8859-1 depois de Write/Edit, e
 // entrega Read/Edit sobre UTF-8. As tools decodificam o arquivo como UTF-8: num arquivo
@@ -59,7 +59,7 @@ const toIso = async ($: EngineInterface, filePath: string) => {
   }
 
   $.ui.status('Convertendo encoding para ISO-8859-1...')
-  const written = await writeLatin1($, filePath, text).finally(() => $.ui.status(undefined))
+  const written = await writeLatin1($, filePath, text).finally(() => $.ui.status(ACTIVE_STATUS))
   if (written.exitCode === 0) return undefined
 
   // O redirecionamento já truncou o arquivo: o conteúdo volta em UTF-8.

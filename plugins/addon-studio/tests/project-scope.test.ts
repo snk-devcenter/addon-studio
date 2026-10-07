@@ -104,3 +104,31 @@ test('em projeto addon, Skill tool carrega skill do plugin', async ($, on) => {
 
   expect(ran.deny).toBeUndefined()
 })
+
+const statusShown = (on: On) => {
+  const shown: (string | undefined)[] = []
+  on('ui.status', (_$, e) => {
+    shown.push(e.text)
+    return { value: undefined }
+  })
+  on('session.start', (_$, e) => ({ cwd: e.cwd }))
+  return shown
+}
+
+test('em projeto addon, a status line diz que o plugin está ativo', async ($, on) => {
+  sessionIn(on, ROOT)
+  const shown = statusShown(on)
+
+  await $.session.start({ cwd: ROOT, surface: 'terminal', isInteractive: true })
+
+  expect(shown).toEqual(['addon-studio ativo'])
+})
+
+test('fora de projeto addon, a status line fica limpa', async ($, on) => {
+  sessionIn(on, OTHER_ROOT)
+  const shown = statusShown(on)
+
+  await $.session.start({ cwd: OTHER_ROOT, surface: 'terminal', isInteractive: true })
+
+  expect(shown).toEqual([])
+})

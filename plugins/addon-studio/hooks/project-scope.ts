@@ -1,5 +1,5 @@
 import type { Register, EngineInterface } from 'claude-code'
-import { isInAddonProject } from './commons.ts'
+import { ACTIVE_STATUS, isInAddonProject } from './commons.ts'
 
 // Fora de projeto Addon Studio o plugin some do contexto: listagem de skills, sub-agents,
 // Skill tool e menu `/`. Permite instalar o plugin no escopo de usuário sem que as
@@ -20,6 +20,11 @@ const withoutOwnSkills = (listing: string, prefix: string) =>
     .join('\n')
 
 export const register: Register = on => {
+  on('session.start', async ($, e, next) => {
+    if (!(await isOutsideAddonProject($))) $.ui.status(ACTIVE_STATUS)
+    return next(e)
+  })
+
   on('prompt.attachment', { type: 'skill_listing' }, async ($, e, next) => {
     if (!(await isOutsideAddonProject($))) return next(e)
     return next({ ...e, text: withoutOwnSkills(e.text, ownPrefix($)) })
