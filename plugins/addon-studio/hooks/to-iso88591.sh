@@ -1,15 +1,16 @@
 #!/bin/sh
-# Chamado por hooks/encoding.ts apos Write|Edit: converte arquivo-fonte de addon Sankhya para ISO-8859-1.
+# Chamado por hooks/encoding.ts: converte arquivo-fonte de addon Sankhya para ISO-8859-1
+# depois de Write|Edit|Read e, com --to-utf8, de volta para UTF-8 antes de Read|Edit.
 #
 # Lê o payload do hook em stdin (JSON) e converte o arquivo tocado, quando aplicável.
 # Rode `sh to-iso88591.sh --selftest` para verificar o comportamento.
 #
-# Regra central (issue #45): as tools Write/Edit não são encoding-aware. Ao editar um
-# arquivo que já está em ISO-8859-1, o trecho não tocado é decodificado como UTF-8;
-# um byte solto (ex. 0xEA = "ê") não é UTF-8 válido e é regravado como U+FFFD. O byte
-# original deixa de existir ANTES deste hook rodar. Converter nessa situação apenas
-# mascara a perda (`//TRANSLIT` transforma U+FFFD em '?'), então aqui o hook aborta e
-# avisa em vez de gravar o dado corrompido.
+# Regra central (issue #45): as tools Read/Edit não são encoding-aware. Um arquivo em
+# ISO-8859-1 é decodificado como UTF-8; um byte solto (ex. 0xEA = "ê") não é UTF-8 válido
+# e o Edit o regrava como U+FFFD. Por isso o mod passa o arquivo para UTF-8 antes da tool
+# (--to-utf8) e de volta depois. Se ainda assim chegar U+FFFD aqui, o byte original já
+# não existe: converter apenas mascararia a perda (`//TRANSLIT` transforma U+FFFD em '?'),
+# então o hook aborta e avisa em vez de gravar o dado corrompido.
 set -u
 
 FFFD=$(printf '\357\277\275')
@@ -85,6 +86,51 @@ open(p, "wb").write(txt.encode("iso-8859-1", errors="replace"))
     return 0
 }
 
+# Inverso de convert_file, para a tool ler o acento certo. Imprime "converted" quando
+# converteu: o mod só devolve para ISO-8859-1 o arquivo que ele mesmo trocou.
+to_utf8_file() {
+    file=$1
+
+    [ -f "$file" ] || return 0
+
+    case "$file" in
+        *.java | *.xml | *.kt | *.properties) ;;
+        *) return 0 ;;
+    esac
+
+    is_addon_project "$file" || return 0
+
+    if command -v iconv > /dev/null 2>&1; then
+        iconv -f UTF-8 -t UTF-8 "$file" > /dev/null 2>&1 && return 0
+
+        tmp=$(mktemp) || return 1
+        if iconv -f ISO-8859-1 -t UTF-8 "$file" > "$tmp"; then
+            cat "$tmp" > "$file"
+            rm -f "$tmp"
+        else
+            rm -f "$tmp"
+            printf 'encoding: iconv falhou em "%s" -- arquivo mantido como estava.\n' "$file" >&2
+            return 2
+        fi
+    else
+        python3 -c '
+import sys
+p = sys.argv[1]
+raw = open(p, "rb").read()
+try:
+    raw.decode("utf-8")
+    sys.exit(0)
+except UnicodeDecodeError:
+    pass
+open(p, "wb").write(raw.decode("iso-8859-1").encode("utf-8"))
+print("converted")
+' "$file" || return 2
+        return 0
+    fi
+
+    printf 'converted\n'
+}
+
 selftest() {
     dir=$(mktemp -d) || exit 1
     fails=0
@@ -138,6 +184,26 @@ selftest() {
     convert_file "$dir/addon-vc/F.java"
     check "submodulo -vc convertido" '6f6ce10a' "$(hex "$dir/addon-vc/F.java")"
 
+    # --to-utf8: ISO-8859-1 -> UTF-8 antes do Read/Edit, para a tool não trocar acento por U+FFFD (#45)
+    printf '/* Frequ\352ncia */\n' > "$dir/G.java"
+    check "to-utf8 converte latin1" 'converted' "$(to_utf8_file "$dir/G.java")"
+    check "to-utf8 grava utf8" '2f2a204672657175c3aa6e636961202a2f0a' "$(hex "$dir/G.java")"
+
+    # --to-utf8 em arquivo já UTF-8 -> intocado e sem marcador
+    check "to-utf8 utf8 sem marcador" '' "$(to_utf8_file "$dir/G.java")"
+    check "to-utf8 utf8 intocado" '2f2a204672657175c3aa6e636961202a2f0a' "$(hex "$dir/G.java")"
+
+    # Ida e volta preserva o byte original
+    convert_file "$dir/G.java"
+    check "ida e volta" '2f2a204672657175ea6e636961202a2f0a' "$(hex "$dir/G.java")"
+
+    # --to-utf8 fora de projeto addon -> intocado
+    outro=$(mktemp -d) || exit 1
+    printf 'ol\341\n' > "$outro/H.java"
+    check "to-utf8 nao-addon sem marcador" '' "$(to_utf8_file "$outro/H.java")"
+    check "to-utf8 nao-addon intocado" '6f6ce10a' "$(hex "$outro/H.java")"
+    rm -rf "$outro"
+
     # Nenhum .tmp adjacente deixado para trás
     check "sem .tmp residual" '' "$(ls "$dir" | grep '\.tmp$' || true)"
 
@@ -153,6 +219,11 @@ fi
 
 FILE=$(jq -r '.tool_input.file_path // .tool_response.filePath // empty' 2> /dev/null) || exit 0
 [ -n "${FILE:-}" ] || exit 0
+
+if [ "${1:-}" = "--to-utf8" ]; then
+    to_utf8_file "$FILE"
+    exit $?
+fi
 
 convert_file "$FILE"
 exit $?

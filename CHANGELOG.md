@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Corrigido
+
+- `Edit` em arquivo ISO-8859-1 deixa de trocar os acentos do trecho não editado por U+FFFD: o hook de encoding passa o arquivo para UTF-8 antes de `Read`/`Edit` e devolve para ISO-8859-1 depois.
+
 ## [3.3.0] - 2026-10-07
 
 ### Alterado
