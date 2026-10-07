@@ -184,7 +184,7 @@ Macros SQL Sankhya (`dbDate`, `nullValue`, etc.) funcionam em `<expression>` do 
 
 ### 8. Validar arquivo gerado
 
-- Encoding ISO-8859-1 (no Claude Code, hook PostToolUse converte automático)
+- Encoding ISO-8859-1 (no Claude Code, hook do plugin converte automático)
 - `<NNN>` sequencial sem gap nem duplicata
 - `ordem` única dentro do arquivo, incrementa a partir de 1
 - Cada `<sql>` tem ambos `<oracle>` e `<mssql>`

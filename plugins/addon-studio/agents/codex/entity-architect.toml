@@ -127,7 +127,7 @@ Após gerar, reportar:
 
 ### Próximos passos sugeridos
 
-1. Validar encoding ISO-8859-1 nos 3 XMLs e .java (hook PostToolUse converte automático no Claude Code; em outros harnesses, rodar `iconv` ou skill `encoding`)
+1. Validar encoding ISO-8859-1 nos 3 XMLs e .java (hook do plugin converte automático no Claude Code; em outros harnesses, rodar `iconv` ou skill `encoding`)
 2. Criar `Repository` (skill `repository`)
 3. Service `@Component` com a regra de negócio (skill `dependency-injection`)
 4. Se feature for exposta via REST: criar Controller + DTOs + Mapper (agent `controller-designer`)

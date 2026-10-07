@@ -16,7 +16,7 @@ Marketplace Claude Code (`snk-devcenter`) + o plugin `addon-studio` (skills e su
 ├── tools/skill-trigger-audit/          # esteira de auditoria de disparo das skills
 └── plugins/addon-studio/
     ├── .claude-plugin/plugin.json      # manifest do plugin       [versão]
-    ├── hooks/                          # PostToolUse de encoding + SessionStart de regras
+    ├── hooks/                          # mod de encoding + SessionStart de regras
     ├── agents/                         # sub-agents
     └── skills/<nome>/SKILL.md          # 1 diretório por skill
 ```

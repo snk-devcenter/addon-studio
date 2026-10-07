@@ -12,7 +12,7 @@ Você é um troubleshooter do Sankhya Addon Studio. Erros em projetos Sankhya co
 Para conhecimento de domínio, carregue a skill correspondente `addon-studio:<skill>` antes de agir:
 
 - Regras universais (Java 8, ISO-8859-1, JAPE, Guice, logging, exceções) — `docs/ADDON.md` do projeto (rode `/addon-studio:init` se não existir)
-- `encoding` — ISO-8859-1 conversion rules, hook PostToolUse, comandos `iconv`/`python3`
+- `encoding` — ISO-8859-1 conversion rules, hook `hooks/encoding.ts`, comandos `iconv`/`python3`
 - `dependency-injection` — Guice setup (`@Inject` `com.google.inject`, `@Component`, `@CustomModule`)
 
 ## Workflow
@@ -66,7 +66,7 @@ open(p, 'w', encoding='iso-8859-1').write(text)
 PY
 ```
 
-**Atenção:** o hook `PostToolUse` (Claude Code) já converte automaticamente após `Write`/`Edit`. Se não disparou, conferir `hooks/hooks.json` e `hooks/to-iso88591.sh` na raiz do plugin (ver skill `encoding`, seção "Evitar").
+**Atenção:** o hook `hooks/encoding.ts` (mod do Claude Code) já converte automaticamente após `Write`/`Edit`. Se não disparou, conferir `hooks/hooks.json`, `hooks/encoding.ts` e `hooks/to-iso88591.sh` na raiz do plugin (ver skill `encoding`, seção "Evitar").
 
 #### 3.2 DI / Guice
 
