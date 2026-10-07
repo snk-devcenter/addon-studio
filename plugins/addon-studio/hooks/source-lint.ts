@@ -24,7 +24,7 @@ const USE_GUICE_INJECT = 'use `com.google.inject.Inject`'
 
 const JAVA_RULES: Rule[] = [
   { pattern: /\bvar\s+[A-Za-z_$][\w$]*\s*[=:]/g, message: '`var` é Java 10+ (projeto é Java 8 estrito)', source: `${ADDON}:11` },
-  { pattern: /\b(?:List|Map)\.of\s*\(/g, message: '`List.of`/`Map.of` é Java 9+ (projeto é Java 8 estrito)', source: `${ADDON}:11` },
+  { pattern: /\b(?:List|Set|Map)\.of\s*\(/g, message: '`List.of`/`Set.of`/`Map.of` é Java 9+ (projeto é Java 8 estrito)', source: `${ADDON}:11` },
   { pattern: /\.isBlank\(\s*\)/g, message: '`String.isBlank()` é Java 11+ (projeto é Java 8 estrito)', source: `${ADDON}:11` },
   { pattern: /(?<!\bCollectors)\.toList\(\s*\)/g, message: '`Stream.toList()` é Java 16+ — use `collect(Collectors.toList())`', source: `${ADDON}:11` },
   {

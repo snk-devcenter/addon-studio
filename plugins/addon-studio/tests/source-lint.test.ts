@@ -38,7 +38,8 @@ const writeJava = async ($: Parameters<Parameters<typeof test>[1]>[0], content: 
 const CASES: { name: string; bad: string; good: string; expected: string }[] = [
   { name: 'var', bad: 'var x = 1;', good: 'int variavel = 1;', expected: '`var`' },
   { name: 'List.of', bad: 'List<String> l = List.of("a");', good: 'List<String> l = ImmutableList.of("a");', expected: '`List.of`' },
-  { name: 'Map.of', bad: 'm = Map.of();', good: 'm = Collections.emptyMap();', expected: '`List.of`/`Map.of`' },
+  { name: 'Set.of', bad: 'Set<String> s = Set.of("a");', good: 'Set<String> s = ImmutableSet.of("a");', expected: '`Set.of`' },
+  { name: 'Map.of', bad: 'm = Map.of();', good: 'm = Collections.emptyMap();', expected: '`Map.of`' },
   { name: 'isBlank', bad: 'if (s.isBlank()) {}', good: 'if (StringUtils.isBlank(s)) {}', expected: '`String.isBlank()`' },
   { name: 'Stream.toList', bad: 'l = s.stream().toList();', good: 'l = s.stream().collect(Collectors.toList());', expected: '`Stream.toList()`' },
   { name: 'orElseThrow', bad: 'o.orElseThrow();', good: 'o.orElseThrow(IllegalStateException::new);', expected: '`orElseThrow()`' },
