@@ -11,14 +11,17 @@ export const parentOf = (path: string) => path.replace(/[\\/]+[^\\/]*$/, '')
 export type ReadIfExists = (path: string) => Promise<string | undefined>
 
 // O módulo -vc não aplica o plugin Gradle, a raiz sim: por isso a subida até a raiz.
-export const isInAddonProject = async (startDir: string, readIfExists: ReadIfExists) => {
+export const findAddonRoot = async (startDir: string, readIfExists: ReadIfExists) => {
   for (let dir = startDir; dir !== ''; ) {
     for (const name of BUILD_FILES) {
-      if ((await readIfExists(`${dir}/${name}`))?.includes(ADDON_GRADLE_PLUGIN)) return true
+      if ((await readIfExists(`${dir}/${name}`))?.includes(ADDON_GRADLE_PLUGIN)) return dir
     }
     const parent = parentOf(dir)
-    if (parent === dir) return false
+    if (parent === dir) return undefined
     dir = parent
   }
-  return false
+  return undefined
 }
+
+export const isInAddonProject = async (startDir: string, readIfExists: ReadIfExists) =>
+  (await findAddonRoot(startDir, readIfExists)) !== undefined
