@@ -76,6 +76,20 @@ test('Write em projeto addon grava o .java em ISO-8859-1', async ($, on) => {
   expect(hex(disk.get(`${ROOT}/A.java`))).toBe('6f6ce120ea0a')
 })
 
+test('conversão devolve a status line ao indicador do plugin', async ($, on) => {
+  const { disk } = fakeDisk(on, { [`${ROOT}/build.gradle`]: ADDON_BUILD })
+  writeTool(on, disk, 'olá\n')
+  const shown: (string | undefined)[] = []
+  on('ui.status', (_$, e) => {
+    shown.push(e.text)
+    return { value: undefined }
+  })
+
+  await $.tool.call({ tool: 'Write', file_path: `${ROOT}/A.java` } as never)
+
+  expect(shown.at(-1)).toBe('addon-studio ativo')
+})
+
 test('Write em submódulo sem o plugin, sob raiz que aplica, converte', async ($, on) => {
   const { disk } = fakeDisk(on, {
     [`${ROOT}/build.gradle`]: ADDON_BUILD,
