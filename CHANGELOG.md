@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.4.5] - 2026-10-09
+
 ### Corrigido
 
 - Exemplo de anatomia da skill `listener` deixa de reaproveitar o `beforeInsert` no `beforeUpdate`: no update o VO só traz o delta, e o campo não alterado entrava como zero no cálculo. O exemplo lê o valor novo do campo alterado e o anterior via `getOldVO()`.
@@ -453,7 +455,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.4...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.5...HEAD
+[3.4.5]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.4...v3.4.5
 [3.4.4]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.3...v3.4.4
 [3.4.3]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.2...v3.4.3
 [3.4.2]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.1...v3.4.2
