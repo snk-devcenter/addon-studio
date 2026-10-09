@@ -156,7 +156,7 @@ Ações:
 
 #### 4.3 Tabela nativa — sem script
 
-Tabela nativa (`TGFCAB`, `TGFPAR`...) não recebe DDL do addon — nem CREATE, nem coluna nova. Campo novo em entidade nativa vai para uma tabela de extensão com a mesma PK (script de tabela nova, 4.1/4.2), fundida via merge-on-root: `Read ${CLAUDE_PLUGIN_ROOT}/skills/merge-on-root/SKILL.md`.
+Tabela nativa (`TGFCAB`, `TGFPAR`...) não recebe DDL do addon — nem CREATE, nem coluna nova. Exceção: tabela que o projeto já declara em `<nativeTable>` com `<field>` (legado) — `ALTER TABLE ADD` nela, no padrão dos scripts existentes. Fora isso, campo novo em entidade nativa vai para uma tabela de extensão com a mesma PK (script de tabela nova, 4.1/4.2), fundida via merge-on-root: `Read ${CLAUDE_PLUGIN_ROOT}/skills/merge-on-root/SKILL.md`.
 
 ### 5. Tipos por banco
 
@@ -171,7 +171,7 @@ Macros SQL Sankhya (`dbDate`, `nullValue`, etc.) funcionam em `<expression>` do 
 - [ ] Omitir uma das tags `<oracle>` ou `<mssql>` — **sempre** dual
 - [ ] Ponto-e-vírgula `;` no final do SQL (parser quebra)
 - [ ] CREATE TABLE com todas as colunas (forma "fat") — usar ALTER incremental
-- [ ] CREATE TABLE ou ALTER TABLE em tabela nativa — campo novo vai para tabela de extensão (merge-on-root)
+- [ ] CREATE TABLE ou ALTER TABLE em tabela nativa — campo novo vai para tabela de extensão (merge-on-root), salvo tabela já declarada em `<nativeTable>` com `<field>` no projeto (legado, segue o padrão dela)
 - [ ] Modificar estrutura de colunas nativas do Sankhya core
 - [ ] Usar prefixo genérico `AD_` em tabela nova — usar convenção `<PRX><MOD3>` do projeto
 - [ ] `ordem` duplicada dentro do mesmo arquivo

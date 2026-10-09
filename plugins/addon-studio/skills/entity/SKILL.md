@@ -67,7 +67,7 @@ Exemplo coerente (`<PRX>`=`PRX`, `<MOD3>`=`XYZ`):
 Tabelas nativas mais comuns: `TGFCAB`, `TGFFIN`, `TGFORD`, `TGFVEI`, `TGFEMP`, `TGFPAR`, `TGFPRO`, `TGFITE`.
 Instâncias nativas mais comuns associadas: `CabecalhoNota` (TGFCAB), `ItemNota` (TGFITE), `Parceiro` (TGFPAR), `Produto` (TGFPRO), `TipoOperacao` (TGFTOP), `Financeiro` (TGFFIN).
 
-> **Campo novo em entidade nativa não entra na entidade nativa.** Nada de `@Column` para coluna que não existe na tabela nativa, nem instância nova do addon sobre tabela nativa (`isNativeTable` sem `isNativeInstance`): o dado vai para uma tabela de extensão com merge-on-root — skill `merge-on-root`.
+> **Campo novo em entidade nativa não entra na entidade nativa.** Nada de `@Column` para coluna que não existe na tabela nativa, nem instância nova do addon sobre tabela nativa (`isNativeTable` sem `isNativeInstance`): o dado vai para uma tabela de extensão com merge-on-root — skill `merge-on-root`. Exceção: tabela que o projeto já declara em `<nativeTable>` com `<field>` (legado) — ali o campo novo entra como `@Column` na entidade nativa, como as colunas que o projeto já criou nela.
 
 ```java
 // 1) Tabela e instância do addon — sem flags
@@ -464,7 +464,7 @@ Entidades completas — PK simples, PK composta + relacionamentos, `@OneToMany` 
 | Colocar `@GeneratedValue` no `@Id`                      | Sequência fica no XML (`sequenceType`/`sequenceField`).   |
 | Colocar `@Expression` no campo                          | Expressões ficam no XML (`<expression>`).                 |
 | Omitir `isNativeTable = true` em tabela nativa Sankhya  | Obrigatório para TGFCAB, TGFFIN, TGFORD, TGFVEI, TGFEMP, TGFPAR — KSP rejeita sem ele com erro de entidade duplicada. |
-| `@Column` de coluna nova do addon na entidade nativa, ou instância nova sobre tabela nativa | Tabela de extensão com merge-on-root (skill `merge-on-root`). |
+| `@Column` de coluna nova do addon na entidade nativa, ou instância nova sobre tabela nativa | Tabela de extensão com merge-on-root (skill `merge-on-root`) — exceto tabela que o projeto já declara em `<nativeTable>` com `<field>`, que segue o padrão dela (skill `merge-on-root`, "Tabela nativa já estendida pelo projeto"). |
 | Omitir `isNativeInstance = true` em instância nativa    | Obrigatório quando o `entity` reusa um nome nativo (`CabecalhoNota`, `Parceiro`, `Produto`, etc.). Sem ele, o deploy regrava a instância para o owner do addon e quebra regras/validações nativas. |
 | Criar `@OneToOne` quando só precisa do valor da FK      | Use `@Column(name = "FK")` se não precisa navegar.        |
 | Esquecer de criar o XML do dicionário                   | Toda entidade **precisa** do XML correspondente.          |

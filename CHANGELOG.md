@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Corrigido
+
+- Merge-on-root deixa de valer para tabela nativa que o projeto já estende por `<nativeTable>`/`<nativeInstance>` com `<field>` (projeto legado): campo novo nessa tabela segue o padrão existente (`ALTER TABLE` + `<field>` + `@Column` na entidade nativa), sem ser apontado como defeito. Tabela nativa que entra no projeto pela primeira vez continua por merge-on-root.
+
 ## [3.4.1] - 2026-10-07
 
 ### Alterado

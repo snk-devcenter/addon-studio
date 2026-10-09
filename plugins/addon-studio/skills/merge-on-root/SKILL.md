@@ -1,6 +1,6 @@
 ---
 name: merge-on-root
-description: Estende uma entidade com campos novos sem criar coluna na tabela dela — tabela de extensão com a mesma PK, ligada por `@OneToOne` com `@ref-param[merge-on-root=true]`, que a plataforma funde na tela e no registro da entidade raiz. É o caminho oficial para guardar informação nova em entidade nativa do Sankhya (Parceiro, Produto, Nota, TOP...). Use quando o dev pedir campo novo, coluna nova ou "guardar mais um dado" num cadastro ou documento nativo — "preciso de um campo a mais na tela de Parceiros", "adicionar uma flag no produto", "gravar X junto da nota" —, ao estender tabela do próprio addon sem mexer nela, ou ao revisar `<nativeTable>` com `<fields>`, `ALTER TABLE` em tabela nativa (`TGF*`, `TSI*`, `TCS*`) ou instância nova sobre tabela nativa. A resposta nunca é `ALTER TABLE` na tabela nativa nem `<field>` dentro de `<nativeTable>`: o campo vai para a tabela de extensão. A tabela de extensão inteira (dbscript, XML e Java) é desta skill. NÃO usar para tabela nova do addon sem relação com entidade existente — isso é a skill `data-dictionary` (ou o sub-agent `entity-architect`, quando XML, dbscript e entidade nascem juntos); nem para relacionamento 1:N (aba separada), que é `<relation relation="OneToMany">` da `data-dictionary`.
+description: Estende uma entidade com campos novos sem criar coluna na tabela dela — tabela de extensão com a mesma PK, ligada por `@OneToOne` com `@ref-param[merge-on-root=true]`, que a plataforma funde na tela e no registro da entidade raiz. É o caminho oficial para guardar informação nova em entidade nativa do Sankhya (Parceiro, Produto, Nota, TOP...). Use quando o dev pedir campo novo, coluna nova ou "guardar mais um dado" num cadastro ou documento nativo — "preciso de um campo a mais na tela de Parceiros", "adicionar uma flag no produto", "gravar X junto da nota" —, ao estender tabela do próprio addon sem mexer nela, ou ao revisar `<nativeTable>` com `<fields>`, `ALTER TABLE` em tabela nativa (`TGF*`, `TSI*`, `TCS*`) ou instância nova sobre tabela nativa. Em tabela nativa que o projeto ainda não declara em `<nativeTable>`, a resposta nunca é `ALTER TABLE` nem `<field>` dentro de `<nativeTable>`: o campo vai para a tabela de extensão; tabela que o projeto já estende por `<nativeTable>` segue o padrão que já usa. A tabela de extensão inteira (dbscript, XML e Java) é desta skill. NÃO usar para tabela nova do addon sem relação com entidade existente — isso é a skill `data-dictionary` (ou o sub-agent `entity-architect`, quando XML, dbscript e entidade nascem juntos); nem para relacionamento 1:N (aba separada), que é `<relation relation="OneToMany">` da `data-dictionary`.
 license: Proprietary
 compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle, ISO-8859-1.
 ---
@@ -9,9 +9,9 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 
 O merge-on-root estende uma entidade com os campos de outra tabela sem criar coluna na tabela estendida. Os campos vivem numa **tabela de extensão** com a **mesma PK** da entidade raiz, ligada a ela por um relacionamento 1:1 com `@ref-param[merge-on-root=true]`. A plataforma funde as duas: na tela e no registro, para o usuário, é uma entidade só.
 
-Funciona para entidade do addon e para entidade nativa. Para entidade nativa é o **único** caminho: não adicione campo em tabela nativa, nem por `ALTER TABLE` em `dbscripts/`, nem por `<field>` dentro de `<nativeTable>` (o `metadados.xsd` marca esse `<fields>` como deprecated). Tabela nativa tem volume e carga altíssimos — a migração em horário de pico pode derrubar o SankhyaOM do cliente —, a coluna pode sumir numa atualização da plataforma e a alteração invalida o suporte.
+Funciona para entidade do addon e para entidade nativa. Para tabela nativa que o projeto ainda não estende é o **único** caminho: não adicione campo nela, nem por `ALTER TABLE` em `dbscripts/`, nem por `<field>` dentro de `<nativeTable>` (o `metadados.xsd` marca esse `<fields>` como deprecated). Tabela nativa tem volume e carga altíssimos — a migração em horário de pico pode derrubar o SankhyaOM do cliente —, a coluna pode sumir numa atualização da plataforma e a alteração invalida o suporte.
 
-Projeto que já tem coluna própria em tabela nativa: não acrescente outras. Campo novo vai para a extensão.
+**Tabela nativa já estendida pelo projeto.** O critério é a tabela, não o campo. Se o `datadictionary/` do projeto já declara a tabela em `<nativeTable>`/`<nativeInstance>` (projeto legado, que estende a tabela com `<field>` + `ALTER TABLE`), o merge-on-root não se aplica a ela: campo novo segue o padrão que o projeto já usa nessa tabela — `ALTER TABLE` em `dbscripts/` (skill `database`), `<field>` no `<nativeTable>` (skill `data-dictionary`) e `@Column` na entidade nativa (skill `entity`). Não aponte esse legado como defeito nem proponha migrar para extensão. Se o `<nativeTable>` existente só traz a relação de merge-on-root, a tabela já usa extensão — continue nela. Tabela nativa que entra no projeto pela primeira vez: merge-on-root.
 
 ---
 
@@ -225,6 +225,8 @@ O `@ref-param[merge-on-root=true]` fica no `<expression>` do XML, não em `@Expr
 
 ## 7. Anti-Patterns (PROIBIDO)
 
+Valem para tabela nativa que o projeto ainda não estende. Tabela já declarada em `<nativeTable>` com `<field>` segue o padrão dela (ver "Tabela nativa já estendida pelo projeto" no topo).
+
 | Anti-Pattern | Correção |
 |:--|:--|
 | `ALTER TABLE TGFPAR ADD <coluna>` (ou qualquer tabela nativa) | Coluna na tabela de extensão |
@@ -240,7 +242,7 @@ O `@ref-param[merge-on-root=true]` fica no `<expression>` do XML, não em `@Expr
 
 ## 8. Checklist
 
-1. [ ] Confirmar que a entidade raiz é a certa e que o dado é 1:1 com ela.
+1. [ ] Confirmar que a entidade raiz é a certa e que o dado é 1:1 com ela. Raiz nativa: conferir se o `datadictionary/` já declara a tabela em `<nativeTable>` com `<field>` — se sim, não é merge-on-root (topo).
 2. [ ] Descobrir `<PRX>`/`<MOD3>` do projeto e nomear a tabela de extensão.
 3. [ ] dbscript: CREATE com a PK idêntica à da raiz + `ALTER` por coluna + CHECK de `CHECKBOX`/`LISTA`.
 4. [ ] `datadictionary/<TABELA>.xml` da extensão: `<table sequenceType="M">`, `<instance>`, campos com `UITabName`.

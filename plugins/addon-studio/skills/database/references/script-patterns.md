@@ -288,7 +288,7 @@ Adicionar `<option value="C">Opcao C</option>` ao dicionário do campo `TIPO`:
 
 ## Tabelas Nativas (`nativeTable`) — Sem Script
 
-Tabela nativa Sankhya (tag `<nativeTable>` no dicionário) **não recebe DDL do addon**: nem CREATE, nem ALTER TABLE ADD. Campo novo em entidade nativa vai para uma tabela de extensão do addon com a mesma PK, fundida via merge-on-root — skill `merge-on-root`. O script é o de tabela nova (CREATE mínimo + ALTER por coluna) na tabela de extensão.
+Tabela nativa Sankhya (tag `<nativeTable>` no dicionário) **não recebe DDL do addon**: nem CREATE, nem ALTER TABLE ADD. Campo novo em entidade nativa vai para uma tabela de extensão do addon com a mesma PK, fundida via merge-on-root — skill `merge-on-root`. O script é o de tabela nova (CREATE mínimo + ALTER por coluna) na tabela de extensão. Exceção: tabela que o projeto já declara em `<nativeTable>` com `<field>` (legado) segue o padrão dela — `ALTER TABLE ADD` na nativa, como os scripts existentes.
 
 ---
 
@@ -297,7 +297,7 @@ Tabela nativa Sankhya (tag `<nativeTable>` no dicionário) **não recebe DDL do 
 | Tag no dicionário | CREATE TABLE?                    | ALTER TABLE para colunas?                           | Observação                |
 |:------------------|:---------------------------------|:----------------------------------------------------|:--------------------------|
 | `<table>`         | Sim (somente PKs + constraint) | Sim (cada coluna não-PK individualmente)          | Tabela criada pelo add-on |
-| `<nativeTable>`   | Não                            | Não — campo novo vai para tabela de extensão (`merge-on-root`) | Tabela nativa Sankhya     |
+| `<nativeTable>`   | Não                            | Não — campo novo vai para tabela de extensão (`merge-on-root`); legado com `<field>` segue com ALTER | Tabela nativa Sankhya     |
 
 ---
 
