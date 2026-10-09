@@ -35,7 +35,7 @@ Antes de criar qualquer artefato:
 
 | Decisão | Opções | Quando usar cada |
 |---------|--------|------------------|
-| Tabela nova vs extensão de nativa | Tabela do addon (`<table>`) ou tabela de extensão com merge-on-root | Addon: dados do produto. Campo novo em entidade nativa (Parceiro, Produto, Nota): tabela de extensão com a mesma PK — skill `merge-on-root`. Nunca coluna nova na tabela nativa. |
+| Tabela nova vs extensão de nativa | Tabela do addon (`<table>`) ou tabela de extensão com merge-on-root | Addon: dados do produto. Campo novo em entidade nativa (Parceiro, Produto, Nota): tabela de extensão com a mesma PK — skill `merge-on-root`. Nunca coluna nova na tabela nativa, salvo tabela que o projeto já declara em `<nativeTable>` com `<field>` (legado, segue o padrão dela). |
 | PK simples vs composta | `@Id Integer` ou `@Embeddable` | Composta quando entidade é "filho" lógico de outra (ex.: itens de um cabeçalho). |
 | Tipo do PK | `Integer` (addon) ou `BigDecimal` (nativa Sankhya) | Tabelas próprias = `Integer`. NUNOTA, CODPARC, CODPROD, etc. = `BigDecimal`. |
 | Sequência | AUTO (banco) ou MANUAL | AUTO por default. MANUAL se PK vem de regra externa. |
@@ -139,4 +139,4 @@ Após gerar, reportar:
 ## Quando NÃO criar
 
 - Se dev não confirmou naming convention `<PRX><MOD3>` — **perguntar primeiro**
-- Se for tabela nativa do Sankhya core (TGFCAB, TGFITE, TGFFIN, TSIPAR, etc.) — **nunca** alterar core nem adicionar coluna; campo novo vai para tabela de extensão (skill `merge-on-root`)
+- Se for tabela nativa do Sankhya core (TGFCAB, TGFITE, TGFFIN, TSIPAR, etc.) — **nunca** alterar core nem adicionar coluna; campo novo vai para tabela de extensão (skill `merge-on-root`). Exceção: tabela que o projeto já declara em `<nativeTable>` com `<field>` (legado) segue o padrão dela

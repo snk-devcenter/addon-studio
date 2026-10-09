@@ -166,7 +166,7 @@ Abreviacoes padrao ecossistema Sankhya:
 | `DESCR`      | Descricao (texto livre)             | `DESCRERRO`, `DESCRPRODUTO`             |
 | `NU`         | Numero unico movimentos/documentos  | `NUNOTA`, `NUIMP`, `NUPED`              |
 
-> **Tabela nativa Sankhya (ex: `TGFCAB`, `TGFPAR`) nao recebe coluna do addon.** Campo novo em entidade nativa vai para uma tabela de extensao do addon (mesma PK) com merge-on-root — skill `merge-on-root`.
+> **Tabela nativa Sankhya (ex: `TGFCAB`, `TGFPAR`) nao recebe coluna do addon.** Campo novo em entidade nativa vai para uma tabela de extensao do addon (mesma PK) com merge-on-root — skill `merge-on-root`, exceto tabela que o projeto ja declara em `<nativeTable>` com `<field>`, que segue o padrao dela (skill `merge-on-root`, "Tabela nativa já estendida pelo projeto"): ali o `ALTER TABLE` na nativa continua, no mesmo padrao dos scripts que ja existem.
 
 > **Chaves primarias sequenciais:** nao usar prefixo `ID`. Para **cadastros**, usar `COD` (ex: `CODCAD`, `CODCFG`); para **movimentos/documentos**, usar `NU` (ex: `NUNOTA`, `NUIMP`).
 
@@ -352,7 +352,7 @@ ALTER TABLE PRXXYZCCA ADD (CODRECEITA VARCHAR2(100))
 </oracle>
 ```
 
-Tabela nativa tem volume e carga altíssimos (migração em horário de pico derruba o SankhyaOM do cliente), a coluna pode sumir numa atualização da plataforma e a alteração invalida o suporte. Fluxo da extensão na skill `merge-on-root`.
+Tabela nativa tem volume e carga altíssimos (migração em horário de pico derruba o SankhyaOM do cliente), a coluna pode sumir numa atualização da plataforma e a alteração invalida o suporte. Fluxo da extensão na skill `merge-on-root`. Tabela que o projeto já declara em `<nativeTable>` com `<field>` (legado) é exceção: o `ALTER TABLE` nela segue o padrão dos scripts existentes.
 
 ### 6. Modificar estrutura de colunas nativas do Sankhya
 
@@ -430,7 +430,7 @@ V003-CREATE_TABLE_PRXXYZIPA.xml
 8. **Ordem de criação** — tabelas referenciadas criadas antes das que referenciam
 9. **CREATE TABLE mínimo** — **só** colunas PK + constraint PK
 10. **Colunas via ALTER TABLE** — cada coluna não-PK adicionada individualmente via `ALTER TABLE ADD`
-11. **Tabela nativa sem DDL** — nem CREATE nem ALTER. Campo novo em entidade nativa = tabela de extensão + merge-on-root (skill `merge-on-root`)
+11. **Tabela nativa sem DDL** — nem CREATE nem ALTER. Campo novo em entidade nativa = tabela de extensão + merge-on-root (skill `merge-on-root`), exceto tabela que o projeto já declara em `<nativeTable>` com `<field>`, que segue o padrão dela (skill `merge-on-root`, "Tabela nativa já estendida pelo projeto")
 12. **Campos auditoria** — `DHALTER DATE`, `DHCREATE DATE` e `CODUSU NUMBER(10)` **opcionais**. Perguntar usuário se deseja incluir
 13. **Sem ponto-e-vírgula** — não colocar `;` no final SQL
 14. **`ordem` única** — cada `<sql>` no mesmo arquivo com `ordem` distinta
@@ -470,7 +470,7 @@ Exemplos completos de XMLs — `V001-CREATE_TABLE_PRXXYZCAD.xml` (PK simples), `
 
 ### Tabela nativa (`<nativeTable>` no dicionário)
 
-- [ ] **Nenhum script** na tabela nativa. Campo novo → tabela de extensão (checklist de tabela nova acima + skill `merge-on-root`).
+- [ ] **Nenhum script** na tabela nativa. Campo novo → tabela de extensão (checklist de tabela nova acima + skill `merge-on-root`). Exceção: tabela que o projeto já declara em `<nativeTable>` com `<field>` (legado) — `ALTER TABLE` por coluna, no padrão dos scripts existentes.
 
 ### Adição de coluna em tabela existente (evolução)
 

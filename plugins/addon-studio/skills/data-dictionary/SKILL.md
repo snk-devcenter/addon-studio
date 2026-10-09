@@ -47,7 +47,7 @@ Entidade Java (`@JapeEntity`) = classe dominio **limpa** — so `@Column(name = 
 |:------------------|:-------------------------------------------------------------------------|
 | `<table />`       | Tabela **nova** criada pelo add-on.                                      |
 | `<treeTable />`   | Tabela **hierarquica** (pai/filho) — cadastros tipo centro de custo, categorias de produto, organogramas. Framework gera UI tree + campos `CODIGOPAI`/`ANALITICO`/`GRAU`. Detalhes em [`references/tree-table.md`](references/tree-table.md). |
-| `<nativeTable />` | Tabela **nativa** Sankhya Om: so para declarar `<nativeInstance>` com `<relationShip>` (ex.: relacao de merge-on-root). **Nao** adiciona campo nem instancia nova — campo novo em entidade nativa e skill `merge-on-root`. Ver 1.10. |
+| `<nativeTable />` | Tabela **nativa** Sankhya Om: so para declarar `<nativeInstance>` com `<relationShip>` (ex.: relacao de merge-on-root). **Nao** adiciona campo nem instancia nova — campo novo em entidade nativa e skill `merge-on-root`, exceto tabela que o projeto ja declara em `<nativeTable>` com `<field>`, que segue o padrao dela (skill `merge-on-root`, "Tabela nativa já estendida pelo projeto"). Ver 1.10. |
 | `<nativeFolder />`| Encaixe em pasta nativa Sankhya: atributo `name` (`CONFIGURACOES_CADASTROS`/`_CONSULTA`/`_ROTINA`/`_RELATORIO`), filhos iguais aos de `<folder>`. Detalhes em [`references/menu.md`](references/menu.md). |
 | `<menu />`        | Estrutura de menu/navegacao do add-on. Container para `<folder>`, `<dynamicForm>`, `<dynamicTreeView>`, `<ui>`, `<dashboard>`. **Todo no de menu leva `resourceId` explicito de no maximo 50 caracteres** — sem isso o deploy pode derrubar o add-on inteiro. Detalhes em [`references/menu.md`](references/menu.md). |
 | `<dynamicForm />` | Tela CRUD declarativa (sem JS/HTML) gerada a partir de uma `<instance>` da tabela. Vai dentro de `<menu>`/`<folder>`. Detalhes em [`references/dynamic-form.md`](references/dynamic-form.md). |
@@ -437,7 +437,7 @@ Campos que referenciam outra entidade: `dataType="PESQUISA"` + `targetInstance`,
 
 `<nativeTable>` so declara relacao em instancia nativa: `<nativeInstance>` com `<relationShip>`. **Sem** `<primaryKey>`, `sequenceType`, `<fields>` ou `<instance>` nova.
 
-- **Campo novo em entidade nativa nao vai aqui.** O `<fields>` de `<nativeTable>` cria coluna na tabela nativa e o `metadados.xsd` o marca como deprecated. O caminho e uma tabela de extensao com merge-on-root — skill `merge-on-root`.
+- **Campo novo em entidade nativa nao vai aqui.** O `<fields>` de `<nativeTable>` cria coluna na tabela nativa e o `metadados.xsd` o marca como deprecated. O caminho e uma tabela de extensao com merge-on-root — skill `merge-on-root`. Exceção: `<nativeTable>` que o projeto ja tem com `<fields>` (legado) — campo novo dessa tabela entra no `<fields>` dela, como os existentes.
 - **Instancia nova do addon sobre tabela nativa** tambem nao se usa mais: a informacao nova vai para a tabela de extensao, com instancia propria em `<table>`.
 
 Uso tipico — relacao de merge-on-root na instancia nativa:
@@ -463,7 +463,7 @@ Combine com `isNativeTable = true` **e** `isNativeInstance = true` no `@JapeEnti
 
 > `<nativeInstance>` aceita apenas `<relationShip>` opcional — sem `<description>`, sem campos.
 
-> Projeto que ja tem `<field>` em `<nativeTable>`: nao acrescente outros. Campo novo vai para a tabela de extensao.
+> Projeto legado que ja tem `<field>` em `<nativeTable>`: essa tabela segue o padrao dela — campo novo entra no mesmo `<fields>` (com o `ALTER TABLE` da skill `database`), sem apontar defeito nem migrar para extensao. Merge-on-root so para tabela nativa que o projeto ainda nao declara.
 
 ---
 
@@ -539,7 +539,7 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 ## 4.1 Checklist: Criando XML do zero (solicitacao do usuario)
 
 1. [ ] Criar `<NOME_TABELA>.xml` em `datadictionary/`.
-2. [ ] `<table>` pra tabela do addon. `<nativeTable>` so para relacao em `<nativeInstance>` (nome reusa entidade do ERP) — campo novo em tabela nativa e `merge-on-root`.
+2. [ ] `<table>` pra tabela do addon. `<nativeTable>` so para relacao em `<nativeInstance>` (nome reusa entidade do ERP) — campo novo em tabela nativa e `merge-on-root`, exceto tabela que o projeto ja declara em `<nativeTable>` com `<field>`, que segue o padrao dela (skill `merge-on-root`, "Tabela nativa já estendida pelo projeto").
 3. [ ] `sequenceType="A"` + `sequenceField="<coluna PK>"` (default — inclui config/log/historico). `"M"` so nas excecoes da secao 1.4.
 4. [ ] Declarar `<description>` da `<table>` (vai pra `TDDTAB.DESCRTAB`, NOT NULL).
 5. [ ] Declarar `<primaryKey>` com campos PK.
@@ -597,7 +597,7 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 | Usar `@Expression` ou `@GeneratedValue` no Java  | Remover — vao pra `<expression>` e `sequenceType` no XML.       |
 | `@JoinColumn` com `name` e `referencedColumnName` invertidos | `name` = campo local (na tabela com `@JoinColumn`). `referencedColumnName` = campo na referenciada. Ver [`references/xml-to-java.md`](references/xml-to-java.md), seção "FK que referencia campo nao-PK". |
 | Usar `<instance>` para instancia nativa Sankhya em `<nativeTable>` | Usar `<nativeInstance>`. `<instance>` faz o builder regravar a entrada no `metadata.xml`; durante o deploy a instancia e re-mapeada para o owner do addon e quebra regras/validacoes nativas. |
-| `<field>` dentro de `<nativeTable><fields>` | Campo vai para tabela de extensao com merge-on-root (skill `merge-on-root`) — o XSD marca esse `<fields>` como deprecated. |
+| `<field>` dentro de `<nativeTable><fields>` em tabela que o projeto ainda nao estendia | Campo vai para tabela de extensao com merge-on-root (skill `merge-on-root`) — o XSD marca esse `<fields>` como deprecated. `<nativeTable>` legado que ja tem `<fields>` segue o padrao dele. |
 | `<instance>` nova do addon dentro de `<nativeTable>` | Tabela de extensao com instancia propria em `<table>` + merge-on-root. |
 | Esquecer `<nativeInstance>` quando o `entity` Java reusa nome nativo (`CabecalhoNota`, `Parceiro`, `Produto`, etc.) | Trocar `<instance>` por `<nativeInstance>` no XML e adicionar `isNativeInstance = true` no `@JapeEntity`. |
 
