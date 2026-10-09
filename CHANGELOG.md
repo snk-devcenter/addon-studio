@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.4.3] - 2026-10-08
+
 ### Corrigido
 
 - Skill `listener` documenta os gotchas do `ModifingFields`: `getOldValue` de campo não alterado lê o VO do evento (não o valor anterior), `getNewValue` lança exceção, `getModifingFields`/`getOldVO` só valem em update, e `isModifingAny` substitui o `||` de `isModifing`. Skill `test` orienta usar `ModifingFields` real em vez de mock no teste de listener.
@@ -441,7 +443,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.2...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.3...HEAD
+[3.4.3]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.2...v3.4.3
 [3.4.2]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.1...v3.4.2
 [3.4.1]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.0...v3.4.1
 [3.4.0]: https://github.com/snk-devcenter/addon-studio/compare/v3.3.0...v3.4.0
