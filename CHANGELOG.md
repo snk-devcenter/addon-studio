@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Corrigido
+
+- Exemplo de anatomia da skill `listener` deixa de reaproveitar o `beforeInsert` no `beforeUpdate`: no update o VO só traz o delta, e o campo não alterado entrava como zero no cálculo. O exemplo lê o valor novo do campo alterado e o anterior via `getOldVO()`.
+
 ## [3.4.4] - 2026-10-09
 
 ### Alterado

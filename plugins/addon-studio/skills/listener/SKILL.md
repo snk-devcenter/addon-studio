@@ -34,6 +34,7 @@ compatibility: Sankhya Addon Studio 2.0 (Wildfly/EJB + JAPE SDK). Java 8, Gradle
 import br.com.sankhya.jape.event.PersistenceEvent;
 import br.com.sankhya.jape.event.PersistenceEventAdapter;
 import br.com.sankhya.jape.vo.DynamicVO;
+import br.com.sankhya.jape.vo.EntityVO;
 import br.com.sankhya.studio.annotations.Listener;
 import com.google.inject.Inject;
 import lombok.extern.java.Log;
@@ -62,15 +63,23 @@ public class PrxXyzPedidoListener extends PersistenceEventAdapter {
     @Override
     public void beforeUpdate(PersistenceEvent event) throws Exception {
         // Recalcula apenas se algum campo relevante mudou
-        if (event.getModifingFields().isModifingAny("VLRUNIT,QTD")) {
-            beforeInsert(event);
-        }
+        if (!event.getModifingFields().isModifingAny("VLRUNIT,QTD")) return;
+        BigDecimal total = calculoService.calcularTotal(valorAtual(event, "VLRUNIT"),
+            valorAtual(event, "QTD"));
+        ((DynamicVO) event.getVo()).setProperty("VLRTOT", total);
+    }
+
+    // VO do update so traz os campos alterados: o que nao mudou vem do registro anterior
+    private static BigDecimal valorAtual(PersistenceEvent event, String campo) {
+        EntityVO origem = event.getModifingFields().isModifing(campo) ? event.getVo() : event.getOldVO();
+        return ((DynamicVO) origem).asBigDecimalOrZero(campo);
     }
 }
 ```
 
 - Classe **estende** `br.com.sankhya.jape.event.PersistenceEventAdapter` e sobrescreve só os eventos de interesse.
 - Listener é **entrypoint fino**: filtra o evento, manipula o `DynamicVO` e **delega a regra de negócio** a service/use case injetado.
+- No update o VO do evento só traz PK + campos alterados — **não** reaproveite o `beforeInsert` lendo o VO: campo não alterado viria `null` (zero no cálculo). Valor atual = novo se alterado, senão `getOldVO()`. Regra na entidade tipada: §7.
 
 ---
 
@@ -384,7 +393,7 @@ public void afterUpdate(PersistenceEvent event) throws Exception {
 |:---------------------------------------------------------------------|:-----------------------------------------------------------------------|
 | Usar `getVo()` sem cast                                             | `(DynamicVO) event.getVo()`                                           |
 | Update sem filtrar por `getModifingFields().isModifing(...)`        | Filtrar campo alterado — listener dispara em **qualquer** update      |
-| Ler campo não alterado do VO em update esperando valor              | VO de update só traz o delta — recarregar pela PK se precisar do todo |
+| Ler campo não alterado do VO em update esperando valor              | VO de update só traz o delta — `getOldVO()` em `beforeUpdate`; recarregar pela PK em `after*` |
 | Chamada HTTP/API externa síncrona no listener                       | Tabela-fila + `@Job`/worker assíncrono                                |
 | Gravar na própria instância sem guard clause de estado              | Guard clause anti-loop (ver §9)                                       |
 | Abrir/fechar conexão JDBC própria                                   | `event.getJdbcWrapper()` — nunca fechar                               |
