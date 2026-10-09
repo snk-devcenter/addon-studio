@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Alterado
+
+- Skill `listener` ensina a aplicar a regra na entidade tipada sem apagar dados: explica por que `EntityMapper.fromVO` + `updateVO` anula as colunas fora do evento em `beforeUpdate` e traz o padrão `EntidadeDoEvento` (estado completo via `getOldVO` + `ModifingFields`, grava no VO só as colunas alteradas). Skill `test` mostra como testar listener com `DynamicVOPojo` e `ModifingFields` reais, verificando que coluna fora do evento fica intocada.
+
 ## [3.4.3] - 2026-10-08
 
 ### Corrigido

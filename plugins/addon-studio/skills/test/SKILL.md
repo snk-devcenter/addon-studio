@@ -359,6 +359,56 @@ campos.put("QTD", new Object[]{ antigo, novo }); // {valor anterior, valor novo}
 when(event.getModifingFields()).thenReturn(campos);
 ```
 
+## Teste de listener com VO real (`DynamicVOPojo`)
+
+`br.com.sankhya.jape.vo.DynamicVOPojo` e um `DynamicVO`/`EntityVO` concreto que funciona sem
+servidor, inclusive com `EntityMapper.fromVO`. Vem do JAPE, no mesmo classpath de teste do
+`ModifingFields`. Monte o evento como o JAPE entrega e verifique o VO resultante, nao cada
+`setProperty`:
+
+- insert: `getVo()` com o registro inteiro.
+- update: `getVo()` so com PK + campos alterados; `getOldVO()` com o registro anterior completo;
+  `ModifingFields` real com `{antigo, novo}` de cada campo alterado.
+
+```java
+import br.com.sankhya.jape.event.ModifingFields;
+import br.com.sankhya.jape.event.PersistenceEvent;
+import br.com.sankhya.jape.vo.DynamicVOPojo;
+
+@Test
+void beforeUpdate_deveRecalcularVlrTot_quandoVlrUnitModificado() throws Exception {
+    DynamicVOPojo anterior = new DynamicVOPojo();       // registro completo
+    anterior.setProperty("NUPED", new BigDecimal(100));
+    anterior.setProperty("CODPROD", new BigDecimal(42));
+    anterior.setProperty("VLRUNIT", new BigDecimal("1"));
+    anterior.setProperty("QTD", new BigDecimal("2"));
+
+    DynamicVOPojo delta = spy(new DynamicVOPojo());     // update: so PK + campos alterados
+    delta.setProperty("NUPED", new BigDecimal(100));
+    delta.setProperty("VLRUNIT", new BigDecimal("5"));
+    ModifingFields alterados = new ModifingFields(delta);
+    alterados.put("VLRUNIT", new Object[] {new BigDecimal("1"), new BigDecimal("5")});
+
+    when(event.getVo()).thenReturn(delta);
+    when(event.getOldVO()).thenReturn(anterior);
+    when(event.getModifingFields()).thenReturn(alterados);
+    clearInvocations(delta);                            // descarta os setProperty da montagem
+
+    listener.beforeUpdate(event);
+
+    assertThat(delta.asBigDecimal("VLRTOT")).isEqualByComparingTo("10");
+    verify(delta, never()).setProperty(eq("CODPROD"), any()); // coluna fora do evento intocada
+}
+```
+
+- O `verify(delta, never())` sobre coluna fora do evento e o que pega listener gravando a entidade
+  inteira no VO (`EntityMapper.updateVO`), que anula essas colunas no banco — ver skill `listener`.
+- `DynamicVOPojo.buildClone()` (e `clean()`) nao e implementado: lanca `IllegalStateException`.
+  Codigo que clona o VO nao roda sobre `DynamicVOPojo`.
+- Mock so nos services de fronteira (gateway, repository); o service chamado pelo listener e real.
+- Prove que a suite pega gravacao indevida: force uma vez o listener a gravar todas as colunas
+  (ex.: `EntityMapper.updateVO`) e confira que algum teste quebra.
+
 ## Boas praticas
 
 - Declare `throws Exception` em metodos teste que interajam com repositorios JapeRepository.

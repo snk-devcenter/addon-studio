@@ -143,6 +143,8 @@ PrxXyzPedido pedido = EntityMapper.fromVO(event.getVo(), PrxXyzPedido.class);
 if (!pedido.deveProcessar()) return;  // regra de dominio na entidade, nao no listener
 ```
 
+> `fromVO(event.getVo())` monta a entidade com **o que veio no VO**: completa no insert, só PK + delta no update. Para ler e **alterar** a entidade em `beforeUpdate` e devolver ao VO, ver §7 — `EntityMapper.updateVO` ali apaga dados.
+
 ---
 
 ## 6. `ModifingFields` — filtrar updates por campo alterado
@@ -178,7 +180,147 @@ public void beforeUpdate(PersistenceEvent event) throws Exception {
 
 ---
 
-## 7. Injeção de dependência
+## 7. Regra na entidade tipada, não no `DynamicVO`
+
+O SDK converte nos dois sentidos: `EntityMapper.fromVO(EntityVO, Classe)` (VO → entidade) e `EntityMapper.updateVO(entidade, vo, Classe)` (entidade → VO). O par `fromVO` + regra + `updateVO` é seguro em `beforeInsert` — o VO da inclusão traz o registro inteiro — e **apaga dados em `beforeUpdate`**:
+
+- O VO do update só traz PK + campos alterados; os demais `@Column` chegam `null` na entidade.
+- `updateVO` grava **todo** `@Column` no VO, inclusive `null`. Não há rastreio de alteração para `@Column`.
+- O JAPE decide o que mudou **comparando valores** (VO × registro no banco): campo que não veio no evento é ignorado, mas campo que voltou `null` conta como alterado para nulo. As colunas fora do evento são anuladas — ou o update falha com `Propriedade requerida` se a coluna é `NOT NULL` sem default.
+
+Padrão: listener como ponte fina, regra em método de domínio da entidade (ou em service que recebe a entidade), e só as colunas que a regra mudou voltam ao VO:
+
+```java
+@Override
+public void beforeInsert(PersistenceEvent event) throws Exception {
+    EntidadeDoEvento<PrxXyzPedido> evento = EntidadeDoEvento.daInclusao(event, PrxXyzPedido.class);
+    evento.entidade().recalcularValorTotal();
+    evento.gravarAlteracoes();
+}
+
+@Override
+public void beforeUpdate(PersistenceEvent event) throws Exception {
+    ModifingFields alterados = event.getModifingFields();
+    EntidadeDoEvento<PrxXyzPedido> evento = EntidadeDoEvento.daAlteracao(event, PrxXyzPedido.class);
+    if (alterados.isModifingAny("VLRUNIT,QTD")) {
+        evento.entidade().recalcularValorTotal();
+    }
+    evento.gravarAlteracoes(); // so as colunas que a regra mudou
+}
+```
+
+`EntidadeDoEvento` **não é do SDK** — é classe do projeto, só com API pública do SDK. Implementação de referência:
+
+```java
+import br.com.sankhya.jape.event.ModifingFields;
+import br.com.sankhya.jape.event.PersistenceEvent;
+import br.com.sankhya.jape.vo.DynamicVO;
+import br.com.sankhya.jape.vo.EntityVO;
+import br.com.sankhya.sdk.data.repository.impl.EntityMapper;
+import br.com.sankhya.studio.persistence.Column;
+
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * Entidade montada a partir do evento de persistencia. {@link #gravarAlteracoes()} devolve ao VO
+ * so as colunas que mudaram: gravar a entidade inteira (EntityMapper.updateVO) anularia, no update,
+ * as colunas que nao vieram no evento.
+ */
+public final class EntidadeDoEvento<T> {
+
+    private final DynamicVO vo;
+    private final List<Field> colunas;
+    private final T original;
+    private final T entidade;
+
+    private EntidadeDoEvento(DynamicVO vo, List<Field> colunas, T original, T entidade) {
+        this.vo = vo;
+        this.colunas = colunas;
+        this.original = original;
+        this.entidade = entidade;
+    }
+
+    /** Para beforeInsert: o VO da inclusao ja traz o registro inteiro. */
+    public static <T> EntidadeDoEvento<T> daInclusao(PersistenceEvent evento, Class<T> tipo) {
+        T original = EntityMapper.fromVO(evento.getVo(), tipo);
+        T entidade = EntityMapper.fromVO(evento.getVo(), tipo);
+        return new EntidadeDoEvento<T>((DynamicVO) evento.getVo(), colunas(tipo), original, entidade);
+    }
+
+    /** Para beforeUpdate, o unico evento em que o JAPE entrega o registro anterior. */
+    public static <T> EntidadeDoEvento<T> daAlteracao(PersistenceEvent evento, Class<T> tipo)
+            throws IllegalAccessException {
+        List<Field> colunas = colunas(tipo);
+        EntityVO anterior = evento.getOldVO();
+        ModifingFields alterados = evento.getModifingFields();
+        T original = estadoAtual(anterior, alterados, tipo, colunas);
+        T entidade = estadoAtual(anterior, alterados, tipo, colunas);
+        return new EntidadeDoEvento<T>((DynamicVO) evento.getVo(), colunas, original, entidade);
+    }
+
+    public T entidade() {
+        return entidade;
+    }
+
+    /** Chamar so em before*: em after* o registro ja foi gravado. */
+    public void gravarAlteracoes() throws IllegalAccessException {
+        for (Field campo : colunas) {
+            Object antes = campo.get(original);
+            Object depois = campo.get(entidade);
+            if (!mesmoValor(antes, depois)) {
+                Column coluna = campo.getAnnotation(Column.class);
+                vo.setProperty(coluna.name(), EntityMapper.adaptToVo(campo, depois, coluna));
+            }
+        }
+    }
+
+    private static <T> T estadoAtual(EntityVO anterior, ModifingFields alterados, Class<T> tipo,
+                                     List<Field> colunas) throws IllegalAccessException {
+        T estado = EntityMapper.fromVO(anterior, tipo);
+        for (Field campo : colunas) {
+            String coluna = campo.getAnnotation(Column.class).name();
+            if (alterados.isModifing(coluna)) {
+                campo.set(estado, EntityMapper.adaptFromVO(campo, alterados.getNewValue(coluna)));
+            }
+        }
+        return estado;
+    }
+
+    private static List<Field> colunas(Class<?> tipo) {
+        List<Field> colunas = new ArrayList<Field>();
+        for (Field campo : tipo.getDeclaredFields()) {
+            if (campo.isAnnotationPresent(Column.class)) {
+                campo.setAccessible(true);
+                colunas.add(campo);
+            }
+        }
+        return colunas;
+    }
+
+    // BigDecimal compara por valor: 10.0 e 10.00 sao o mesmo valor e nao devem voltar ao VO.
+    private static boolean mesmoValor(Object antes, Object depois) {
+        if (antes instanceof BigDecimal && depois instanceof BigDecimal) {
+            return ((BigDecimal) antes).compareTo((BigDecimal) depois) == 0;
+        }
+        return Objects.equals(antes, depois);
+    }
+}
+```
+
+- `daInclusao`: `fromVO(event.getVo())`.
+- `daAlteracao`: `fromVO(event.getOldVO())` com os valores novos do `ModifingFields` por cima (`EntityMapper.adaptFromVO`) — o estado completo do registro depois do update.
+- `gravarAlteracoes()`: compara a entidade antes × depois, `@Column` a `@Column`, e grava no VO só o que mudou, convertido por `EntityMapper.adaptToVo` (enum → valor do banco, `Integer` → `BigDecimal`).
+- Só em `before*` — `getOldVO()` só existe em `beforeUpdate`. Cobre os `@Column` declarados na própria classe; PK composta (`@Embeddable`) e relacionamentos ficam de fora.
+- Em `after*` nada volta ao VO: `fromVO(event.getVo())` basta para ler a PK e recarregar pelo repository.
+- Teste com `DynamicVOPojo` real, verificando que coluna fora do evento fica intocada — ver skill `test`.
+
+---
+
+## 8. Injeção de dependência
 
 `@Listener` **suporta `@Inject` (Guice)** — não consta na documentação oficial, mas é suportado pelo SDK. Delegue a regra de negócio a services/use cases injetados via construtor:
 
@@ -209,7 +351,7 @@ public class PrxXyzPedidoListener extends PersistenceEventAdapter {
 
 ---
 
-## 8. Transação, loops e chamadas externas
+## 9. Transação, loops e chamadas externas
 
 O listener roda **dentro da transação da operação**:
 
@@ -236,7 +378,7 @@ public void afterUpdate(PersistenceEvent event) throws Exception {
 
 ---
 
-## 9. Anti-Patterns (PROIBIDO)
+## 10. Anti-Patterns (PROIBIDO)
 
 | Anti-Pattern                                                        | Correção                                                              |
 |:---------------------------------------------------------------------|:-----------------------------------------------------------------------|
@@ -244,7 +386,7 @@ public void afterUpdate(PersistenceEvent event) throws Exception {
 | Update sem filtrar por `getModifingFields().isModifing(...)`        | Filtrar campo alterado — listener dispara em **qualquer** update      |
 | Ler campo não alterado do VO em update esperando valor              | VO de update só traz o delta — recarregar pela PK se precisar do todo |
 | Chamada HTTP/API externa síncrona no listener                       | Tabela-fila + `@Job`/worker assíncrono                                |
-| Gravar na própria instância sem guard clause de estado              | Guard clause anti-loop (ver §8)                                       |
+| Gravar na própria instância sem guard clause de estado              | Guard clause anti-loop (ver §9)                                       |
 | Abrir/fechar conexão JDBC própria                                   | `event.getJdbcWrapper()` — nunca fechar                               |
 | Alterar VO em `after*` esperando persistir                          | Alterações persistem só em `before*`                                  |
 | `throw new RuntimeException(...)` cru para bloquear operação        | Exceção tipada com mensagem de negócio                                |
@@ -252,10 +394,11 @@ public void afterUpdate(PersistenceEvent event) throws Exception {
 | `@Inject` de `javax.inject`                                         | Usar `com.google.inject.Inject`                                       |
 | `System.out` / SLF4J para log                                       | `@Log` Lombok + `java.util.logging`                                   |
 | Import `br.com.sankhya.jape.util.JdbcWrapper`                       | Pacote correto: `br.com.sankhya.jape.dao.JdbcWrapper`                 |
+| `EntityMapper.updateVO` da entidade inteira em `beforeUpdate`        | Gravar só as colunas que a regra mudou (`EntidadeDoEvento`, ver §7)   |
 
 ---
 
-## 10. Checklist: Novo `@Listener`
+## 11. Checklist: Novo `@Listener`
 
 1. [ ] Classe estende `br.com.sankhya.jape.event.PersistenceEventAdapter` e sobrescreve **só** os eventos necessários.
 2. [ ] Anotada com `@Listener(instanceNames = "<NomeDaInstancia>")` — nome lógico da entidade, **não** a tabela; array para múltiplas instâncias.
@@ -267,6 +410,7 @@ public void afterUpdate(PersistenceEvent event) throws Exception {
 8. [ ] Sem chamada externa síncrona — tabela-fila + `@Job`/worker se precisar integrar.
 9. [ ] Guard clause anti-loop se o listener (ou quem ele chama) grava na própria instância.
 10. [ ] `@Log` Lombok para logging (`java.util.logging`).
+11. [ ] Regra na entidade tipada em `beforeUpdate`: estado completo via `getOldVO()` + `ModifingFields`, e só as colunas alteradas voltam ao VO — nunca `updateVO` da entidade inteira (ver §7).
 
 ## Skills relacionadas
 
