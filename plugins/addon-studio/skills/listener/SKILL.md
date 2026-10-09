@@ -202,23 +202,23 @@ Padrão: listener como ponte fina, regra em método de domínio da entidade (ou 
 ```java
 @Override
 public void beforeInsert(PersistenceEvent event) throws Exception {
-    EntidadeDoEvento<PrxXyzPedido> evento = EntidadeDoEvento.daInclusao(event, PrxXyzPedido.class);
-    evento.entidade().recalcularValorTotal();
-    evento.gravarAlteracoes();
+    EventEntity<PrxXyzPedido> pedido = EventEntity.fromInsert(event, PrxXyzPedido.class);
+    pedido.entity().recalcularValorTotal();
+    pedido.writeChanges();
 }
 
 @Override
 public void beforeUpdate(PersistenceEvent event) throws Exception {
     ModifingFields alterados = event.getModifingFields();
-    EntidadeDoEvento<PrxXyzPedido> evento = EntidadeDoEvento.daAlteracao(event, PrxXyzPedido.class);
+    EventEntity<PrxXyzPedido> pedido = EventEntity.fromUpdate(event, PrxXyzPedido.class);
     if (alterados.isModifingAny("VLRUNIT,QTD")) {
-        evento.entidade().recalcularValorTotal();
+        pedido.entity().recalcularValorTotal();
     }
-    evento.gravarAlteracoes(); // so as colunas que a regra mudou
+    pedido.writeChanges(); // so as colunas que a regra mudou
 }
 ```
 
-`EntidadeDoEvento` **não é do SDK** — é classe do projeto, só com API pública do SDK. Implementação de referência:
+`EventEntity` **não é do SDK** — é classe do projeto, só com API pública do SDK. Implementação de referência:
 
 ```java
 import br.com.sankhya.jape.event.ModifingFields;
@@ -235,94 +235,94 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Entidade montada a partir do evento de persistencia. {@link #gravarAlteracoes()} devolve ao VO
+ * Entidade montada a partir do evento de persistencia. {@link #writeChanges()} devolve ao VO
  * so as colunas que mudaram: gravar a entidade inteira (EntityMapper.updateVO) anularia, no update,
  * as colunas que nao vieram no evento.
  */
-public final class EntidadeDoEvento<T> {
+public final class EventEntity<T> {
 
     private final DynamicVO vo;
-    private final List<Field> colunas;
+    private final List<Field> columns;
     private final T original;
-    private final T entidade;
+    private final T entity;
 
-    private EntidadeDoEvento(DynamicVO vo, List<Field> colunas, T original, T entidade) {
+    private EventEntity(DynamicVO vo, List<Field> columns, T original, T entity) {
         this.vo = vo;
-        this.colunas = colunas;
+        this.columns = columns;
         this.original = original;
-        this.entidade = entidade;
+        this.entity = entity;
     }
 
     /** Para beforeInsert: o VO da inclusao ja traz o registro inteiro. */
-    public static <T> EntidadeDoEvento<T> daInclusao(PersistenceEvent evento, Class<T> tipo) {
-        T original = EntityMapper.fromVO(evento.getVo(), tipo);
-        T entidade = EntityMapper.fromVO(evento.getVo(), tipo);
-        return new EntidadeDoEvento<T>((DynamicVO) evento.getVo(), colunas(tipo), original, entidade);
+    public static <T> EventEntity<T> fromInsert(PersistenceEvent event, Class<T> type) {
+        T original = EntityMapper.fromVO(event.getVo(), type);
+        T entity = EntityMapper.fromVO(event.getVo(), type);
+        return new EventEntity<T>((DynamicVO) event.getVo(), columns(type), original, entity);
     }
 
     /** Para beforeUpdate, o unico evento em que o JAPE entrega o registro anterior. */
-    public static <T> EntidadeDoEvento<T> daAlteracao(PersistenceEvent evento, Class<T> tipo)
+    public static <T> EventEntity<T> fromUpdate(PersistenceEvent event, Class<T> type)
             throws IllegalAccessException {
-        List<Field> colunas = colunas(tipo);
-        EntityVO anterior = evento.getOldVO();
-        ModifingFields alterados = evento.getModifingFields();
-        T original = estadoAtual(anterior, alterados, tipo, colunas);
-        T entidade = estadoAtual(anterior, alterados, tipo, colunas);
-        return new EntidadeDoEvento<T>((DynamicVO) evento.getVo(), colunas, original, entidade);
+        List<Field> columns = columns(type);
+        EntityVO previous = event.getOldVO();
+        ModifingFields modified = event.getModifingFields();
+        T original = currentState(previous, modified, type, columns);
+        T entity = currentState(previous, modified, type, columns);
+        return new EventEntity<T>((DynamicVO) event.getVo(), columns, original, entity);
     }
 
-    public T entidade() {
-        return entidade;
+    public T entity() {
+        return entity;
     }
 
     /** Chamar so em before*: em after* o registro ja foi gravado. */
-    public void gravarAlteracoes() throws IllegalAccessException {
-        for (Field campo : colunas) {
-            Object antes = campo.get(original);
-            Object depois = campo.get(entidade);
-            if (!mesmoValor(antes, depois)) {
-                Column coluna = campo.getAnnotation(Column.class);
-                vo.setProperty(coluna.name(), EntityMapper.adaptToVo(campo, depois, coluna));
+    public void writeChanges() throws IllegalAccessException {
+        for (Field field : columns) {
+            Object before = field.get(original);
+            Object after = field.get(entity);
+            if (!sameValue(before, after)) {
+                Column column = field.getAnnotation(Column.class);
+                vo.setProperty(column.name(), EntityMapper.adaptToVo(field, after, column));
             }
         }
     }
 
-    private static <T> T estadoAtual(EntityVO anterior, ModifingFields alterados, Class<T> tipo,
-                                     List<Field> colunas) throws IllegalAccessException {
-        T estado = EntityMapper.fromVO(anterior, tipo);
-        for (Field campo : colunas) {
-            String coluna = campo.getAnnotation(Column.class).name();
-            if (alterados.isModifing(coluna)) {
-                campo.set(estado, EntityMapper.adaptFromVO(campo, alterados.getNewValue(coluna)));
+    private static <T> T currentState(EntityVO previous, ModifingFields modified, Class<T> type,
+                                      List<Field> columns) throws IllegalAccessException {
+        T state = EntityMapper.fromVO(previous, type);
+        for (Field field : columns) {
+            String column = field.getAnnotation(Column.class).name();
+            if (modified.isModifing(column)) {
+                field.set(state, EntityMapper.adaptFromVO(field, modified.getNewValue(column)));
             }
         }
-        return estado;
+        return state;
     }
 
-    private static List<Field> colunas(Class<?> tipo) {
-        List<Field> colunas = new ArrayList<Field>();
-        for (Field campo : tipo.getDeclaredFields()) {
-            if (campo.isAnnotationPresent(Column.class)) {
-                campo.setAccessible(true);
-                colunas.add(campo);
+    private static List<Field> columns(Class<?> type) {
+        List<Field> columns = new ArrayList<Field>();
+        for (Field field : type.getDeclaredFields()) {
+            if (field.isAnnotationPresent(Column.class)) {
+                field.setAccessible(true);
+                columns.add(field);
             }
         }
-        return colunas;
+        return columns;
     }
 
     // BigDecimal compara por valor: 10.0 e 10.00 sao o mesmo valor e nao devem voltar ao VO.
-    private static boolean mesmoValor(Object antes, Object depois) {
-        if (antes instanceof BigDecimal && depois instanceof BigDecimal) {
-            return ((BigDecimal) antes).compareTo((BigDecimal) depois) == 0;
+    private static boolean sameValue(Object before, Object after) {
+        if (before instanceof BigDecimal && after instanceof BigDecimal) {
+            return ((BigDecimal) before).compareTo((BigDecimal) after) == 0;
         }
-        return Objects.equals(antes, depois);
+        return Objects.equals(before, after);
     }
 }
 ```
 
-- `daInclusao`: `fromVO(event.getVo())`.
-- `daAlteracao`: `fromVO(event.getOldVO())` com os valores novos do `ModifingFields` por cima (`EntityMapper.adaptFromVO`) — o estado completo do registro depois do update.
-- `gravarAlteracoes()`: compara a entidade antes × depois, `@Column` a `@Column`, e grava no VO só o que mudou, convertido por `EntityMapper.adaptToVo` (enum → valor do banco, `Integer` → `BigDecimal`).
+- `fromInsert`: `fromVO(event.getVo())`.
+- `fromUpdate`: `fromVO(event.getOldVO())` com os valores novos do `ModifingFields` por cima (`EntityMapper.adaptFromVO`) — o estado completo do registro depois do update.
+- `writeChanges()`: compara a entidade antes × depois, `@Column` a `@Column`, e grava no VO só o que mudou, convertido por `EntityMapper.adaptToVo` (enum → valor do banco, `Integer` → `BigDecimal`).
 - Só em `before*` — `getOldVO()` só existe em `beforeUpdate`. Cobre os `@Column` declarados na própria classe; PK composta (`@Embeddable`) e relacionamentos ficam de fora.
 - Em `after*` nada volta ao VO: `fromVO(event.getVo())` basta para ler a PK e recarregar pelo repository.
 - Teste com `DynamicVOPojo` real, verificando que coluna fora do evento fica intocada — ver skill `test`.
@@ -403,7 +403,7 @@ public void afterUpdate(PersistenceEvent event) throws Exception {
 | `@Inject` de `javax.inject`                                         | Usar `com.google.inject.Inject`                                       |
 | `System.out` / SLF4J para log                                       | `@Log` Lombok + `java.util.logging`                                   |
 | Import `br.com.sankhya.jape.util.JdbcWrapper`                       | Pacote correto: `br.com.sankhya.jape.dao.JdbcWrapper`                 |
-| `EntityMapper.updateVO` da entidade inteira em `beforeUpdate`        | Gravar só as colunas que a regra mudou (`EntidadeDoEvento`, ver §7)   |
+| `EntityMapper.updateVO` da entidade inteira em `beforeUpdate`        | Gravar só as colunas que a regra mudou (`EventEntity`, ver §7)        |
 
 ---
 
