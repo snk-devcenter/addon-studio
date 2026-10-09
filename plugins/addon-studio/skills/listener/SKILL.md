@@ -62,8 +62,7 @@ public class PrxXyzPedidoListener extends PersistenceEventAdapter {
     @Override
     public void beforeUpdate(PersistenceEvent event) throws Exception {
         // Recalcula apenas se algum campo relevante mudou
-        if (event.getModifingFields().isModifing("VLRUNIT")
-                || event.getModifingFields().isModifing("QTD")) {
+        if (event.getModifingFields().isModifingAny("VLRUNIT,QTD")) {
             beforeInsert(event);
         }
     }
@@ -113,8 +112,8 @@ public class PrxXyzPedidoListener extends PersistenceEventAdapter {
 | Método                  | Retorno                                       | Uso                                                                       |
 |:-------------------------|:-----------------------------------------------|:----------------------------------------------------------------------------|
 | `getVo()`               | `EntityVO` — **cast para `DynamicVO`**         | Dados atuais do registro (ler/alterar campos).                             |
-| `getOldVO()`            | `EntityVO`                                     | Dados **antes** da modificação (updates).                                  |
-| `getModifingFields()`   | `ModifingFields`                               | Quais campos estão sendo alterados (updates) — ver §6.                     |
+| `getOldVO()`            | `EntityVO`                                     | Registro completo **antes** do update, relido do banco. Só em `beforeUpdate`. |
+| `getModifingFields()`   | `ModifingFields`                               | Quais campos estão sendo alterados. Só em `beforeUpdate`/`afterUpdate` — ver §6. |
 | `getJdbcWrapper()`      | `br.com.sankhya.jape.dao.JdbcWrapper`          | JDBC **dentro da transação corrente**. Nunca feche a conexão.              |
 | `getEntity()`           | `EntityMetaData`                               | Metadados da entidade (`getEntity().getName()`, etc.).                     |
 
@@ -153,9 +152,9 @@ if (!pedido.deveProcessar()) return;  // regra de dominio na entidade, nao no li
 | Método                        | Uso                                                            |
 |:-------------------------------|:-----------------------------------------------------------------|
 | `isModifing("CAMPO")`         | `true` se o campo está sendo alterado neste update.             |
-| `isModifingAny("C1,C2")`      | `true` se qualquer um dos campos está sendo alterado.           |
-| `getOldValue("CAMPO")`        | Valor anterior do campo.                                        |
-| `getNewValue("CAMPO")`        | Valor novo do campo.                                            |
+| `isModifingAny("C1,C2")`      | `true` se qualquer um dos campos (lista separada por vírgula) está sendo alterado — substitui `isModifing(A) \|\| isModifing(B)`. |
+| `getOldValue("CAMPO")`        | Valor anterior do campo **alterado** (ver gotchas abaixo).      |
+| `getNewValue("CAMPO")`        | Valor novo do campo **alterado** (ver gotchas abaixo).          |
 
 ```java
 @Override
@@ -170,6 +169,12 @@ public void beforeUpdate(PersistenceEvent event) throws Exception {
 ```
 
 > **Gotcha:** no update, `vo.getProperty("CAMPO")` de campo **não alterado** pode vir `null` — o VO do evento só carrega o delta. Precisa do registro completo em `after*`? Leia a PK do VO e recarregue via repository/use case.
+
+> **Gotchas do `ModifingFields`:**
+> - `getOldValue("CAMPO")` de campo **não alterado** **não** devolve o valor anterior: devolve `getProperty` do próprio VO do evento (o mesmo delta de `getVo()`), que pode vir `null`. Estado anterior completo: `event.getOldVO()`.
+> - `getNewValue("CAMPO")` de campo não alterado lança `IllegalStateException` — cheque `isModifing("CAMPO")` antes.
+> - `getModifingFields()` fora de `beforeUpdate`/`afterUpdate` e `getOldVO()` fora de `beforeUpdate` lançam `PersistenceError`.
+> - Em teste, **não** use mock de `ModifingFields`: stub de `isModifing` não alimenta `isModifingAny` (devolve `false`) e o teste passa sem exercitar o filtro. Use a instância real — ver skill `test`.
 
 ---
 

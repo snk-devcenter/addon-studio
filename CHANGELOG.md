@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Corrigido
+
+- Skill `listener` documenta os gotchas do `ModifingFields`: `getOldValue` de campo não alterado lê o VO do evento (não o valor anterior), `getNewValue` lança exceção, `getModifingFields`/`getOldVO` só valem em update, e `isModifingAny` substitui o `||` de `isModifing`. Skill `test` orienta usar `ModifingFields` real em vez de mock no teste de listener.
+
 ## [3.4.2] - 2026-10-08
 
 ### Corrigido

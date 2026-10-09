@@ -345,6 +345,20 @@ void deveLancarIntegrationException_quandoGatewayFalhar() throws Exception {
 }
 ```
 
+## Armadilha: mock de `ModifingFields` em teste de listener
+
+Stub de `isModifing` num mock de `ModifingFields` nao vale para `isModifingAny`,
+que no mock devolve `false` — o listener pula o filtro e o teste passa sem testar
+nada. `ModifingFields` e um `HashMap` simples: use a instancia real.
+
+```java
+import br.com.sankhya.jape.event.ModifingFields;
+
+ModifingFields campos = new ModifingFields(vo);
+campos.put("QTD", new Object[]{ antigo, novo }); // {valor anterior, valor novo}
+when(event.getModifingFields()).thenReturn(campos);
+```
+
 ## Boas praticas
 
 - Declare `throws Exception` em metodos teste que interajam com repositorios JapeRepository.
