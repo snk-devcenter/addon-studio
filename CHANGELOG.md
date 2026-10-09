@@ -10,11 +10,11 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.4.5] - 2026-10-09
+
 ### Alterado
 
 - Padrão de entidade tipada da skill `listener` passa a se chamar `EventEntity`, com API em inglês: `fromInsert`, `fromUpdate`, `entity()` e `writeChanges()` (antes `EntidadeDoEvento`, `daInclusao`, `daAlteracao`, `entidade()` e `gravarAlteracoes()`).
-
-## [3.4.5] - 2026-10-09
 
 ### Corrigido
 
