@@ -165,6 +165,20 @@ public enum StatusProcesso {
 }
 ```
 
+Coluna NUMBER/INT com lista de opções:
+
+```java
+
+@AllArgsConstructor
+@Getter
+public enum ModeloDocumento {
+    NOTA_FISCAL_ELETRONICA(BigDecimal.valueOf(55)),
+    CONHECIMENTO_TRANSPORTE_ELETRONICO(BigDecimal.valueOf(57));
+
+    private final BigDecimal value;
+}
+```
+
 ## PK Composta (`@Embeddable`)
 
 ```java
