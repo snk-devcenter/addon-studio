@@ -86,6 +86,8 @@ List<Pedido> findByPeriodo(
 );
 ```
 
+> **Parâmetro de tipo com `@GlobalTypeAdapter` vai como primitivo.** O `@Criteria` não aplica o `TypeAdapter` ao parâmetro (o `@NativeQuery` aplica): declare o tipo da coluna e passe o valor convertido, ex.: `findByCpfCnpj(String cpfCnpj)` chamado com `cpfCnpj.getDigits()`. Com o value object no parâmetro, compila e falha em runtime. Ver skill `type-adapter`, seção 5.1.
+
 #### Operadores SQL suportados em `@Criteria`
 
 | Operador / construção                   | Exemplo de clause                                             |

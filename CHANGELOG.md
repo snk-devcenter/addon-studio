@@ -10,6 +10,14 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Adicionado
+
+- Skill `type-adapter` ensina a trocar o tipo de uma coluna, inclusive de entidade nativa, por um value object de domínio com `TypeAdapter`, e alerta que o adapter é global por tipo e não vale para parâmetro de `@Criteria`, que deve receber o valor primitivo. Skills `entity` e `repository` remetem a ela.
+
+### Alterado
+
+- Skill `type-adapter` deixa de sobrescrever `setType` com corpo vazio nos exemplos e no checklist: o método é `default` em `TypeAdapter` e só precisa ser implementado quando o adaptador depende do subtipo concreto.
+
 ### Corrigido
 
 - Skill `entity` manda o enum de coluna NUMBER/INT com lista de opções usar `private final BigDecimal value` (texto/char continua `String`): com `String`, o `EnumAdapter` gravava texto no VO e `vo.asInt`/`asBigDecimal` lançava `ClassCastException`, inclusive em listener nativo.

@@ -285,6 +285,7 @@ Nenhum outro atributo. Ponto.
 | `CHECKBOX`                       | `Boolean`                              |
 | `PESQUISA` (FK)                  | `BigDecimal` ou `Integer` (tipo da FK) |
 | Campo com opções (enum no banco) | Enum Java (veja seção 9)               |
+| Coluna com tipo de domínio (value object), inclusive em entidade nativa | Tipo próprio + `TypeAdapter` (skill `type-adapter`, seção 5.1) |
 | Demais `dataType`s (`CAIXA_TEXTO`, `HORA`, `LISTA`, `HTML`, `ARQUIVO`, ...) | Ver tabela completa em `data-dictionary/references/xml-to-java.md` |
 
 ### Quando usar `Integer` vs `BigDecimal`
