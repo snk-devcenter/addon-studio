@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Corrigido
+
+- Skill `entity` manda o enum de coluna NUMBER/INT com lista de opções usar `private final BigDecimal value` (texto/char continua `String`): com `String`, o `EnumAdapter` gravava texto no VO e `vo.asInt`/`asBigDecimal` lançava `ClassCastException`, inclusive em listener nativo.
+
 ## [3.4.5] - 2026-10-09
 
 ### Alterado

@@ -94,7 +94,7 @@ Tipos de classe que aparecem aqui:
 |:-------------------------------------------|:------------------------------------------------------------------------|
 | Entidade persistida (`@JapeEntity`)        | Mapeia tabela do banco                                                  |
 | PK composta (`@Embeddable`)                | Classe que agrupa colunas-chave de uma PK composta                      |
-| Enum (Value Object)                        | Valores finitos persistidos como texto curto                            |
+| Enum (Value Object)                        | Valores finitos persistidos com o tipo da coluna (texto ou número)      |
 | Classe sem persistencia                    | Conceito de negocio, sem `@JapeEntity` (`@Data` + factory methods)      |
 
 ---
@@ -133,7 +133,7 @@ Valores finitos de domínio (listas opções). Usados como tipo campo em entidad
 |:-----------------------------------|:-----------------------------------------------------------------|
 | `@Getter` (Lombok)                 | Gera o getter de `value` automaticamente.                        |
 | `@AllArgsConstructor` (Lombok)     | Gera o construtor que recebe `value`.                            |
-| Campo `private final String value` | Valor persistido no banco (código curto).                        |
+| Campo `private final <Tipo> value` | Valor persistido no banco. `<Tipo>` segue a coluna: `String` em coluna texto/char, `BigDecimal` em coluna numérica (NUMBER/INT). |
 | Nome da classe                     | Sufixo `Enum` é opcional (`TipoStatus` ou `TipoStatusEnum`) — siga o que o projeto já usa. Obrigatório é o campo de opções ser `enum`, não `String`. |
 
 **Anatomia completa:**
@@ -151,6 +151,25 @@ public enum TipoEnum {
     private final String value;
 }
 ```
+
+Coluna numérica (NUMBER/INT) com lista de opções usa `BigDecimal`:
+
+```java
+import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public enum ModeloDocumento {
+    NOTA_FISCAL_ELETRONICA(BigDecimal.valueOf(55)),
+    CONHECIMENTO_TRANSPORTE_ELETRONICO(BigDecimal.valueOf(57));
+
+    private final BigDecimal value;
+}
+```
+
+O `EnumAdapter` grava no VO o objeto que `getValue()` devolve, sem converter. `value` `String` numa coluna NUMBER põe uma `String` no VO, e o primeiro `vo.asInt`/`asBigDecimal` sobre o campo (inclusive em listener nativo) lança `ClassCastException: String cannot be cast to BigDecimal`.
 
 ### 3.4 Classe de Domínio Puro
 
@@ -287,7 +306,7 @@ Padrões de relacionamento — `@OneToMany` (pai → filhos), `@OneToOne` + `@Jo
 
 ## 9. Enums (Value Objects)
 
-Enums = valores finitos armazenados no banco como texto curto (geralmente 1 caractere).
+Enums = valores finitos armazenados no banco com o tipo da coluna: texto curto (geralmente 1 caractere) ou número.
 
 ### Estrutura padrão
 
@@ -310,9 +329,9 @@ public enum NomeEnum {
 | Regra                | Detalhe                                                  |
 |:---------------------|:---------------------------------------------------------|
 | Anotações            | `@AllArgsConstructor`, `@Getter`                         |
-| Campo `value`        | `private final String value` — valor armazenado no banco |
+| Campo `value`        | Valor armazenado no banco, com o tipo da coluna: `private final String value` em texto/char, `private final BigDecimal value` em NUMBER/INT (ver §3.3) |
 | Nomes das constantes | `UPPER_SNAKE_CASE` descritivo                            |
-| Valores              | Strings curtas (1-2 caracteres, geralmente)              |
+| Valores              | Texto: strings curtas (1-2 caracteres, geralmente). Número: `BigDecimal.valueOf(n)` |
 
 ### Uso na entidade
 
@@ -444,7 +463,7 @@ Entidades completas — PK simples, PK composta + relacionamentos, `@OneToMany` 
 
 1. [ ] Criar conforme arquitetura do projeto.
 2. [ ] Anotar com `@AllArgsConstructor`, `@Getter`.
-3. [ ] Campo `private final String value`.
+3. [ ] Campo `private final String value` em coluna texto/char; `private final BigDecimal value` em coluna NUMBER/INT.
 4. [ ] Constantes em `UPPER_SNAKE_CASE`.
 
 ### Criando uma PK composta
@@ -471,6 +490,7 @@ Entidades completas — PK simples, PK composta + relacionamentos, `@OneToMany` 
 | Esquecer `@NoArgsConstructor`                           | Obrigatório para o framework instanciar a entidade.       |
 | Usar `String` para campo `CHECKBOX`                     | Use `Boolean` — o framework converte S/N automaticamente. |
 | Usar `Integer` para PKs nativas (NUNOTA, CODPARC)       | Use `BigDecimal` — padrão do Sankhya Om.                  |
+| Enum com `value` `String` em coluna NUMBER/INT          | `private final BigDecimal value` — `String` no VO quebra `vo.asInt`/`asBigDecimal` com `ClassCastException`. |
 
 
 ## Skills relacionadas
