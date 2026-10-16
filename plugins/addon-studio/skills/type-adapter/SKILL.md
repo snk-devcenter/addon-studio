@@ -73,9 +73,6 @@ public class MeuTipoAdapter
         // converter MeuTipo -> valor para banco
     }
 
-    @Override
-    public void setType(Class<? extends MeuTipo> aClass) {}  // geralmente vazio
-
     // JsonSerializer<T> — conversao Java -> JSON
     @Override
     public JsonElement serialize(MeuTipo value, Type type, JsonSerializationContext ctx) {
@@ -103,7 +100,7 @@ public class MeuTipoAdapter
 |:-----------------------------------------------|:--------------------------------------------------------------|
 | `fromVO(Object o)`                             | Converte valor do banco/VO para objeto Java. Trate `null`.    |
 | `toVO(T value)`                                | Converte objeto Java para valor compativel com Jape/banco.    |
-| `setType(Class<? extends T> aClass)`           | Injetado pelo SDK com o tipo concreto. Geralmente corpo vazio.|
+| `setType(Class<? extends T> aClass)`           | `default`: injetado pelo SDK com o tipo concreto. So sobrescreva se precisar do subtipo. |
 
 ---
 
@@ -141,9 +138,6 @@ public class ZonedDateTimeAdapter
     }
 
     @Override
-    public void setType(Class<? extends ZonedDateTime> aClass) {}
-
-    @Override
     public ZonedDateTime deserialize(JsonElement el, Type type, JsonDeserializationContext ctx)
             throws JsonParseException {
         try {
@@ -159,6 +153,70 @@ public class ZonedDateTimeAdapter
     }
 }
 ```
+
+---
+
+## 5.1 Value object de domínio numa coluna (inclusive de entidade nativa)
+
+`TypeAdapter<T>` deixa a entidade expor um tipo de domínio no lugar do primitivo da coluna. Vale também em entidade nativa (`isNativeInstance = true`): a tabela não muda, o banco continua guardando o primitivo.
+
+```java
+import br.com.sankhya.studio.adapters.TypeAdapter;
+import br.com.sankhya.studio.stereotypes.GlobalTypeAdapter;
+import java.util.Optional;
+
+public final class CpfCnpj {
+    private final String digits;
+
+    private CpfCnpj(String digits) { this.digits = digits; }
+
+    /** Vazio quando o texto é nulo ou não tem dígito. */
+    public static Optional<CpfCnpj> of(String text) {
+        String digits = text == null ? "" : text.replaceAll("\\D", "");
+        return digits.isEmpty() ? Optional.<CpfCnpj>empty() : Optional.of(new CpfCnpj(digits));
+    }
+
+    public String getDigits() { return digits; }
+    // equals/hashCode por digits
+}
+
+@GlobalTypeAdapter
+public class CpfCnpjAdapter implements TypeAdapter<CpfCnpj> {
+
+    // Coluna nativa com dado legado vira null: lançar aqui impede ler a linha inteira
+    @Override
+    public CpfCnpj fromVO(Object value) {
+        return value == null ? null : CpfCnpj.of(value.toString()).orElse(null);
+    }
+
+    @Override
+    public Object toVO(CpfCnpj value) {
+        return value == null ? null : value.getDigits();
+    }
+}
+
+// Entidade nativa: só o tipo do campo muda
+@Column(name = "CGC_CPF")
+private CpfCnpj cpfCnpj;
+
+// Repository: @Criteria recebe o primitivo, não o value object
+@Criteria(clause = "this.CGC_CPF = :cpfCnpj")
+Optional<Parceiro> findByCpfCnpj(String cpfCnpj);   // chamada: findByCpfCnpj(cpfCnpj.getDigits())
+```
+
+`setType` é `default` na interface: só sobrescreva se precisar do subtipo concreto.
+
+**Escopo global, por tipo.** O adapter vale para todo campo daquele tipo, em todas as entidades do addon. Coluna que precisa de outra conversão pede outro tipo, não outro adapter para o mesmo tipo. O build gera `custom-global-type-adapters.properties` (`JAPE=<tipo>:<adapter>`) e o `StartListener` gerado registra o adapter.
+
+**Onde o adapter vale:**
+
+| Ponto                                   | Adapter aplicado?                                                              |
+|:----------------------------------------|:-------------------------------------------------------------------------------|
+| Leitura da entidade                     | Sim (`fromVO`)                                                                 |
+| Gravação (`save`)                       | Sim (`toVO`)                                                                   |
+| Campo de PK                             | Sim                                                                            |
+| Parâmetro de `@NativeQuery`             | Sim                                                                            |
+| Parâmetro de `@Criteria`                | **Não.** O SDK passa o objeto sem adaptar: compila e falha em runtime. Receba o primitivo (`getDigits()`) |
 
 ---
 
@@ -191,7 +249,7 @@ Ja registrados automaticamente. Nao recriar sem necessidade — apenas sobrescre
 - **Implemente somente o necessario**: se o tipo e usado so em JSON (DTO), basta `JsonSerializer` + `JsonDeserializer`. Se usado em entidade (`@JapeEntity`), inclua `TypeAdapter`.
 - **Trate `null` explicitamente**: `fromVO` e `toVO` devem retornar `null` se entrada for `null`.
 - **Lance `JsonParseException`** em erros de desserializacao — nunca retorne `null` silenciosamente.
-- **`setType` pode ficar vazio** na maioria dos casos — e util apenas quando o adaptador precisa conhecer o subtipo concreto em runtime.
+- **Nao sobrescreva `setType`**: e `default` na interface. So implemente quando o adaptador precisa conhecer o subtipo concreto em runtime.
 - **Nao recriar nativos sem motivo**: verifique a tabela de nativos antes de criar novo adaptador.
 
 ---
@@ -205,6 +263,8 @@ Ja registrados automaticamente. Nao recriar sem necessidade — apenas sobrescre
 | Engolir excecao no `deserialize` retornando `null`    | Lancar `JsonParseException` com mensagem clara                  |
 | Logica de negocio dentro do adaptador                 | Adaptador so converte — negocio fica no Service                 |
 | Implementar as 3 interfaces quando so JSON e usado    | Implementar apenas `JsonSerializer` + `JsonDeserializer`        |
+| Value object como parametro de `@Criteria`            | Receber o primitivo (`getDigits()`): `@Criteria` nao aplica o adapter — compila e falha em runtime (secao 5.1) |
+| Adapter de `String`/`BigDecimal` para converter uma coluna so | O adapter e global por tipo e pegaria todas as colunas: criar um tipo de dominio proprio (secao 5.1) |
 
 ---
 
@@ -216,11 +276,13 @@ Ja registrados automaticamente. Nao recriar sem necessidade — apenas sobrescre
 4. [ ] Implementar `fromVO` / `toVO` se tipo for usado em `@JapeEntity`.
 5. [ ] Tratar `null` em todos os caminhos de `fromVO` e `toVO`.
 6. [ ] Lancar `JsonParseException` (nunca silenciar) em erros de `deserialize`.
-7. [ ] Manter `setType` com corpo vazio se subtipo concreto nao for relevante.
-8. [ ] Registrar no modulo Guice os **services/dependencias injetados** na classe — o adapter em si nao precisa de binding (o SDK o descobre pela anotacao `@GlobalTypeAdapter`). Ver `dependency-injection`.
+7. [ ] Nao sobrescrever `setType` (e `default` na interface), a menos que o adaptador precise do subtipo concreto.
+8. [ ] Tipo usado em `@Criteria`? O metodo do repository recebe o valor primitivo, nao o tipo adaptado (secao 5.1).
+9. [ ] Registrar no modulo Guice os **services/dependencias injetados** na classe — o adapter em si nao precisa de binding (o SDK o descobre pela anotacao `@GlobalTypeAdapter`). Ver `dependency-injection`.
 
 ## Skills relacionadas
 
 - `entity` — tipos suportados em @JapeEntity
+- `repository` — parâmetro de `@Criteria` com tipo adaptado vai como primitivo
 - `controller` — DTOs e serialização JSON nos endpoints; endpoint REST que serializa/desserializa via adapter
 - `dependency-injection` — wiring Guice dos services injetados no adapter
