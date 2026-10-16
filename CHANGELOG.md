@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.4.6] - 2026-10-16
+
 ### Adicionado
 
 - Skill `type-adapter` ensina a trocar o tipo de uma coluna, inclusive de entidade nativa, por um value object de domínio com `TypeAdapter`, e alerta que o adapter é global por tipo e não vale para parâmetro de `@Criteria`, que deve receber o valor primitivo. Skills `entity` e `repository` remetem a ela.
@@ -471,7 +473,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.5...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.6...HEAD
+[3.4.6]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.5...v3.4.6
 [3.4.5]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.4...v3.4.5
 [3.4.4]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.3...v3.4.4
 [3.4.3]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.2...v3.4.3
