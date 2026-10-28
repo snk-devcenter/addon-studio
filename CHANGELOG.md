@@ -13,6 +13,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 ### Adicionado
 
 - Skill `init` declara o `addon-studio` no `.claude/settings.json` do projeto, para que quem clonar receba o marketplace e o aviso de plugin não instalado; o `ADDON.md` instrui o agente a pedir a instalação quando as skills do plugin não estiverem na sessão.
+- Plugin avisa na linha de dica do prompt e num toast quando há versão nova publicada, com o comando de atualização, e quando o `docs/ADDON.md` do projeto ficou desatualizado em relação ao plugin instalado.
+- Skill `init` liga o `autoUpdate` do marketplace `snk-devcenter` no `.claude/settings.json` do projeto: o Claude Code passa a atualizar o plugin sozinho.
 
 ## [3.4.6] - 2026-10-16
 

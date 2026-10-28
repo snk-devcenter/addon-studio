@@ -64,7 +64,8 @@ Garanta que o `.claude/settings.json` (o arquivo versionado, não o `settings.lo
 {
   "extraKnownMarketplaces": {
     "snk-devcenter": {
-      "source": { "source": "github", "repo": "snk-devcenter/addon-studio" }
+      "source": { "source": "github", "repo": "snk-devcenter/addon-studio" },
+      "autoUpdate": true
     }
   },
   "enabledPlugins": {
@@ -75,8 +76,10 @@ Garanta que o `.claude/settings.json` (o arquivo versionado, não o `settings.lo
 
 Com o arquivo commitado, quem clona o projeto e aceita a confiança da pasta recebe o marketplace registrado e o aviso do Claude Code de que o `addon-studio` está habilitado no projeto mas não instalado. O plugin vem de fonte externa, então cada dev ainda roda `/plugin install addon-studio@snk-devcenter` uma vez.
 
+`autoUpdate` liga a atualização automática do marketplace, que é desligada por padrão para marketplace de terceiro: o Claude Code atualiza o plugin em segundo plano depois do início da sessão e avisa `Plugin updated: addon-studio · Run /reload-plugins to apply`.
+
 - **Arquivo não existe:** crie com exatamente o JSON acima.
-- **Arquivo existe:** mescle só as duas entradas (`snk-devcenter` em `extraKnownMarketplaces`, `addon-studio@snk-devcenter` em `enabledPlugins`), preservando todas as outras chaves e entradas. Se `addon-studio@snk-devcenter` estiver `false`, não mude: foi decisão do projeto, apenas reporte.
+- **Arquivo existe:** mescle só as duas entradas (`snk-devcenter` em `extraKnownMarketplaces`, `addon-studio@snk-devcenter` em `enabledPlugins`), preservando todas as outras chaves e entradas. Se `addon-studio@snk-devcenter` ou o `autoUpdate` da entrada `snk-devcenter` estiverem `false`, não mude: foi decisão do projeto, apenas reporte. Entrada `snk-devcenter` sem `autoUpdate` (de um `init` anterior) recebe `true`.
 - JSON estrito: sem comentário nem vírgula sobrando, senão o Claude Code descarta o arquivo inteiro na próxima sessão.
 
 ### 5. Confirmar para o dev
