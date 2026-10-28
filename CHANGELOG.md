@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.5.0] - 2026-10-28
+
 ### Adicionado
 
 - Skill `init` declara o `addon-studio` no `.claude/settings.json` do projeto, para que quem clonar receba o marketplace e o aviso de plugin não instalado; o `ADDON.md` instrui o agente a pedir a instalação quando as skills do plugin não estiverem na sessão.
@@ -479,7 +481,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.6...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.0...HEAD
+[3.5.0]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.6...v3.5.0
 [3.4.6]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.5...v3.4.6
 [3.4.5]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.4...v3.4.5
 [3.4.4]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.3...v3.4.4
