@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Alterado
+
+- README documenta que, em contas Team e Enterprise, os hooks de contexto do plugin dependem de instalação gerenciada pela organização e que o `/addon-studio:init` cobre as regras nesse caso.
+
 ## [3.5.0] - 2026-10-28
 
 ### Adicionado
