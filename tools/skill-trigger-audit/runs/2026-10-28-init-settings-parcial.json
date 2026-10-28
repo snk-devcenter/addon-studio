@@ -1,0 +1,20 @@
+{
+ "B4C1": {"skills": ["type-adapter"], "conf": 90},
+ "B4C2": {"skills": ["macros"], "conf": 95},
+ "B4C3": {"skills": [], "conf": 75},
+ "B4C4": {"skills": ["dependency-injection"], "conf": 85},
+ "B4C5": {"skills": ["job"], "conf": 95},
+ "B4C6": {"skills": ["build"], "conf": 70},
+ "B8C1": {"skills": ["sankhya-js"], "conf": 90},
+ "B8C2": {"skills": ["type-adapter"], "conf": 95},
+ "B8C3": {"skills": ["database"], "conf": 80},
+ "B8C4": {"skills": ["init"], "conf": 85},
+ "B8C5": {"skills": ["dependency-injection"], "conf": 92},
+ "B8C6": {"skills": ["repository"], "conf": 92},
+ "B12C1": {"skills": ["data-dictionary"], "conf": 95},
+ "B12C2": {"skills": ["sankhya-js"], "conf": 97},
+ "B12C3": {"skills": ["action-button"], "conf": 80},
+ "B12C4": {"skills": ["database", "entity"], "conf": 88},
+ "B12C5": {"skills": ["init"], "conf": 92},
+ "B12C6": {"skills": ["type-adapter"], "conf": 93}
+}

@@ -6,6 +6,8 @@ Projeto **Sankhya Addon Studio 2.0** — plugin Gradle `br.com.sankhya.addonstud
 
 Antes de gerar ou alterar código, case o domínio do artefato com a skill do plugin cujos gatilhos batem — cada skill declara os seus na própria `description`, inclusive quando **não** deve ser usada. Delegação a sub-agent: os `description` deles dizem quando entram.
 
+Se nenhuma skill `addon-studio:*` estiver disponível na sessão, o plugin não está instalado: antes de escrever código do SDK, avise o dev para rodar `/plugin marketplace add snk-devcenter/addon-studio` e `/plugin install addon-studio@snk-devcenter` e reiniciar a sessão.
+
 ## Regras universais (sempre ativas)
 
 - **Java 8 estrito** — sem `var`, `List.of`/`Map.of`, `String.isBlank`, `Stream.toList`, `Optional.orElseThrow()` sem argumento (Java 10; a sobrecarga `orElseThrow(Supplier)` é Java 8 e é permitida), records, sealed, text blocks.
