@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Adicionado
+
+- Skill `init` declara o `addon-studio` no `.claude/settings.json` do projeto, para que quem clonar receba o marketplace e o aviso de plugin não instalado; o `ADDON.md` instrui o agente a pedir a instalação quando as skills do plugin não estiverem na sessão.
+
 ## [3.4.6] - 2026-10-16
 
 ### Adicionado
