@@ -239,6 +239,15 @@ O plugin detecta o padrão existente. Quando não houver referência suficiente,
 
 O hook de pós-edição converte `.java`, `.xml`, `.kt` e `.properties` para ISO-8859-1. Se o conteúdo já tiver sido corrompido na leitura, o hook interrompe a conversão e pede a restauração do trecho para evitar perda silenciosa.
 
+### Contas Team e Enterprise
+
+Em contas Team e Enterprise, o Claude Code só repassa os eventos `prompt.attachment` e `prompt.context` aos plugins que a organização instala pelas configurações gerenciadas. Se a organização não fizer essa instalação, o Claude Code avisa que esses hooks do plugin não rodam, e o efeito é:
+
+- Sem `/addon-studio:init`, as regras universais do `docs/ADDON.md` não entram no contexto. Rode o `init` em cada projeto.
+- Fora de projeto Addon Studio, as skills do plugin continuam listadas para o modelo, mas a invocação delas segue bloqueada.
+
+Para os hooks rodarem, um administrador da organização precisa instalar o plugin como gerenciado.
+
 ## Atualização
 
 Execute novamente o instalador do seu provider e sistema operacional. Ele atualiza o marketplace, o plugin e, no Codex, os agents pessoais.
