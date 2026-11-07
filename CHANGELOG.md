@@ -10,6 +10,26 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Adicionado
+
+- Skill `listener` ensina a rodar efeito externo (HTTP, e-mail, fila) só depois do commit com `addOnSucessTXTask`, e as skills `job` e `business-rule` apontam para o padrão.
+- Skill `repository` documenta `saveNew()` e a diferença para o upsert do `save()`.
+- Skill `data-dictionary` avisa que `<ui>` e `<dynamicForm>` intercalados no mesmo `<folder>` descartam telas em silêncio e que `license` no menu quebra o `clean test`.
+- Skills `database` e `data-dictionary` avisam que `--` dentro de comentário XML derruba o `convertMetadata`.
+- Skill `database` documenta que `<sql>` com erro vira `FORCED_IGNORE` sem abortar o arquivo, que `ADD ... DEFAULT` em tabela nativa pode cair em trigger e que Oracle 11g é o mínimo suportado.
+- Skill `jsp` documenta as armadilhas de parâmetro nomeado da `<snk:query>`, o bind de DATE que perde o índice e como obter o usuário logado sem `AuthenticationInfo.getCurrent()`.
+- Skill `listener` avisa que `""` gravado pelo nativo em coluna numérica quebra o `fromVO`.
+- Skill `dependency-injection` aponta o `.env` com `STUDIO_FEATURE_SDK=true` quando a DI não é gerada.
+
+### Corrigido
+
+- Skill `entity` decide o tipo do `value` do enum pelo `dataType` do dicionário, não pela coluna física: `LISTA` sobre coluna NUMBER pede `String`.
+- Skills `entity` e `data-dictionary` deixam de exigir XML no `datadictionary/` para tabela nativa só lida pelo addon.
+- Skill `data-dictionary` orienta `TEXTO` + `String` para VARCHAR e `CAIXA_TEXTO` + `char[]` só para CLOB.
+- Skill `repository` deixa de ensinar campo S/N de tabela nativa como parâmetro `Boolean` de `@Criteria`, que dá `ORA-01722`.
+- Skill `macros` deixa de recomendar `maxLines()`, que gera SQL inválido, e passa a exigir colchete em `diffdays`/`diffhour`.
+- Skills `controller` e `job` explicam que o `@Transactional` de método não vai para o descritor EJB.
+
 ## [3.5.1] - 2026-11-06
 
 ### Corrigido

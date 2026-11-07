@@ -110,6 +110,13 @@ Pra **cada** `<field>` no XML, cria campo Java com **so** `@Column(name = "<nome
 >
 > O criterio e o `TIPCAMPO`, nao o tipo fisico da coluna: coluna CLOB no banco declarada no XML como `TEXTO` (`TIPCAMPO = S`) continua `String`. Precisa de texto no dominio? Converta na borda, preservando `null`: `s == null ? null : s.toCharArray()` na gravacao e `chars == null ? null : new String(chars)` na leitura. Teste que pega o tipo errado sem servidor: skill `test`, "Teste de mapeamento CLOB/BLOB".
 
+> **Nao declare `CAIXA_TEXTO`/`HTML` sobre coluna `VARCHAR`/`VARCHAR2`.** O JAPE trata o campo como CLOB pelo dicionario e, na subida do modulo, avisa que o banco nao bate: `AVISO: <Instancia>->CAMPO(Clob) com um tipo incompatível no banco de dados: java.sql.Types 12` (12 = `VARCHAR`). Escolha um dos dois pares, coerentes nas tres pontas:
+>
+> | Coluna no dbscript | `dataType` no XML | Tipo Java | Efeito |
+> |:-------------------|:------------------|:----------|:-------|
+> | `VARCHAR2(n)`      | `TEXTO`           | `String`  | Campo single-line, limite de `n` |
+> | `CLOB`             | `CAIXA_TEXTO`     | `char[]`  | Textarea, sem limite de 4000 |
+
 > Campos `dataType="PESQUISA"` geram campo Java com tipo FK conforme `targetType`. Nao precisa `@OneToOne` / `@JoinColumn` so por ser PESQUISA — so adiciona quando entidade precisa navegar pra referenciada no dominio.
 
 ---

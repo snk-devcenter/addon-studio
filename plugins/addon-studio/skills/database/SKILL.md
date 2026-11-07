@@ -100,6 +100,14 @@ CREATE TABLE EXEMPLO (CODEXEMPLO NUMBER(10) NOT NULL, CONSTRAINT PK_EXEMPLO PRIM
 | `SE_EXISTIR`     | Executa **se** objeto **já existir** banco                                | ALTER TABLE modificar coluna existente, DROP, migração dados            |
 | `SEMPRE`         | Executa **toda vez** deploy, independente existência                      | INSERT/UPDATE dados config, scripts idempotentes. **Usar com cautela**  |
 
+> `SE_NAO_EXISTIR`/`SE_EXISTIR` conferem só o **nome** (`tipoObjeto` + `nomeObjeto`). Índice com outro nome sobre as mesmas colunas, ou constraint equivalente criada à mão no cliente, não é detectado: o `CREATE` roda e falha (`ORA-01408: such column list already indexed`).
+
+### `<sql>` com erro não aborta o arquivo
+
+Um `<sql>` que dá erro no banco é logado como `Script AUTOMATICAMENTE IGNORADO: (FORCED_IGNORE)` e a instalação **segue**: as `ordem` seguintes do mesmo `V<NNN>` rodam normalmente, e a etapa de scripts só termina "com alerta". O objeto do `<sql>` que falhou simplesmente não existe no cliente.
+
+Consequência: `ordem` **não é guarda**. Se a ordem 2 depende de a ordem 1 ter dado certo (limpar referências antes de apagar o dono, migrar dado antes de recriar CHECK), a ordem 2 precisa se proteger sozinha — `WHERE NOT EXISTS` nas referências, ou identificar o alvo por algo que sobreviva à etapa anterior. Senão o cliente fica em estado parcial, sem erro visível.
+
 ---
 
 ## Regras de Nomenclatura
@@ -200,6 +208,8 @@ Abreviacoes padrao ecossistema Sankhya:
 | INSERT sem tabela  | `SELECT 1 FROM DUAL`              | `SELECT 1`                            |
 
 > **Nota:** Oracle `DATE` guarda data+hora. SQL Server usar `DATETIME` mesmo efeito.
+>
+> **Oracle mínimo é 11g** (há cliente em XE). Sintaxe 12c+ (`GENERATED AS IDENTITY`, `OFFSET`/`FETCH`, `DEFAULT ON NULL`, identificador acima de 30 caracteres) passa no banco homologado e quebra no cliente com erro de sintaxe (`ORA-00933`, `ORA-00907`…). Erro de sintaxe num 11g/XE é defeito do script, não do banco.
 
 ---
 
@@ -416,6 +426,18 @@ V002-CREATE_TABLE_PRXXYZFAT.xml
 V003-CREATE_TABLE_PRXXYZIPA.xml
 ```
 
+### 14. `--` dentro de comentário XML
+
+```xml
+<!-- ERRADO — XML proíbe traço duplo dentro de comentário -->
+<!-- Indice de NUNOTA -- usado pela tela de conferencia -->
+
+<!-- CORRETO -->
+<!-- Indice de NUNOTA, usado pela tela de conferencia -->
+```
+
+> Derruba o `:convertMetadata` com `String '--' not allowed in comment ... [row,col]`, e nenhum teste roda — o job de CI sobe sem `test-results` e o log costuma parar antes da causa (reproduzir local). Vale para `dbscripts/` e `datadictionary/`. Script recebido de fora: varrer os `<!-- -->` por `--` antes de subir.
+
 ---
 
 ## Regras de Migração
@@ -471,12 +493,14 @@ Exemplos completos de XMLs — `V001-CREATE_TABLE_PRXXYZCAD.xml` (PK simples), `
 ### Tabela nativa (`<nativeTable>` no dicionário)
 
 - [ ] **Nenhum script** na tabela nativa. Campo novo → tabela de extensão (checklist de tabela nova acima + skill `merge-on-root`). Exceção: tabela que o projeto já declara em `<nativeTable>` com `<field>` (legado) — `ALTER TABLE` por coluna, no padrão dos scripts existentes.
+- [ ] Legado com `ALTER TABLE` na nativa: `ADD` **sem** `DEFAULT` (ver `references/script-patterns.md`, "Tabelas Nativas")
 
 ### Adição de coluna em tabela existente (evolução)
 
 - [ ] Verificar último `V<NNN>-*.xml` existente para definir `N+1` (3 dígitos, zero-padded)
 - [ ] Nomear arquivo `V<NNN>-ALTER_TABLE_<TABELA>.xml`
 - [ ] ALTER TABLE ADD com `executar="SE_NAO_EXISTIR"` e `tipoObjeto="COLUMN"`
+- [ ] Tabela já tem linhas no cliente: coluna `NOT NULL` sem valor dá `ORA-01758`, e CHECK nova sobre dado fora do domínio dá `ORA-02293` — conferir o que o código e as integrações já gravam antes de restringir
 - [ ] Incluir **ambas** tags `<mssql>` e `<oracle>` em cada `<sql>`
 - [ ] `ordem` única e sequencial no arquivo
 - [ ] **Não colocar ponto-e-vírgula** no final SQL

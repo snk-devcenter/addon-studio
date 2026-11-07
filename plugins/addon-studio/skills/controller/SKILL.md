@@ -101,7 +101,7 @@ Define comportamento transacional **padrao** todos metodos classe. E o atributo 
 
 ## 3. Controle Transacional com `@Transactional`
 
-`@Transactional` so pode ser aplicado em **metodo** (`@Target(METHOD)`) e **sempre tem precedencia** sobre `transactionType` da classe.
+`@Transactional` so pode ser aplicado em **metodo** (`@Target(METHOD)`) e **nao entra no descritor EJB**: o build gera um unico `<container-transaction>` por bean, com `<method-name>*</method-name>` e o `transactionType` da classe valendo para todos os metodos. O `@Transactional` age dentro do metodo, pelo interceptor do SDK, depois que o container ja aplicou o `transactionType`.
 
 ### Valores de `Transactional.TxType`
 

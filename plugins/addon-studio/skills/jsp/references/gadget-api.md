@@ -38,7 +38,9 @@ Três consequências que compensam a escolha:
 
 - **Autorização é a da plataforma.** O serviço tem controle de acesso próprio, por recurso.
   Não há regra de segurança escrita pelo add-on, e portanto nada para manter.
-- **Teto de linhas é o da plataforma.** O serviço corta o resultado num teto fixo, e o
+- **Teto de linhas é o da plataforma.** O serviço corta o resultado num teto fixo de
+  1.000 linhas (constante do `ExecQuerySP`, sem como subir; passar disso dá "O limite para
+  esse serviço é 1000 linhas por vez."), e o
   parâmetro **`MAXROWEXECQUERY`** ajusta o limite quando o cliente não pede um valor
   explícito. Pedir `maxRows = -1` — o que o gadget faz e o template reproduz — usa o teto
   máximo e ignora o parâmetro, cujo padrão é menor.

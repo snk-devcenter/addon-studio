@@ -154,6 +154,10 @@ if (!pedido.deveProcessar()) return;  // regra de dominio na entidade, nao no li
 
 > `fromVO(event.getVo())` monta a entidade com **o que veio no VO**: completa no insert, só PK + delta no update. Para ler e **alterar** a entidade em `beforeUpdate` e devolver ao VO, ver §7 — `EntityMapper.updateVO` ali apaga dados.
 
+> **Gotcha — variável tipada:** a assinatura é `<T> T fromVO(EntityVO, Class<?>)` — o `T` vem do lado esquerdo da atribuição, não da classe passada. Encadear a chamada (`EntityMapper.fromVO(event.getVo(), PrxXyzPedido.class).deveProcessar()`) não compila: `cannot find symbol ... location: class Object`. Guarde numa variável do tipo da entidade, como acima.
+
+> **Gotcha — `""` em coluna numérica:** código nativo pode gravar `""` em coluna numérica para dizer "vazio". O `NumberAdapter` do SDK faz `new BigDecimal(String)` com o valor, e `fromVO`/`adaptFromVO` estouram `NumberFormatException` antes de a regra rodar. Paliativo no projeto: troque o `""` por `null` só durante a conversão (tire do VO antes do `fromVO` e devolva depois, para não mudar o que o nativo grava) e, no `fromUpdate` do `EventEntity` (§7), trate o `getNewValue` antes do `adaptFromVO`. `NumberFormatException` em listener de instância nativa: suspeite primeiro de `""`.
+
 ---
 
 ## 6. `ModifingFields` — filtrar updates por campo alterado
@@ -368,7 +372,45 @@ O listener roda **dentro da transação da operação**:
 - Acesso a banco na mesma transação: use `event.getJdbcWrapper()` ou repositories — **nunca** abra/feche conexão própria.
 - **Classe enxuta (boa prática):** o listener filtra o evento e delega a regra para outra classe injetada (ex.: service `@Component`) — a organização em camadas é do projeto.
 - **`@Transactional` no service chamado daqui: confira o `TxType`.** O listener já roda dentro da sessão e da transação da operação. `@Transactional` bare (`REQUIRED`, o default) entra nessa transação — caso seguro. `REQUIRES_NEW` suspende a transação da operação e commita por conta própria: se a operação for revertida depois, o que ele gravou fica. `NOT_SUPPORTED` roda fora dela e não participa do commit/rollback. Nada falha na hora — o bug só aparece quando a operação dá erro depois da chamada.
-- **Chamada externa síncrona (API HTTP) dentro do listener é PROIBIDA** — segura a transação e derruba o tempo de resposta da gravação. Padrão correto: gravar numa **tabela-fila** e processar via `@Job` ou worker pool assíncrono (fire-and-forget).
+- **Chamada externa síncrona (API HTTP) dentro do listener é PROIBIDA** — segura a transação e derruba o tempo de resposta da gravação. Padrão correto: gravar numa **tabela-fila** e processar via `@Job` ou worker pool assíncrono (fire-and-forget). Efeito que só não pode acontecer se a operação for desfeita, e cuja perda é tolerável: agende para depois do commit (abaixo).
+
+### Efeito externo só depois do commit
+
+HTTP, e-mail ou mensagem disparados dentro do listener saem mesmo que a operação dê rollback depois. O JAPE permite registrar uma tarefa que só roda se a transação commitar:
+
+```java
+import br.com.sankhya.jape.core.JapeSession;
+import br.com.sankhya.studio.stereotypes.Component;
+import com.google.inject.Inject;
+
+/** Roda a tarefa so depois do commit da transacao corrente; em rollback, nao roda. */
+@Component
+public class AfterCommit {
+
+    @Inject
+    public AfterCommit() {
+    }
+
+    public void run(Runnable task) throws Exception {
+        JapeSession.getCurrentSession().getTopMostHandle().addOnSucessTXTask(task);
+    }
+}
+```
+
+```java
+@Override
+public void afterUpdate(PersistenceEvent event) throws Exception {
+    if (!event.getModifingFields().isModifing("STATUS")) return;
+    BigDecimal nuPed = ((DynamicVO) event.getVo()).asBigDecimal("NUPED");
+    afterCommit.run(() -> notificacaoService.notificar(nuPed));
+}
+```
+
+- Grafia da plataforma: `addOnSucessTXTask` ("Sucess"). O par `addOnFailureTXTask` roda quando a transação **não** commita.
+- O registro exige transação ativa: fora dela, `IllegalStateException: Não existe uma transação ativa.` No listener sempre há; em controller/job, só dentro de método `@Transactional`.
+- A tarefa fica presa à transação corrente. Registrada dentro de um método `REQUIRES_NEW`, roda no commit **dele**, mesmo que a operação externa seja desfeita depois.
+- Roda no fim do commit, na mesma thread, com a transação já suspensa — **sem transação**. Para gravar, chame um método `@Transactional(Transactional.TxType.REQUIRES_NEW)`. HTTP lento ali não segura lock, mas ainda atrasa a resposta.
+- Exceção na tarefa é logada (`Erro ao executar task de sincronizacao de TX`) e **engolida**: a operação segue commitada, quem chamou não vê o erro e não há retentativa. Trate e logue dentro da tarefa. Entrega que não pode se perder continua sendo tabela-fila + `@Job`.
 
 ### Loop de eventos
 
@@ -384,6 +426,8 @@ public void afterUpdate(PersistenceEvent event) throws Exception {
     processamentoService.processar(vo.asBigDecimal("NUPED"));
 }
 ```
+
+> **Flag de sessão temporária como guard:** `JapeSession.scopedState`/`saveState`/`restoreState` só existem nas versões mais recentes do jape — se o build não os acha (`cannot find symbol`), use `JapeSession.putProperty` antes e `removeProperty` (ou o valor anterior de volta) num `finally`.
 
 ---
 

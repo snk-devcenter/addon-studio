@@ -414,6 +414,7 @@ Pontos de injeção que pedem o tipo concreto continuam funcionando sem alteraç
 | Erro | Correção |
 |:-----|:---------|
 | Usar `javax.inject.Inject` | Sempre `com.google.inject.Inject`. |
+| Build falha com `package com.google.inject does not exist` / `Couldn't find type jakarta.inject.Singleton`, e o KSP avisa `Unable to process: ...SankhyaAnnotationProcessor` | Falta o `.env` na raiz do projeto com `STUDIO_FEATURE_SDK=true`: sem a flag o plugin Gradle não põe o `sdk-sankhya` (que traz Guice e `jakarta.inject`) no classpath, e o EJB gerado faz `new` do controller em vez de injetar. Com a flag, o build imprime `Features Beta em uso. - SDK`. Versione o `.env` — sem ele, quem clona compila diferente. Não declare guice/jakarta.inject à mão no `build.gradle`: mascara o erro e a injeção continua sem acontecer. |
 | Adicionar `@Component` em `@Controller` | `@Controller` já gerenciado. Remove `@Component`. |
 | Adicionar `@Component` em `@Repository` | `@Repository` já gerenciado. Remove `@Component`. |
 | Criar implementação manual de Repository | Use interface `JapeRepository` — framework gera implementação. |

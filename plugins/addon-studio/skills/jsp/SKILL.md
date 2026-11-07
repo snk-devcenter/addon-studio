@@ -281,6 +281,14 @@ casar `<script>(.*?)</script>` procurando `<snk:` dentro.
 **Caractere fora do latin-1 vira `?`.** Vale para `─`, `…` e afins, mesmo com o `.jsp` em
 UTF-8 — use ASCII em arte de comentário. Acentuação normal de texto (`ç`, `ã`, `é`) funciona.
 
+**`AuthenticationInfo.getCurrent()` lança no `.jsp`.** A página roda no contexto web do
+add-on e nada registra o usuário na thread: em vez de `null`, vem `AuthenticationException`
+"Não existe informação de autenticação disponível neste processo" (`CORE_E00883`). Resolva
+como os servlets da própria plataforma (`Html5ComponentServlet`, `DownloadServlet`), em
+cascata: atributo de sessão `usuarioLogado` → `AuthenticationInfo.getCurrentOrNull()` →
+`MGESession.getSessaoPai(request.getSession()).getAttribute("usuarioLogado")`
+(`br.com.sankhya.modulemgr`, jar `mge-modulemgr`). Trate o `null` no fim da cascata.
+
 **`executeQuery` devolve string, não objeto** — e todo valor vem como string, inclusive
 coluna numérica. Converta no cliente.
 

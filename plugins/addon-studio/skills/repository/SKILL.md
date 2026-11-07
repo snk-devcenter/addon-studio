@@ -36,7 +36,8 @@ public interface VeiculoRepository extends JapeRepository<BigDecimal, Veiculo> {
 
 | Método                       | Descrição                                                                   | Lança       |
 |:-----------------------------|:----------------------------------------------------------------------------|:------------|
-| `save(T entity)`             | Salva ou atualiza entidade                                                  | `Exception` |
+| `save(T entity)`             | Upsert pela PK: atualiza se existe, inclui se não → retorna `T` gravado     | `Exception` |
+| `saveNew(T entity)`          | Só inclui; falha se a PK já existir → retorna `T` gravado                   | `Exception` |
 | `findByPK(ID id)`            | Busca por PK → retorna `T` (pode ser `null` — verificar com null-check)     | `Exception` |
 | `findAll()`                  | Retorna todas instâncias                                                    | `Exception` |
 | `findAll(Pageable pageable)` | Retorna página com ordenação → `Page<T>`                                    | `Exception` |
@@ -49,6 +50,12 @@ public interface VeiculoRepository extends JapeRepository<BigDecimal, Veiculo> {
 > MinhaEntidade e = repository.findByPK(id);
 > if (e == null) throw new MinhaException("Registro não encontrado: " + id);
 > ```
+>
+> **`save` x `saveNew`.** `save` procura o registro pela PK antes de decidir entre UPDATE e INSERT; `saveNew` vai direto ao INSERT. Registro que nasce sempre novo (cópia, linha de fila, log) vai por `saveNew`: é mais leve e nunca altera um registro existente por engano. Os dois aceitam entidade com mapeamento parcial, só com as colunas que o fluxo usa.
+>
+> **PK gerada volta no retorno.** Com PK gerada no INSERT (`sequenceType = "A"`, campo nulo antes de gravar), o `T` devolvido por `save`/`saveNew` já vem com a PK preenchida — use `entidade = repository.saveNew(entidade);` em vez de reler com `findByPK`.
+>
+> **Filtro que é a PK inteira vai por `findByPK`, não por `@Criteria`.** Com PK simples, `findByPK` resolve pela busca por chave do Jape (`EntityFacade.findEntityByPrimaryKey`), que reaproveita a entidade já carregada na transação; `@Criteria` é sempre um finder dinâmico que vai ao banco. Re-leitura por `findByPK` em loop não é gargalo; `@Criteria(clause = "this.CODPROD = :codigo")` sobre a PK é.
 
 ---
 
@@ -65,8 +72,8 @@ Use `@Criteria` para filtros SELECT simples tipados.
 @Criteria(clause = "this.PLACA = :placa")
 Optional<Veiculo> findByPlaca(String placa);
 
-@Criteria(clause = "this.ATIVO = :ativo")
-List<Veiculo> findByAtivo(Boolean ativo);
+@Criteria(clause = "this.ATIVO = 'S'")
+List<Veiculo> findAtivos();
 
 @Criteria(clause = "this.CODEMP = :empresa AND this.STATUS = :status")
 List<Pedido> findByEmpresaAndStatus(BigDecimal empresa, String status);
@@ -85,6 +92,8 @@ List<Pedido> findByPeriodo(
     @Parameter(name = "dataFim") java.sql.Date fim
 );
 ```
+
+> **Campo `S`/`N` de tabela nativa vai literal na clause, não como parâmetro `Boolean`.** `this.ATIVO = :ativo` com `Boolean ativo` compila, mas falha em runtime com `ORA-01722: número inválido`: o `Boolean` não é convertido para `'S'`/`'N'` no bind do finder e o Oracle compara número com `VARCHAR2`. Fixe o valor na clause (`this.ATIVO = 'S'`). O campo `private Boolean ativo` na entidade continua certo — a conversão vale na leitura, o problema é só o parâmetro. Em tabela do addon com `dataType="CHECKBOX"`, parâmetro `Boolean` funciona.
 
 > **Parâmetro de tipo com `@GlobalTypeAdapter` vai como primitivo.** O `@Criteria` não aplica o `TypeAdapter` ao parâmetro (o `@NativeQuery` aplica): declare o tipo da coluna e passe o valor convertido, ex.: `findByCpfCnpj(String cpfCnpj)` chamado com `cpfCnpj.getDigits()`. Com o value object no parâmetro, compila e falha em runtime. Ver skill `type-adapter`, seção 5.1.
 
@@ -203,15 +212,15 @@ import br.com.sankhya.sdk.data.pagination.impl.Direction;
 
 ```java
 
-@Criteria(clause = "this.ATIVO = :ativo")
-Page<Veiculo> findByAtivoPaginado(Boolean ativo, Pageable pageable);
+@Criteria(clause = "this.ATIVO = 'S'")
+Page<Veiculo> findAtivosPaginado(Pageable pageable);
 ```
 
 **Uso no serviço:**
 
 ```java
 PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("PLACA", Direction.DESC));
-Page<Veiculo> pagina = repository.findByAtivoPaginado(true, pageRequest);
+Page<Veiculo> pagina = repository.findAtivosPaginado(pageRequest);
 ```
 
 `Pageable` é interface e não tem factory estática — quem constrói é `PageRequest.of(int page, int size)` ou `PageRequest.of(int page, int size, Sort... sort)`. `Sort.by(campo)` / `Sort.by(campo, Direction.ASC|DESC)`.
@@ -586,6 +595,8 @@ public class PedidoService {
 | Import errado de `@NativeQuery`                  | Usar `br.com.sankhya.studio.persistence.NativeQuery`, não `br.com.sankhya.sdk.data.repository.NativeQuery` |
 | `Pageable.of(0, 50)`                             | `Pageable` é interface sem factory — usar `PageRequest.of(...)` de `...pagination.impl` |
 | `page.getTotalElements()` / `getTotalPages()`    | `Page<T>` não tem total — usar `hasNext()`/`isLast()`, ou `COUNT` próprio via `@NativeQuery` |
+| `ORA-01722` em `@Criteria` com parâmetro `Boolean` sobre campo `S`/`N` de tabela nativa | Fixar o literal na clause (`this.ATIVO = 'S'`); manter `Boolean` na entidade |
+| `save` para registro sempre novo (cópia, fila)   | `saveNew` — só inclui, sem a busca prévia pela PK |
 
 
 ## Skills relacionadas

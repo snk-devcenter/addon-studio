@@ -60,7 +60,7 @@ Exemplo coerente (`<PRX>`=`PRX`, `<MOD3>`=`XYZ`):
 | Cenário                               | `isNativeTable` | `isNativeInstance` | Tag XML correspondente                  |
 |:--------------------------------------|:----------------|:-------------------|:----------------------------------------|
 | Tabela addon + Instância addon        | omitir          | omitir             | `<table>` + `<instance>`                |
-| Tabela nativa + Instância nativa      | `true`          | `true`             | `<nativeTable>` + `<nativeInstance>`    |
+| Tabela nativa + Instância nativa      | `true`          | `true`             | `<nativeTable>` + `<nativeInstance>` — só se o addon declara relação nova; só ler/gravar não tem XML |
 
 > **Por que isso importa:** sem `isNativeTable`, o KSP rejeita a compilação com erro de entidade duplicada ao detectar que a tabela já existe. Sem `isNativeInstance` em uma instância nativa, a instância é regravada no `metadata.xml` gerado e, durante o deploy do addon, o dicionário a re-mapeia para o owner do addon — quebrando todas as regras, validações e telas nativas que dependem dessa instância.
 
@@ -68,6 +68,14 @@ Tabelas nativas mais comuns: `TGFCAB`, `TGFFIN`, `TGFORD`, `TGFVEI`, `TGFEMP`, `
 Instâncias nativas mais comuns associadas: `CabecalhoNota` (TGFCAB), `ItemNota` (TGFITE), `Parceiro` (TGFPAR), `Produto` (TGFPRO), `TipoOperacao` (TGFTOP), `Financeiro` (TGFFIN).
 
 > **Campo novo em entidade nativa não entra na entidade nativa.** Nada de `@Column` para coluna que não existe na tabela nativa, nem instância nova do addon sobre tabela nativa (`isNativeTable` sem `isNativeInstance`): o dado vai para uma tabela de extensão com merge-on-root — skill `merge-on-root`. Exceção: tabela que o projeto já declara em `<nativeTable>` com `<field>` (legado) — ali o campo novo entra como `@Column` na entidade nativa, como as colunas que o projeto já criou nela.
+
+> **Quais `@Column` entram numa entidade nativa — confira nesta ordem**, ao mapear ou auditar:
+>
+> 1. **Colunas físicas** da tabela no banco (`ALL_TAB_COLUMNS` no Oracle, `INFORMATION_SCHEMA.COLUMNS` no MSSQL). Coluna que não existe ali não entra.
+> 2. **Campos do dicionário nativo** da instância (`TDDCAM`). A coluna física também precisa estar aqui: coluna só física quebra rotinas nativas, porque a plataforma converte o VO para a entidade e o `getProperty` de um campo que o VO não tem estoura.
+> 3. **Colunas do próprio addon** sobre a nativa (merge-on-root ou `<nativeTable>` com `<field>`) entram por último e valem mesmo se ainda não existem no banco local onde o addon não foi aplicado.
+>
+> Coluna fora das três fontes não entra.
 
 ```java
 // 1) Tabela e instância do addon — sem flags
@@ -94,7 +102,7 @@ Tipos de classe que aparecem aqui:
 |:-------------------------------------------|:------------------------------------------------------------------------|
 | Entidade persistida (`@JapeEntity`)        | Mapeia tabela do banco                                                  |
 | PK composta (`@Embeddable`)                | Classe que agrupa colunas-chave de uma PK composta                      |
-| Enum (Value Object)                        | Valores finitos persistidos com o tipo da coluna (texto ou número)      |
+| Enum (Value Object)                        | Valores finitos persistidos com o tipo do campo no dicionário (texto ou número) |
 | Classe sem persistencia                    | Conceito de negocio, sem `@JapeEntity` (`@Data` + factory methods)      |
 
 ---
@@ -133,7 +141,7 @@ Valores finitos de domínio (listas opções). Usados como tipo campo em entidad
 |:-----------------------------------|:-----------------------------------------------------------------|
 | `@Getter` (Lombok)                 | Gera o getter de `value` automaticamente.                        |
 | `@AllArgsConstructor` (Lombok)     | Gera o construtor que recebe `value`.                            |
-| Campo `private final <Tipo> value` | Valor persistido no banco. `<Tipo>` segue a coluna: `String` em coluna texto/char, `BigDecimal` em coluna numérica (NUMBER/INT). |
+| Campo `private final <Tipo> value` | Valor persistido no banco. `<Tipo>` segue o `dataType` do campo no dicionário, não o tipo físico da coluna: `String` em `LISTA`/`TEXTO` (inclusive sobre coluna NUMBER), `BigDecimal` em campo numérico (`INTEIRO`/`DECIMAL`, `TIPCAMPO` `I`/`F` no `TDDCAM` de tabela nativa). |
 | Nome da classe                     | Sufixo `Enum` é opcional (`TipoStatus` ou `TipoStatusEnum`) — siga o que o projeto já usa. Obrigatório é o campo de opções ser `enum`, não `String`. |
 
 **Anatomia completa:**
@@ -152,7 +160,7 @@ public enum TipoEnum {
 }
 ```
 
-Coluna numérica (NUMBER/INT) com lista de opções usa `BigDecimal`:
+Campo numérico no dicionário (`INTEIRO`/`DECIMAL`; em tabela nativa, `TIPCAMPO` `I`/`F` no `TDDCAM`) com lista de opções usa `BigDecimal`:
 
 ```java
 import java.math.BigDecimal;
@@ -169,7 +177,12 @@ public enum ModeloDocumento {
 }
 ```
 
-O `EnumAdapter` grava no VO o objeto que `getValue()` devolve, sem converter. `value` `String` numa coluna NUMBER põe uma `String` no VO, e o primeiro `vo.asInt`/`asBigDecimal` sobre o campo (inclusive em listener nativo) lança `ClassCastException: String cannot be cast to BigDecimal`.
+O `EnumAdapter` grava no VO o objeto que `getValue()` devolve, sem converter, e o JAPE confere esse objeto contra o tipo do campo no dicionário:
+
+- `value` `String` em campo numérico do dicionário: o primeiro `vo.asInt`/`asBigDecimal` sobre o campo (inclusive em listener nativo) lança `ClassCastException: String cannot be cast to BigDecimal`.
+- `value` `BigDecimal` em campo `LISTA` (`TIPCAMPO` `S`), mesmo sobre coluna `NUMBER`: o insert falha com `'<Instancia>->CAMPO': Tipo esperado 'String' , tipo recebido 'java.math.BigDecimal'.` Use `String` (`"55"`); o banco converte na gravação.
+
+Antes de escolher o tipo, abra o `<field>` no XML de `datadictionary/` (ou o `TDDCAM`, em tabela nativa) — não o DDL da coluna.
 
 ### 3.4 Classe de Domínio Puro
 
@@ -309,7 +322,7 @@ Padrões de relacionamento — `@OneToMany` (pai → filhos), `@OneToOne` + `@Jo
 
 ## 9. Enums (Value Objects)
 
-Enums = valores finitos armazenados no banco com o tipo da coluna: texto curto (geralmente 1 caractere) ou número.
+Enums = valores finitos armazenados no banco com o tipo do campo no dicionário: texto curto (geralmente 1 caractere) ou número.
 
 ### Estrutura padrão
 
@@ -332,7 +345,7 @@ public enum NomeEnum {
 | Regra                | Detalhe                                                  |
 |:---------------------|:---------------------------------------------------------|
 | Anotações            | `@AllArgsConstructor`, `@Getter`                         |
-| Campo `value`        | Valor armazenado no banco, com o tipo da coluna: `private final String value` em texto/char, `private final BigDecimal value` em NUMBER/INT (ver §3.3) |
+| Campo `value`        | Valor armazenado no banco, com o tipo do `dataType` do dicionário: `private final String value` em `LISTA`/`TEXTO`, `private final BigDecimal value` em `INTEIRO`/`DECIMAL` (ver §3.3) |
 | Nomes das constantes | `UPPER_SNAKE_CASE` descritivo                            |
 | Valores              | Texto: strings curtas (1-2 caracteres, geralmente). Número: `BigDecimal.valueOf(n)` |
 
@@ -450,7 +463,7 @@ Entidades completas — PK simples, PK composta + relacionamentos, `@OneToMany` 
 
 ### Criando uma entidade nova
 
-1. [ ] Criar XML dicionário em `datadictionary/<TABELA>.xml` (ver `data-dictionary`).
+1. [ ] Criar XML dicionário em `datadictionary/<TABELA>.xml` (ver `data-dictionary`). Tabela nativa que o addon só lê/grava, sem relação nova, não tem XML — os flags de 1.2 bastam.
 2. [ ] Criar classe Java conforme arquitetura do projeto.
 3. [ ] Anotar com `@Data`, `@NoArgsConstructor`, `@AllArgsConstructor`.
 4. [ ] Anotar com `@JapeEntity(entity = "...", table = "...")`. Tabela nativa Sankhya (TGFCAB, TGFFIN, TGFORD, etc.): adicionar `isNativeTable = true`. Instância também nativa (entity = `CabecalhoNota`, `Parceiro`, `Produto`, etc.): adicionar também `isNativeInstance = true`. Ver seção 1.2.
@@ -466,7 +479,7 @@ Entidades completas — PK simples, PK composta + relacionamentos, `@OneToMany` 
 
 1. [ ] Criar conforme arquitetura do projeto.
 2. [ ] Anotar com `@AllArgsConstructor`, `@Getter`.
-3. [ ] Campo `private final String value` em coluna texto/char; `private final BigDecimal value` em coluna NUMBER/INT.
+3. [ ] Campo `private final String value` em campo `LISTA`/`TEXTO` do dicionário (mesmo sobre coluna NUMBER); `private final BigDecimal value` em `INTEIRO`/`DECIMAL`.
 4. [ ] Constantes em `UPPER_SNAKE_CASE`.
 
 ### Criando uma PK composta
@@ -489,12 +502,12 @@ Entidades completas — PK simples, PK composta + relacionamentos, `@OneToMany` 
 | `@Column` de coluna nova do addon na entidade nativa, ou instância nova sobre tabela nativa | Tabela de extensão com merge-on-root (skill `merge-on-root`) — exceto tabela que o projeto já declara em `<nativeTable>` com `<field>`, que segue o padrão dela (skill `merge-on-root`, "Tabela nativa já estendida pelo projeto"). |
 | Omitir `isNativeInstance = true` em instância nativa    | Obrigatório quando o `entity` reusa um nome nativo (`CabecalhoNota`, `Parceiro`, `Produto`, etc.). Sem ele, o deploy regrava a instância para o owner do addon e quebra regras/validações nativas. |
 | Criar `@OneToOne` quando só precisa do valor da FK      | Use `@Column(name = "FK")` se não precisa navegar.        |
-| Esquecer de criar o XML do dicionário                   | Toda entidade **precisa** do XML correspondente.          |
+| Esquecer de criar o XML do dicionário                   | Toda entidade de tabela do addon **precisa** do XML correspondente. Tabela nativa só ganha XML se o addon declara relação nova nela (`data-dictionary`, 1.10). |
 | Esquecer `@NoArgsConstructor`                           | Obrigatório para o framework instanciar a entidade.       |
 | Usar `String` para campo `CHECKBOX`                     | Use `Boolean` — o framework converte S/N automaticamente. |
 | Usar `String` para campo `CAIXA_TEXTO`/`HTML` (CLOB) ou `ARQUIVO`/`MULTIPLOS_ARQUIVOS`/`IMAGEM` (BLOB) | `char[]` no CLOB, `byte[]` no BLOB. Com `String` compila e o teste com repository mockado passa, mas o servidor quebra no `save` (`Tipo esperado 'char[]'`) e no `fromVO` (`Can not set java.lang.String field`). O critério é o `dataType` do XML (`TIPCAMPO` `C`/`B`), não o tipo físico da coluna. Conversão: `data-dictionary/references/xml-to-java.md`; teste: skill `test`. |
 | Usar `Integer` para PKs nativas (NUNOTA, CODPARC)       | Use `BigDecimal` — padrão do Sankhya Om.                  |
-| Enum com `value` `String` em coluna NUMBER/INT          | `private final BigDecimal value` — `String` no VO quebra `vo.asInt`/`asBigDecimal` com `ClassCastException`. |
+| Tipo do `value` do enum escolhido pela coluna física    | O critério é o `dataType` do dicionário. `String` em campo `INTEIRO`/`DECIMAL` quebra `vo.asInt`/`asBigDecimal` com `ClassCastException`; `BigDecimal` em `LISTA` sobre coluna NUMBER quebra o insert com `Tipo esperado 'String'`. Ver §3.3. |
 
 
 ## Skills relacionadas

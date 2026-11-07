@@ -282,6 +282,7 @@ public class IntegracaoExternaRegra implements Regra {
 - **Velocidade**: Regra roda dentro da transacao da confirmacao. Deve executar em milissegundos.
 - **`@Transactional` no service chamado daqui: confira o `TxType`.** A regra ja roda dentro da sessao e da transacao da operacao. `@Transactional` bare (`REQUIRED`, o default) entra nessa transacao — caso seguro. `REQUIRES_NEW` suspende a transacao da operacao e commita por conta propria: se a operacao for revertida depois, o que ele gravou fica. `NOT_SUPPORTED` roda fora dela e nao participa do commit/rollback. Nada falha na hora — o bug so aparece quando a operacao da erro depois da chamada.
 - **Assincronismo para integracoes**: Chamadas a APIs externas = sempre `CompletableFuture`, `ExecutorService` ou JMS. Nunca sincrono.
+- **Integracao que nao pode sair se a operacao for desfeita**: `CompletableFuture` dispara na hora, antes do commit — se a confirmacao der rollback depois, a chamada ja saiu. Agende para depois do commit com `addOnSucessTXTask` (skill `listener`, secao 9).
 - **Classe enxuta (boa pratica)**: a classe da `@BusinessRule` filtra o evento e delega a regra para outra classe injetada (ex.: service `@Component`) — a organizacao em camadas e do projeto.
 - **Feedback ao usuario**: Use `addMensagem()` para informar acoes automaticas executadas.
 - **Excecoes para bloqueio**: lance excecao tipada do projeto com mensagem clara para impedir a operacao.

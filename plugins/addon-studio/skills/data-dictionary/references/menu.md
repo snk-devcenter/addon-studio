@@ -50,11 +50,11 @@ Define ponto de entrada na barra de navegação principal do Sankhya Om. Contain
 | `id` | Sim | Identificador único. Pattern `[a-zA-Z0-9_.-]+`. Usar prefixo do projeto (`<PRX>_MENU_<MOD3>`) | `PRX_MENU_XYZ` |
 | `description` | Sim | Label visível na barra de navegação | `Modulo XYZ` |
 | `icon` | Sim | URL do ícone (local `/$ctx/assets/...` ou externa) | `/$ctx/assets/xyz.png` |
-| `license` | Não | Identificador de licença (controle por feature) | — |
+| `license` | Não | Identificador de licença (controle por feature). Ver [`license`](#license--licença-por-tela) | — |
 
 ## Filhos de `<menu>` / `<folder>` (folderSubItens)
 
-`folderSubItens` aceita 5 tipos de filhos (todos 0..N, ordem livre):
+`folderSubItens` aceita 5 tipos de filhos (todos 0..N; o XSD aceita qualquer ordem, mas `<ui>` e `<dynamicForm>` não podem ficar intercalados — ver [abaixo](#ui-e-dynamicform-intercalados-somem-do-menu)):
 
 | Filho | Função | Detalhes |
 |-------|--------|----------|
@@ -63,6 +63,23 @@ Define ponto de entrada na barra de navegação principal do Sankhya Om. Contain
 | `<dynamicTreeView>` | Tela CRUD com tree-view para `<treeTable>` hierárquica. Atributos idênticos ao `<dynamicForm>` (`id`, `instance`, `description`, `resourceId`, `license`). **Regra:** `<table>` → `<dynamicForm>`; `<treeTable>` → `<dynamicTreeView>` | Ver [`tree-table.md`](tree-table.md) |
 | `<ui>` | Tela custom (xhtml5/JS/HTML) | URL aponta para arquivo XHTML5 |
 | `<dashboard>` | Dashboard de gráficos/KPIs | Arquivo em `/dashboards/` |
+
+### `<ui>` e `<dynamicForm>` intercalados somem do menu
+
+Dentro do mesmo `<folder>`, um `<ui>` que aparece **depois** de um `<dynamicForm>` faz o `convertMetadata` descartar os itens já acumulados daquele folder. As telas anteriores somem do menu, e os `<ctrlRelationship>` do folder apontam só para as sobreviventes.
+
+| Ordem dos filhos no `<folder>` | Itens gerados |
+|---|---|
+| `ui, df, df, df` | 4 |
+| `ui, df, ui, df` | **2** |
+| `ui, ui, df, df` | 4 |
+| `df, df, ui, ui` | 4 |
+
+O descarte é silencioso: build, deploy e migração do dicionário passam sem erro e o `server.log` não registra nada — só se percebe abrindo o menu (não é permissão nem cache). Agrupe os filhos por tipo (todos os `<ui>` juntos, todos os `<dynamicForm>` juntos) e, ao mexer no menu, compare a contagem de controles gerados com a de filhos declarados:
+
+```bash
+grep -oE '<control name="[^"]*" type="MN"' build/dist/datadictionary/metadata.xml | wc -l
+```
 
 ## `<folder>` — submenu recursivo
 
@@ -83,7 +100,7 @@ Define ponto de entrada na barra de navegação principal do Sankhya Om. Contain
 | `id` | Sim | Pattern `[a-zA-Z0-9_.-]+`, único no plugin |
 | `description` | Sim | Label do submenu |
 | `resourceId` | Opcional no XSD, **obrigatório na prática** | Recurso para controle de permissão. Máx. 50 caracteres. Sem ele o `NOME` em `TRDCON` vira `<domain>.<id>` e pode estourar a coluna — ver [teto de 50](#resourceid--obrigatório-na-prática-teto-de-50-em-trdconnome) |
-| `license` | Não | Licença |
+| `license` | Não | Licença — **descartado sem aviso em `<folder>`**; declare no item de tela. Ver [`license`](#license--licença-por-tela) |
 
 ## `<ui>` — tela custom (xhtml5)
 
@@ -110,6 +127,21 @@ Usa quando UI não pode ser gerada declarativamente (gráficos, layouts custom, 
 | `license` | Não | Licença |
 
 Filhos: `<acesso>` (0..N), `<properties>` (controlproperties).
+
+## `license` — licença por tela
+
+`license="<codprod>"` num `<ui>` amarra a tela ao produto licenciado: o `convertMetadata` grava um bloco `<license-by-resource>` (`<resource>` com `<id>` = recurso e `<module>` = licença) dentro de `build/dist/extension.xml`. O código vem do produto licenciado do cliente — não invente.
+
+- **Em `<folder>` o atributo é descartado sem aviso.** Declare no item de tela.
+- **O `convertMetadata` não depende da task que cria o `extension.xml`.** `clean gerarAddon` passa por acaso, mas `clean test` e `clean build` — o que o CI roda — falham com `Arquivo extension.xml não existe`. Declare a dependência no `build.gradle`; `tasks.named` não acha a task, que o plugin registra depois da avaliação do script:
+
+```groovy
+tasks.matching { it.name == 'convertMetadata' }.configureEach {
+    dependsOn 'createExtensionFile'
+}
+```
+
+Mudança em menu/dicionário se valida com `clean test`, não só com `gerarAddon`.
 
 ## `resourceId` — obrigatório na prática (teto de 50 em `TRDCON.NOME`)
 
@@ -341,6 +373,8 @@ Item somente aparece no menu se a query retornar pelo menos 1 row no banco.
 - [ ] **Nó de menu sem `resourceId`** — o `NOME` gravado em `TRDCON` passa a ser `<domain>.<id>`, o orçamento do `id` cai para `50 - len(domain) - 1` e um `id` longo derruba o carregamento do módulo inteiro. Ver [teto de 50](#resourceid--obrigatório-na-prática-teto-de-50-em-trdconnome).
 - [ ] **`resourceId` com mais de 50 caracteres** — mesma `ORA-12899`, mesmo módulo fora do ar.
 - [ ] **Validar o limite só no `deployAddon` local** — base de desenvolvimento pode ter `TRDCON.NOME` com 60. Contar caracteres no XML é o único teste que vale.
+- [ ] **`<ui>` depois de `<dynamicForm>` no mesmo `<folder>`** — o gerador descarta as telas anteriores do folder sem erro nenhum. Agrupar por tipo. Ver [intercalados](#ui-e-dynamicform-intercalados-somem-do-menu).
+- [ ] **`license` em `<folder>`** — descartado sem aviso. Declarar no item de tela.
 - [ ] **Aninhar `<menu>` dentro de `<menu>`** — `<menu>` é só raiz da nav bar. Use `<folder>` para hierarquia.
 - [ ] Usar prefixo `AD_` em `id` — reservado para Sankhya core. Usar `<PRX>_` do projeto.
 - [ ] IDs duplicados (mesmo `id` em `<folder>`/`<ui>`/etc.) — causa falha de renderização
