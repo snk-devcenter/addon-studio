@@ -267,7 +267,7 @@ Adicionar `<option value="C">Opcao C</option>` ao dicionário do campo `TIPO`:
 
 > **DROP com `SE_EXISTIR`, ADD com `SE_NAO_EXISTIR`** — nessa combinação o par é idempotente e não quebra em ambiente que nunca teve a CHECK antiga.
 
-**Opção removida do domínio** (ex.: `'B'` sai da lista): dado já gravado com o valor antigo faz o `ADD CONSTRAINT` falhar e **quebra o deploy inteiro** no cliente. Migrar antes, em `ordem` intermediária:
+**Opção removida do domínio** (ex.: `'B'` sai da lista): dado já gravado com o valor antigo faz o `ADD CONSTRAINT` falhar (`ORA-02293`). O `<sql>` é ignorado (`FORCED_IGNORE`) e o deploy segue — como o DROP já rodou, o cliente fica **sem CHECK nenhuma**, sem erro visível. Migrar antes, em `ordem` intermediária:
 
 ```xml
 <sql nomeTabela="PRXXYZCAD" ordem="2" executar="SEMPRE"
@@ -283,12 +283,18 @@ Adicionar `<option value="C">Opcao C</option>` ao dicionário do campo `TIPO`:
 ```
 
 > Definir o destino do dado órfão é **decisão de negócio** — perguntar ao dev, nunca escolher sozinho. `ADD CONSTRAINT` passa a ser `ordem="3"`.
+>
+> O mesmo vale para CHECK **nova** em coluna que já tem dado (tabela existente, base vinda de versão antiga): o domínio do dicionário restringe só a UI, então integração/listener/SQL direto pode ter gravado valor fora dele. Conferir o que o código grava antes de criar a CHECK.
 
 ---
 
 ## Tabelas Nativas (`nativeTable`) — Sem Script
 
 Tabela nativa Sankhya (tag `<nativeTable>` no dicionário) **não recebe DDL do addon**: nem CREATE, nem ALTER TABLE ADD. Campo novo em entidade nativa vai para uma tabela de extensão do addon com a mesma PK, fundida via merge-on-root — skill `merge-on-root`. O script é o de tabela nova (CREATE mínimo + ALTER por coluna) na tabela de extensão. Exceção: tabela que o projeto já declara em `<nativeTable>` com `<field>` (legado) segue o padrão dela — `ALTER TABLE ADD` na nativa, como os scripts existentes.
+
+Nesse legado, `ADD` **sem** `DEFAULT`. No Oracle 11g, `ADD` de coluna anulável com `DEFAULT` reescreve todas as linhas para gravar o valor, e a reescrita dispara os triggers de `UPDATE` da nativa. Observado na `TSIUSU`: trigger `BEFORE UPDATE ... FOR EACH ROW` barrou a linha de um usuário de sistema com `ORA-20001`, o `ALTER` morreu, a coluna não nasceu e o dicionário passou a citá-la em todo `SELECT` da tabela → `ORA-00904` no login. `ADD` sem `DEFAULT` é só metadado e não toca linha.
+
+Linha existente fica `NULL`: tratar `NULL` como o valor padrão no código (`"S".equals(...)`). Default para INSERT futuro, se precisar, vai num `<sql>` separado com `ALTER TABLE <TABELA> MODIFY (<COLUNA> DEFAULT 'N')` no Oracle — também só metadado.
 
 ---
 

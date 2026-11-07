@@ -92,6 +92,12 @@ Só os nomes por extenso são reconhecidos (maiúscula ou minúscula). Abreviaç
 erro: cai em "qualquer outro" e o valor vai como texto. No Oracle a conversão implícita faz a
 consulta parecer certa, mas o tipo se perdeu.
 
+**`DATE` liga um `Timestamp`, e no Oracle isso derruba o índice da coluna `DATE`.** O bind
+vai por `setTimestamp`; TIMESTAMP tem precedência sobre DATE, então o Oracle converte a
+**coluna**, e o predicado sai de `INDEX RANGE SCAN` para `INDEX FULL SCAN`. Envolva o
+parâmetro: `WHERE DTNEG >= CAST(:DT_INI AS DATE)`. É portável — no MSSQL vira `date` e
+descarta a hora, o que não importa em período começando 00h.
+
 Valor ausente ou vazio vira `null` no parâmetro — a consulta roda, com o efeito que `null`
 tiver na cláusula. Se a intenção era "sem filtro", escreva isso no SQL em vez de contar com
 o `null`.
@@ -106,6 +112,36 @@ SELECT ... WHERE DTNEG BETWEEN :PERIODO.INI AND :PERIODO.FIN
 ```
 
 com `request.setAttribute("PERIODO", period)`.
+
+Aqui não há degradação para `null`: sem o atributo `PERIODO`, o cast para `Period` devolve
+`null` e a tag estoura `NullPointerException` no render.
+
+### Porte de gadget: ninguém mais popula os atributos
+
+No `Dashboard.xhtml5` quem fazia `setAttribute` dos parâmetros (e montava o `Period` a partir
+de `.INI`/`.FIN`) era o servlet do gadget, com os valores das `<prompt-parameters>`. Na tela
+de menu do add-on nada faz isso. Um `.jsp` portado com `<snk:query>` parametrizada abre com
+`NullPointerException` (se usa `:X.INI`/`:X.FIN`) ou filtrando por `null` sem erro (parâmetro
+simples). Antes de portar, procure `:[A-Z_]` dentro das tags e decida de onde o filtro vem
+agora — query string lida num scriptlet, filtro na própria tela, default no servidor.
+
+### O que o parser toma por parâmetro
+
+O reconhecimento é a regex `:[^(]\w+(\.\w+)?[^)]`, aplicada ao corpo inteiro **sem saber o
+que é literal ou comentário**. Ela aceita um caractere qualquer entre o `:` e o nome, e consome
+um caractere depois dele. Consequências:
+
+| SQL | O que acontece |
+|---|---|
+| `'PENDENCIA: Chassi nao informado'` | `: Chassi ` vira o parâmetro `Chassi`, ligado a `null`; o literal é reescrito |
+| `/* ver nota: AFRE */` | idem, parâmetro `AFRE` |
+| `= :CODVEI, ...` | a vírgula colada entra no nome (`CODVEI,`), que não casa com atributo nenhum |
+
+Corrija partindo o literal no dois-pontos (`concatstr('PENDENCIA:', ' Chassi nao informado')`,
+skill `macros`), tirando `:` de comentário, e deixando espaço antes de vírgula depois de
+`:nome`. Ao migrar SQL que rodava por
+`executeQuery` (onde nada disso é parâmetro), gere a troca por script e confira rodando a
+regex sobre o corpo da tag: zero casamentos fora dos parâmetros de verdade.
 
 ### Cláusula IN
 

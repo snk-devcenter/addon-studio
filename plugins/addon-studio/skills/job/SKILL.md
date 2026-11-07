@@ -117,7 +117,7 @@ O EJB que o SDK gera a partir do `@Job` nao abre `JapeSession`. Sem um `@Transac
 
 ### Valores de `Transactional.TxType`
 
-`@Transactional` so pode ser aplicado em **metodo** (`@Target(METHOD)`) e tem precedencia sobre o `transactionType` da classe.
+`@Transactional` so pode ser aplicado em **metodo** (`@Target(METHOD)`) e **nao entra no descritor EJB**: o descritor gerado so carrega o `transactionType` da classe (`<method-name>*</method-name>` e `onSchedule`). O `@Transactional` age dentro do metodo, pelo interceptor do SDK, depois que o container ja aplicou o `transactionType`.
 
 | `TxType` | Semantica |
 |:---------|:----------|
@@ -317,7 +317,7 @@ public class MeuJob extends IJob {
 - **Logging**: `@Log` Lombok + `java.util.logging`. Nunca `System.out`.
 - **Transacao adequada**: escrita → `@Transactional` no metodo do service; lote item a item → metodo por item com `REQUIRES_NEW`; somente leitura → consulta tambem sob `@Transactional` (sessao JAPE).
 - **Frequencia configuravel**: Use `getScheduleConfig()` (`String`) + parametro do sistema para evitar hardcode.
-- **Integracoes externas**: o job e o worker natural da tabela-fila alimentada por listener/regra; mantenha a chamada HTTP fora do trecho `@Transactional`.
+- **Integracoes externas**: o job e o worker natural da tabela-fila alimentada por listener/regra; mantenha a chamada HTTP fora do trecho `@Transactional`. Efeito externo que so pode sair se a gravacao commitar: `addOnSucessTXTask` (skill `listener`, secao 9).
 
 ---
 

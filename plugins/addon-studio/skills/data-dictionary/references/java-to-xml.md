@@ -71,7 +71,7 @@ Entidade original com atributos extra no `@Column`? Mapeie pra XML:
 | Java (`DataType`)              | XML (`dataType`)       | Notas                                                          |
 |:-------------------------------|:-----------------------|:---------------------------------------------------------------|
 | `DataType.TEXT`                | `TEXTO`                | Exige atributo `size` no XML                                   |
-| `DataType.TEXT_BOX`            | `CAIXA_TEXTO`          | Textarea/multi-line. Exige `size`                              |
+| `DataType.TEXT_BOX`            | `CAIXA_TEXTO`          | Textarea/multi-line. Exige `size`. CLOB: coluna `CLOB` no dbscript e `char[]` na entidade — sobre `VARCHAR` use `TEXTO` (ver `xml-to-java.md`, nota CLOB/BLOB) |
 | `DataType.INTEGER`             | `INTEIRO`              | —                                                              |
 | `DataType.DECIMAL`             | `DECIMAL`              | Exige `nuCasasDecimais`                                        |
 | `DataType.DATE`                | `DATA`                 | Sem hora                                                       |

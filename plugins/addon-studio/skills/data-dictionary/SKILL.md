@@ -437,6 +437,8 @@ Campos que referenciam outra entidade: `dataType="PESQUISA"` + `targetInstance`,
 
 `<nativeTable>` so declara relacao em instancia nativa: `<nativeInstance>` com `<relationShip>`. **Sem** `<primaryKey>`, `sequenceType`, `<fields>` ou `<instance>` nova.
 
+- **Tabela nativa que o addon so le ou grava nao tem XML.** Sem relacao nova a declarar, nao crie arquivo em `datadictionary/` para ela: `isNativeTable = true` + `isNativeInstance = true` no `@JapeEntity` ja mapeiam a entidade, e build e testes passam sem o XML. Um `<nativeTable>` vazio vai no `deployAddon` e mexe no dicionario do ERP sem contrapartida.
+
 - **Campo novo em entidade nativa nao vai aqui.** O `<fields>` de `<nativeTable>` cria coluna na tabela nativa e o `metadados.xsd` o marca como deprecated. O caminho e uma tabela de extensao com merge-on-root — skill `merge-on-root`. Exceção: `<nativeTable>` que o projeto ja tem com `<fields>` (legado) — campo novo dessa tabela entra no `<fields>` dela, como os existentes.
 - **Instancia nova do addon sobre tabela nativa** tambem nao se usa mais: a informacao nova vai para a tabela de extensao, com instancia propria em `<table>`.
 
@@ -552,6 +554,8 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 12. [ ] Incluir `<fieldOptions>` so em `LISTA`.
 13. [ ] Usar `dataType="PESQUISA"` + `targetInstance`/`targetField`/`targetType` pra lookups.
 14. [ ] `<description>` preenchida em todos `<field>` (nao vazia). Acentos permitidos — skill `encoding` ajusta o charset depois.
+15. [ ] Nenhum `--` dentro de comentario `<!-- -->` (vale tambem para dbscript recebido de fora).
+16. [ ] Tabela nativa so ganha XML se o addon declara relacao nova nela (secao 1.10).
 
 ## 4.2 Checklist: Gerando XML a partir de entidade Java existente
 
@@ -581,6 +585,10 @@ Workflow para gerar entidade `@JapeEntity` Java a partir do XML do dicionário �
 | Erro                                              | Correcao                                                         |
 |:--------------------------------------------------|:-----------------------------------------------------------------|
 | No de menu (`<ui>`, `<folder>`, `<dynamicForm>`, `<dynamicTreeView>`, `<dashboard>`) sem `resourceId` | Declarar `resourceId` explicito, igual ao `id` e com no maximo 50 caracteres. Sem ele o import grava `TRDCON.NOME` = `<domain>.<id>` numa coluna `VARCHAR2(50)`: estourar da `ORA-12899` -> `ModuleBootLoaderException` e **o modulo inteiro nao carrega**. Base local pode ter a coluna com 60 e mascarar. Detalhes em [`references/menu.md`](references/menu.md). |
+| `--` dentro de comentario `<!-- ... -->` em `datadictionary/` (ou `dbscripts/`) | XML proibe `--` em comentario. O `:convertMetadata` falha com `String '--' not allowed in comment` e nenhum teste roda — no CI o job sobe sem `test-results` e o log pode terminar antes da causa; reproduza local. Troque o `--` por outro separador. |
+| `<ui>` depois de `<dynamicForm>` no mesmo `<folder>` do menu | Agrupar os filhos por tipo. Intercalados, o gerador descarta as telas anteriores do folder sem erro algum. Ver [`references/menu.md`](references/menu.md). |
+| XML em `datadictionary/` para tabela nativa que o addon so le/grava | Apagar: os flags `isNativeTable`/`isNativeInstance` do `@JapeEntity` bastam. Ver 1.10. |
+| `CAIXA_TEXTO`/`HTML` sobre coluna `VARCHAR2` | `TEXTO` + `String`, ou coluna `CLOB` + `CAIXA_TEXTO` + `char[]`. Sobre VARCHAR o boot avisa `(Clob) com um tipo incompatível no banco de dados: java.sql.Types 12`. Ver [`references/xml-to-java.md`](references/xml-to-java.md). |
 | Usar `uiTabName` no XML                           | Sempre `UITabName` (Pascal Case, UI maiusculo).               |
 | Usar `precision` no XML                           | Sempre `nuCasasDecimais`.                                        |
 | Usar `required="true"` no XML                     | Sempre `required="S"` ou `required="N"`.                         |

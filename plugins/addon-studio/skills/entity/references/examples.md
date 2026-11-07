@@ -165,7 +165,7 @@ public enum StatusProcesso {
 }
 ```
 
-Coluna NUMBER/INT com lista de opções:
+Campo `INTEIRO`/`DECIMAL` no dicionário com lista de opções (campo `LISTA` usa `String`, mesmo sobre coluna NUMBER — ver SKILL §3.3):
 
 ```java
 
