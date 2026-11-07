@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Corrigido
+
+- Skills `data-dictionary` e `entity` mapeiam `CAIXA_TEXTO`/`HTML` como `char[]` e `ARQUIVO`/`MULTIPLOS_ARQUIVOS`/`IMAGEM` como `byte[]`, em vez de `String`, que quebrava `save` e `fromVO` no servidor; o sub-agent `addon-reviewer` aponta o `String` como blocker e a skill `test` ensina o teste de `EntityMapper.fromVO` que pega o erro sem servidor.
+
 ### Alterado
 
 - README documenta que, em contas Team e Enterprise, os hooks de contexto do plugin dependem de instalação gerenciada pela organização e que o `/addon-studio:init` cobre as regras nesse caso.

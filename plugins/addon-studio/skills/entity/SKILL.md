@@ -283,10 +283,12 @@ Nenhum outro atributo. Ponto.
 | `DECIMAL`                        | `BigDecimal`                           |
 | `DATA_HORA`                      | `Timestamp` (`java.sql.Timestamp`)     |
 | `CHECKBOX`                       | `Boolean`                              |
+| `CAIXA_TEXTO`, `HTML` (CLOB)     | `char[]` — nunca `String`              |
+| `ARQUIVO`, `MULTIPLOS_ARQUIVOS`, `IMAGEM` (BLOB) | `byte[]` — nunca `String` |
 | `PESQUISA` (FK)                  | `BigDecimal` ou `Integer` (tipo da FK) |
 | Campo com opções (enum no banco) | Enum Java (veja seção 9)               |
 | Coluna com tipo de domínio (value object), inclusive em entidade nativa | Tipo próprio + `TypeAdapter` (skill `type-adapter`, seção 5.1) |
-| Demais `dataType`s (`CAIXA_TEXTO`, `HORA`, `LISTA`, `HTML`, `ARQUIVO`, ...) | Ver tabela completa em `data-dictionary/references/xml-to-java.md` |
+| Demais `dataType`s (`DATA`, `HORA`, `LISTA`, ...) | Ver tabela completa em `data-dictionary/references/xml-to-java.md` |
 
 ### Quando usar `Integer` vs `BigDecimal`
 
@@ -454,7 +456,7 @@ Entidades completas — PK simples, PK composta + relacionamentos, `@OneToMany` 
 4. [ ] Anotar com `@JapeEntity(entity = "...", table = "...")`. Tabela nativa Sankhya (TGFCAB, TGFFIN, TGFORD, etc.): adicionar `isNativeTable = true`. Instância também nativa (entity = `CabecalhoNota`, `Parceiro`, `Produto`, etc.): adicionar também `isNativeInstance = true`. Ver seção 1.2.
 5. [ ] Definir PK com `@Id` + `@Column(name)` (simples) ou `@Id` + classe `@Embeddable` (composta).
 6. [ ] Cada campo persistido com `@Column(name = "...")` — só `name`.
-7. [ ] Tipo Java correto para cada campo (ver tabela tipos).
+7. [ ] Tipo Java correto para cada campo (ver tabela tipos). Campo `CAIXA_TEXTO`/`HTML` no XML é `char[]`; campo `ARQUIVO`/`MULTIPLOS_ARQUIVOS`/`IMAGEM` é `byte[]` — confira o `dataType` do `<field>` no XML de cada `@Column`.
 8. [ ] Relacionamentos só quando necessários no domínio.
 9. [ ] `@JoinColumn` com só `name` e `referencedColumnName`.
 10. [ ] Nenhum `@Expression`, `@GeneratedValue`, `@Option`, `@Property`.
@@ -490,6 +492,7 @@ Entidades completas — PK simples, PK composta + relacionamentos, `@OneToMany` 
 | Esquecer de criar o XML do dicionário                   | Toda entidade **precisa** do XML correspondente.          |
 | Esquecer `@NoArgsConstructor`                           | Obrigatório para o framework instanciar a entidade.       |
 | Usar `String` para campo `CHECKBOX`                     | Use `Boolean` — o framework converte S/N automaticamente. |
+| Usar `String` para campo `CAIXA_TEXTO`/`HTML` (CLOB) ou `ARQUIVO`/`MULTIPLOS_ARQUIVOS`/`IMAGEM` (BLOB) | `char[]` no CLOB, `byte[]` no BLOB. Com `String` compila e o teste com repository mockado passa, mas o servidor quebra no `save` (`Tipo esperado 'char[]'`) e no `fromVO` (`Can not set java.lang.String field`). O critério é o `dataType` do XML (`TIPCAMPO` `C`/`B`), não o tipo físico da coluna. Conversão: `data-dictionary/references/xml-to-java.md`; teste: skill `test`. |
 | Usar `Integer` para PKs nativas (NUNOTA, CODPARC)       | Use `BigDecimal` — padrão do Sankhya Om.                  |
 | Enum com `value` `String` em coluna NUMBER/INT          | `private final BigDecimal value` — `String` no VO quebra `vo.asInt`/`asBigDecimal` com `ClassCastException`. |
 
