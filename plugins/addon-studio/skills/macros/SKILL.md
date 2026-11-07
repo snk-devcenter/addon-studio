@@ -158,7 +158,7 @@ GROUP BY VEND.CODVEND, VEND.NOMEVEND, getYear(CAB.DTNEG)
 |:----------------------------------------------------------|:----------------------------------------------------|
 | Usar `SYSDATE`/`GETDATE()` direto                         | `dbDate()`                                          |
 | Usar `NVL`/`ISNULL` direto                                | `nullValue(<expr>, <padrao>)`                       |
-| Usar `ROWNUM`/`TOP` direto (ou `maxLines`)                | Limitar fora do SQL: consulta paginada (`Pageable`, skill `repository`) |
+| Usar `ROWNUM`/`TOP` direto (ou `maxLines`)                | Limitar fora do SQL: `@Criteria` + `Pageable` (skill `repository`) |
 | Concatenacao com `||` ou `+`                              | `concatstr(<a>, <b>)`                               |
 | `UPPER(...)` sem tratar acentos em busca textual          | `normalizeText(<expr>)` ou `ignorecase(<expr>)`     |
 | `INSTR`/`CHARINDEX` direto                                | `stringIndex(<src>, <trg>)`                         |
@@ -178,7 +178,7 @@ Comportamento lido no fonte do `MacroTranslator`:
 - **`addMonths` separa os argumentos por `split(",")`**: nada com virgula dentro dele. `onlydate`/`truncDate` sao expandidos antes e, no MSSQL, geram virgulas — escreva `onlydate(addMonths(dbDate(), -3))`, nunca `addMonths(onlydate(...), -3)`. Erro: `Número incorreto de parâmetros para a função addMonths`.
 - **`convertToVarchar(x)` no Oracle devolve `x` cru** (sem `TO_CHAR`); no MSSQL e `RTRIM(CONVERT(VARCHAR(4000), x))`. Nao serve para formatar data. Para mostrar data, devolva a coluna crua e formate no cliente.
 - **`truncDate` no MSSQL e `CONVERT(date, x)`**, que nao aceita `+`/`-` inteiro. Para aritmetica de dias use `onlydate` (devolve `DATETIME`).
-- **`maxLines(n)` injeta ` AND ROWNUM <= n` (Oracle) ou ` TOP n` (MSSQL) no mesmo ponto do texto** — nenhuma posicao e valida nos dois. Nao ha forma SQL de limitar linhas que rode em Oracle 11g (minimo suportado) e MSSQL — `OFFSET`/`FETCH` e 12c+. Limite fora do SQL, com consulta paginada (`Pageable`, skill `repository`).
+- **`maxLines(n)` injeta ` AND ROWNUM <= n` (Oracle) ou ` TOP n` (MSSQL) no mesmo ponto do texto** — nenhuma posicao e valida nos dois. Nao ha forma SQL de limitar linhas que rode em Oracle 11g (minimo suportado) e MSSQL — `OFFSET`/`FETCH` e 12c+. Limite fora do SQL: `@Criteria` com `Pageable` → `Page<T>` (skill `repository`). `@NativeQuery` nao aceita `Pageable`.
 - **`convertToMilliseconds` no MSSQL usa `DATEDIFF(S, '1970-01-01', x)`**, que devolve `INT` e estoura em 2038-01-19.
 - **`concatstr` troca toda virgula de nivel 0 por `||`/`+`.** Operando numerico precisa de `convertToVarchar` no MSSQL (`+` entre numero e texto tenta somar).
 
