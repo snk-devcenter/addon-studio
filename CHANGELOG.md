@@ -28,6 +28,7 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 - Skill `data-dictionary` orienta `TEXTO` + `String` para VARCHAR e `CAIXA_TEXTO` + `char[]` só para CLOB.
 - Skill `repository` deixa de ensinar campo S/N de tabela nativa como parâmetro `Boolean` de `@Criteria`, que dá `ORA-01722`.
 - Skill `macros` deixa de recomendar `maxLines()`, que gera SQL inválido, e passa a exigir colchete em `diffdays`/`diffhour`.
+- Skill `business-rule` troca o `CompletableFuture.runAsync` do exemplo de integração, que disparava antes do commit, pelo agendamento depois do commit.
 - Skills `controller` e `job` explicam que o `@Transactional` de método não vai para o descritor EJB.
 
 ## [3.5.1] - 2026-11-06

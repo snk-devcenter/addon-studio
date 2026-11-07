@@ -83,7 +83,7 @@ A interface declara **6 metodos abstratos, sem default** — toda classe `implem
 | `beforeInsert(ctx)`| Antes de inserir o documento                        | Raramente usado — prefira `@Listener`     |
 | `afterInsert(ctx)` | Apos inserir o documento                            | Raramente usado — prefira `@Listener`     |
 | `beforeUpdate(ctx)`| Antes de atualizar (inclui confirmacao/faturamento) | **Caso de uso principal**                 |
-| `afterUpdate(ctx)` | Apos atualizar (inclui confirmacao/faturamento)     | Integracoes assincronas pos-confirmacao   |
+| `afterUpdate(ctx)` | Apos atualizar (inclui confirmacao/faturamento)     | Integracao pos-confirmacao (pos-commit)   |
 | `beforeDelete(ctx)`| Antes de excluir o documento                        | Raramente usado — prefira `@Listener`     |
 | `afterDelete(ctx)` | Apos excluir o documento                            | Raramente usado — prefira `@Listener`     |
 
@@ -237,17 +237,19 @@ public class AdicionaObservacaoConfirmacaoRegra implements Regra {
 }
 ```
 
-### Exemplo 3: Integracao assincrona pos-confirmacao
+### Exemplo 3: Integracao depois do commit da confirmacao
 
 ```java
 @BusinessRule(description = "Envia nota para sistema externo apos confirmacao")
 public class IntegracaoExternaRegra implements Regra {
 
     private final IntegracaoService integracaoService;
+    private final AfterCommit afterCommit;
 
     @Inject
-    public IntegracaoExternaRegra(IntegracaoService integracaoService) {
+    public IntegracaoExternaRegra(IntegracaoService integracaoService, AfterCommit afterCommit) {
         this.integracaoService = integracaoService;
+        this.afterCommit = afterCommit;
     }
 
     @Override
@@ -262,8 +264,8 @@ public class IntegracaoExternaRegra implements Regra {
 
         BigDecimal nuNota = notaVO.asBigDecimal("NUNOTA");
 
-        // Assincrono — nao bloqueia thread da confirmacao
-        CompletableFuture.runAsync(() -> integracaoService.enviar(nuNota));
+        // So sai se a confirmacao commitar; em rollback, nada e enviado
+        afterCommit.run(() -> integracaoService.enviar(nuNota));
     }
 
     // interface exige os 6; deixe vazios os que nao usar
@@ -281,8 +283,8 @@ public class IntegracaoExternaRegra implements Regra {
 
 - **Velocidade**: Regra roda dentro da transacao da confirmacao. Deve executar em milissegundos.
 - **`@Transactional` no service chamado daqui: confira o `TxType`.** A regra ja roda dentro da sessao e da transacao da operacao. `@Transactional` bare (`REQUIRED`, o default) entra nessa transacao — caso seguro. `REQUIRES_NEW` suspende a transacao da operacao e commita por conta propria: se a operacao for revertida depois, o que ele gravou fica. `NOT_SUPPORTED` roda fora dela e nao participa do commit/rollback. Nada falha na hora — o bug so aparece quando a operacao da erro depois da chamada.
-- **Assincronismo para integracoes**: Chamadas a APIs externas = sempre `CompletableFuture`, `ExecutorService` ou JMS. Nunca sincrono.
-- **Integracao que nao pode sair se a operacao for desfeita**: `CompletableFuture` dispara na hora, antes do commit — se a confirmacao der rollback depois, a chamada ja saiu. Agende para depois do commit com `addOnSucessTXTask` (skill `listener`, secao 9).
+- **Integracao externa nunca dentro da transacao**: chamada HTTP/Web Service direto na regra segura a transacao da confirmacao. Agende para depois do commit com `AfterCommit` (`addOnSucessTXTask`, skill `listener`, secao 9) — a tarefa roda sem transacao e excecao nela e engolida, entao trate e logue dentro. Entrega que nao pode se perder: tabela-fila + `@Job`.
+- **`CompletableFuture`/`ExecutorService` direto na regra dispara antes do commit**: se a confirmacao der rollback depois, a chamada ja saiu.
 - **Classe enxuta (boa pratica)**: a classe da `@BusinessRule` filtra o evento e delega a regra para outra classe injetada (ex.: service `@Component`) — a organizacao em camadas e do projeto.
 - **Feedback ao usuario**: Use `addMensagem()` para informar acoes automaticas executadas.
 - **Excecoes para bloqueio**: lance excecao tipada do projeto com mensagem clara para impedir a operacao.
@@ -294,7 +296,7 @@ public class IntegracaoExternaRegra implements Regra {
 | Anti-Pattern                                   | Correcao                                                    |
 |:-----------------------------------------------|:------------------------------------------------------------|
 | Usar para CRUD simples (salvar/excluir)         | Usar `@Listener`                                            |
-| Chamada sincrona a API/Web Service              | Usar `CompletableFuture` ou JMS                             |
+| Chamada sincrona a API/Web Service              | `AfterCommit` (depois do commit) ou tabela-fila + `@Job`    |
 | Usar `afterInsert` para validacao               | Validar antes de gravar — `@Listener` `beforeInsert` (ou `beforeUpdate` da regra na confirmacao) |
 | `new` em dependencias gerenciadas               | Injetar via construtor com `@Inject`                        |
 | Usar para Notas de Entrada (compras)            | Usar `@Callback` — skill `callback`                         |
@@ -310,7 +312,7 @@ public class IntegracaoExternaRegra implements Regra {
 5. [ ] Implementar a logica so nos metodos de evento necessarios; os demais ficam com corpo vazio (a interface exige os 6).
 6. [ ] Detectar o momento correto (confirmacao, faturamento) via comparacao `oldVO`/`newVO` ou `JapeSession`.
 7. [ ] Delegar logica de negocio para Service (`@Component`).
-8. [ ] Integracoes externas: usar mecanismo assincrono.
+8. [ ] Integracoes externas: fora da transacao — `AfterCommit` ou tabela-fila + `@Job`.
 9. [ ] Fornecer feedback ao usuario via `addMensagem()` ou excecao com mensagem clara.
 10. [ ] Registrar no modulo Guice os **services/dependencias injetados** na classe — a classe da regra em si nao precisa de binding (o SDK a descobre pela anotacao `@BusinessRule`). Ver `dependency-injection`.
 
