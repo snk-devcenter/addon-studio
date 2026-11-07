@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.5.1] - 2026-11-06
+
 ### Corrigido
 
 - Skills `data-dictionary` e `entity` mapeiam `CAIXA_TEXTO`/`HTML` como `char[]` e `ARQUIVO`/`MULTIPLOS_ARQUIVOS`/`IMAGEM` como `byte[]`, em vez de `String`, que quebrava `save` e `fromVO` no servidor; o sub-agent `addon-reviewer` aponta o `String` como blocker e a skill `test` ensina o teste de `EntityMapper.fromVO` que pega o erro sem servidor.
@@ -490,7 +492,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.0...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.1...HEAD
+[3.5.1]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.0...v3.5.1
 [3.5.0]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.6...v3.5.0
 [3.4.6]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.5...v3.4.6
 [3.4.5]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.4...v3.4.5
