@@ -13,6 +13,7 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 ### Corrigido
 
 - Skills `data-dictionary` e `entity` mapeiam `CAIXA_TEXTO`/`HTML` como `char[]` e `ARQUIVO`/`MULTIPLOS_ARQUIVOS`/`IMAGEM` como `byte[]`, em vez de `String`, que quebrava `save` e `fromVO` no servidor; o sub-agent `addon-reviewer` aponta o `String` como blocker e a skill `test` ensina o teste de `EntityMapper.fromVO` que pega o erro sem servidor.
+- Skill `data-dictionary` cita `DataType.TEXT_BOX` para `CAIXA_TEXTO` no lugar de `DataType.LARGE_TEXT`, constante que não existe no SDK.
 
 ### Alterado
 
