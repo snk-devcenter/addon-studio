@@ -71,7 +71,7 @@ Entidade original com atributos extra no `@Column`? Mapeie pra XML:
 | Java (`DataType`)              | XML (`dataType`)       | Notas                                                          |
 |:-------------------------------|:-----------------------|:---------------------------------------------------------------|
 | `DataType.TEXT`                | `TEXTO`                | Exige atributo `size` no XML                                   |
-| `DataType.LARGE_TEXT`          | `CAIXA_TEXTO`          | Textarea/multi-line. Exige `size`                              |
+| `DataType.TEXT_BOX`            | `CAIXA_TEXTO`          | Textarea/multi-line. Exige `size`                              |
 | `DataType.INTEGER`             | `INTEIRO`              | —                                                              |
 | `DataType.DECIMAL`             | `DECIMAL`              | Exige `nuCasasDecimais`                                        |
 | `DataType.DATE`                | `DATA`                 | Sem hora                                                       |
