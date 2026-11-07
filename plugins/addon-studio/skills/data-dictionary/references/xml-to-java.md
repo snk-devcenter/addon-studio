@@ -89,7 +89,7 @@ Pra **cada** `<field>` no XML, cria campo Java com **so** `@Column(name = "<nome
 | XML `dataType`        | Tipo Java sugerido                                |
 |:----------------------|:--------------------------------------------------|
 | `TEXTO`               | `String`                                          |
-| `CAIXA_TEXTO`         | `String`                                          |
+| `CAIXA_TEXTO`         | `char[]` (CLOB, ver nota abaixo)                  |
 | `INTEIRO`             | `BigDecimal` ou `Integer` (PK addon = `Integer`, PK nativa Sankhya = `BigDecimal`) |
 | `DECIMAL`             | `BigDecimal`                                      |
 | `DATA`                | `java.sql.Date`                                   |
@@ -98,10 +98,17 @@ Pra **cada** `<field>` no XML, cria campo Java com **so** `@Column(name = "<nome
 | `CHECKBOX`            | `Boolean`                                         |
 | `LISTA`               | `String` (valor da `<option>`)                    |
 | `PESQUISA`            | Tipo correspondente ao `targetType` (FK simples). Se navegar para entidade, adicionar `@OneToOne`/`@JoinColumn` com a entidade-alvo |
-| `HTML`                | `String`                                          |
-| `ARQUIVO`             | `String` (chave/path do arquivo)                  |
-| `MULTIPLOS_ARQUIVOS`  | `String` (chaves serializadas)                    |
-| `IMAGEM`              | `String` (chave/path da imagem)                   |
+| `HTML`                | `char[]` (CLOB, ver nota abaixo)                  |
+| `ARQUIVO`             | `byte[]` (BLOB, ver nota abaixo)                  |
+| `MULTIPLOS_ARQUIVOS`  | `byte[]` (BLOB, ver nota abaixo)                  |
+| `IMAGEM`              | `byte[]` (BLOB, ver nota abaixo)                  |
+
+> **CLOB/BLOB nao aceitam `String`.** O JAPE decide o tipo do valor pelo `TIPCAMPO` do campo no dicionario (`TDDCAM`): `CAIXA_TEXTO` e `HTML` viram `C` (CLOB) e trafegam como `char[]`; `ARQUIVO`, `MULTIPLOS_ARQUIVOS` e `IMAGEM` viram `B` (BLOB) e trafegam como `byte[]`. Campo declarado `String` compila e passa em teste com repository mockado, mas quebra no servidor:
+>
+> - gravacao (`save`): `'<Instancia>->CAMPO': Tipo esperado 'char[]' , tipo recebido 'java.lang.String'.`
+> - leitura (`fromVO`): `PersistenceError: IllegalArgumentException: Can not set java.lang.String field <Entidade>.<campo> to [C` (`[B` no BLOB)
+>
+> O criterio e o `TIPCAMPO`, nao o tipo fisico da coluna: coluna CLOB no banco declarada no XML como `TEXTO` (`TIPCAMPO = S`) continua `String`. Precisa de texto no dominio? Converta na borda, preservando `null`: `s == null ? null : s.toCharArray()` na gravacao e `chars == null ? null : new String(chars)` na leitura. Teste que pega o tipo errado sem servidor: skill `test`, "Teste de mapeamento CLOB/BLOB".
 
 > Campos `dataType="PESQUISA"` geram campo Java com tipo FK conforme `targetType`. Nao precisa `@OneToOne` / `@JoinColumn` so por ser PESQUISA — so adiciona quando entidade precisa navegar pra referenciada no dominio.
 

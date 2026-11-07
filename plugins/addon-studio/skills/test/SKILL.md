@@ -409,6 +409,34 @@ void beforeUpdate_deveRecalcularVlrTot_quandoVlrUnitModificado() throws Exceptio
 - Prove que a suite pega gravacao indevida: force uma vez o listener a gravar todas as colunas
   (ex.: `EntityMapper.updateVO`) e confira que algum teste quebra.
 
+## Teste de mapeamento CLOB/BLOB (`EntityMapper.fromVO`)
+
+Campo `CAIXA_TEXTO`/`HTML` (CLOB) tem que ser `char[]` na entidade e `ARQUIVO`/`MULTIPLOS_ARQUIVOS`/`IMAGEM`
+(BLOB) tem que ser `byte[]` (skill `entity`, "Mapeamento de tipos"). Declarado como `String`, compila e
+passa em todo teste com `JapeRepository` mockado, e so quebra no servidor. O `fromVO` sobre um
+`DynamicVOPojo` com o valor no tipo que o JAPE entrega pega o erro sem servidor:
+
+```java
+import br.com.sankhya.jape.vo.DynamicVOPojo;
+import br.com.sankhya.sdk.data.repository.impl.EntityMapper;
+
+@Test
+void fromVO_deveMapearCamposClobEBlob() {
+    DynamicVOPojo vo = new DynamicVOPojo();
+    vo.setProperty("RETORNO", "x".toCharArray());       // CLOB chega como char[]
+    vo.setProperty("ANEXO", new byte[] {1, 2});         // BLOB chega como byte[]
+
+    PrxXyzLogIntegracao log = EntityMapper.fromVO(vo, PrxXyzLogIntegracao.class);
+
+    assertThat(log.getRetorno()).containsExactly('x');
+    assertThat(log.getAnexo()).hasSize(2);
+}
+```
+
+- Com o campo `String`, o `fromVO` lanca `PersistenceError: IllegalArgumentException: Can not set
+  java.lang.String field ... to [C` (`[B` no BLOB) — o mesmo erro da leitura em producao.
+- Um teste por entidade com campo CLOB/BLOB, preenchendo todos eles no mesmo VO.
+
 ## Boas praticas
 
 - Declare `throws Exception` em metodos teste que interajam com repositorios JapeRepository.
@@ -460,6 +488,7 @@ Fluxo dev Addon Studio: rode testes antes de `deployAddon`.
 - [ ] Sem dependencia externa real em teste unitario.
 - [ ] `./gradlew :<modulo-backend>:test` passando local.
 - [ ] `throws Exception` declarado em metodos que interagem com repositorios.
+- [ ] Entidade com campo CLOB/BLOB tem teste de `EntityMapper.fromVO` (ver "Teste de mapeamento CLOB/BLOB").
 - [ ] Stubs sem acentos nas asserções de mensagem.
 
 

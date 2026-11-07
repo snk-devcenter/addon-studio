@@ -59,6 +59,7 @@ Estruturar feedback em 3 níveis de severidade:
 ### 🔴 Blockers (must-fix antes de merge)
 - Violação que quebra runtime ou compromete segurança
 - Inclui: encoding errado, API pós-Java 8 (`var`, `List.of`, `isBlank`...), JPA padrão em vez de @JapeEntity, `new` em dep gerenciada, RuntimeException cru, controller com try/catch, repository manual
+- Inclui: `@Column` tipado `String` cujo `<field>` no XML do dicionário é `CAIXA_TEXTO`/`HTML` (CLOB, exige `char[]`) ou `ARQUIVO`/`MULTIPLOS_ARQUIVOS`/`IMAGEM` (BLOB, exige `byte[]`). Para cada `@Column` de entidade alterada, abrir o `datadictionary/<TABELA>.xml` e conferir o `dataType` do `<field>` — compila e passa em teste com repository mockado, mas quebra no `save`/`fromVO` do servidor. Coluna CLOB física declarada como `TEXTO` no XML continua `String`. Ver skill `entity`, "Mapeamento de tipos"
 - Inclui: `<table sequenceType="M">` em tabela de config/log/registro/apoio do addon (tela grava sem chave → `ORA-01400`); seed em dbscript com PK literal em tabela de PK automática. `"M"` só passa com PK composta só de FKs, código de negócio externo ou espelho de chave nativa — ver skill `data-dictionary`, seção "Como determinar `sequenceType`"
 
 ### 🟡 Warnings (should-fix)
