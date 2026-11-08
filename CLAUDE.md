@@ -21,7 +21,7 @@ Marketplace Claude Code (`snk-devcenter`) + o plugin `addon-studio` (skills e su
     └── skills/<nome>/SKILL.md          # 1 diretório por skill
 ```
 
-Não há build do plugin: o entregável é markdown + JSON. O único empacotamento é `scripts/build-release-artifacts.sh`, que gera os instaladores e pacotes anexados à GitHub Release. Validação = ler o diff, conferir os manifests (`jq . <arquivo>`) e, se tocar nos instaladores, rodar `sh scripts/test-release-artifacts.sh`.
+Não há build do plugin: o entregável é markdown + JSON. O único empacotamento é `scripts/build-release-artifacts.sh`, que gera os instaladores e pacotes anexados à GitHub Release. Validação = ler o diff, rodar `claude plugin validate . --strict` (marketplace) e `claude plugin validate plugins/addon-studio --strict` (plugin: manifest, skills, agents e hooks) e, se tocar nos instaladores, rodar `sh scripts/test-release-artifacts.sh`.
 
 Mexeu em `description` de skill ou de sub-agent? Rode a esteira de disparo antes do PR — `tools/skill-trigger-audit/README.md`. Ela mede se a skill dispara sem âncora no projeto e guarda o histórico em `runs/`; description nova sem cenário na esteira passa a ser dívida.
 
@@ -80,3 +80,12 @@ Checagem final: `plugin.json`, `marketplace.json` e o topo do `CHANGELOG.md` apo
 - **Exemplos sem dado real de cliente**: prefixo parametrizado `<PRX>`, sem branding, sem `resourceId` nativo ou perfil de app concreto.
 - **Snippet não declara `package` do projeto consumidor.** Só imports. Um `package ...infrastructure.integration` num exemplo é lido pelo modelo como layout recomendado e vence qualquer prosa de "sem opinião arquitetural" — código copiável fala mais alto que disclaimer. Vale também para nome de diretório e árvore de arquivos em prosa. Exceção: `package` de classe do **SDK**, quando o snippet documenta onde o símbolo mora.
 - Skills e docs deste repo são markdown **UTF-8**. A regra ISO-8859-1 é conteúdo ensinado às skills (vale para `.java`/`.xml`/`.kt`/`.properties` do projeto consumidor), não para os arquivos daqui.
+
+## Já decidido
+
+Propostas que já foram avaliadas e recusadas. Não reabrir sem argumento novo.
+
+- **`@Service` não é mapeado.** É o predecessor legado de `@Controller` (só mapeia o Servlet, sem DI completa). Existir no jar não basta para entrar na skill. Única menção permitida: a linha de anti-pattern da skill `controller` que aponta `@Controller` para o endpoint e `@Component` para o service de negócio.
+- **Sem rótulo "Beta" ou "Acesso Antecipado".** O plugin assume que o projeto consumidor tem as features do SDK habilitadas.
+- **Sub-agents usam só `model: sonnet` ou `opus`.** Haiku não entra, nem como corte de custo.
+- **Arquitetura é escolha do dev.** Controller fino com service `@Component` entra como boa prática, nunca como regra, anti-pattern PROIBIDO ou linha no `ADDON.md`. Regra do plugin é só API do SDK.
