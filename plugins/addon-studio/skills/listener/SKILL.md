@@ -508,7 +508,6 @@ public void afterUpdate(PersistenceEvent event) throws Exception {
 ## Skills relacionadas
 
 - `entity` — entidade `@JapeEntity` alvo do listener; `EntityMapper.fromVO` converte VO → entidade
-- `repository` — recarregar registro completo pela PK quando o VO do `beforeUpdate` só traz o delta
 - `before-load-listener` — interceptação de **leitura** (escopo distinto: busca, não CRUD)
 - `business-rule` — hook transacional do barramento comercial (notas)
 - `job` — processamento assíncrono da tabela-fila alimentada pelo listener
