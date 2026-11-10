@@ -389,6 +389,7 @@ void beforeUpdate_deveRecalcularVlrTot_quandoVlrUnitModificado() throws Exceptio
     ModifingFields alterados = new ModifingFields(delta);
     alterados.put("VLRUNIT", new Object[] {new BigDecimal("1"), new BigDecimal("5")});
 
+    when(event.getType()).thenReturn(PersistenceEvent.BEFORE_UPDATE);
     when(event.getVo()).thenReturn(delta);
     when(event.getOldVO()).thenReturn(anterior);
     when(event.getModifingFields()).thenReturn(alterados);
@@ -401,6 +402,8 @@ void beforeUpdate_deveRecalcularVlrTot_quandoVlrUnitModificado() throws Exceptio
 }
 ```
 
+- Stube `event.getType()` com o evento que o listener recebe: o mock devolve `0` (`BEFORE_INSERT`)
+  e a fabrica do `EventEntity` de qualquer outro evento lanca a excecao de tipo — ver skill `listener`.
 - O `verify(delta, never())` sobre coluna fora do evento e o que pega listener gravando a entidade
   inteira no VO (`EntityMapper.updateVO`), que anula essas colunas no banco — ver skill `listener`.
 - `DynamicVOPojo.buildClone()` (e `clean()`) nao e implementado: lanca `IllegalStateException`.

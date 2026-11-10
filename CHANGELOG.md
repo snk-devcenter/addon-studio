@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Corrigido
+
+- Skill `listener` valida o tipo do evento em cada fábrica do `EventEntity` e adiciona `afterPersist` para os eventos `after*`, com a tabela evento → fábrica; skill `test` stuba `getType()` do evento no teste de listener.
+
 ## [3.5.2] - 2026-11-06
 
 ### Adicionado

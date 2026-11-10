@@ -183,7 +183,7 @@ public void beforeUpdate(PersistenceEvent event) throws Exception {
 }
 ```
 
-> **Gotcha:** no update, `vo.getProperty("CAMPO")` de campo **não alterado** pode vir `null` — o VO do evento só carrega o delta. Precisa do registro completo em `after*`? Leia a PK do VO e recarregue via repository/use case.
+> **Gotcha:** no update, `vo.getProperty("CAMPO")` de campo **não alterado** pode vir `null` — o VO do evento só carrega o delta. Precisa do registro completo em `after*`? `EventEntity.afterPersist` (§7) lê a entidade do `getVo()`, que nos eventos `after*` traz o registro completo.
 
 > **Gotchas do `ModifingFields`:**
 > - `getOldValue("CAMPO")` de campo **não alterado** **não** devolve o valor anterior: devolve `getProperty` do próprio VO do evento (o mesmo delta de `getVo()`), que pode vir `null`. Estado anterior completo: `event.getOldVO()`.
@@ -220,7 +220,24 @@ public void beforeUpdate(PersistenceEvent event) throws Exception {
     }
     pedido.writeChanges(); // so as colunas que a regra mudou
 }
+
+@Override
+public void afterUpdate(PersistenceEvent event) throws Exception {
+    PrxXyzPedido pedido = EventEntity.afterPersist(event, PrxXyzPedido.class);
+    pedidoService.notificarAlteracao(pedido);
+}
 ```
+
+Cada evento tem a sua fábrica — a fábrica errada lança a exceção do projeto já no início, dizendo qual usar:
+
+| Evento | Fábrica | Devolve |
+|:-------|:--------|:--------|
+| `beforeInsert` | `EventEntity.fromInsert(event, Classe)` | `EventEntity<T>` — `entity()` + `writeChanges()` |
+| `beforeUpdate` | `EventEntity.fromUpdate(event, Classe)` | `EventEntity<T>` — `entity()` + `writeChanges()` |
+| `afterInsert` / `afterUpdate` / `afterDelete` | `EventEntity.afterPersist(event, Classe)` | só a entidade `T` — nada volta ao VO |
+| `beforeDelete` | `EntityMapper.fromVO(event.getVo(), Classe)` | a entidade `T` — exclusão não grava VO |
+
+Padrão: todo evento `after*` usa `afterPersist`.
 
 `EventEntity` **não é do SDK** — é classe do projeto, só com API pública do SDK. Implementação de referência:
 
@@ -259,6 +276,7 @@ public final class EventEntity<T> {
 
     /** Para beforeInsert: o VO da inclusao ja traz o registro inteiro. */
     public static <T> EventEntity<T> fromInsert(PersistenceEvent event, Class<T> type) {
+        requireType(event, PersistenceEvent.BEFORE_INSERT);
         T original = EntityMapper.fromVO(event.getVo(), type);
         T entity = EntityMapper.fromVO(event.getVo(), type);
         return new EventEntity<T>((DynamicVO) event.getVo(), columns(type), original, entity);
@@ -267,12 +285,20 @@ public final class EventEntity<T> {
     /** Para beforeUpdate, o unico evento em que o JAPE entrega o registro anterior. */
     public static <T> EventEntity<T> fromUpdate(PersistenceEvent event, Class<T> type)
             throws IllegalAccessException {
+        requireType(event, PersistenceEvent.BEFORE_UPDATE);
         List<Field> columns = columns(type);
         EntityVO previous = event.getOldVO();
         ModifingFields modified = event.getModifingFields();
         T original = currentState(previous, modified, type, columns);
         T entity = currentState(previous, modified, type, columns);
         return new EventEntity<T>((DynamicVO) event.getVo(), columns, original, entity);
+    }
+
+    /** Para afterInsert, afterUpdate e afterDelete: o registro ja foi gravado e o VO traz o registro completo. */
+    public static <T> T afterPersist(PersistenceEvent event, Class<T> type) {
+        requireType(event, PersistenceEvent.AFTER_INSERT, PersistenceEvent.AFTER_UPDATE,
+                PersistenceEvent.AFTER_DELETE);
+        return EntityMapper.fromVO(event.getVo(), type);
     }
 
     public T entity() {
@@ -289,6 +315,18 @@ public final class EventEntity<T> {
                 vo.setProperty(column.name(), EntityMapper.adaptToVo(field, after, column));
             }
         }
+    }
+
+    // getOldVO fora do beforeUpdate so acusa com um PersistenceError generico: falha aqui, dizendo qual fabrica usar.
+    private static void requireType(PersistenceEvent event, int... types) {
+        for (int type : types) {
+            if (event.getType() == type) {
+                return;
+            }
+        }
+        throw new EventoDePersistenciaInvalidoException("EventEntity: fromInsert vale no beforeInsert, "
+                + "fromUpdate no beforeUpdate e afterPersist nos eventos after; evento recebido do tipo "
+                + event.getType() + ".");
     }
 
     private static <T> T currentState(EntityVO previous, ModifingFields modified, Class<T> type,
@@ -324,12 +362,14 @@ public final class EventEntity<T> {
 }
 ```
 
+- Cada fábrica valida `event.getType()` antes de ler o evento: sem isso, `fromUpdate` no `afterUpdate` só quebra no `getOldVO()` com `PersistenceError: Chamada de método válida apenas para eventos 'before-update'`. `EventoDePersistenciaInvalidoException` é exceção do projeto (`extends RuntimeException`) — use a exceção tipada que o projeto já tiver.
 - `fromInsert`: `fromVO(event.getVo())`.
 - `fromUpdate`: `fromVO(event.getOldVO())` com os valores novos do `ModifingFields` por cima (`EntityMapper.adaptFromVO`) — o estado completo do registro depois do update.
 - `writeChanges()`: compara a entidade antes × depois, `@Column` a `@Column`, e grava no VO só o que mudou, convertido por `EntityMapper.adaptToVo` (enum → valor do banco, `Integer` → `BigDecimal`).
-- Só em `before*` — `getOldVO()` só existe em `beforeUpdate`. Cobre os `@Column` declarados na própria classe; PK composta (`@Embeddable`) e relacionamentos ficam de fora.
-- Em `after*` nada volta ao VO: `fromVO(event.getVo())` basta para ler a PK e recarregar pelo repository.
+- `writeChanges()` só existe em `before*` — `getOldVO()` só existe em `beforeUpdate`. Cobre os `@Column` declarados na própria classe; PK composta (`@Embeddable`) e relacionamentos ficam de fora.
+- `afterPersist`: `fromVO(event.getVo())` com o registro completo — em `after*` o registro já foi gravado e nada volta ao VO, por isso devolve só a entidade.
 - Teste com `DynamicVOPojo` real, verificando que coluna fora do evento fica intocada — ver skill `test`.
+- **Gotcha — tipo do evento em teste:** mock de `PersistenceEvent` devolve `getType() == 0` (`BEFORE_INSERT`), e a fábrica de qualquer outro evento lança a exceção do `requireType`. Stube o tipo do evento que o listener recebe: `when(event.getType()).thenReturn(PersistenceEvent.BEFORE_UPDATE)`.
 
 ---
 
