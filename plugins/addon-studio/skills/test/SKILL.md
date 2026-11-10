@@ -367,7 +367,7 @@ servidor, inclusive com `EntityMapper.fromVO`. Vem do JAPE, no mesmo classpath d
 `setProperty`:
 
 - insert: `getVo()` com o registro inteiro.
-- update: `getVo()` so com PK + campos alterados; `getOldVO()` com o registro anterior completo;
+- beforeUpdate: `getVo()` so com PK + campos alterados; `getOldVO()` com o registro anterior completo;
   `ModifingFields` real com `{antigo, novo}` de cada campo alterado.
 
 ```java
@@ -383,7 +383,7 @@ void beforeUpdate_deveRecalcularVlrTot_quandoVlrUnitModificado() throws Exceptio
     anterior.setProperty("VLRUNIT", new BigDecimal("1"));
     anterior.setProperty("QTD", new BigDecimal("2"));
 
-    DynamicVOPojo delta = spy(new DynamicVOPojo());     // update: so PK + campos alterados
+    DynamicVOPojo delta = spy(new DynamicVOPojo());     // beforeUpdate: so PK + campos alterados
     delta.setProperty("NUPED", new BigDecimal(100));
     delta.setProperty("VLRUNIT", new BigDecimal("5"));
     ModifingFields alterados = new ModifingFields(delta);
