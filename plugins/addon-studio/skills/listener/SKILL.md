@@ -69,7 +69,7 @@ public class PrxXyzPedidoListener extends PersistenceEventAdapter {
         ((DynamicVO) event.getVo()).setProperty("VLRTOT", total);
     }
 
-    // VO do update so traz os campos alterados: o que nao mudou vem do registro anterior
+    // VO do beforeUpdate so traz os campos alterados: o que nao mudou vem do registro anterior
     private static BigDecimal valorAtual(PersistenceEvent event, String campo) {
         EntityVO origem = event.getModifingFields().isModifing(campo) ? event.getVo() : event.getOldVO();
         return ((DynamicVO) origem).asBigDecimalOrZero(campo);
@@ -79,7 +79,7 @@ public class PrxXyzPedidoListener extends PersistenceEventAdapter {
 
 - Classe **estende** `br.com.sankhya.jape.event.PersistenceEventAdapter` e sobrescreve só os eventos de interesse.
 - Listener é **entrypoint fino**: filtra o evento, manipula o `DynamicVO` e **delega a regra de negócio** a service/use case injetado.
-- No update o VO do evento só traz PK + campos alterados — **não** reaproveite o `beforeInsert` lendo o VO: campo não alterado viria `null` (zero no cálculo). Valor atual = novo se alterado, senão `getOldVO()`. Regra na entidade tipada: §7.
+- No `beforeUpdate` o VO do evento só traz PK + campos alterados — **não** reaproveite o `beforeInsert` lendo o VO: campo não alterado viria `null` (zero no cálculo). Valor atual = novo se alterado, senão `getOldVO()`. Regra na entidade tipada: §7.
 
 ---
 
@@ -152,7 +152,7 @@ PrxXyzPedido pedido = EntityMapper.fromVO(event.getVo(), PrxXyzPedido.class);
 if (!pedido.deveProcessar()) return;  // regra de dominio na entidade, nao no listener
 ```
 
-> `fromVO(event.getVo())` monta a entidade com **o que veio no VO**: completa no insert, só PK + delta no update. Para ler e **alterar** a entidade em `beforeUpdate` e devolver ao VO, ver §7 — `EntityMapper.updateVO` ali apaga dados.
+> `fromVO(event.getVo())` monta a entidade com **o que veio no VO**: completa no insert e nos eventos `after*` (use `EventEntity.afterPersist`, §7), só PK + delta no `beforeUpdate`. Para ler e **alterar** a entidade em `beforeUpdate` e devolver ao VO, ver §7 — `EntityMapper.updateVO` ali apaga dados.
 
 > **Gotcha — variável tipada:** a assinatura é `<T> T fromVO(EntityVO, Class<?>)` — o `T` vem do lado esquerdo da atribuição, não da classe passada. Encadear a chamada (`EntityMapper.fromVO(event.getVo(), PrxXyzPedido.class).deveProcessar()`) não compila: `cannot find symbol ... location: class Object`. Guarde numa variável do tipo da entidade, como acima.
 
@@ -162,7 +162,7 @@ if (!pedido.deveProcessar()) return;  // regra de dominio na entidade, nao no li
 
 ## 6. `ModifingFields` — filtrar updates por campo alterado
 
-`beforeUpdate`/`afterUpdate` disparam em **qualquer** update da instância — e o evento de update **só traz os campos alterados** no VO. Filtre pelo que mudou:
+`beforeUpdate`/`afterUpdate` disparam em **qualquer** update da instância — e o VO do `beforeUpdate` **só traz os campos alterados** (no `afterUpdate` o `getVo()` traz o registro completo). Filtre pelo que mudou:
 
 | Método                        | Uso                                                            |
 |:-------------------------------|:-----------------------------------------------------------------|
@@ -183,10 +183,10 @@ public void beforeUpdate(PersistenceEvent event) throws Exception {
 }
 ```
 
-> **Gotcha:** no update, `vo.getProperty("CAMPO")` de campo **não alterado** pode vir `null` — o VO do evento só carrega o delta. Precisa do registro completo em `after*`? Leia a PK do VO e recarregue via repository/use case.
+> **Gotcha:** no `beforeUpdate`, `vo.getProperty("CAMPO")` de campo **não alterado** pode vir `null` — o VO do evento só carrega o delta. Precisa do registro completo em `after*`? `EventEntity.afterPersist` (§7) lê a entidade do `getVo()`, que nos eventos `after*` traz o registro completo.
 
 > **Gotchas do `ModifingFields`:**
-> - `getOldValue("CAMPO")` de campo **não alterado** **não** devolve o valor anterior: devolve `getProperty` do próprio VO do evento (o mesmo delta de `getVo()`), que pode vir `null`. Estado anterior completo: `event.getOldVO()`.
+> - `getOldValue("CAMPO")` de campo **não alterado** **não** devolve o valor anterior: devolve `getProperty` do próprio VO do evento (no `beforeUpdate`, o mesmo delta de `getVo()`), que pode vir `null`. Estado anterior completo: `event.getOldVO()`.
 > - `getNewValue("CAMPO")` de campo não alterado lança `IllegalStateException` — cheque `isModifing("CAMPO")` antes.
 > - `getModifingFields()` fora de `beforeUpdate`/`afterUpdate` e `getOldVO()` fora de `beforeUpdate` lançam `PersistenceError`.
 > - Em teste, **não** use mock de `ModifingFields`: stub de `isModifing` não alimenta `isModifingAny` (devolve `false`) e o teste passa sem exercitar o filtro. Use a instância real — ver skill `test`.
@@ -197,7 +197,7 @@ public void beforeUpdate(PersistenceEvent event) throws Exception {
 
 O SDK converte nos dois sentidos: `EntityMapper.fromVO(EntityVO, Classe)` (VO → entidade) e `EntityMapper.updateVO(entidade, vo, Classe)` (entidade → VO). O par `fromVO` + regra + `updateVO` é seguro em `beforeInsert` — o VO da inclusão traz o registro inteiro — e **apaga dados em `beforeUpdate`**:
 
-- O VO do update só traz PK + campos alterados; os demais `@Column` chegam `null` na entidade.
+- O VO do `beforeUpdate` só traz PK + campos alterados; os demais `@Column` chegam `null` na entidade.
 - `updateVO` grava **todo** `@Column` no VO, inclusive `null`. Não há rastreio de alteração para `@Column`.
 - O JAPE decide o que mudou **comparando valores** (VO × registro no banco): campo que não veio no evento é ignorado, mas campo que voltou `null` conta como alterado para nulo. As colunas fora do evento são anuladas — ou o update falha com `Propriedade requerida` se a coluna é `NOT NULL` sem default.
 
@@ -220,7 +220,24 @@ public void beforeUpdate(PersistenceEvent event) throws Exception {
     }
     pedido.writeChanges(); // so as colunas que a regra mudou
 }
+
+@Override
+public void afterUpdate(PersistenceEvent event) throws Exception {
+    PrxXyzPedido pedido = EventEntity.afterPersist(event, PrxXyzPedido.class);
+    pedidoService.notificarAlteracao(pedido);
+}
 ```
+
+Cada evento tem a sua fábrica — a fábrica errada lança a exceção do projeto já no início, dizendo qual usar:
+
+| Evento | Fábrica | Devolve |
+|:-------|:--------|:--------|
+| `beforeInsert` | `EventEntity.fromInsert(event, Classe)` | `EventEntity<T>` — `entity()` + `writeChanges()` |
+| `beforeUpdate` | `EventEntity.fromUpdate(event, Classe)` | `EventEntity<T>` — `entity()` + `writeChanges()` |
+| `afterInsert` / `afterUpdate` / `afterDelete` | `EventEntity.afterPersist(event, Classe)` | só a entidade `T` — nada volta ao VO |
+| `beforeDelete` | `EntityMapper.fromVO(event.getVo(), Classe)` | a entidade `T` — exclusão não grava VO |
+
+Padrão: todo evento `after*` usa `afterPersist`.
 
 `EventEntity` **não é do SDK** — é classe do projeto, só com API pública do SDK. Implementação de referência:
 
@@ -259,6 +276,7 @@ public final class EventEntity<T> {
 
     /** Para beforeInsert: o VO da inclusao ja traz o registro inteiro. */
     public static <T> EventEntity<T> fromInsert(PersistenceEvent event, Class<T> type) {
+        requireType(event, PersistenceEvent.BEFORE_INSERT);
         T original = EntityMapper.fromVO(event.getVo(), type);
         T entity = EntityMapper.fromVO(event.getVo(), type);
         return new EventEntity<T>((DynamicVO) event.getVo(), columns(type), original, entity);
@@ -267,12 +285,20 @@ public final class EventEntity<T> {
     /** Para beforeUpdate, o unico evento em que o JAPE entrega o registro anterior. */
     public static <T> EventEntity<T> fromUpdate(PersistenceEvent event, Class<T> type)
             throws IllegalAccessException {
+        requireType(event, PersistenceEvent.BEFORE_UPDATE);
         List<Field> columns = columns(type);
         EntityVO previous = event.getOldVO();
         ModifingFields modified = event.getModifingFields();
         T original = currentState(previous, modified, type, columns);
         T entity = currentState(previous, modified, type, columns);
         return new EventEntity<T>((DynamicVO) event.getVo(), columns, original, entity);
+    }
+
+    /** Para afterInsert, afterUpdate e afterDelete: o registro ja foi gravado e o VO traz o registro completo. */
+    public static <T> T afterPersist(PersistenceEvent event, Class<T> type) {
+        requireType(event, PersistenceEvent.AFTER_INSERT, PersistenceEvent.AFTER_UPDATE,
+                PersistenceEvent.AFTER_DELETE);
+        return EntityMapper.fromVO(event.getVo(), type);
     }
 
     public T entity() {
@@ -289,6 +315,18 @@ public final class EventEntity<T> {
                 vo.setProperty(column.name(), EntityMapper.adaptToVo(field, after, column));
             }
         }
+    }
+
+    // getOldVO fora do beforeUpdate so acusa com um PersistenceError generico: falha aqui, dizendo qual fabrica usar.
+    private static void requireType(PersistenceEvent event, int... types) {
+        for (int type : types) {
+            if (event.getType() == type) {
+                return;
+            }
+        }
+        throw new EventoDePersistenciaInvalidoException("EventEntity: fromInsert vale no beforeInsert, "
+                + "fromUpdate no beforeUpdate e afterPersist nos eventos after; evento recebido do tipo "
+                + event.getType() + ".");
     }
 
     private static <T> T currentState(EntityVO previous, ModifingFields modified, Class<T> type,
@@ -324,12 +362,14 @@ public final class EventEntity<T> {
 }
 ```
 
+- Cada fábrica valida `event.getType()` antes de ler o evento: sem isso, `fromUpdate` no `afterUpdate` só quebra no `getOldVO()` com `PersistenceError: Chamada de método válida apenas para eventos 'before-update'`. `EventoDePersistenciaInvalidoException` é exceção do projeto (`extends RuntimeException`) — use a exceção tipada que o projeto já tiver.
 - `fromInsert`: `fromVO(event.getVo())`.
 - `fromUpdate`: `fromVO(event.getOldVO())` com os valores novos do `ModifingFields` por cima (`EntityMapper.adaptFromVO`) — o estado completo do registro depois do update.
 - `writeChanges()`: compara a entidade antes × depois, `@Column` a `@Column`, e grava no VO só o que mudou, convertido por `EntityMapper.adaptToVo` (enum → valor do banco, `Integer` → `BigDecimal`).
-- Só em `before*` — `getOldVO()` só existe em `beforeUpdate`. Cobre os `@Column` declarados na própria classe; PK composta (`@Embeddable`) e relacionamentos ficam de fora.
-- Em `after*` nada volta ao VO: `fromVO(event.getVo())` basta para ler a PK e recarregar pelo repository.
+- `writeChanges()` só existe em `before*` — `getOldVO()` só existe em `beforeUpdate`. Cobre os `@Column` declarados na própria classe; PK composta (`@Embeddable`) e relacionamentos ficam de fora.
+- `afterPersist`: `fromVO(event.getVo())` com o registro completo — em `after*` o registro já foi gravado e nada volta ao VO, por isso devolve só a entidade.
 - Teste com `DynamicVOPojo` real, verificando que coluna fora do evento fica intocada — ver skill `test`.
+- **Gotcha — tipo do evento em teste:** mock de `PersistenceEvent` devolve `getType() == 0` (`BEFORE_INSERT`), e a fábrica de qualquer outro evento lança a exceção do `requireType`. Stube o tipo do evento que o listener recebe: `when(event.getType()).thenReturn(PersistenceEvent.BEFORE_UPDATE)`.
 
 ---
 
@@ -437,7 +477,7 @@ public void afterUpdate(PersistenceEvent event) throws Exception {
 |:---------------------------------------------------------------------|:-----------------------------------------------------------------------|
 | Usar `getVo()` sem cast                                             | `(DynamicVO) event.getVo()`                                           |
 | Update sem filtrar por `getModifingFields().isModifing(...)`        | Filtrar campo alterado — listener dispara em **qualquer** update      |
-| Ler campo não alterado do VO em update esperando valor              | VO de update só traz o delta — `getOldVO()` em `beforeUpdate`; recarregar pela PK em `after*` |
+| Ler campo não alterado do VO em update esperando valor              | VO do `beforeUpdate` só traz o delta — use `getOldVO()` ali; em `after*` o VO vem completo: `EventEntity.afterPersist` |
 | Chamada HTTP/API externa síncrona no listener                       | Tabela-fila + `@Job`/worker assíncrono                                |
 | Gravar na própria instância sem guard clause de estado              | Guard clause anti-loop (ver §9)                                       |
 | Abrir/fechar conexão JDBC própria                                   | `event.getJdbcWrapper()` — nunca fechar                               |
@@ -468,7 +508,6 @@ public void afterUpdate(PersistenceEvent event) throws Exception {
 ## Skills relacionadas
 
 - `entity` — entidade `@JapeEntity` alvo do listener; `EntityMapper.fromVO` converte VO → entidade
-- `repository` — recarregar registro completo pela PK quando o VO do evento só traz o delta
 - `before-load-listener` — interceptação de **leitura** (escopo distinto: busca, não CRUD)
 - `business-rule` — hook transacional do barramento comercial (notas)
 - `job` — processamento assíncrono da tabela-fila alimentada pelo listener
