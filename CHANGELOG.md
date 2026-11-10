@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.5.3] - 2026-11-10
+
 ### Corrigido
 
 - Skill `listener` valida o tipo do evento em cada fábrica do `EventEntity` e adiciona `afterPersist` para os eventos `after*`, com a tabela evento → fábrica; skill `test` stuba `getType()` do evento no teste de listener.
@@ -519,7 +521,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.2...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.3...HEAD
+[3.5.3]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.2...v3.5.3
 [3.5.2]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.1...v3.5.2
 [3.5.1]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.0...v3.5.1
 [3.5.0]: https://github.com/snk-devcenter/addon-studio/compare/v3.4.6...v3.5.0
