@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Alterado
+
+- Skills `test`, `sankhya-utils` e `repository` disparam com mais firmeza em pedido sem termo do SDK: proteger regra contra regressão sem dizer "teste", arredondar/formatar valor "pra mostrar" e listagem paginada sem rota.
+
 ## [3.5.3] - 2026-11-10
 
 ### Corrigido
