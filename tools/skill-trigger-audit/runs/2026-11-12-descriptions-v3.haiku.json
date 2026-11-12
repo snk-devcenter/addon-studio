@@ -1,0 +1,861 @@
+{
+ "_modelo": "haiku",
+ "_notas": [
+  "Sobreposição em status de pedido: listener diz que cobre auditoria de pedido nativo, mas business-rule também descreve beforeUpdate/afterUpdate de pedido e callback descreve alteração de cabeçalho. Só a frase de exemplo do listener desempata, e ela é específica demais.",
+  "'Traduzir labels' cai em data-dictionary e sankhya-js. O default de data-dictionary depende de a mensagem não citar webapp/html5/, e sankhya-js também reivindica traduzir textos sob webapp/html5/. Ficaria mais claro se a regra estivesse nas duas descriptions.",
+  "'Injetar repository no controller' é tratado em controller e em dependency-injection. A regra de desempate está no texto de controller, não só em dependency-injection, o que é ruído.",
+  "Em 'cria a entidade', entity e entity-architect competem. A regra 'só a classe Java → entity' está na description de entity-architect, não na de entity. Faltou esse termo na description de entity.",
+  "action-button, repository e entity estão claros para as mensagens deste lote: os termos principais (grade, botão, JapeRepository, @JapeEntity) aparecem nas descriptions.",
+  "controller vs controller-designer: o agent tem 'MUST BE USED' para criar endpoint REST e a skill cobre o mesmo gatilho de CRUD. Sem campos ou rotas na mensagem, a escolha entre skill e sub-agent fica indefinida (B2C2).",
+  "'faturamento' aparece em callback e em business-rule. O texto de callback exclui o caso de limite de crédito, mas a palavra em comum é um ponto de atrito (B2C4).",
+  "'consulta' e 'listar/filtrar' aparecem também em repository. O before-load-listener ganha pelo trecho 'sem repetir o filtro em cada consulta', mas a description de repository não diz que não é o lugar do filtro transversal (B2C1).",
+  "As exclusões cruzadas funcionaram bem: test exclui 'Postman/curl', e troubleshooter exclui NPE em mock e design de ControllerAdvice. Isso evitou sobreposição nos cenários B2C3, B2C5 e B2C6.",
+  "O catálogo não traz nenhum termo que aponte para o endpoint específico do projeto, então em B2C6 a skill só indica onde procurar a URL, não a URL em si.",
+  "Overlap entre controller e controller-advice em '@Valid': a description do controller diz que a validação mora no DTO e que a resposta de erro é do controller-advice, mas quem lê 'validar request com @Valid' pode pegar o controller-advice pela palavra-chave.",
+  "Overlap entre a skill database e o sub-agent dbscript-builder em 'criar migration': ambos se dizem donos. A description do sub-agent ('MUST BE USED') é mais forte, mas a skill vem primeiro na listagem.",
+  "controller-designer diz 'use proativamente ao criar endpoint REST', mas o catálogo do controller pede que o pedido vago seja esclarecido antes de delegar. Os dois textos puxam direções diferentes para 'expõe pro app'.",
+  "'Tabela' aparece em pedidos de data-dictionary e de database. A description da data-dictionary resolve bem quando cita o caminho datadictionary/ ou 'tela de cadastro', mas um pedido só com 'tabela' ficaria ambíguo.",
+  "A description da mapstruct usa 'get/set à mão', termo que casa bem com a mensagem do dev. Já a description do controller só menciona DTO de passagem, então o DTO não puxa a skill errada.",
+  "B4C3: o nome 'snk-application' (Design System, não coberto) é quase igual a 'sk-application' (sankhya-js). Uma leitura por palavra-chave levaria para sankhya-js, mas a exclusão explícita na description resolve. Vale reforçar a exclusão na description de sankhya-js ou criar a cobertura do DS.",
+  "B4C4: build e dependency-injection se sobrepõem em 'deploy'. build diz 'troubleshooting de deploy' sem separar bem o caso de erro de componente Guice; a separação só aparece na exclusão de build ('causa conhecida em outro domínio') e na de troubleshooter.",
+  "B4C6: a description de build afirma 'de onde vem um projeto novo' mas não diz o que fazer quando o dev pede criar do zero. Não há skill que gere build.gradle novo, e init exclui isso. Falta um caminho explícito para esse pedido.",
+  "B4C5: 'roda todo dia às' não tem competidor real, mas a skill 'schedule' (fora do plugin) usa o mesmo vocabulário de agendamento; a description de job ganha porque é específica de @Job.",
+  "B4C1: BigDecimal aparece em sankhya-utils ('arredondamento de BigDecimal'), mas a description de type-adapter cobre 'formato de número no JSON', que é o caso. A ausência de termo de serialização em sankhya-utils evita o desvio.",
+  "B5C3: sankhya-js e data-dictionary dividem os termos 'sk-dynaform' e '<instance>'. A frase 'montar dynaform sobre <instance> do dicionário' em sankhya-js empurra a decisão para uma parte do pedido que deveria ser de data-dictionary. Uma frase mais clara sobre quem é dono da tela e quem é dono da instância evitaria a ambiguidade.",
+  "B5C6: data-dictionary diz 'tabela nova sem relação com entidade existente → data-dictionary (ou entity-architect, quando XML, dbscript e entidade nascem juntos)'. A regra de três artefatos fica só no agent, e a skill não a menciona como gatilho. Quem só lê as skills pode acabar com data-dictionary sozinha, sem dbscript nem entidade.",
+  "B5C6: 'tela de cadastro' aparece como gatilho de data-dictionary, mas em sankhya-js também aparece 'tela de cadastro' como caso de tela própria. O termo sozinho não separa as duas.",
+  "B5C1: 'value' fala em feature flag e liga-desliga, mas não diz que o pedido de feature flag pode exigir também dbscript (seed do parâmetro). Isso não mudou a escolha aqui, mas pode gerar uma segunda chamada não prevista.",
+  "Em geral, as descriptions com gatilhos literais (AcaoRotinaJava, @Listener, PersistenceEventAdapter, 'PedidoNAo') disparam com alta confiança. Os problemas estão nas fronteiras entre sankhya-js, data-dictionary e entity-architect.",
+  "O termo 'caractere/charset' aparece em build (exclusão para encoding) e em encoding (sintoma 'unmappable character'). Na prática o roteamento depende da exclusão, não do sintoma, o que deixa a decisão frágil.",
+  "'Regra de cálculo' não tem termo próprio no catálogo: business-rule fala de comercial/barramento e test fala de regressão. Quem decide é a presença de 'Regra'/'barramento', e o cenário sem esses termos fica dependendo de inferência.",
+  "'Listener' está em duas descriptions (listener e before-load-listener) com exclusões cruzadas bem marcadas. Funciona, mas só pela leitura completa da exclusão.",
+  "'Mapear tipos Oracle/MSSQL' aparece em database, e 'NVL/portável' em macros. A separação está escrita na description de macros, mas o termo 'Oracle/MSSQL' por si só puxa para database.",
+  "Não encontrei termo faltando para nenhum dos seis cenários: todos têm pelo menos um gatilho literal na description da skill escolhida. Os riscos estão nas sobreposições acima, não em lacunas.",
+  "controller: a description lista '@Valid, @NotNull' e 'códigos de status' mas não diz explicitamente 'payload' como gatilho. Esse critério só aparece na description de listener, o que gera competição em B7C6.",
+  "controller x controller-advice: ambas tratam de HTTP status. controller-advice precisa de 'exceção' ou 'stacktrace' para ganhar com clareza. Sem esses termos, B7C3 poderia cair em controller.",
+  "sankhya-utils x sankhya-js: 'arredondar/formatar moeda' aparece nas duas. O desempate depende da menção a tela, que a mensagem de B7C4 não traz. A description de sankhya-js já tem a negação, o que ajuda.",
+  "retrofit x controller: 'REST' e 'API' se sobrepõem. A negação de controller ('consumir API REST de terceiro é retrofit') resolve bem B7C1, mas depende de leitura cuidadosa da description.",
+  "B7C2 e B7C5 são limpos: os termos do pedido (@Callback/ICustomCallBack; MapStruct/Mapper) batem diretamente com uma única description.",
+  "Nota 1: sankhya-js e jsp se referenciam nos NÃO usar, e a regra de formulário que envia para endpoint está clara. Não há sobreposição real aqui.",
+  "Nota 2: 'índice' aparece em database e em data-dictionary, mas a description de data-dictionary manda o índice para database. Funciona, mas a palavra 'tabela' sem tipo (AD_ ou nativa) é o ponto cego real de B8C3, e merge-on-root também reivindica ALTER em tabela nativa.",
+  "Nota 3: controller e repository se sobrepõem em 'listagem/filtro/paginação'. Quem desempata é a frase do controller ('pedido que só diz listar/filtrar/paginar X... é a query, skill repository'). Ela funciona, mas só se eu ler a description inteira.",
+  "Nota 4: type-adapter fala em 'tipos nativos' e 'formato de data' mas não cita Timestamp. Não atrapalhou B8C2, porque o nome da anotação bate sozinho. Entity, que cita Timestamp no mapeamento de tipos, poderia concorrer se o pedido fosse 'mapear Timestamp' sem anotação.",
+  "Nota 5: a maioria das descriptions de sub-agents tem 'MUST BE USED' e 'Use proativamente'. Nenhum dos seis cenários envolve revisão pré-commit, criação de suíte ou diagnóstico de erro, então esses gatilhos não entraram em jogo. Não generalizo a partir disso.",
+  "jsp e sankhya-js competem em 'tela de leitura/mapa/painel'. jsp exclui explicitamente painel denso de sankhya-js, mas 'tela que você desenha' em sankhya-js soa parecido com 'monto o html na mão' em jsp. Faltou um sinal mais direto de 'somente leitura, sem envio'.",
+  "value e database compartilham o vocabulário 'dados de configuração / parametrização'. value exclui seed e database inclui seed, mas um pedido de seed com a palavra 'configuração' cai na zona de sobreposição.",
+  "dbscript-builder (sub-agent) também cita 'script de dados de configuração', repetindo a sobreposição com database. A skill e o sub-agent não deixam claro quem fica com a carga de dados.",
+  "action-button descreve o fluxo como 'marca registros na grade'. Um botão que não depende de seleção de registros, como em B9C6, fica mais fraco na description e compete com callback e sankhya-js.",
+  "merge-on-root e data-dictionary competem em 'campo na tela de Parceiros'. A description de merge-on-root resolve bem com 'entidade nativa' e 'guardar', mas data-dictionary também fala em campo e tela de cadastro, sem exclusão explícita para campo de tabela nativa além do sinal em <nativeTable>.",
+  "Sem CLAUDE.md nem docs/ADDON.md, a única forma de decidir é a description de cada skill. Termos genéricos como 'listagem', 'guardar no banco' e 'botão' aparecem em mais de uma description, então a escolha depende de termos específicos do pedido.",
+  "`repository` e `before-load-listener` se sobrepõem em leitura filtrada: 'listagem' e 'filtro' estão na description de repository, enquanto a intenção transversal ('sem depender de quem chama') só está em before-load-listener. Seria mais claro que repository dissesse que filtro de segurança transversal vai para `before-load-listener`.",
+  "`entity`, `entity-architect`, `database` e `data-dictionary` competem em 'guardar no banco': só a description de entity-architect fala explicitamente dos três artefatos juntos. Um pedido que só fala 'classe Java' poderia ser melhor distinguido.",
+  "`test` e `test-writer` dividem o caso de teste de controller: a regra de 'um arquivo = inline / vários = sub-agent' está só na description do sub-agent e não na de `test`. Vale mencionar na skill `test` que ela cobre um arquivo.",
+  "`sankhya-js` cita 'botão que chama meu controller' e `action-button` cita 'botão'. A exclusão explícita de html5 em `action-button` resolve, mas os termos 'botão' e 'controller' ainda geram ruído.",
+  "Em B11C1 (mobile) a description de `controller` cita 'app mobile', mas a de `repository` também diz que listar/paginar é dela, sem rota. A mensagem mistura listagem e criação, então a escolha depende de a description ser lida inteira.",
+  "Em B11C3 'bloquear' e 'faturada' aparecem em três descriptions (`listener`, `business-rule`, `callback`). A distinção (AD_ do addon vs. documento comercial) está só na negação de `business-rule`, o que é fácil de perder.",
+  "Em B11C6 a fronteira entre `database` (NOT NULL) e `listener` (não vazio) é clara no texto, mas depende de um sinal sutil ('campo da tabela, não payload'). Sem essa frase, `controller` (@NotBlank) ganharia peso.",
+  "Em B11C4 o `controller` também trata de @Transactional e status HTTP, então competiria com `controller-advice` pelo rollback. A description de `controller-advice` é específica o bastante e resolve.",
+  "Em B11C2 a palavra 'parceiro' pode puxar a entidade nativa Parceiro (`merge-on-root`), mas o termo Retrofit é forte o suficiente para não haver disputa real.",
+  "Em B12C2, 'sk-dynaform' aparece em sankhya-js e também em data-dictionary (<dynamicForm>). Só o termo 'HTML5' separa as duas.",
+  "Em B12C3, 'confirmar em lote' cai entre action-button, callback (confirmação e faturamento em lote do portal) e business-rule. A description de action-button fala em marcar registros e clicar num botão, mas não cita 'confirmar', então a escolha fica menos firme.",
+  "Em B12C4, 'campo novo na entidade' não diz se a entidade é do addon ou nativa. Isso deixa database, entity, data-dictionary e merge-on-root competindo. Faltou uma regra clara do tipo 'pergunta sobre o que falta depois do ALTER = database'.",
+  "dbscript-builder está marcado como MUST BE USED para migration nova e coluna nova em entidade publicada (ALTER), o que conflita com a description de database. Para uma pergunta informativa como B12C4, a skill database inline parece suficiente, mas o texto do sub-agent não deixa isso explícito.",
+  "Nenhum cenário caiu em NENHUMA: todos têm termos que aparecem literalmente numa description. B12C1, B12C5 e B12C6 são os casos de maior confiança e sem sobreposição relevante. Em B12C5 a skill init é a única com escopo de CLAUDE.md.",
+  "Descriptions de macros, jsp, job, merge-on-root e value têm termos literais do pedido (NVL/TRUNC, snk:query, de madrugada, merge-on-root, parâmetro Sankhya), então a escolha é direta.",
+  "Sobreposição de 'DTO': controller fala em DTOs e @Valid; mapstruct fala em DTO↔Entidade. A escolha depende de a mensagem falar em conversão, não em endpoint.",
+  "Sobreposição de 'tela': sankhya-js e jsp disputam o termo. Cada description exclui a outra explicitamente, o que resolve, mas depende de o dev citar snk:query ou .jsp.",
+  "Sobreposição de 'service/injeção': dependency-injection e value disputam pedidos de injeção. A exclusão explícita na description de DI aponta para value quando o valor é parâmetro do Sankhya.",
+  "No contexto simulado não existem CLAUDE.md nem docs/ADDON.md, então a skill init não é sugerida por nenhum destes cenários. A avaliação foi feita só pelo catálogo e pela mensagem, como pedido."
+ ],
+ "B1C1": {
+  "skills": [
+   "addon-studio:action-button"
+  ],
+  "conf": 90,
+  "saliencia": 88,
+  "sub_agent": "nenhum",
+  "motivo": "A descrição de action-button cobre exatamente o caso: usuário marca registros na grade de tela nativa do Sankhya e clica num botão para executar algo, com validação da seleção e mensagem de retorno. Os termos 'marcar linhas', 'clicar' e 'mensagem' batem com a descrição.",
+  "ambiguidade": "Baixa. Só haveria dúvida se a tela fosse HTML5 do próprio addon (sankhya-js), mas a mensagem fala de tela do Sankhya, então action-button é a escolha."
+ },
+ "B1C2": {
+  "skills": [
+   "addon-studio:entity"
+  ],
+  "conf": 85,
+  "saliencia": 85,
+  "sub_agent": "nenhum",
+  "motivo": "O pedido é a classe Java `@JapeEntity` com PK e campos. A descrição de entity cobre isso ('classe Java @JapeEntity', 'modelar', PK, tipos). O dev não pediu XML nem dbscript, então não entra entity-architect nem data-dictionary.",
+  "ambiguidade": "Média-baixa. 'Cria a entidade da tabela AD_VSTVIS' pode soar como os três artefatos (entity-architect, que também cuida de XML e dbscript). A mensagem pede só a classe, então entity fica na frente. Como AD_VSTVIS já existe no projeto, a tabela não é nova."
+ },
+ "B1C3": {
+  "skills": [
+   "addon-studio:dependency-injection"
+  ],
+  "conf": 83,
+  "saliencia": 80,
+  "sub_agent": "nenhum",
+  "motivo": "dependency-injection descreve 'injetar repository/service em controller' como caso típico de costura entre camadas. A description de controller também diz que injetar repository no controller é dependency-injection, então a delegação é explícita.",
+  "ambiguidade": "Média. 'Controller' aparece em controller e controller-advice. Mas o pedido é sobre injeção, e controller diz que essa parte é de dependency-injection."
+ },
+ "B1C4": {
+  "skills": [
+   "addon-studio:listener"
+  ],
+  "conf": 82,
+  "saliencia": 85,
+  "sub_agent": "nenhum",
+  "motivo": "listener cita explicitamente 'auditoria de alterações (quem mudou e quando) — inclusive em documento nativo, como gravar automaticamente quem mudou o status do pedido'. O pedido é quase esse exemplo literal, e é gravação de registro, não barramento de confirmação.",
+  "ambiguidade": "Alta. 'Pedido' e 'mudar status' também batem em business-rule (beforeUpdate de Regra no comercial) e possivelmente callback (confirmação/alteração de cabeçalho). Mesmo assim, listener é o dono declarado da auditoria de status em documento nativo."
+ },
+ "B1C5": {
+  "skills": [
+   "addon-studio:repository"
+  ],
+  "conf": 94,
+  "saliencia": 90,
+  "sub_agent": "nenhum",
+  "motivo": "A mensagem pede interface que estende JapeRepository com busca por status. repository descreve exatamente isso ('interfaces @Repository estendendo JapeRepository', 'busca', 'filtro', @Criteria, @NativeQuery). Não há menção a endpoint ou REST, então não vai para controller.",
+  "ambiguidade": "Baixa. Só o nome 'VstVistoria' (a entidade pode ainda não existir) mudaria o fluxo, não a skill escolhida."
+ },
+ "B1C6": {
+  "skills": [
+   "addon-studio:data-dictionary",
+   "addon-studio:sankhya-js"
+  ],
+  "conf": 68,
+  "saliencia": 78,
+  "sub_agent": "nenhum",
+  "motivo": "data-dictionary diz que é o dono default quando o dev fala 'label/texto da tela' sem citar webapp/html5/. Nesse caso a tela seria a gerada pelo dicionário. sankhya-js também reivindica 'traduzir textos e rótulos que moram no template/.properties sob webapp/html5/', e a estrutura do projeto mostra que webapp/html5/ existe. Só essa pista vem do contexto, a mensagem em si não a cita.",
+  "ambiguidade": "Alta. Ficou em aberto se a tela é gerada pelo dicionário (data-dictionary) ou é html5 própria (sankhya-js). Pela regra de decidir só pela mensagem, o default de data-dictionary prevalece. Eu perguntaria qual tela antes de editar."
+ },
+ "B2C1": {
+  "skills": [
+   "addon-studio:before-load-listener"
+  ],
+  "conf": 92,
+  "saliencia": 90,
+  "sub_agent": "NENHUM",
+  "motivo": "A description de before-load-listener cita quase literalmente o pedido: 'filtro de segurança/multi-tenant transversal a uma entidade (só trazer os registros da empresa do usuário logado, sem depender de quem chama e sem repetir o filtro em cada consulta)'. O 'sem repetir o filtro' descarta a abordagem de filtrar em cada repository.",
+  "ambiguidade": "Baixa. 'consulta' também aparece em repository, mas o pedido de filtro transversal sem repetição é o caso explícito do FinderListener."
+ },
+ "B2C2": {
+  "skills": [
+   "addon-studio:controller",
+   "addon-studio:repository"
+  ],
+  "conf": 78,
+  "saliencia": 88,
+  "sub_agent": "addon-studio:controller-designer (opcional, se o dev quiser o endpoint completo com DTOs e mapper)",
+  "motivo": "A description de controller cobre 'ao implementar listagem/lançamento/detalhamento/atualização/exclusão expostos por endpoint' e a mensagem cita @Controller REST, então a primeira escolha é controller. Repository só entra como dependência, porque o CRUD precisa de acesso a dados. Controller-designer também se aplica pela regra 'MUST BE USED' ao criar endpoint REST, mas a mensagem não traz campos nem rotas, então a skill inline parece suficiente.",
+  "ambiguidade": "Média. controller vs controller-designer (a regra de MUST BE USED empurra para o sub-agent) e controller vs repository (o CRUD toca a camada de dados). A mensagem não traz campos, o que deixa a escolha entre skill e sub-agent em aberto."
+ },
+ "B2C3": {
+  "skills": [
+   "addon-studio:test"
+  ],
+  "conf": 93,
+  "saliencia": 92,
+  "sub_agent": "NENHUM (test-writer só para suíte ou várias classes; troubleshooter não se aplica)",
+  "motivo": "A description de test cita explicitamente 'diagnosticar teste flaky, teste falhando ou NullPointerException/stub faltando em mock'. A mensagem bate com esse trecho, e o próprio texto diz que o erro de mock de JapeRepository é o caso típico da skill.",
+  "ambiguidade": "Baixa. troubleshooter também tem 'teste falhando' na lista de casos, mas a própria description do troubleshooter exclui 'NPE em mock → skill test'."
+ },
+ "B2C4": {
+  "skills": [
+   "addon-studio:business-rule"
+  ],
+  "conf": 88,
+  "saliencia": 88,
+  "sub_agent": "NENHUM",
+  "motivo": "A description de business-rule diz que 'liberação, bloqueio ou aprovação por limite de crédito é @BusinessRule', e cita o caso de 'impedir o faturamento do pedido'. A liberação pelo supervisor também cai na aprovação por limite. A description de callback exclui esse caso explicitamente.",
+  "ambiguidade": "Média. 'faturamento' aparece em callback (gancho PROCESS_BILLING do lote do portal) e em business-rule. O texto de callback já separa os dois, mas a palavra em comum pode confundir. listener também poderia aparecer se o dev quisesse auditar a liberação, mas o gatilho aqui é o barramento comercial."
+ },
+ "B2C5": {
+  "skills": [
+   "addon-studio:controller-advice"
+  ],
+  "conf": 95,
+  "saliencia": 92,
+  "sub_agent": "NENHUM (troubleshooter exclui design de tratamento de erro)",
+  "motivo": "A description de controller-advice cobre explicitamente 'criar ... handlers globais de exceção com @ControllerAdvice + @ExceptionHandler' para exceções do addon. A mensagem usa os mesmos termos. Não há endpoint a desenhar, então controller-designer não se aplica.",
+  "ambiguidade": "Baixa. controller-designer menciona '@ControllerAdvice (se necessário)', mas o pedido é só o advice."
+ },
+ "B2C6": {
+  "skills": [
+   "addon-studio:controller"
+  ],
+  "conf": 80,
+  "saliencia": 78,
+  "sub_agent": "NENHUM",
+  "motivo": "A description de controller diz 'ao descobrir como chamar o endpoint de fora (URL a partir do serviceName/SP, chamada por Postman ou curl)', que casa com o pedido. A description de test exclui explicitamente 'teste manual (Postman, curl)', então ela não compete. Sem o projeto à vista, a URL depende de localizar o @Controller, mas isso ainda é o escopo de controller.",
+  "ambiguidade": "Baixa-média. A confiança é menor porque o pedido não diz qual endpoint, então a resposta depende de achar o controller no código antes de responder."
+ },
+ "B3C1": {
+  "skills": [
+   "callback"
+  ],
+  "conf": 92,
+  "saliencia": 90,
+  "sub_agent": "",
+  "motivo": "'Confirmar a nota de compra' bate com a description do callback, que cobre nota de entrada/compra, 'emitir documento auxiliar antes da confirmação' e 'abortar a confirmação com exceção'. A exclusão explícita de @BusinessRule para Nota de Entrada confirma a escolha, mesmo com o verbo 'barrar'.",
+  "ambiguidade": "Baixa. 'Barrar' poderia puxar business-rule (bloqueio), mas a description de business-rule exclui nota de entrada e remete ao callback."
+ },
+ "B3C2": {
+  "skills": [
+   "data-dictionary"
+  ],
+  "conf": 95,
+  "saliencia": 92,
+  "sub_agent": "",
+  "motivo": "O pedido é o XML do dicionário em datadictionary/, caminho e tipo de artefato que a description da data-dictionary cita literalmente. Não pede dbscript nem entidade, então entity-architect não se aplica.",
+  "ambiguidade": "Baixa. A palavra 'tabela' poderia puxar database, mas o artefato pedido é o XML do dicionário. O arquivo AD_VSTVIS.xml já existe no projeto, então 'monta' pode ser recriar ou revisar, o que não muda a skill."
+ },
+ "B3C3": {
+  "skills": [
+   "controller"
+  ],
+  "conf": 85,
+  "saliencia": 88,
+  "sub_agent": "",
+  "motivo": "'Expor endpoint REST pro app' bate com a description do controller ('expor cadastro/feature via REST', 'integrar com app mobile/frontend'). O pedido não descreve recurso, campos, rotas nem payload, então pelo próprio catálogo eu esclareceria antes de delegar ao controller-designer.",
+  "ambiguidade": "Média. controller e controller-designer (MUST BE USED quando o recurso já está descrito) competem. Sem recurso definido, a skill controller vem antes do sub-agent. sankhya-js também cita 'app/frontend', mas a skill é para tela HTML5 e não para app."
+ },
+ "B3C4": {
+  "skills": [
+   "mapstruct"
+  ],
+  "conf": 94,
+  "saliencia": 92,
+  "sub_agent": "",
+  "motivo": "'Converter DTO e entidade sem escrever get/set à mão' é quase o texto da description do mapstruct ('conversão DTO↔Entidade campo a campo, sem escrever get/set à mão'). O controller-designer cobriria também DTO e rota, mas o dev pediu só a conversão.",
+  "ambiguidade": "Baixa. controller também menciona DTO, mas o escopo do mapper é da mapstruct."
+ },
+ "B3C5": {
+  "skills": [
+   "database"
+  ],
+  "conf": 85,
+  "saliencia": 85,
+  "sub_agent": "dbscript-builder",
+  "motivo": "'Criar dbscript de migration' para uma tabela nova está na description da database ('cria... dbscripts... ao adicionar tabela'). A description do dbscript-builder é 'MUST BE USED ao criar migration nova', então eu também delegaria a ele.",
+  "ambiguidade": "Média. database (skill) e dbscript-builder (sub-agent) têm o mesmo escopo para migration nova. entity-architect só entraria se o pedido incluísse entidade e XML juntos, o que não acontece aqui."
+ },
+ "B3C6": {
+  "skills": [
+   "controller"
+  ],
+  "conf": 80,
+  "saliencia": 85,
+  "sub_agent": "",
+  "motivo": "'Validar o request com @Valid' está na description do controller, que lista @Valid, @NotNull e @Size como validação de entrada no DTO. Não há criação de endpoint, então não delego ao controller-designer.",
+  "ambiguidade": "Média. controller-advice também fala de @Valid, mas trata da resposta HTTP de erro, e o dev pediu a validação de entrada. Se ele quisesse tratar o erro de violação, a escolha mudaria."
+ },
+ "B4C1": {
+  "skills": [
+   "addon-studio:type-adapter"
+  ],
+  "conf": 93,
+  "saliencia": 88,
+  "sub_agent": "",
+  "motivo": "A description de type-adapter cobre exatamente o pedido: 'define, num lugar só, como um tipo serializa e desserializa em todo o addon', 'corrigir formato de data/número no JSON de resposta' e `@GlobalTypeAdapter`. O termo BigDecimal aparece no pedido, mas o problema é formato JSON, não cálculo.",
+  "ambiguidade": "BigDecimal também aparece em sankhya-utils (arredondamento de BigDecimal), mas a mensagem fala de serialização JSON, não de cálculo. Baixa ambiguidade."
+ },
+ "B4C2": {
+  "skills": [
+   "addon-studio:macros"
+  ],
+  "conf": 90,
+  "saliencia": 85,
+  "sub_agent": "",
+  "motivo": "A description de macros cita explicitamente 'MacroTranslator' e lista as macros (dbDate, nullValue, etc.). O pedido é só sobre quais macros existem, sem citar arquivo de dbscript, então não cai em database.",
+  "ambiguidade": "Leve sobreposição com repository (@NativeQuery) e database (dbscripts). A menção ao MacroTranslator e a palavra 'query' decidem para macros."
+ },
+ "B4C3": {
+  "skills": [],
+  "conf": 85,
+  "saliencia": 40,
+  "sub_agent": "",
+  "motivo": "Nenhuma skill cobre o frontend novo de Design System (snk-application Stencil/web components em frontend/<App>, gradle compileDS). A description de sankhya-js exclui esse caso explicitamente. Responderia direto (ou diria que não há skill para isso). O único risco é o nome parecido sk-application (sankhya-js) com snk-application.",
+  "ambiguidade": "Parece parecido com sankhya-js por causa de 'snk-application' vs 'sk-application', mas a própria description de sankhya-js diz que não serve para esse frontend."
+ },
+ "B4C4": {
+  "skills": [
+   "addon-studio:dependency-injection"
+  ],
+  "conf": 93,
+  "saliencia": 88,
+  "sub_agent": "",
+  "motivo": "A description de dependency-injection cobre o caso literal: 'quando o addon sobe (deploy) e reclama que não conseguiu criar/instanciar um componente, que não achou como criar o seu service'. Os termos de erro Guice também aparecem. troubleshooter fica de fora porque a própria description dele manda erro de componente Guice para dependency-injection.",
+  "ambiguidade": "build também cita 'troubleshooting de deploy' e 'BUILD FAILED', mas a sua description exclui causa em outro domínio (Guice é dependency-injection). Ambiguidade baixa."
+ },
+ "B4C5": {
+  "skills": [
+   "addon-studio:job"
+  ],
+  "conf": 96,
+  "saliencia": 93,
+  "sub_agent": "",
+  "motivo": "A description de job cita @Job, IJob, CRON e o gatilho 'roda todo dia às', que bate direto com o pedido. Não há disputa com action-button porque não é clique do usuário.",
+  "ambiguidade": "A skill 'schedule' (fora do plugin) fala de rotinas agendadas, mas trata de agendar agentes remotos, não de @Job. Não é competidora real."
+ },
+ "B4C6": {
+  "skills": [
+   "addon-studio:build",
+   "addon-studio:init"
+  ],
+  "conf": 65,
+  "saliencia": 75,
+  "sub_agent": "",
+  "motivo": "build é a skill mais próxima: cita build.gradle, editar build.gradle e 'de onde vem um projeto novo'. Mas a própria description de build diz que o esqueleto do addon é gerado pelo tooling Sankhya e não por skill nenhuma, então não consigo criar do zero com skill. A init entra só como segunda opção, e a própria description dela exclui criar build.gradle do zero. No contexto simulado já existe build.gradle, o que contraria 'do zero'.",
+  "ambiguidade": "build vs init: init diz 'não cria build.gradle do zero' e build diz que é escopo dele só quando já existe. Nenhuma das duas resolve o pedido literal de criar do zero."
+ },
+ "B5C1": {
+  "skills": [
+   "addon-studio:value"
+  ],
+  "conf": 90,
+  "saliencia": 88,
+  "sub_agent": "",
+  "motivo": "A description de 'value' lista quase literalmente o pedido: 'liga-desliga', 'o cliente muda sem redeploy' e 'configurável por cliente', e cita feature flag via MGECoreParameter. Não há outra skill competindo.",
+  "ambiguidade": "Baixa. 'dependency-injection' só entraria se o dev pedisse wiring Guice, o que não aparece na mensagem."
+ },
+ "B5C2": {
+  "skills": [
+   "addon-studio:action-button"
+  ],
+  "conf": 95,
+  "saliencia": 92,
+  "sub_agent": "",
+  "motivo": "'AcaoRotinaJava' é termo exato da description de 'action-button', e 'botão' em tela nativa de pedidos bate com 'clica num botão' da mesma description. A exclusão de sankhya-js (tela HTML5 própria) não se aplica, porque a mensagem fala de tela de pedidos nativa.",
+  "ambiguidade": "Baixa."
+ },
+ "B5C3": {
+  "skills": [
+   "addon-studio:sankhya-js",
+   "addon-studio:data-dictionary"
+  ],
+  "conf": 75,
+  "saliencia": 88,
+  "sub_agent": "",
+  "motivo": "'tela HTML5 do addon' bate com sankhya-js (webapp/html5, sk-dynaform). Porém 'ligada numa instância do dicionário' bate com data-dictionary (<instance>) e com a frase de sankhya-js 'montar dynaform sobre <instance> do dicionário', então a escolha depende de qual parte do pedido pesa mais. Escolho sankhya-js porque o pedido é uma tela que eu desenho, e a exclusão de data-dictionary diz 'NÃO usar para tela própria do addon em webapp/html5/'.",
+  "ambiguidade": "Alta entre sankhya-js e data-dictionary. Ambas citam <instance> e dynaform, e a fronteira depende de quem desenha a tela."
+ },
+ "B5C4": {
+  "skills": [
+   "addon-studio:encoding"
+  ],
+  "conf": 95,
+  "saliencia": 85,
+  "sub_agent": "",
+  "motivo": "A description de 'encoding' cita 'acento aparece trocado no log' e o exemplo 'PedidoNAo', que é quase o mesmo sintoma. Também cobre 'quando o build reclama de caractere inválido'. Não há skill concorrente.",
+  "ambiguidade": "Baixa. 'troubleshooter' poderia ser acionado por erro em log, mas a própria description de troubleshooter manda charset para 'encoding'."
+ },
+ "B5C5": {
+  "skills": [
+   "addon-studio:listener"
+  ],
+  "conf": 96,
+  "saliencia": 92,
+  "sub_agent": "",
+  "motivo": "'@Listener' e 'PersistenceEventAdapter' são termos exatos da description de 'listener', e 'insert' bate com o gatilho de CRUD. A exclusão de before-load-listener não se aplica, porque não há busca.",
+  "ambiguidade": "Baixa."
+ },
+ "B5C6": {
+  "skills": [
+   "addon-studio:data-dictionary",
+   "addon-studio:database",
+   "addon-studio:entity"
+  ],
+  "conf": 60,
+  "saliencia": 85,
+  "sub_agent": "entity-architect",
+  "motivo": "'tabela nova' sem relação com entidade existente cai em data-dictionary, e 'quero que essa tabela vire uma tela de cadastro' é gatilho literal dessa skill. Mas o pedido junta três artefatos (XML do dicionário, dbscript e classe JapeEntity) que nascem juntos, e a description de entity-architect manda usar o agent nesse caso. Por isso eu delegaria ao entity-architect e usaria data-dictionary como base. Database e entity entram só como artefatos do mesmo trabalho.",
+  "ambiguidade": "Alta. data-dictionary, database, entity e o sub-agent entity-architect todos competem. A regra de 'três artefatos juntos' só aparece na description do agent, não na da skill."
+ },
+ "B6C1": {
+  "skills": [
+   "build"
+  ],
+  "conf": 95,
+  "saliencia": 90,
+  "sub_agent": "",
+  "motivo": "A description de build cita quase literalmente o caso: 'quando o servidor local continua respondendo com a versao antiga do addon' e 'troubleshooting de deploy'. Não há sinal de outro domínio e a causa é de deploy/build, não de DI ou charset. O troubleshooter não entra porque a causa já é conhecida e cai na skill build.",
+  "ambiguidade": "Baixa. Só 'deploy' genérico poderia puxar dependency-injection se o deploy falhasse com erro de componente, mas a mensagem fala de versão antiga respondendo."
+ },
+ "B6C2": {
+  "skills": [
+   "before-load-listener"
+  ],
+  "conf": 95,
+  "saliencia": 95,
+  "sub_agent": "",
+  "motivo": "A mensagem cita 'FinderListener' e '@BeforeLoadListener', que são termos exatos da description, e o caso de interceptar busca em entidade é o escopo dela. A description de listener exclui explicitamente FinderListener, então não há disputa real.",
+  "ambiguidade": "Mínima. A palavra 'Listener' aparece também em listener (persistência), mas a description de listener já manda FinderListener para before-load-listener."
+ },
+ "B6C3": {
+  "skills": [
+   "encoding"
+  ],
+  "conf": 93,
+  "saliencia": 88,
+  "sub_agent": "",
+  "motivo": "A description de encoding cobre 'build reclama de caractere inválido ou unmappable character' e 'erros de build relacionados a charset', que é o sintoma descrito. A description de build exclui explicitamente charset para encoding. Não é troubleshooter, pois a causa é conhecida.",
+  "ambiguidade": "Média. 'classe da entidade' puxa para entity, e 'quebrando o build' puxa para build/troubleshooter. A description de entity exclui charset em arquivo de entidade, então encoding deveria ganhar."
+ },
+ "B6C4": {
+  "skills": [
+   "test"
+  ],
+  "conf": 88,
+  "saliencia": 82,
+  "sub_agent": "",
+  "motivo": "A description de test cobre o padrão 'garantir que não quebre quando eu mexer' e 'proteger esse cálculo' como pedido de teste de regressão, mesmo sem a palavra 'teste'. O pedido é de uma regra só, então o test-writer não é necessário e a skill test resolve inline.",
+  "ambiguidade": "Média. 'regra de cálculo' pode puxar business-rule, mas a mensagem não fala de barramento nem de Regra/ContextoRegra, e a description de test diz que as outras skills escrevem a regra enquanto ela trava o comportamento."
+ },
+ "B6C5": {
+  "skills": [
+   "business-rule"
+  ],
+  "conf": 97,
+  "saliencia": 95,
+  "sub_agent": "",
+  "motivo": "A mensagem traz '@BusinessRule', 'Regra' e 'barramento', que batem literalmente com a description de business-rule. Nenhuma outra skill reivindica esse termo.",
+  "ambiguidade": "Mínima. Há uma descrição de listener que menciona 'regra' em outro sentido, mas o pedido explícito de @BusinessRule resolve."
+ },
+ "B6C6": {
+  "skills": [
+   "macros"
+  ],
+  "conf": 90,
+  "saliencia": 85,
+  "sub_agent": "",
+  "motivo": "A description de macros cobre 'ao ver NVL ... em SQL do addon' e 'portar SQL' para portabilidade Oracle/MSSQL, que é o pedido. Não é database, porque a description de macros diz que NVL portável é macro e database é para dbscripts com tags de banco.",
+  "ambiguidade": "Média. A description de database cita 'mapear tipos entre Oracle e MSSQL', o que pode puxar para lá, e a de sankhya-utils/sankhya-js não se aplicam. A distinção NVL-é-macro está explícita só em macros."
+ },
+ "B7C1": {
+  "skills": [
+   "addon-studio:retrofit"
+  ],
+  "conf": 92,
+  "saliencia": 85,
+  "sub_agent": "nenhum",
+  "motivo": "A description de retrofit cobre 'consumir endpoint de terceiro' e 'integrar API REST/JSON externa', e diz explicitamente 'consumir (não expor)'. A mensagem pede consumo de webservice de terceiro, então a escolha é direta. Carregaria a skill antes de codar.",
+  "ambiguidade": "Baixa. 'REST' também aparece em controller, mas controller é 'expor' e nega explicitamente consumo de terceiro."
+ },
+ "B7C2": {
+  "skills": [
+   "addon-studio:callback"
+  ],
+  "conf": 95,
+  "saliencia": 92,
+  "sub_agent": "nenhum",
+  "motivo": "O pedido cita @Callback e ICustomCallBack literalmente, além de 'central de vendas' e 'antes da confirmação', que são termos centrais da description de callback. Não há competição real.",
+  "ambiguidade": "Baixa. business-rule menciona confirmação de documento, mas a própria description de callback manda para cá a confirmação pela Central."
+ },
+ "B7C3": {
+  "skills": [
+   "addon-studio:controller-advice"
+  ],
+  "conf": 85,
+  "saliencia": 80,
+  "sub_agent": "nenhum",
+  "motivo": "A description de controller-advice cobre 'exceção do addon volta stacktrace cru para o cliente' e 'mapeamento de status HTTP', que batem com o pedido. Tratamento global de exceção é o dono.",
+  "ambiguidade": "Média. controller também lista 'códigos de status' e 'DTO'. Quem decide é a frase 'exceção que estoura' e 'JSON de erro padronizado', que pertencem a controller-advice."
+ },
+ "B7C4": {
+  "skills": [
+   "addon-studio:sankhya-utils",
+   "addon-studio:sankhya-js"
+  ],
+  "conf": 78,
+  "saliencia": 85,
+  "sub_agent": "nenhum",
+  "motivo": "A description de sankhya-utils diz que 'arredondar', 'tratar null' e 'formatar como moeda' sem citar tela é Java do addon, inclusive para 'pra mostrar'. Carregaria antes de escrever setScale/formatação à mão. Ainda assim, sankhya-js também trata formatação, então eu confirmaria que não há tela envolvida.",
+  "ambiguidade": "Média. 'pra mostrar' pode sugerir tela HTML5 (sankhya-js, com StringUtils/NumberUtils do .js). A regra de desempate é a ausência de tela citada, que aponta para sankhya-utils."
+ },
+ "B7C5": {
+  "skills": [
+   "addon-studio:mapstruct"
+  ],
+  "conf": 95,
+  "saliencia": 90,
+  "sub_agent": "nenhum",
+  "motivo": "O pedido é um mapper MapStruct explícito entre DTO e entidade, e a description cobre 'conversão DTO↔Entidade campo a campo' e arquivos *Mapper.java. Não há termo concorrente forte.",
+  "ambiguidade": "Baixa. VstVistoria aponta para entity, mas a mensagem pede o mapper e não a classe da entidade."
+ },
+ "B7C6": {
+  "skills": [
+   "addon-studio:controller",
+   "addon-studio:controller-advice"
+  ],
+  "conf": 70,
+  "saliencia": 70,
+  "sub_agent": "nenhum",
+  "motivo": "A description de controller diz que validação de entrada no DTO (@Valid, @NotNull) mora nela e a listener diz que 'se for só o payload que chega no endpoint, é controller'. Carregaria controller. Controller-advice entra como segunda opção se o dev quiser a resposta de erro da violação.",
+  "ambiguidade": "Alta. listener também cobre 'validar campos' (mas no insert/update da tabela, o que não é o caso), e controller-advice trata a resposta da violação. A mensagem fala só em 'payload que chega no endpoint', o que favorece controller."
+ },
+ "B8C1": {
+  "skills": [
+   "addon-studio:sankhya-js",
+   "addon-studio:jsp"
+  ],
+  "conf": 85,
+  "saliencia": 88,
+  "sub_agent": "",
+  "motivo": "A description de sankhya-js diz explicitamente que formulário que o usuário preenche e envia para endpoint/serviço do addon é dela. A de jsp exclui esse caso no seu bloco NÃO usar. O endpoint já existe ('meu endpoint'), então não preciso de controller nem de controller-designer.",
+  "ambiguidade": "Baixa. 'Tela' pode puxar data-dictionary, mas só se a tela fosse gerada da tabela, e o pedido de formulário com envio para endpoint descarta essa leitura. jsp aparece como segunda opção só por causa da palavra 'tela'."
+ },
+ "B8C2": {
+  "skills": [
+   "addon-studio:type-adapter"
+  ],
+  "conf": 95,
+  "saliencia": 95,
+  "sub_agent": "",
+  "motivo": "O termo @GlobalTypeAdapter aparece literalmente na description de type-adapter, que também cobre adaptadores de serialização e formato de data. Não há concorrente real: mapstruct trata DTO↔Entidade, não serialização global.",
+  "ambiguidade": "Nenhuma relevante."
+ },
+ "B8C3": {
+  "skills": [
+   "addon-studio:database"
+  ],
+  "conf": 85,
+  "saliencia": 82,
+  "sub_agent": "dbscript-builder (opcional, se virar migration nova com DDL MSSQL/Oracle)",
+  "motivo": "A description de database cobre índice explicitamente ('adicionar coluna, tabela, índice ou constraint... CREATE INDEX, UNIQUE/PK/FK') e a de data-dictionary manda índice para database. Tratei como migration de dbscripts/. Não consigo ver se a tabela é do addon (AD_) ou nativa (TGF/TSI).",
+  "ambiguidade": "Média. 'Dessa tabela' não diz qual tabela. Se for nativa, merge-on-root é a skill dona de ALTER em TGF*/TSI*, e a resposta muda. Eu perguntaria ou inspecionaria o XML antes de decidir."
+ },
+ "B8C4": {
+  "skills": [
+   "addon-studio:init"
+  ],
+  "conf": 92,
+  "saliencia": 92,
+  "sub_agent": "",
+  "motivo": "A description de init lista 'preparar esse projeto recém-clonado' e 'configurar CLAUDE.md' como gatilhos, e o pedido bate com os dois. No contexto simulado, CLAUDE.md e docs/ADDON.md não existem, o que reforça que init é o setup certo, pois ele cria esses arquivos. Não é o /init embutido do Claude Code.",
+  "ambiguidade": "Baixa. Um leitor poderia pensar no /init nativo do Claude Code, mas a description de init diz expressamente que não é esse."
+ },
+ "B8C5": {
+  "skills": [
+   "addon-studio:dependency-injection"
+  ],
+  "conf": 93,
+  "saliencia": 90,
+  "sub_agent": "",
+  "motivo": "A description de dependency-injection cobre 'montar wiring, criar/alterar módulos Guice' e @CustomModule, que é exatamente o pedido. O 'value' não entra, porque ele é para parâmetros de configuração, e o pedido é sobre bindings de services.",
+  "ambiguidade": "Baixa. Apenas @Value/value seria um desvio, e o pedido não toca em configuração."
+ },
+ "B8C6": {
+  "skills": [
+   "addon-studio:repository",
+   "addon-studio:controller"
+  ],
+  "conf": 78,
+  "saliencia": 72,
+  "sub_agent": "",
+  "motivo": "A description de repository diz que 'a query mora aqui' e cita consulta, listagem, filtro e paginação. A pergunta é como escrever a query, então repository é a primeira escolha. Dou saliência menor que nas demais porque é uma pergunta 'como', e eu poderia responder de memória sem consultar o catálogo.",
+  "ambiguidade": "Média. controller também cita listagem e filtro. Só a description de controller resolve o empate, ao mandar listar/filtrar/paginar sem rota para repository. Se o dev fosse expor isso por endpoint, controller entraria."
+ },
+ "B9C1": {
+  "skills": [
+   "addon-studio:jsp",
+   "addon-studio:sankhya-js"
+  ],
+  "conf": 85,
+  "saliencia": 90,
+  "sub_agent": "nenhum",
+  "motivo": "A mensagem pede tela de leitura com mapa e painéis, com HTML escrito à mão. A description de jsp cobre exatamente 'painel operacional, dashboard denso, mapa ou tela de leitura em que você escreve o HTML na mão'. Não há menção a endpoint nem a formulário, então sankhya-js não se aplica.",
+  "ambiguidade": "Baixa-média. sankhya-js também fala em tela HTML5 que eu desenho com layout próprio; a diferença está em jsp ser para leitura/painel denso e sankhya-js para tela com lógica e envio a endpoint do addon. A mensagem diz 'só de leitura', o que favorece jsp."
+ },
+ "B9C2": {
+  "skills": [
+   "addon-studio:value"
+  ],
+  "conf": 95,
+  "saliencia": 95,
+  "sub_agent": "nenhum",
+  "motivo": "O pedido cita o termo '@Value' e 'parâmetro do Sankhya', que estão na description de value ('injeção @Value Sankhya', 'SANKHYA_PARAM'). A description de dependency-injection exclui explicitamente o caso de parâmetro de configuração e aponta para @Value.",
+  "ambiguidade": "Baixa. dependency-injection menciona 'injetar service', mas a própria description manda o caso de parâmetro para value."
+ },
+ "B9C3": {
+  "skills": [
+   "addon-studio:database"
+  ],
+  "conf": 80,
+  "saliencia": 85,
+  "sub_agent": "dbscript-builder",
+  "motivo": "A description de database inclui 'popular dados de configuração ou parametrização inicial do módulo (seed/carga de linhas)', casando quase literalmente com o pedido. value exclui seed e aponta para database. O sub-agent dbscript-builder é o gerador de migrations, então serviria se o resultado for um dbscript.",
+  "ambiguidade": "Média. 'Dados de configuração' e 'parametrização' também aparecem em value, o que cria sobreposição. Além disso, 'script' pode significar um script de carga fora de dbscripts/, caso em que nenhuma skill do plugin se aplica diretamente."
+ },
+ "B9C4": {
+  "skills": [
+   "addon-studio:merge-on-root"
+  ],
+  "conf": 85,
+  "saliencia": 90,
+  "sub_agent": "nenhum",
+  "motivo": "A description de merge-on-root diz 'guardar informação nova em entidade nativa (Parceiro...)' e cita 'preciso de um campo a mais na tela de Parceiros' como exemplo literal. Parceiro é tabela nativa, e o caminho oficial é a tabela de extensão com merge-on-root.",
+  "ambiguidade": "Média. data-dictionary também cobre telas de cadastro e campos na tela, e entity cobre classes de entidade. A combinação 'guardar' + 'cadastro de parceiros nativo' favorece merge-on-root, mas o trabalho pode cruzar com data-dictionary se o dev quiser alterar a tela."
+ },
+ "B9C5": {
+  "skills": [
+   "addon-studio:encoding"
+  ],
+  "conf": 95,
+  "saliencia": 95,
+  "sub_agent": "nenhum",
+  "motivo": "A description de encoding diz 'converte e audita encoding de arquivos-fonte para ISO-8859-1 via iconv ou Python' e 'use sempre que conteúdo gerado por LLM tiver sido salvo em UTF-8'. O pedido combina os dois pontos quase literalmente.",
+  "ambiguidade": "Baixa. Não sei quais arquivos são 'os que eu acabei de criar' numa sessão nova, mas isso afeta o alvo da conversão, não a escolha da skill."
+ },
+ "B9C6": {
+  "skills": [
+   "addon-studio:action-button"
+  ],
+  "conf": 75,
+  "saliencia": 90,
+  "sub_agent": "nenhum",
+  "motivo": "A description de action-button cobre 'clica num botão para executar algo' em tela nativa do Sankhya (Pedidos, Notas) via AcaoRotinaJava. O pedido tem clique do usuário em tela nativa de pedidos, então é o caso central. As exclusões de job (rotina agendada) e de sankhya-js (tela do addon) não se aplicam.",
+  "ambiguidade": "Média. A description fala em 'marca registros na grade', e a mensagem não menciona seleção, só 'um botão na tela de pedidos'. callback também trata de pedido, mas só no ponto de confirmação. sankhya-js poderia ser lido como 'botão' em tela, mas o alvo é tela nativa, não do addon."
+ },
+ "B10C1": {
+  "skills": [
+   "entity"
+  ],
+  "conf": 70,
+  "saliencia": 88,
+  "sub_agent": "nenhum (entity-architect só se XML de dicionário e dbscript nascerem junto)",
+  "motivo": "A description de `entity` cobre 'quando o dev diz que precisa guardar isso no banco e o entregável é a classe Java'. O pedido é só a classe ('monta a classe java disso'). Não carregaria `database` nem `data-dictionary` agora, porque não foram pedidos dbscript nem XML.",
+  "ambiguidade": "Média. 'Guardar no banco' pode sugerir os três artefatos (entity-architect) ou um dbscript/dicionário (database, data-dictionary). Sem confirmação do dev, sigo só com a classe Java e digo isso na resposta."
+ },
+ "B10C2": {
+  "skills": [
+   "build"
+  ],
+  "conf": 95,
+  "saliencia": 92,
+  "sub_agent": "nenhum",
+  "motivo": "A description de `build` cita explicitamente `gradle clean deployAddon` / `./gradlew clean deployAddon`, e o projeto aplica o plugin br.com.sankhya.addonstudio no build.gradle. Carregaria a skill para fixar a forma correta do comando antes de rodar.",
+  "ambiguidade": "Baixa. Só há conflito se o build falhar por outra causa, aí a skill manda para encoding ou dependency-injection."
+ },
+ "B10C3": {
+  "skills": [
+   "sankhya-js"
+  ],
+  "conf": 90,
+  "saliencia": 85,
+  "sub_agent": "nenhum",
+  "motivo": "A description de `sankhya-js` cobre 'tela HTML5 do addon' e 'tela com botão que chama meu controller', além de SanPopup e MessageUtils. A exclusão de `action-button` para tela html5 do addon reforça a escolha.",
+  "ambiguidade": "Baixa. `action-button` aparece pelo 'botão', mas a própria description exclui tela html5 do addon. `controller` poderia aparecer pelo endpoint, mas o foco é a tela."
+ },
+ "B10C4": {
+  "skills": [
+   "repository"
+  ],
+  "conf": 85,
+  "saliencia": 85,
+  "sub_agent": "nenhum (controller-designer só se o pedido virar endpoint REST)",
+  "motivo": "A description de `repository` diz que 'listar/filtrar/paginar X' sem citar rota, REST ou app é a query, e cita paginação e filtro por faixa de data/período. O pedido não menciona endpoint, então não é `controller`.",
+  "ambiguidade": "Média-baixa. 'Listagem' também aparece na description de `controller`, mas só quando há endpoint, rota ou app. O pedido não tem esses termos."
+ },
+ "B10C5": {
+  "skills": [
+   "test"
+  ],
+  "conf": 92,
+  "saliencia": 90,
+  "sub_agent": "test-writer só se o pedido virar suíte com vários arquivos; aqui é um arquivo, então inline",
+  "motivo": "A description de `test` cobre 'escreve testes JUnit 5 + Mockito' em src/test/java/ e cita explicitamente controllers. Pedido de um arquivo só resolve inline pela skill, não pelo sub-agent.",
+  "ambiguidade": "Baixa. `controller` poderia casar pelo nome VistoriaController, mas a description dela é para escrever o controller, não o teste."
+ },
+ "B10C6": {
+  "skills": [
+   "before-load-listener"
+  ],
+  "conf": 85,
+  "saliencia": 82,
+  "sub_agent": "nenhum",
+  "motivo": "A description de `before-load-listener` cita de forma quase literal 'filtro de segurança/multi-tenant transversal a uma entidade (só trazer os registros da empresa do usuário logado, sem depender de quem chama e sem repetir o filtro em cada consulta)'. Esse é o gancho certo para filtro transversal em leitura.",
+  "ambiguidade": "Média. `repository` casa por 'listagem' e 'filtro', mas o pedido é transversal ('sem depender de quem chama'), o que aponta para o FinderListener e não para a query de cada repository."
+ },
+ "B11C1": {
+  "skills": [
+   "addon-studio:controller"
+  ],
+  "conf": 70,
+  "saliencia": 85,
+  "sub_agent": "nenhum (pedido vago; a description manda carregar a skill e esclarecer antes de delegar ao controller-designer)",
+  "motivo": "A description de `controller` cita explicitamente 'integrar com app mobile/frontend' e 'listagem/lançamento... expostos por endpoint'. A mensagem menciona app mobile, então a skill casa. Mas não há recurso, campos nem rotas definidos, então eu não delegaria ao controller-designer ainda. A parte de listar pode puxar `repository`, porque a description de repository diz que listar sem citar rota/app é query, mas aqui o app mobile é citado, o que favorece `controller`.",
+  "ambiguidade": "Média. Mistura listagem e criação, e a listagem pode ser tratada como repository (query) se o endpoint for ignorado. Também pode precisar de entity/data-dictionary se 'vistoria' ainda não existir como entidade."
+ },
+ "B11C2": {
+  "skills": [
+   "addon-studio:retrofit"
+  ],
+  "conf": 95,
+  "saliencia": 96,
+  "sub_agent": "nenhum",
+  "motivo": "A description de `retrofit` diz 'Configura... Retrofit + Moshi + OkHttp' e 'consumir API de terceiro'. A mensagem pede exatamente isso ('configura o Retrofit + Moshi' e 'consumir a API do parceiro'). Não há sub-agent de integração HTTP no catálogo.",
+  "ambiguidade": "Baixa. A palavra 'parceiro' poderia sugerir a entidade nativa Parceiro (merge-on-root), mas o contexto de API externa e a menção explícita a Retrofit deixam claro."
+ },
+ "B11C3": {
+  "skills": [
+   "addon-studio:listener"
+  ],
+  "conf": 85,
+  "saliencia": 90,
+  "sub_agent": "nenhum",
+  "motivo": "A description de `listener` diz 'bloquear gravação ou exclusão com exceção em before*' e 'bloquear exclusão — isso é @Listener'. A `business-rule` também aparece para 'bloquear exclusão' de documento nativo, e `callback` cita 'faturamento', mas 'vistoria' é tabela do addon (AD_*), que `business-rule` exclui explicitamente. Então `listener` é a escolha.",
+  "ambiguidade": "Média. 'Já foi faturada' pode levar a business-rule ou callback (são as skills que falam de faturamento). Se a vistoria for um documento do comercial, a resposta muda. Pelo catálogo e pela tabela AD_, listener."
+ },
+ "B11C4": {
+  "skills": [
+   "addon-studio:controller-advice"
+  ],
+  "conf": 92,
+  "saliencia": 92,
+  "sub_agent": "nenhum (troubleshooter não se aplica, é design; controller-designer também não, porque é só o handler global)",
+  "motivo": "A description de `controller-advice` diz 'consolidar tratamento de exceções globais', 'rollback automático' e 'cada endpoint trata erro do seu jeito'. A mensagem bate quase literalmente nesses termos.",
+  "ambiguidade": "Baixa-média. A skill `controller` também fala de @Transactional e de códigos de status, então alguém poderia tentar corrigir o rollback no controller. A description de controller-advice diz que a resposta HTTP de exceção é aqui."
+ },
+ "B11C5": {
+  "skills": [
+   "addon-studio:sankhya-utils"
+  ],
+  "conf": 94,
+  "saliencia": 85,
+  "sub_agent": "nenhum",
+  "motivo": "A description de `sankhya-utils` lista explicitamente 'validadores de CPF/CNPJ/e-mail/PIS' e 'com.sankhya.util'. A mensagem cita o pacote e o validador de CNPJ. Mesmo sendo uma pergunta direta, a description manda carregar antes de responder em Java do addon.",
+  "ambiguidade": "Baixa. Se o usuário quiser o código do validador em tela HTML5, seria sankhya-js (StringUtils do framework JS), mas ele pediu com.sankhya.util, que é o Java."
+ },
+ "B11C6": {
+  "skills": [
+   "addon-studio:listener"
+  ],
+  "conf": 90,
+  "saliencia": 88,
+  "sub_agent": "nenhum",
+  "motivo": "A description de `listener` diz 'exigir campo preenchido/não vazio (sinal prático: o dev fala do campo da tabela no insert/update, não de payload nem de tela)'. A mensagem fala do campo PLACA da tabela AD_VSTVIS no insert, o que casa com esse sinal. A description de `database` diz que NOT NULL é lá, mas 'string vazia' é listener.",
+  "ambiguidade": "Média. `database` (NOT NULL) e `controller` (@NotBlank no DTO) concorrem. A description de listener resolve para o campo da tabela no insert, mas se o dev quiser barrar só no payload, a resposta é controller."
+ },
+ "B12C1": {
+  "skills": [
+   "data-dictionary"
+  ],
+  "conf": 92,
+  "saliencia": 85,
+  "sub_agent": "",
+  "motivo": "A mensagem bate quase literalmente com a description de data-dictionary: 'quero que essa tabela vire uma tela de cadastro', 'campo de busca de parceiro' (dataType PESQUISA) e 'quero a tabela no menu'. Não há tela HTML5 nem endpoint citado, então não é sankhya-js. Não é entity-architect porque o pedido não pede os três artefatos juntos.",
+  "ambiguidade": "Baixa. 'Essa tabela' não tem arquivo citado, mas a intenção de tela gerada pelo dicionário é clara."
+ },
+ "B12C2": {
+  "skills": [
+   "sankhya-js"
+  ],
+  "conf": 92,
+  "saliencia": 88,
+  "sub_agent": "",
+  "motivo": "'Tela HTML5 do addon' é o gatilho principal da description de sankhya-js, que também lista sk-dynaform e sk-dataset explicitamente. O termo 'sk-dynaform' também aparece em data-dictionary (dynamicForm), mas o 'HTML5 do addon' desempata a favor de sankhya-js.",
+  "ambiguidade": "Baixa-média: sk-dynaform aparece em sankhya-js e, como <dynamicForm>, em data-dictionary. Sem a palavra 'HTML5' a escolha seria incerta."
+ },
+ "B12C3": {
+  "skills": [
+   "action-button",
+   "callback"
+  ],
+  "conf": 78,
+  "saliencia": 85,
+  "sub_agent": "",
+  "motivo": "'Botão na tela de pedidos' e 'marcar as notas' batem com action-button (AcaoRotinaJava, usuário marca registros na grade de tela nativa e clica num botão). 'Confirmar em lote' puxa para callback (confirmação de documento e faturamento em lote do portal) e para business-rule (confirmação de pedido/nota). A description de action-button não cita 'confirmar', então a escolha tem alguma incerteza.",
+  "ambiguidade": "Alta entre action-button, callback (confirmação em lote, faturamento em lote) e business-rule (confirmação de nota/pedido). Action-button é a primeira escolha pela parte 'botão na grade'."
+ },
+ "B12C4": {
+  "skills": [
+   "database",
+   "entity"
+  ],
+  "conf": 82,
+  "saliencia": 80,
+  "sub_agent": "",
+  "motivo": "'O que falta pro banco do cliente pegar essa coluna quando atualizar o addon' é a frase exata da description de database ('quando o dev pergunta o que falta para o banco do cliente pegar um campo novo na atualização do addon'). Entity entra em segundo lugar porque a description cita 'ajustar campo pontualmente' e que renomear/adicionar coluna em entidade publicada arrasta dbscripts e datadictionary.",
+  "ambiguidade": "Média: 'campo novo na entidade' não diz se a entidade é do addon (database/entity/data-dictionary) ou nativa (merge-on-root). dbscript-builder também pode competir por ser MUST BE USED para ALTER, mas a pergunta é informativa e cabe inline."
+ },
+ "B12C5": {
+  "skills": [
+   "init"
+  ],
+  "conf": 95,
+  "saliencia": 92,
+  "sub_agent": "",
+  "motivo": "'Configura o CLAUDE.md desse projeto pro addon-studio' bate direto com a description de init: 'configurar CLAUDE.md', 'setup do projeto', copiar ADDON.md para docs e importar via @docs/ADDON.md. Nenhuma outra description trata de CLAUDE.md, e o fato de o CLAUDE.md não existir não muda a escolha.",
+  "ambiguidade": "Muito baixa. A skill init de addon-studio é a única com esse escopo; não confundir com o /init embutido do Claude Code, que a própria description exclui."
+ },
+ "B12C6": {
+  "skills": [
+   "type-adapter"
+  ],
+  "conf": 92,
+  "saliencia": 85,
+  "sub_agent": "",
+  "motivo": "'Controlar como o tipo Timestamp sai no JSON em todos os endpoints' é o caso central de @GlobalTypeAdapter: 'define, num lugar só, como um tipo serializa', 'formato de data/número no JSON de resposta'. A description de mapstruct exclui explicitamente esse caso e manda para type-adapter.",
+  "ambiguidade": "Baixa. 'Timestamp' aparece também em entity, mas a intenção é de serialização JSON global, não de mapeamento de tipo de entidade."
+ },
+ "B13C1": {
+  "skills": [
+   "addon-studio:macros"
+  ],
+  "conf": 92,
+  "saliencia": 90,
+  "sub_agent": "nenhum",
+  "motivo": "A description de macros cita explicitamente NVL, SYSDATE, TRUNC e a portabilidade Oracle/MSSQL como caso de uso. A mensagem tem esses termos literais, então carregaria a skill antes de reescrever o SQL.",
+  "ambiguidade": "Baixa. A skill database também fala de mapeamento Oracle/MSSQL, mas só para dbscripts (tags <mssql>/<oracle>), e a description de macros diz que dbscripts não são dela. Não há conflito real."
+ },
+ "B13C2": {
+  "skills": [
+   "addon-studio:jsp"
+  ],
+  "conf": 92,
+  "saliencia": 92,
+  "sub_agent": "nenhum",
+  "motivo": "A description de jsp cobre a instalação do suporte a .jsp num add-on que ainda não tem (TLD, taglibs) e o uso de <snk:query>. A pergunta 'o que falta no projeto' bate com esse caso. No contexto simulado não há CLAUDE.md nem docs/ADDON.md, o que não muda a escolha.",
+  "ambiguidade": "Média-baixa. sankhya-js também aparece porque a palavra 'tela' está na mensagem, mas a própria description de sankhya-js exclui .jsp e taglib sankhyaUtil, o que resolve a dúvida. Como o dev menciona snk:query, a escolha é jsp."
+ },
+ "B13C3": {
+  "skills": [
+   "addon-studio:mapstruct"
+  ],
+  "conf": 85,
+  "saliencia": 80,
+  "sub_agent": "nenhum",
+  "motivo": "A description de mapstruct fala em conversão DTO↔Entidade campo a campo sem get/set à mão, que é exatamente o que o dev pede. Eu carregaria mapstruct antes de escrever o conversor.",
+  "ambiguidade": "Média. controller também menciona 'DTOs' e 'validação', mas a description de controller trata de endpoints e de declarar @Valid no DTO, não de converter DTO em entidade. A palavra 'DTO' é o único ponto de sobreposição. Sem citar mapper ou entidade eu hesitaria mais."
+ },
+ "B13C4": {
+  "skills": [
+   "addon-studio:job"
+  ],
+  "conf": 95,
+  "saliencia": 92,
+  "sub_agent": "nenhum",
+  "motivo": "A description de job lista 'de madrugada', 'processo noturno', 'sem intervenção do usuário' e 'rotina agendada'. A mensagem usa 'de madrugada' e 'sozinha', então a skill é clara.",
+  "ambiguidade": "Baixa. 'Consolidando lançamentos' poderia sugerir business-rule ou listener, mas nenhuma delas cobre rotina agendada, e o gatilho de tempo é o que decide."
+ },
+ "B13C5": {
+  "skills": [
+   "addon-studio:merge-on-root"
+  ],
+  "conf": 96,
+  "saliencia": 93,
+  "sub_agent": "nenhum",
+  "motivo": "A description de merge-on-root trata de estender entidade nativa (Parceiro, Produto, Nota) com tabela de extensão de mesma PK via @OneToOne e merge-on-root. A mensagem cita o nome da técnica e o caso. A description também diz que dbscript, XML e Java da tabela de extensão são desta skill, então entity-architect não entra.",
+  "ambiguidade": "Baixa. entity-architect e database também aparecem em 'tabela', mas a description de merge-on-root delimita que a extensão inteira é dela e que entity-architect é para tabela nova do addon."
+ },
+ "B13C6": {
+  "skills": [
+   "addon-studio:value"
+  ],
+  "conf": 90,
+  "saliencia": 88,
+  "sub_agent": "nenhum",
+  "motivo": "A description de value cobre injeção de parâmetro de configuração do Sankhya (@Value, ValueType, parameter.xml). A dependency-injection exclui explicitamente o caso de 'parâmetro de configuração do Sankhya', o que aponta para value.",
+  "ambiguidade": "Média-baixa. dependency-injection também aparece por causa de 'service' e por ser Guice. A exclusão explícita na description de DI resolve a escolha."
+ }
+}
