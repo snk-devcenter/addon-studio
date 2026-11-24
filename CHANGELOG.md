@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.5.5] - 2026-11-24
+
 ### Adicionado
 
 - Skill `repository` documenta o `EntityDynamicVO`, que converte a entidade lida pelo repository em `DynamicVO` para código legado da plataforma, e a skill `test` mostra como testá-lo.
@@ -531,7 +533,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.4...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.5...HEAD
+[3.5.5]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.4...v3.5.5
 [3.5.4]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.3...v3.5.4
 [3.5.3]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.2...v3.5.3
 [3.5.2]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.1...v3.5.2
