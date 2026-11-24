@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Adicionado
+
+- Skill `repository` documenta o `EntityDynamicVO`, que converte a entidade lida pelo repository em `DynamicVO` para código legado da plataforma, e a skill `test` mostra como testá-lo.
+
 ## [3.5.4] - 2026-11-12
 
 ### Alterado

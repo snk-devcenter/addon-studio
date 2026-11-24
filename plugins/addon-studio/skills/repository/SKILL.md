@@ -57,6 +57,45 @@ public interface VeiculoRepository extends JapeRepository<BigDecimal, Veiculo> {
 >
 > **Filtro que é a PK inteira vai por `findByPK`, não por `@Criteria`.** Com PK simples, `findByPK` resolve pela busca por chave do Jape (`EntityFacade.findEntityByPrimaryKey`), que reaproveita a entidade já carregada na transação; `@Criteria` é sempre um finder dinâmico que vai ao banco. Re-leitura por `findByPK` em loop não é gargalo; `@Criteria(clause = "this.CODPROD = :codigo")` sobre a PK é.
 
+### 2.1 `EntityDynamicVO` — entidade lida pelo repository → `DynamicVO`
+
+Código legado da plataforma (helpers do `modelcore`, `ManifestoHelpper`, ...) só aceita `DynamicVO`. Não traga `EntityFacade`/`findEntityByPrimaryKeyAsVO` para o addon para isso: leia a entidade pelo repository e converta na borda.
+
+```java
+OrdemCarga ordem = ordemCargaRepository.findByPK(new OrdemCargaId(codEmp, ordemCarga));
+DynamicVO ordemCargaVO = EntityDynamicVO.from(ordem);
+
+new ManifestoHelpper().gerarManifesto(ordemCargaVO, ServiceContext.getCurrent());
+```
+
+O repository não devolve a classe `@JapeEntity` pura: devolve a subclasse gerada (`<Entidade>JapePojoEntity`, implementa `JapePojoEntity`), que guarda a `PersistentLocalEntity` do registro lido. `getPersistentEntity().getValueObject()` devolve o `EntityVO` daquele registro, que aceita cast para `DynamicVO`. Entidade criada com `new` não tem registro: a conversão falha com exceção tipada, não com `NullPointerException`.
+
+`EntityDynamicVO` **não é do SDK** — é classe do projeto, só com API pública do SDK (como o `EventEntity` da skill `listener`). Implementação de referência:
+
+```java
+import br.com.sankhya.jape.vo.DynamicVO;
+import br.com.sankhya.sdk.data.repository.JapePojoEntity;
+
+public final class EntityDynamicVO {
+
+    private EntityDynamicVO() {
+    }
+
+    public static DynamicVO from(Object entity) throws Exception {
+        if (!(entity instanceof JapePojoEntity) || ((JapePojoEntity) entity).getPersistentEntity() == null) {
+            throw new EntityWithoutJapeRecordException("EntityDynamicVO: only an entity read by the repository has a DynamicVO; received "
+                + (entity == null ? "null" : entity.getClass().getName()) + ".");
+        }
+        return (DynamicVO) ((JapePojoEntity) entity).getPersistentEntity().getValueObject();
+    }
+}
+```
+
+- `EntityWithoutJapeRecordException` é exceção do projeto (`extends RuntimeException`) — use a exceção tipada que o projeto já tiver.
+- Só vale para entidade **lida** pelo repository (`findByPK`, `@Criteria`). Retorno de `save`/`saveNew` e entidade montada por `EntityMapper.fromVO` (ex.: no listener) não passam pela leitura e caem na exceção.
+- O VO devolvido é o do próprio registro: gravar nele grava no registro. Para alterar a entidade, use `repository.save`; reserve o VO para entregar ao legado.
+- Teste: skill `test`.
+
 ---
 
 ## 3. Consultas Customizadas
@@ -603,4 +642,5 @@ public class PedidoService {
 
 - `entity` — entidade `@JapeEntity` sobre a qual o repositório opera
 - `macros` — macros SQL para `@NativeQuery` e `queries/<arquivo>.xml`
+- `listener` — `EventEntity`, o equivalente de evento do `EntityDynamicVO` (§2.1)
 - `test` — JUnit + Mockito do repositório; repository é tipicamente mockado em testes (cuidado com quirks do `JapeRepository`)
