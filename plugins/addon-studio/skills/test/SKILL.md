@@ -440,6 +440,36 @@ void fromVO_deveMapearCamposClobEBlob() {
   java.lang.String field ... to [C` (`[B` no BLOB) — o mesmo erro da leitura em producao.
 - Um teste por entidade com campo CLOB/BLOB, preenchendo todos eles no mesmo VO.
 
+## Teste de `EntityDynamicVO` (entidade do repository → `DynamicVO`)
+
+`EntityDynamicVO.from(entidade)` (skill `repository`, §2.1) le a `PersistentLocalEntity` da subclasse
+`*JapePojoEntity` que o repository devolve. Em teste, a entidade criada com `new` nao tem registro e cai na
+excecao do projeto. Mocke a fronteira (`JapePojoEntity` e `PersistentLocalEntity`) e devolva um `EntityVO`
+que tambem seja `DynamicVO`:
+
+```java
+import br.com.sankhya.jape.bmp.PersistentLocalEntity;
+import br.com.sankhya.jape.vo.DynamicVO;
+import br.com.sankhya.jape.vo.EntityVO;
+import br.com.sankhya.sdk.data.repository.JapePojoEntity;
+
+@Test
+void from_deveDevolverOVoDaPersistentEntity() throws Exception {
+    EntityVO vo = mock(EntityVO.class, withSettings().extraInterfaces(DynamicVO.class));
+    PersistentLocalEntity persistente = mock(PersistentLocalEntity.class);
+    when(persistente.getValueObject()).thenReturn(vo);
+    JapePojoEntity lida = mock(JapePojoEntity.class);
+    when(lida.getPersistentEntity()).thenReturn(persistente);
+
+    assertThat(EntityDynamicVO.from(lida)).isSameAs(vo);
+}
+```
+
+- `thenReturn(mock(DynamicVO.class))` nao compila: `getValueObject()` devolve `EntityVO`. Declare o mock como
+  `EntityVO` com `extraInterfaces(DynamicVO.class)`.
+- Servico que recebe a entidade e chama o legado: stube o repository para devolver o mock `JapePojoEntity`
+  (ou injete a conversao como fronteira); entidade `new OrdemCarga()` faz `from` lancar a excecao.
+
 ## Boas praticas
 
 - Declare `throws Exception` em metodos teste que interajam com repositorios JapeRepository.
