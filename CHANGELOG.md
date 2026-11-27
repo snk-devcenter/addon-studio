@@ -10,6 +10,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+## [3.5.6] - 2026-11-27
+
 ### Adicionado
 
 - Skill `sankhya-js` documenta o `MGEParameters` e o `launcher/<Tela>.parameters` para ler parâmetro do sistema na tela sem criar `@Controller`, e a skill `value` aponta para esse caminho.
@@ -541,7 +543,8 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 - Versão inicial do plugin `addon-studio`.
 
-[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.5...HEAD
+[Não publicado]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.6...HEAD
+[3.5.6]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.5...v3.5.6
 [3.5.5]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.4...v3.5.5
 [3.5.4]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.3...v3.5.4
 [3.5.3]: https://github.com/snk-devcenter/addon-studio/compare/v3.5.2...v3.5.3
