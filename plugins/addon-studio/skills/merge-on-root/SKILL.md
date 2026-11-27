@@ -31,7 +31,7 @@ O exemplo abaixo estende `Parceiro` (`TGFPAR`) com dois campos de integração. 
 
 ## 2. Tabela de extensão — dbscript
 
-PK **idêntica** à da raiz (mesmas colunas e tipos), sem FK declarada no DDL. CREATE mínimo + um `ALTER` por coluna + CHECK do `CHECKBOX`, como em qualquer tabela do addon:
+PK **idêntica** à da raiz (mesmas colunas e tipos) e **FK física da PK da extensão para a raiz**. CREATE mínimo + um `ALTER` por coluna + CHECK do `CHECKBOX`, como em qualquer tabela do addon, e o `<sql>` da FK:
 
 ```xml
 <sql nomeTabela="PRXXYZIPA" ordem="1" executar="SE_NAO_EXISTIR"
@@ -83,7 +83,25 @@ PK **idêntica** à da raiz (mesmas colunas e tipos), sem FK declarada no DDL. C
         ALTER TABLE PRXXYZIPA ADD (DHULTIMPORT DATE)
     </oracle>
 </sql>
+
+<sql nomeTabela="PRXXYZIPA" ordem="5" executar="SE_NAO_EXISTIR"
+     tipoObjeto="CONSTRAINT" nomeObjeto="FK_PRXXYZIPA_CODPARC_TGFPAR"
+     descricao="FK da extensao PRXXYZIPA para a raiz TGFPAR">
+    <mssql>
+        ALTER TABLE PRXXYZIPA WITH NOCHECK ADD CONSTRAINT FK_PRXXYZIPA_CODPARC_TGFPAR FOREIGN KEY (CODPARC) REFERENCES TGFPAR (CODPARC) ON DELETE CASCADE
+    </mssql>
+    <oracle>
+        ALTER TABLE PRXXYZIPA ADD CONSTRAINT FK_PRXXYZIPA_CODPARC_TGFPAR FOREIGN KEY (CODPARC) REFERENCES TGFPAR (CODPARC) ON DELETE CASCADE ENABLE NOVALIDATE
+    </oracle>
+</sql>
 ```
+
+Por que a FK é obrigatória: a plataforma só trata a PK da extensão como chave estrangeira quando existe a constraint física no banco. Sem ela, a PK da raiz vira campo de pesquisa apontando para a instância de extensão — aparece a lupa, some a máscara, e cadastrar registro novo na raiz falha com `CORE_E01315` ("<instância> não existe ou não pode ser usado aqui"), porque o código digitado ainda não existe na extensão. As extensões nativas (`TGFCPL`, `TGFTEF`...) seguem o mesmo padrão.
+
+- Nome `FK_<EXTENSAO>_<PK>_<RAIZ>`, dentro do limite de 30 chars do Oracle; PK composta lista todas as colunas nos dois lados.
+- `ON DELETE CASCADE` — excluir o registro raiz leva a linha da extensão junto. É do banco; não tem relação com o `cascade` do `@OneToOne` (seção 6).
+- `WITH NOCHECK` (MSSQL) / `ENABLE NOVALIDATE` (Oracle) — não valida linhas já existentes, para a instalação não quebrar em base que já tem linha órfã na extensão. Linha nova é validada normalmente.
+- A coluna da extensão precisa ter o mesmo tipo da coluna da raiz — o MSSQL recusa FK entre tipos diferentes.
 
 ---
 
@@ -217,6 +235,7 @@ O `@ref-param[merge-on-root=true]` fica no `<expression>` do XML, não em `@Expr
 ## 6. Cuidados
 
 - **Mesma PK.** A PK da extensão é a PK da raiz — as mesmas colunas, com os mesmos tipos (se composta, todas). É o que torna o 1:1 possível.
+- **FK física para a raiz.** Sem a constraint no banco, a PK da raiz vira campo de pesquisa na tela e o cadastro de registro novo quebra com `CORE_E01315` (seção 2).
 - **Sem `Cascade.DELETE` nem `Cascade.ALL`.** Com `DELETE` a relação passa a ser obrigatória, e uma 1:1 obrigatória não aparece na tela enquanto o registro raiz ainda não tem linha na extensão — todo registro antigo fica sem os campos.
 - **Só 1:1.** Precisa de N valores por registro raiz? É tabela filha com `OneToMany` (aba separada), não merge-on-root.
 - **Registro antigo sem linha na extensão** é o estado normal: a linha nasce quando o registro raiz é gravado (`insert="S"`).
@@ -233,6 +252,7 @@ Valem para tabela nativa que o projeto ainda não estende. Tabela já declarada 
 | `<field>` dentro de `<nativeTable><fields>` | Campo no `<table>` da extensão; `<nativeTable>` só com `<nativeInstance>` + `<relationShip>` |
 | `<instance>` nova do addon sobre tabela nativa | Tabela de extensão com instância própria + merge-on-root |
 | PK da extensão diferente da PK da raiz (sequência própria, `sequenceType="A"`) | Mesma PK, `sequenceType="M"` |
+| Tabela de extensão sem FK física para a raiz | `<sql>` de `CONSTRAINT` `FK_<EXTENSAO>_<PK>_<RAIZ>` com `ON DELETE CASCADE` (seção 2) |
 | `relation="OneToMany"` com `merge-on-root` | Merge só funde 1:1 |
 | `<relation>` de merge sem `insert="S"`/`update="S"` | Informar os dois — senão a tela não grava a extensão |
 | `Cascade.ALL` / `Cascade.DELETE` no `@OneToOne` da raiz | `{ Cascade.CREATE, Cascade.UPDATE, Cascade.MERGE }` |
@@ -244,7 +264,7 @@ Valem para tabela nativa que o projeto ainda não estende. Tabela já declarada 
 
 1. [ ] Confirmar que a entidade raiz é a certa e que o dado é 1:1 com ela. Raiz nativa: conferir se o `datadictionary/` já declara a tabela em `<nativeTable>` com `<field>` — se sim, não é merge-on-root (topo).
 2. [ ] Descobrir `<PRX>`/`<MOD3>` do projeto e nomear a tabela de extensão.
-3. [ ] dbscript: CREATE com a PK idêntica à da raiz + `ALTER` por coluna + CHECK de `CHECKBOX`/`LISTA`.
+3. [ ] dbscript: CREATE com a PK idêntica à da raiz + `ALTER` por coluna + CHECK de `CHECKBOX`/`LISTA` + FK física da PK para a raiz (`ON DELETE CASCADE`, `NOCHECK`/`NOVALIDATE`).
 4. [ ] `datadictionary/<TABELA>.xml` da extensão: `<table sequenceType="M">`, `<instance>`, campos com `UITabName`.
 5. [ ] `datadictionary/<TABELA_RAIZ>.xml`: `<relation relation="OneToOne" insert="S" update="S">` com `@ref-param[merge-on-root=true]`; raiz nativa sem `<fields>`.
 6. [ ] Entidade Java da extensão (só `@Column(name)`).

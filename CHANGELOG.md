@@ -10,6 +10,10 @@ Tipos de entrada: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Depreciado
 
 ## [Não publicado]
 
+### Corrigido
+
+- Skill `merge-on-root` exige FK física da tabela de extensão para a raiz (`ON DELETE CASCADE`): sem ela a PK da raiz vira campo de pesquisa e cadastrar registro novo falha com `CORE_E01315`; skill `database` e sub-agent `dbscript-builder` registram a exceção à regra de não declarar FK.
+
 ## [3.5.5] - 2026-11-24
 
 ### Adicionado
