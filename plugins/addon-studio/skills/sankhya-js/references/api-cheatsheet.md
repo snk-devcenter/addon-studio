@@ -234,6 +234,32 @@ Injetar `$SkInjector` fora de um `.config(...)` lanca `Error('Este injector deve
 
 ---
 
+## `MGEParameters` — parametros do sistema na tela
+
+Le parametros do sistema, inclusive os que o addon declara em `META-INF/parameter.xml`, sem `@Controller` novo nem leitura da `TSIPAR`. Os nomes lidos precisam estar em `launcher/<Tela>.parameters` ([addon-screen.md](addon-screen.md#parameters-parametros-que-a-tela-le)).
+
+```javascript
+angular.module('<Tela>App', ['snk'])
+  .controller('<Tela>Controller', ['MGEParameters', function (MGEParameters) {
+    var minhaFlag = MGEParameters.asBoolean('br.com.xyz.minhaflag');
+  }]);
+```
+
+| Metodo | Retorno |
+|---|---|
+| `asBoolean(name)` | `'S' == valor` |
+| `asInteger(name)` | `parseInt(valor)` |
+| `asFloat(name)` | `parseFloat(valor)` |
+| `asDate(name)` | `DateUtils.strToDate(valor)` |
+| `asString(name)` | valor cru |
+| `setParamValue(name, valor)` | sobrescreve em memoria, nao grava |
+
+- Leitura **sincrona**, sem promise e sem ida ao servidor: o valor e o do carregamento da tela. Quem altera o parametro precisa reabrir a tela.
+- Nome que nao veio no carregamento (fora do `.parameters`, grafia diferente ou falha ao resolver) abre o popup `Erro interno: O parâmetro X foi solicitado, mas não consta na lista declarada para esta tela.` e devolve `undefined`.
+- Parametro sem valor chega como a **string** `'null'`: `asString` devolve `'null'` e `asInteger`/`asFloat` devolvem `NaN`.
+
+---
+
 ## Modulos principais
 
 | Modulo | Dependencias |

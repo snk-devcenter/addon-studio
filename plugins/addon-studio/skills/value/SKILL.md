@@ -176,6 +176,8 @@ private boolean flagAtiva() {
     description="Descricao exibida nas Preferencias"/>
 ```
 
+Tela `sankhya-js` le o mesmo parametro (ex.: para a feature flag esconder um campo) com `MGEParameters` + `launcher/<Tela>.parameters`, sem `@Controller` novo: use o `name`, sem `_` (skill `sankhya-js`).
+
 Restricoes do XSD (`parameters.xsd`) que derrubam o build/deploy — menos `description`, que falha depois (ver abaixo):
 
 | Atributo | Restricao |

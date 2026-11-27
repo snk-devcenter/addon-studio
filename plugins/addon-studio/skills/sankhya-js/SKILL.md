@@ -23,6 +23,7 @@ Telas ficam no módulo web do addon (`<addon>-vc`, plugin Gradle `war`):
     <Tela>.css
     launcher/<Tela>.body         # <script> extras (popups, código comum)
     launcher/<Tela>.include      # <link rel="stylesheet">
+    launcher/<Tela>.parameters   # parâmetros do sistema lidos via MGEParameters
     popup/<algo>.tpl.html        # templates de popup/diretiva
     popup/<algo>.controller.js
   assets/                        # ícones e imagens da tela e do menu
@@ -160,8 +161,8 @@ Sem cache por padrão (`_useInternalCache = false`): cada chamada vai ao servido
 
 ## Onde aprofundar
 
-- [references/addon-screen.md](references/addon-screen.md) — anatomia da tela no addon, `gerarTela`, launcher `.body`/`.include`, registro no menu, deploy, checklist
-- [references/api-cheatsheet.md](references/api-cheatsheet.md) — `ServiceProxy`, `FluidBuilder`, `MetadataProvider`, `SkComponentRegistry`, `SkI18nService`, `SkWorkspace`, `$SkInjectorProvider`
+- [references/addon-screen.md](references/addon-screen.md) — anatomia da tela no addon, `gerarTela`, launcher `.body`/`.include`/`.parameters`, registro no menu, deploy, checklist
+- [references/api-cheatsheet.md](references/api-cheatsheet.md) — `ServiceProxy`, `FluidBuilder`, `MetadataProvider`, `SkComponentRegistry`, `SkI18nService`, `SkWorkspace`, `MGEParameters` (parâmetro do sistema na tela, sem endpoint novo), `$SkInjectorProvider`
 - [references/utils.md](references/utils.md) — utilitários do `snk.core.util` prontos para injetar: `StringUtils`, `NumberUtils`, `DateUtils`/`DateUtilsConstants`, `ArrayUtils`, `ObjectUtils`, `SkConstants`, `Base64`, `UrlUtils`, `SqlUtils`, `CrudUtils` (ler entidade sem endpoint novo), `SessionFileUpload`, `ClipboardUtils`, `AngularUtil`
 - [references/patterns.md](references/patterns.md) — padrões canônicos + tabela de decisão
 - [references/anti-patterns.md](references/anti-patterns.md) — práticas a evitar, útil em triagem de bug
