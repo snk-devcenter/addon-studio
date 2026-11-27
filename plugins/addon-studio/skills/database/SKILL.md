@@ -384,6 +384,8 @@ Scripts migração **imutáveis** após deploy. Sempre criar novo `V<NNN>-<OPERA
 
 Relacionamentos entre tabelas definidos **exclusivamente** em `datadictionary/` via `PESQUISA`. Não usar `FOREIGN KEY` ou `REFERENCES` no SQL.
 
+Exceção: tabela de extensão de merge-on-root **exige** FK física da PK dela para a tabela raiz — sem ela a PK da raiz vira campo de pesquisa e o cadastro quebra. Padrão do `<sql>` na skill `merge-on-root`.
+
 ### 11. Campo de domínio fechado sem CHECK
 
 ```xml
@@ -486,7 +488,7 @@ Exemplos completos de XMLs — `V001-CREATE_TABLE_PRXXYZCAD.xml` (PK simples), `
 - [ ] `ordem` única e sequencial no arquivo
 - [ ] **Não colocar ponto-e-vírgula** no final SQL
 - [ ] **Perguntar usuário** se deseja incluir campos auditoria (`DHALTER`, `DHCREATE`, `CODUSU`)
-- [ ] Não declarar `FOREIGN KEY` constraints (FKs definidas no datadictionary)
+- [ ] Não declarar `FOREIGN KEY` constraints (FKs definidas no datadictionary) — exceto a FK obrigatória da tabela de extensão para a raiz (skill `merge-on-root`)
 - [ ] Incluir atributo `descricao` para documentação script
 - [ ] Atualizar datadictionary correspondente após criar script
 

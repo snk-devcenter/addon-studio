@@ -155,7 +155,7 @@ Ações:
 
 #### 4.3 Tabela nativa — sem script
 
-Tabela nativa (`TGFCAB`, `TGFPAR`...) não recebe DDL do addon — nem CREATE, nem coluna nova. Exceção: tabela que o projeto já declara em `<nativeTable>` com `<field>` (legado) — `ALTER TABLE ADD` nela, no padrão dos scripts existentes. Fora isso, campo novo em entidade nativa vai para uma tabela de extensão com a mesma PK (script de tabela nova, 4.1/4.2), fundida via merge-on-root: carregue a skill `addon-studio:merge-on-root`.
+Tabela nativa (`TGFCAB`, `TGFPAR`...) não recebe DDL do addon — nem CREATE, nem coluna nova. Exceção: tabela que o projeto já declara em `<nativeTable>` com `<field>` (legado) — `ALTER TABLE ADD` nela, no padrão dos scripts existentes. Fora isso, campo novo em entidade nativa vai para uma tabela de extensão com a mesma PK e FK física para a raiz (script de tabela nova, 4.1/4.2, + o `<sql>` da FK), fundida via merge-on-root: carregue a skill `addon-studio:merge-on-root`.
 
 ### 5. Tipos por banco
 
@@ -175,7 +175,7 @@ Macros SQL Sankhya (`dbDate`, `nullValue`, etc.) funcionam em `<expression>` do 
 - [ ] Usar prefixo genérico `AD_` em tabela nova — usar convenção `<PRX><MOD3>` do projeto
 - [ ] `ordem` duplicada dentro do mesmo arquivo
 - [ ] Alterar dbscript já aplicado (criar novo `V<NNN>` em vez)
-- [ ] `FOREIGN KEY` constraint no DDL — não declarar (Sankhya gerencia via `<relationShip>` no dicionário)
+- [ ] `FOREIGN KEY` constraint no DDL — não declarar (Sankhya gerencia via `<relationShip>` no dicionário). Exceção: tabela de extensão de merge-on-root **exige** FK física da PK para a raiz (skill `merge-on-root`)
 - [ ] `IDENTITY` / `GENERATED AS IDENTITY` / `CREATE SEQUENCE` / trigger de sequência para a PK — quem gera é o dicionário (`sequenceType="A"`), coluna é `INT`/`NUMBER(10)` simples
 - [ ] Seed (`INSERT`) com PK literal (`SELECT 1`) — derivar `MAX(<PK>)+1` (`COALESCE`/`NVL`) e usar `WHERE NOT EXISTS` pela chave de negócio; chave fixa disputa o próximo valor da sequência do framework
 - [ ] Versionamento `V<NNN>` fora do padrão (sem `V`, sem zero-padding, etc.)
@@ -224,5 +224,5 @@ Macros SQL Sankhya (`dbDate`, `nullValue`, etc.) funcionam em `<expression>` do 
 
 - Se dbscript com mesma `<NNN>` já existe — **não sobrescrever**, criar próximo `<NNN+1>`
 - Se for alteração em coluna nativa do Sankhya core — **proibido**, alertar dev
-- Se for FOREIGN KEY constraint — **não declarar no DDL**, gerenciar via `<relationShip>` do dicionário
+- Se for FOREIGN KEY constraint — **não declarar no DDL**, gerenciar via `<relationShip>` do dicionário. Exceção: a FK da tabela de extensão de merge-on-root para a raiz é obrigatória (skill `merge-on-root`)
 '''
