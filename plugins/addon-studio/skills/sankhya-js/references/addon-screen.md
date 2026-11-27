@@ -29,6 +29,7 @@ settings.gradle
       launcher/
         <Tela>.body                      # <script> extras
         <Tela>.include                   # <link rel="stylesheet">
+        <Tela>.parameters                # parâmetros do sistema que a tela lê
       popup/
         <algo>.tpl.html
         <algo>.controller.js
@@ -117,7 +118,7 @@ angular.module('<Tela>App', ['snk'])
 
 ---
 
-## Launcher: `.body` e `.include`
+## Launcher: `.body`, `.include` e `.parameters`
 
 Arquivos que o launcher injeta na página final da tela. A tag `<ignored>` existe só para o arquivo continuar sendo HTML válido — ela não é renderizada.
 
@@ -141,6 +142,17 @@ Regras:
 - Todo `.js` da tela que não seja o `<Tela>.js` (controller de popup, diretiva, service auxiliar) **precisa** de uma linha no `.body`. Sem isso o Angular acusa controller/diretiva desconhecida em runtime, sem erro no build.
 - `src` e `href` são relativos à raiz do `webapp` (`html5/...`), não à pasta da tela.
 - O `.body` gerado já vem com `html5/commons/service.js`. Se o projeto não tiver essa pasta, remova a linha — o navegador busca um arquivo inexistente a cada abertura da tela.
+
+### `.parameters`: parâmetros que a tela lê
+
+Texto puro, um parâmetro por linha, sem a tag `<ignored>` e sem comentário. O launcher resolve cada linha e entrega os valores na página, onde o `MGEParameters` os lê ([api-cheatsheet.md](api-cheatsheet.md#mgeparameters--parametros-do-sistema-na-tela)).
+
+```
+br.com.xyz.minhaflag
+```
+
+- A linha é o **`name`** do `<parameter>` no `parameter.xml` (skill `value`), não a `key`, e a mesma string vai na chamada do `.js`.
+- O formato decide a busca: string com `_` é tratada como chave da `TSIPAR` no formato `CHAVE_CAMPO`. Uma `key` como `XYZ_MINHAFLAG` volta `'null'` sem erro na tela, e um `name` com `.` e `_` juntos não resolve. Use `name` com `.` e sem `_`.
 
 ---
 
@@ -219,7 +231,7 @@ angular.module('<Tela>App').controller('<Algo>Controller', [/* ... */]);
 
 1. [ ] `gradle gerarTela -Ptela=<Tela>` (com `-Pinstancia=` se for dynaform sobre instância do dicionário).
 2. [ ] `<Tela>.js` declara `angular.module('<Tela>App', ['snk'])` e usa DI por array.
-3. [ ] Todo `.js` extra da tela listado em `launcher/<Tela>.body`; CSS em `launcher/<Tela>.include`.
+3. [ ] Todo `.js` extra da tela listado em `launcher/<Tela>.body`; CSS em `launcher/<Tela>.include`; parâmetros do sistema lidos pela tela em `launcher/<Tela>.parameters`.
 4. [ ] Chamadas de serviço com prefixo `<addon>@` e `serviceName` casando com o `@Controller` do `-model`.
 5. [ ] `sk-entity-name` casando com o `name` da `<instance>` do dicionário.
 6. [ ] `<ui url="/$ctx/<Tela>.xhtml5">` no XML de menu, com `resourceId` para permissão.
